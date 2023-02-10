@@ -50,7 +50,7 @@ def get_image(mol, atomset, name):
 		img = MolToImage(mol, size=(600, 600),fitImage=True, highlightAtoms=atomset,highlightColor=hcolor)
 	else:
 		img = MolToImage(mol, size=(400, 400),fitImage=True)
-	
+  
 	img = img.save("./media/" + name + ".jpg") 
 	return img
 
@@ -228,7 +228,8 @@ def create_pytorch_geometric_graph_data_list_from_smiles_and_labels(x_smiles, y)
         
         # convert SMILES to RDKit mol object
         mol = Chem.MolFromSmiles(smiles)
-
+        if mol is None:
+            continue
         # get feature dimensions
         n_nodes = mol.GetNumAtoms()
         n_edges = 2*mol.GetNumBonds()
