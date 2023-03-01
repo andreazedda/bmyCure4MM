@@ -293,4 +293,39 @@ class GAE(nn.Module):
         x = self.conv3(x, edge_index)
         return x
 
+def building_gudhi_txt(file_name, rips_simplex_tree):
+    """This is the file that builds the txt file that contains the Gudhi simplicial complex.
+        the header is:
+        node1_id,x1,y1,z1,node2_id,x2,y2,z2,weight,
+    """
+    
+    print ("type of Rips_simplex_tree_sample is: " + str(type(rips_simplex_tree)))
+    print ("The number of simplices is: " + str(rips_simplex_tree.num_simplices()))
+    print ("The num of vertices is: " + str(rips_simplex_tree.num_vertices()))
+    print ("The dimension is: " + str(rips_simplex_tree.dimension()))
+    fmt_new = ''
+    fmt = '%s -> %.4f'
+    file = open(file_name, "w")
+    file.write("node1_id,x1,y1,z1,node2_id,x2,y2,z2,weight,\n")
+    for filtered_value in rips_simplex_tree.get_filtration():
+        print (filtered_value)
+        tuple_filtered_value = tuple(filtered_value)
+        print (tuple_filtered_value)
+        print(fmt % tuple(filtered_value))
+        file.write(fmt % tuple(filtered_value))
+        file.write("\n")
+    file.close()
+    return True
+
+# this is the converter function that converts a Gudhi simplicial complexes to a Pytorch Geometric graph diagram
+def gudhi_to_pg_converter(file_txt):
+    """ 
+    Rememeber: the file_txt is the name of the file that contains the Gudhi simplicial complex.
+    It starts with the following header:
+    node1_id,x1,y1,z1,node2_id,x2,y2,z2,weight,
+    """
+    
+    pass
+
+
       
