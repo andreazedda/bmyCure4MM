@@ -303,9 +303,10 @@ def building_gudhi_txt(file_name, rips_simplex_tree):
     print ("The number of simplices is: " + str(rips_simplex_tree.num_simplices()))
     print ("The num of vertices is: " + str(rips_simplex_tree.num_vertices()))
     print ("The dimension is: " + str(rips_simplex_tree.dimension()))
-    fmt_new = ''
+    fmt_new = '%d,%f,%f,%f,%d,%f,%f,%f,%f,'
     fmt = '%s -> %.4f'
     file = open(file_name, "w")
+    file_new = open("new_" + file_name, "w")
     file.write("node1_id,x1,y1,z1,node2_id,x2,y2,z2,weight,\n")
     for filtered_value in rips_simplex_tree.get_filtration():
         print (filtered_value)
