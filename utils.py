@@ -318,6 +318,16 @@ def building_gudhi_txt(file_name, rips_simplex_tree):
     file.close()
     return True
 
+def adjacency_matrix_from_gudhi_simplicial_complex(rips_simplex_tree):
+    for filtered_value in rips_simplex_tree.get_filtration():
+        print (filtered_value)
+        tuple_filtered_value = tuple(filtered_value)
+        print (tuple_filtered_value)
+        print(fmt % tuple(filtered_value))
+        file.write(fmt % tuple(filtered_value))
+        file.write("\n")
+    
+
 # this is the converter function that converts a Gudhi simplicial complexes to a Pytorch Geometric graph diagram
 def gudhi_to_pg_converter(file_txt):
     """ 
