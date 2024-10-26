@@ -1,0 +1,6 @@
+{
+    "data_path": "/Volumes/nvme/Github/bmyCure4MM/pipelines/data",
+    "logs_path": "/Volumes/nvme/Github/bmyCure4MM/pipelines/data/logs",
+    "outputs_path": "/Volumes/nvme/Github/bmyCure4MM/pipelines/data/outputs",
+    "pickles_path": "/Volumes/nvme/Github/bmyCure4MM/pipelines/data/outputs/pickles"
+}

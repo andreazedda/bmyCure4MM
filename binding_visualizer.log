@@ -1,0 +1,4 @@
+2024-10-26 23:00:37,568 - INFO - Fetching PDB data for ID: 5LF3
+2024-10-26 23:00:40,075 - INFO - PDB data fetched successfully.
+2024-10-26 23:00:40,096 - INFO - Initializing 3Dmol viewer.
+2024-10-26 23:00:40,305 - INFO - Visualization saved to 5LF3_structure_viewer.html
