@@ -1,0 +1,10 @@
+pdb_id: "5LF3"
+viewer:
+  width: 800
+  height: 600
+visualization:
+  chain_style: 
+    stick: {}
+  residue_style:
+    stick: 
+      colorscheme: "cyanCarbon"

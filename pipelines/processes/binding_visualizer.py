@@ -3,7 +3,19 @@ import requests
 import logging
 from colorama import Fore, Style
 import traceback
-import argparse
+import yaml
+import json
+import os
+import processes_utils as pu
+
+# Load general settings
+general_settings = pu.load_general_settings()
+
+# Load configuration settings
+# get name of the current module
+module_name = os.path.splitext(os.path.basename(__file__))[0]
+with open(os.path.join(general_settings['configs_path'], module_name + ".yaml"), "r") as config_file:
+    config = yaml.safe_load(config_file)
 
 
 def fetch_pdb_data(pdb_id):
@@ -39,7 +51,7 @@ def fetch_pdb_data(pdb_id):
         print(Fore.RED + "Error fetching PDB data. Check the log file for details." + Style.RESET_ALL)
         raise
 
-def visualize_structure(pdb_data, width, height, chain_style, residue_style, output_html="structure_viewer.html"):
+def visualize_structure(pdb_data, width, height, chain_style, residue_style, output_html):
     """
     Visualizes the PDB structure using py3Dmol.
 
@@ -104,38 +116,32 @@ def main():
     Main function to execute the PDB data fetching and visualization workflow.
 
     Workflow:
-        - Parses command line arguments for PDB ID, viewer dimensions, and visualization styles.
+        - Uses settings from configuration files for PDB ID, viewer dimensions, and visualization styles.
         - Fetches the PDB data using `fetch_pdb_data`.
         - Visualizes the data using `visualize_structure`.
         - Handles any exceptions, logs errors, and prints a traceback for debugging.
     """
-    
     # Initialize logging configuration
     logging.basicConfig(
-        filename="binding_visualizer.log", level=logging.INFO,
+        filename=os.path.join(general_settings['logs_path'], "binding_visualizer.log"),
+        level=logging.INFO,
         format="%(asctime)s - %(levelname)s - %(message)s"
     )
-    
-    parser = argparse.ArgumentParser(description="Fetch and visualize PDB structure.")
-    parser.add_argument('--pdb_id', type=str, required=False, default='5LF3', help="PDB ID of the structure to be visualized (default: 5LF3).")
-    parser.add_argument('--width', type=int, default=800, help="Width of the viewer window.")
-    parser.add_argument('--height', type=int, default=600, help="Height of the viewer window.")
-    parser.add_argument('--chain_style', type=str, default='stick', help="Style for the chain visualization (e.g., stick, cartoon).")
-    parser.add_argument('--residue_style', type=str, default='cyanCarbon', help="Colorscheme for the residue visualization.")
-    parser.add_argument('--output_html', type=str, required=False, help="Path to save the HTML file for visualization. The default name will be generated based on the PDB ID.")
-
-    args = parser.parse_args()
-
-    chain_style = {args.chain_style: {}}
-    residue_style = {'stick': {'colorscheme': args.residue_style}}
 
     try:
         # Fetch the PDB data using the helper function
-        pdb_data = fetch_pdb_data(args.pdb_id)
+        pdb_data = fetch_pdb_data(config['pdb_id'])
 
         # Visualize the structure using the fetched data
-        output_html = args.output_html if args.output_html else f"{args.pdb_id}_structure_viewer.html"
-        visualize_structure(pdb_data, args.width, args.height, chain_style, residue_style, output_html)
+        output_html = os.path.join(general_settings['outputs_path'], f"{config['pdb_id']}_structure_viewer.html")
+        visualize_structure(
+            pdb_data, 
+            config['viewer']['width'], 
+            config['viewer']['height'], 
+            config['visualization']['chain_style'], 
+            config['visualization']['residue_style'], 
+            output_html
+        )
     except Exception as error:
         # Log if an error occurs in the main function
         logging.error("An error occurred in the main function: %s", error)
