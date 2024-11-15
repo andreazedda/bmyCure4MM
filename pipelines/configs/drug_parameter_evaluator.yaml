@@ -1,0 +1,16 @@
+# General configuration for drug parameter evaluation script
+
+# PubChem CID or other database identifier for the drug
+drug_id: "387447"  # Example CID for aspirin; replace with desired drug ID
+
+# Viewer settings for 3D visualization
+viewer:
+  width: 800
+  height: 600
+
+# Visualization styles (optional)
+visualization:
+  chain_style:
+    stick: {}
+  residue_style:
+    cartoon: {'color': 'spectrum'}

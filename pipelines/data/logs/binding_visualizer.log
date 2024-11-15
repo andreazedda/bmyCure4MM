@@ -7,3 +7,7 @@
 2024-10-26 23:35:40,902 - INFO - PDB data fetched successfully.
 2024-10-26 23:35:40,925 - INFO - Initializing 3Dmol viewer.
 2024-10-26 23:35:40,985 - ERROR - An error occurred in the main function: [Errno 2] No such file or directory: '/Volumes/nvme/Github/bmyCure4MM/pipelines/data/outputs/5LF3_structure_viewer.html'
+2024-11-06 22:24:11,640 - INFO - Fetching PDB data for ID: 5LF3
+2024-11-06 22:24:14,889 - INFO - PDB data fetched successfully.
+2024-11-06 22:24:14,910 - INFO - Initializing 3Dmol viewer.
+2024-11-06 22:24:15,175 - INFO - Visualization saved to /Volumes/nvme/Github/bmyCure4MM/pipelines/data/outputs/5LF3_structure_viewer.html
