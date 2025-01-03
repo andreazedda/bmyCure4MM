@@ -85,17 +85,40 @@ def calculate_drug_parameters(smiles):
     """
     try:
         molecule = Chem.MolFromSmiles(smiles)
+
+        # Calculate parameters
         parameters = {
             'Molecular_Weight': Descriptors.MolWt(molecule),
             'LogP': Descriptors.MolLogP(molecule),
             'Num_H_Donors': Descriptors.NumHDonors(molecule),
-            'Num_H_Acceptors': Descriptors.NumHAcceptors(molecule)
+            'Num_H_Acceptors': Descriptors.NumHAcceptors(molecule),
+            'TPSA': Descriptors.TPSA(molecule),
+            'Num_Rotatable_Bonds': Descriptors.NumRotatableBonds(molecule),
+            'LogS': -Descriptors.MolLogP(molecule) + 0.5  # Approximate LogS using empirical formula
         }
+
+        # Print parameters with details
+        print(Fore.GREEN + "Calculated Parameters:" + Style.RESET_ALL)
+        details = {
+            'Molecular_Weight': "Sum of atomic masses of all atoms in the molecule. Optimal range: ≤ 500 u.",
+            'LogP': "Logarithm of the partition coefficient (octanol/water). Optimal range: 0–3.",
+            'Num_H_Donors': "Number of hydrogen bond donors (e.g., –OH or –NH groups). Optimal range: ≤ 5.",
+            'Num_H_Acceptors': "Number of hydrogen bond acceptors (e.g., oxygen, nitrogen). Optimal range: ≤ 10.",
+            'TPSA': "Topological Polar Surface Area, related to drug permeability. Optimal range: ≤ 140 Å².",
+            'Num_Rotatable_Bonds': "Number of rotatable bonds, related to molecular flexibility. Optimal range: ≤ 10.",
+            'LogS': "Approximate aqueous solubility. Optimal range: ≥ -5."
+        }
+
+        for param, value in parameters.items():
+            print(f"{Fore.BLUE}{param}: {value}{Style.RESET_ALL}")
+            print(f"  {Fore.YELLOW}{details[param]}{Style.RESET_ALL}\n")
+
         logging.info("Parameters calculated: %s", parameters)
         return parameters
     except Exception as error:
         logging.error("Error calculating parameters: %s", error)
         raise
+
 
 
 def visualize_drug_structure(smiles, width, height, output_html):
