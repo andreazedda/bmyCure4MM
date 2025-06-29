@@ -1,0 +1,5 @@
+input_smiles: "CC(C)Cc1ccc(cc1)O"
+fingerprint_type: "morgan"        # Options: morgan or maccs
+radius: 2
+n_results: 10
+output_csv: "data/output/ligand_similarity_results.csv"
