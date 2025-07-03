@@ -11,3 +11,7 @@
 2024-11-06 22:24:14,889 - INFO - PDB data fetched successfully.
 2024-11-06 22:24:14,910 - INFO - Initializing 3Dmol viewer.
 2024-11-06 22:24:15,175 - INFO - Visualization saved to /Volumes/nvme/Github/bmyCure4MM/pipelines/data/outputs/5LF3_structure_viewer.html
+2025-03-14 16:40:14,876 - INFO - Fetching PDB data for ID: 5LF3
+2025-03-14 16:40:17,762 - INFO - PDB data fetched successfully.
+2025-03-14 16:40:17,783 - INFO - Initializing 3Dmol viewer.
+2025-03-14 16:40:17,873 - INFO - Visualization saved to /Volumes/nvme/Github/bmyCure4MM/pipelines/data/outputs/5LF3_structure_viewer.html

@@ -1,0 +1,11 @@
+biopython==1.85
+certifi==2025.1.31
+charset-normalizer==3.4.1
+colorama==0.4.6
+idna==3.10
+numpy==2.0.2
+py3Dmol==2.4.2
+pyaml==25.1.0
+PyYAML==6.0.2
+requests==2.32.3
+urllib3==1.26.6

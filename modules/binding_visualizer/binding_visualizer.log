@@ -1,0 +1,188 @@
+2025-03-14 17:32:37,525 - INFO - Fetching PDB data for ID: 5LF3
+2025-03-14 17:32:38,104 - INFO - PDB data fetched successfully.
+2025-03-14 17:32:38,118 - ERROR - An error occurred in the main function: name 'general_settings' is not defined
+2025-03-14 17:33:41,997 - INFO - Fetching PDB data for ID: 5LF3
+2025-03-14 17:33:42,353 - INFO - PDB data fetched successfully.
+2025-03-14 17:33:42,361 - INFO - Initializing 3Dmol viewer.
+2025-03-14 17:33:42,421 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-30 11:16:45,570 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-30 11:16:48,489 - INFO - PDB data fetched successfully.
+2025-05-30 11:16:48,649 - INFO - Initializing 3Dmol viewer.
+2025-05-30 11:16:49,935 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-30 11:34:52,992 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-30 11:34:53,502 - INFO - PDB data fetched successfully.
+2025-05-30 11:34:53,511 - INFO - Initializing 3Dmol viewer.
+2025-05-30 11:34:53,580 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-30 11:36:30,468 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-30 11:36:30,917 - INFO - PDB data fetched successfully.
+2025-05-30 11:36:30,926 - INFO - Initializing 3Dmol viewer.
+2025-05-30 11:36:30,989 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-30 11:38:16,634 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-30 11:38:17,115 - INFO - PDB data fetched successfully.
+2025-05-30 11:38:17,125 - INFO - Initializing 3Dmol viewer.
+2025-05-30 11:38:17,250 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-30 11:45:10,933 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-30 11:45:11,354 - INFO - PDB data fetched successfully.
+2025-05-30 11:45:11,367 - INFO - Initializing 3Dmol viewer.
+2025-05-30 11:45:11,521 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-30 11:52:38,761 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-30 11:52:39,179 - INFO - PDB data fetched successfully.
+2025-05-30 11:52:39,191 - INFO - Initializing 3Dmol viewer.
+2025-05-30 11:52:41,006 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-30 11:58:28,177 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-30 11:58:28,638 - INFO - PDB data fetched successfully.
+2025-05-30 11:58:28,648 - INFO - Initializing 3Dmol viewer.
+2025-05-30 11:58:30,830 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-30 12:01:33,027 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-30 12:01:33,424 - INFO - PDB data fetched successfully.
+2025-05-30 12:01:33,437 - INFO - Initializing 3Dmol viewer.
+2025-05-30 12:01:36,088 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-30 12:09:53,492 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-30 12:09:53,978 - INFO - PDB data fetched successfully.
+2025-05-30 12:09:53,995 - INFO - Initializing 3Dmol viewer.
+2025-05-30 12:09:56,824 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-30 15:14:30,499 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-30 15:14:32,882 - INFO - PDB data fetched successfully.
+2025-05-30 15:14:32,898 - INFO - Initializing 3Dmol viewer.
+2025-05-30 15:14:35,776 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-30 15:26:34,336 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-30 15:26:34,941 - INFO - PDB data fetched successfully.
+2025-05-30 15:26:34,956 - INFO - Initializing 3Dmol viewer.
+2025-05-30 15:26:37,485 - ERROR - An error occurred in the main function: missing ), unterminated subpattern at position 0
+2025-05-30 15:28:08,039 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-30 15:28:08,888 - INFO - PDB data fetched successfully.
+2025-05-30 15:28:08,896 - INFO - Initializing 3Dmol viewer.
+2025-05-30 15:28:11,370 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-30 15:30:13,928 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-30 15:30:14,706 - INFO - PDB data fetched successfully.
+2025-05-30 15:30:14,719 - INFO - Initializing 3Dmol viewer.
+2025-05-30 15:30:17,149 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-30 15:32:45,035 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-30 15:32:47,849 - INFO - PDB data fetched successfully.
+2025-05-30 15:32:47,868 - INFO - Initializing 3Dmol viewer.
+2025-05-30 15:32:50,139 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-30 15:38:29,218 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-30 15:38:29,814 - INFO - PDB data fetched successfully.
+2025-05-30 15:38:29,828 - INFO - Initializing 3Dmol viewer.
+2025-05-30 15:38:32,447 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-30 15:42:56,480 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-30 15:42:57,375 - INFO - PDB data fetched successfully.
+2025-05-30 15:42:57,393 - INFO - Initializing 3Dmol viewer.
+2025-05-30 15:42:59,687 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-30 15:44:56,255 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-30 15:44:56,839 - INFO - PDB data fetched successfully.
+2025-05-30 15:44:56,855 - INFO - Initializing 3Dmol viewer.
+2025-05-30 15:44:59,201 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-30 16:01:48,153 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-30 16:01:48,698 - INFO - PDB data fetched successfully.
+2025-05-30 16:01:48,707 - INFO - Initializing 3Dmol viewer.
+2025-05-30 16:01:51,156 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-30 16:58:37,682 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-30 16:58:40,637 - INFO - PDB data fetched successfully.
+2025-05-30 16:58:40,653 - INFO - Initializing 3Dmol viewer.
+2025-05-30 16:58:43,370 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-30 21:54:55,295 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-30 21:54:57,750 - INFO - PDB data fetched successfully.
+2025-05-30 21:54:57,768 - INFO - Initializing 3Dmol viewer.
+2025-05-30 21:55:00,454 - ERROR - An error occurred in the main function: name 'sidebar_html' is not defined
+2025-05-30 22:03:04,692 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-30 22:03:05,285 - INFO - PDB data fetched successfully.
+2025-05-30 22:03:05,295 - INFO - Initializing 3Dmol viewer.
+2025-05-30 22:03:07,694 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-31 13:00:41,678 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-31 13:00:44,030 - INFO - PDB data fetched successfully.
+2025-05-31 13:00:44,047 - INFO - Initializing 3Dmol viewer.
+2025-05-31 13:00:46,556 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-31 13:05:38,739 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-31 13:05:39,222 - INFO - PDB data fetched successfully.
+2025-05-31 13:05:39,235 - INFO - Initializing 3Dmol viewer.
+2025-05-31 13:05:41,324 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-31 13:07:51,532 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-31 13:07:52,033 - INFO - PDB data fetched successfully.
+2025-05-31 13:07:52,042 - INFO - Initializing 3Dmol viewer.
+2025-05-31 13:07:54,311 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-31 13:12:09,236 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-31 13:12:09,718 - INFO - PDB data fetched successfully.
+2025-05-31 13:12:09,731 - INFO - Initializing 3Dmol viewer.
+2025-05-31 13:12:11,835 - ERROR - An error occurred in the main function: 3Dmol-min.js not found. Download it from https://3Dmol.csb.pitt.edu/build/3Dmol-min.js and place it in the script folder.
+2025-05-31 13:12:22,620 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-31 13:12:23,022 - INFO - PDB data fetched successfully.
+2025-05-31 13:12:23,036 - INFO - Initializing 3Dmol viewer.
+2025-05-31 13:12:25,033 - ERROR - An error occurred in the main function: 3Dmol-min.js not found. Download it from https://3Dmol.csb.pitt.edu/build/3Dmol-min.js and place it in the script folder.
+2025-05-31 13:12:25,397 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-31 13:12:25,807 - INFO - PDB data fetched successfully.
+2025-05-31 13:12:25,814 - INFO - Initializing 3Dmol viewer.
+2025-05-31 13:12:27,761 - ERROR - An error occurred in the main function: 3Dmol-min.js not found. Download it from https://3Dmol.csb.pitt.edu/build/3Dmol-min.js and place it in the script folder.
+2025-05-31 13:14:14,639 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-31 13:14:15,143 - INFO - PDB data fetched successfully.
+2025-05-31 13:14:16,176 - INFO - Initializing 3Dmol viewer.
+2025-05-31 13:14:18,563 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-31 13:14:51,936 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-31 13:14:52,354 - INFO - PDB data fetched successfully.
+2025-05-31 13:14:52,371 - INFO - Initializing 3Dmol viewer.
+2025-05-31 13:14:54,580 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-31 13:14:55,075 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-31 13:14:55,492 - INFO - PDB data fetched successfully.
+2025-05-31 13:14:55,500 - INFO - Initializing 3Dmol viewer.
+2025-05-31 13:14:57,491 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-31 13:16:41,988 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-31 13:16:42,469 - INFO - PDB data fetched successfully.
+2025-05-31 13:16:42,483 - INFO - Initializing 3Dmol viewer.
+2025-05-31 13:16:44,603 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-31 13:21:57,126 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-31 13:21:57,626 - INFO - PDB data fetched successfully.
+2025-05-31 13:21:57,641 - INFO - Initializing 3Dmol viewer.
+2025-05-31 13:21:59,965 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-31 13:25:19,959 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-31 13:25:20,441 - INFO - PDB data fetched successfully.
+2025-05-31 13:25:20,450 - INFO - Initializing 3Dmol viewer.
+2025-05-31 13:25:22,555 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-31 14:24:04,224 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-31 14:24:06,766 - INFO - PDB data fetched successfully.
+2025-05-31 14:24:06,777 - INFO - Initializing 3Dmol viewer.
+2025-05-31 14:24:09,251 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-31 14:24:45,980 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-31 14:24:46,458 - INFO - PDB data fetched successfully.
+2025-05-31 14:24:46,467 - INFO - Initializing 3Dmol viewer.
+2025-05-31 14:24:49,809 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-31 14:26:16,574 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-31 14:26:17,066 - INFO - PDB data fetched successfully.
+2025-05-31 14:26:17,073 - INFO - Initializing 3Dmol viewer.
+2025-05-31 14:26:19,271 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-31 14:28:34,555 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-31 14:28:35,043 - INFO - PDB data fetched successfully.
+2025-05-31 14:28:35,052 - INFO - Initializing 3Dmol viewer.
+2025-05-31 14:28:37,153 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-31 14:31:39,209 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-31 14:31:39,737 - INFO - PDB data fetched successfully.
+2025-05-31 14:31:39,752 - INFO - Initializing 3Dmol viewer.
+2025-05-31 14:31:42,064 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-31 14:35:13,700 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-31 14:35:14,191 - INFO - PDB data fetched successfully.
+2025-05-31 14:35:14,205 - INFO - Initializing 3Dmol viewer.
+2025-05-31 14:35:16,653 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-31 14:38:23,983 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-31 14:38:24,527 - INFO - PDB data fetched successfully.
+2025-05-31 14:38:24,540 - INFO - Initializing 3Dmol viewer.
+2025-05-31 14:38:26,880 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-31 14:43:00,111 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-31 14:43:00,643 - INFO - PDB data fetched successfully.
+2025-05-31 14:43:00,656 - INFO - Initializing 3Dmol viewer.
+2025-05-31 14:43:03,027 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-31 14:45:40,879 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-31 14:45:41,448 - INFO - PDB data fetched successfully.
+2025-05-31 14:45:41,457 - INFO - Initializing 3Dmol viewer.
+2025-05-31 14:45:43,639 - INFO - Visualization saved to /Volumes/nvme/Github/bmyLab4DrugDiscovery/sources/modules/binding_visualizer/5LF3_structure_viewer.html
+2025-05-31 15:06:44,269 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-31 15:06:44,753 - INFO - PDB data fetched successfully.
+2025-05-31 15:06:44,771 - INFO - Initializing 3Dmol viewer.
+2025-05-31 15:06:47,313 - ERROR - An error occurred in the main function: local variable 'content' referenced before assignment
+2025-05-31 15:08:19,752 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-31 15:08:20,310 - INFO - PDB data fetched successfully.
+2025-05-31 15:08:20,315 - INFO - Initializing 3Dmol viewer.
+2025-05-31 15:18:29,627 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-31 15:18:30,131 - INFO - PDB data fetched successfully.
+2025-05-31 15:18:30,144 - INFO - Initializing 3Dmol viewer.
+2025-05-31 15:25:46,085 - INFO - Fetching PDB data for ID: 5LF3
+2025-05-31 15:25:48,620 - INFO - PDB data fetched successfully.
+2025-05-31 15:25:48,632 - INFO - Initializing 3Dmol viewer.

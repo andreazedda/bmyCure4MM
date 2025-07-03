@@ -1,0 +1,47 @@
+pdb_id: "5LF3"
+viewer:
+  width: 800
+  height: 600
+visualization:
+  chain_style: 
+    stick: {}
+  residue_style:
+    stick: 
+      colorscheme: "cyanCarbon"
+ligand: "BOR"      # Main drug/ligand to map
+
+binding_site_detection:
+  enabled: true    # Switch for biopython residue mapping
+  cutoff_angstrom: 5.0
+
+mutations:
+  - chain: K
+    resnum: 45
+    mutation: A45T
+    effect: resistance
+  - chain: K
+    resnum: 49
+    mutation: C49W
+    effect: unknown
+
+therapies:
+  - name: Bortezomib
+    pdb_ligand: BOR
+    clinical_phase: Approved
+    mm_relevance: High
+    resistance_mutations: [A45T, C49W]
+  - name: Carfilzomib
+    pdb_ligand: ...
+    clinical_phase: Approved
+    mm_relevance: High
+    resistance_mutations: [...]
+
+pathways:
+  - name: "Proteasome pathway"
+    kegg_id: "hsa03050"
+    reactome_id: "R-HSA-174084"
+
+literature:
+  - doi: "10.1126/science.aaf8993"
+    pmid: "27493187"
+    title: "The inhibition mechanism of human 20S proteasomes enables next-generation inhibitor design."
