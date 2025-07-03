@@ -1,35 +1,50 @@
 # bmyCure4MM
 
-## Description
-bmyCure4MM is a project aimed at providing solutions for multiple myeloma treatment and management. This project includes various tools and resources to assist researchers and healthcare professionals.
+A collection of utilities and experiments around drug discovery for multiple
+myeloma.  The repository contains small Python scripts used in our research
+pipeline together with a set of Jupyter notebooks found under `lab/`.
 
 ## Installation
-To install the project, clone the repository and install the necessary dependencies:
 
+1. Clone the repository
+   ```bash
+   git clone https://github.com/yourusername/bmyCure4MM.git
+   cd bmyCure4MM
+   ```
+2. Install dependencies
+   ```bash
+   pip install -r lab/requirements.txt
+   ```
+
+## Quick Start
+
+After installing the dependencies, generate the default configuration files:
 ```bash
-git clone https://github.com/yourusername/bmyCure4MM.git
-cd bmyCure4MM
-# Install dependencies
-npm install
+python pipelines/processes/settings_generator.py
+```
+This creates the folder structure under `pipelines/data` and writes
+`pipelines/configs/general_settings.json` with absolute paths.
+
+You can then run any of the processing scripts, e.g. to visualise a PDB
+structure:
+```bash
+python pipelines/processes/binding_visualizer.py
+```
+Outputs and logs are stored under `pipelines/data`.
+You can also run the LigandSimilaritySearcher module:
+```bash
+python LigandSimilaritySearcher/sources/ligand_similarity_searcher.py
 ```
 
-## Usage
-Provide instructions on how to use the project. For example:
-
-```bash
-# Run the application
-npm start
-```
+See the [docs](docs/README.md) directory for a more detailed overview of the
+available scripts and notebooks.
 
 ## Contributing
-We welcome contributions! Please follow these steps to contribute:
 
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature-branch`).
-3. Make your changes.
-4. Commit your changes (`git commit -m 'Add some feature'`).
-5. Push to the branch (`git push origin feature-branch`).
-6. Open a pull request.
+We welcome contributions! Please fork the repository, create a branch for your
+changes and open a pull request when ready.
 
 ## License
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE)
+file for details.
