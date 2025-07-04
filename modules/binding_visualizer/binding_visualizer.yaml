@@ -10,6 +10,14 @@ visualization:
       colorscheme: "cyanCarbon"
 ligand: "BOR"      # Main drug/ligand to map
 
+# PDF Report Generation
+generate_pdf: true
+pdf_options:
+  include_structure_image: true
+  image_width: 800
+  image_height: 600
+  cleanup_aux_files: true
+
 binding_site_detection:
   enabled: true    # Switch for biopython residue mapping
   cutoff_angstrom: 5.0
@@ -28,6 +36,7 @@ therapies:
   - name: Bortezomib
     pdb_ligand: BOR
     clinical_phase: Approved
+    mechanism: Proteasome inhibitor targeting the 26S proteasome
     mm_relevance: High
     resistance_mutations: [A45T, C49W]
   - name: Carfilzomib

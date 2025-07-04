@@ -1,0 +1,1970 @@
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.9.15)  3 JUL 2025 23:28
+entering extended mode
+ restricted \write18 enabled.
+ file:line:error style messages enabled.
+ %&-line parsing enabled.
+**/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex
+(/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-02-20>
+(/usr/local/texlive/2024/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2023/05/17 v1.4n Standard LaTeX document class
+(/usr/local/texlive/2024/texmf-dist/tex/latex/base/size11.clo
+File: size11.clo 2023/05/17 v1.4n Standard LaTeX file (size option)
+)
+\c@part=\count188
+\c@section=\count189
+\c@subsection=\count190
+\c@subsubsection=\count191
+\c@paragraph=\count192
+\c@subparagraph=\count193
+\c@figure=\count194
+\c@table=\count195
+\abovecaptionskip=\skip48
+\belowcaptionskip=\skip49
+\bibindent=\dimen140
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/base/inputenc.sty
+Package: inputenc 2021/02/14 v1.3d Input encoding file
+\inpenc@prehook=\toks17
+\inpenc@posthook=\toks18
+) (/usr/local/texlive/2024/texmf-dist/tex/generic/babel/babel.sty
+Package: babel 2024/02/07 v24.2 The Babel package
+\babel@savecnt=\count196
+\U@D=\dimen141
+\l@unhyphenated=\language89
+ (/usr/local/texlive/2024/texmf-dist/tex/generic/babel/txtbabel.def)
+\bbl@readstream=\read2
+\bbl@dirlevel=\count197
+ (/usr/local/texlive/2024/texmf-dist/tex/generic/babel-english/english.ldf
+Language: english 2017/06/06 v3.3r English support from the babel system
+Package babel Info: Hyphen rules for 'canadian' set to \l@english
+(babel)             (\language0). Reported on input line 102.
+Package babel Info: Hyphen rules for 'australian' set to \l@ukenglish
+(babel)             (\language23). Reported on input line 105.
+Package babel Info: Hyphen rules for 'newzealand' set to \l@ukenglish
+(babel)             (\language23). Reported on input line 108.
+)) (/usr/local/texlive/2024/texmf-dist/tex/generic/babel/locale/en/babel-english.tex
+Package babel Info: Importing font and identification data for english
+(babel)             from babel-en.ini. Reported on input line 11.
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/amsmath/amsmath.sty
+Package: amsmath 2023/05/13 v2.17o AMS math features
+\@mathmargin=\skip50
+
+For additional information on amsmath, use the `?' option.
+(/usr/local/texlive/2024/texmf-dist/tex/latex/amsmath/amstext.sty
+Package: amstext 2021/08/26 v2.01 AMS text
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/amsmath/amsgen.sty
+File: amsgen.sty 1999/11/30 v2.0 generic functions
+\@emptytoks=\toks19
+\ex@=\dimen142
+)) (/usr/local/texlive/2024/texmf-dist/tex/latex/amsmath/amsbsy.sty
+Package: amsbsy 1999/11/29 v1.2d Bold Symbols
+\pmbraise@=\dimen143
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/amsmath/amsopn.sty
+Package: amsopn 2022/04/08 v2.04 operator names
+)
+\inf@bad=\count198
+LaTeX Info: Redefining \frac on input line 234.
+\uproot@=\count199
+\leftroot@=\count266
+LaTeX Info: Redefining \overline on input line 399.
+LaTeX Info: Redefining \colon on input line 410.
+\classnum@=\count267
+\DOTSCASE@=\count268
+LaTeX Info: Redefining \ldots on input line 496.
+LaTeX Info: Redefining \dots on input line 499.
+LaTeX Info: Redefining \cdots on input line 620.
+\Mathstrutbox@=\box51
+\strutbox@=\box52
+LaTeX Info: Redefining \big on input line 722.
+LaTeX Info: Redefining \Big on input line 723.
+LaTeX Info: Redefining \bigg on input line 724.
+LaTeX Info: Redefining \Bigg on input line 725.
+\big@size=\dimen144
+LaTeX Font Info:    Redeclaring font encoding OML on input line 743.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 744.
+\macc@depth=\count269
+LaTeX Info: Redefining \bmod on input line 905.
+LaTeX Info: Redefining \pmod on input line 910.
+LaTeX Info: Redefining \smash on input line 940.
+LaTeX Info: Redefining \relbar on input line 970.
+LaTeX Info: Redefining \Relbar on input line 971.
+\c@MaxMatrixCols=\count270
+\dotsspace@=\muskip16
+\c@parentequation=\count271
+\dspbrk@lvl=\count272
+\tag@help=\toks20
+\row@=\count273
+\column@=\count274
+\maxfields@=\count275
+\andhelp@=\toks21
+\eqnshift@=\dimen145
+\alignsep@=\dimen146
+\tagshift@=\dimen147
+\tagwidth@=\dimen148
+\totwidth@=\dimen149
+\lineht@=\dimen150
+\@envbody=\toks22
+\multlinegap=\skip51
+\multlinetaggap=\skip52
+\mathdisplay@stack=\toks23
+LaTeX Info: Redefining \[ on input line 2953.
+LaTeX Info: Redefining \] on input line 2954.
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/amsfonts/amsfonts.sty
+Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
+\symAMSa=\mathgroup4
+\symAMSb=\mathgroup5
+LaTeX Font Info:    Redeclaring math symbol \hbar on input line 98.
+LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/amsfonts/amssymb.sty
+Package: amssymb 2013/01/14 v3.01 AMS font symbols
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2021/09/16 v1.2d Enhanced LaTeX Graphics (DPC,SPQR)
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2022/05/29 v1.15 key=value parser (DPC)
+\KV@toks@=\toks24
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2022/03/10 v1.4e Standard LaTeX Graphics (DPC,SPQR)
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 2021/08/11 v1.11 sin cos tan (DPC)
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: pdftex.def on input line 107.
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/graphics-def/pdftex.def
+File: pdftex.def 2022/09/22 v1.2b Graphics/color driver for pdftex
+))
+\Gin@req@height=\dimen151
+\Gin@req@width=\dimen152
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/geometry/geometry.sty
+Package: geometry 2020/01/02 v5.9 Page Geometry
+ (/usr/local/texlive/2024/texmf-dist/tex/generic/iftex/ifvtex.sty
+Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
+ (/usr/local/texlive/2024/texmf-dist/tex/generic/iftex/iftex.sty
+Package: iftex 2022/02/03 v1.0f TeX engine tests
+))
+\Gm@cnth=\count276
+\Gm@cntv=\count277
+\c@Gm@tempcnt=\count278
+\Gm@bindingoffset=\dimen153
+\Gm@wd@mp=\dimen154
+\Gm@odd@mp=\dimen155
+\Gm@even@mp=\dimen156
+\Gm@layoutwidth=\dimen157
+\Gm@layoutheight=\dimen158
+\Gm@layouthoffset=\dimen159
+\Gm@layoutvoffset=\dimen160
+\Gm@dimlist=\toks25
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/xcolor/xcolor.sty
+Package: xcolor 2023/11/15 v3.01 LaTeX color extensions (UK)
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/graphics-cfg/color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package xcolor Info: Driver file: pdftex.def on input line 274.
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/graphics/mathcolor.ltx)
+Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1350.
+Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1354.
+Package xcolor Info: Model `RGB' extended on input line 1366.
+Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1368.
+Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1369.
+Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1370.
+Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1371.
+Package xcolor Info: Model `Gray' substituted by `gray' on input line 1372.
+Package xcolor Info: Model `wave' substituted by `hsb' on input line 1373.
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/booktabs/booktabs.sty
+Package: booktabs 2020/01/12 v1.61803398 Publication quality tables
+\heavyrulewidth=\dimen161
+\lightrulewidth=\dimen162
+\cmidrulewidth=\dimen163
+\belowrulesep=\dimen164
+\belowbottomsep=\dimen165
+\aboverulesep=\dimen166
+\abovetopsep=\dimen167
+\cmidrulesep=\dimen168
+\cmidrulekern=\dimen169
+\defaultaddspace=\dimen170
+\@cmidla=\count279
+\@cmidlb=\count280
+\@aboverulesep=\dimen171
+\@belowrulesep=\dimen172
+\@thisruleclass=\count281
+\@lastruleclass=\count282
+\@thisrulewidth=\dimen173
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/tools/longtable.sty
+Package: longtable 2023-11-01 v4.19 Multi-page Table package (DPC)
+\LTleft=\skip53
+\LTright=\skip54
+\LTpre=\skip55
+\LTpost=\skip56
+\LTchunksize=\count283
+\LTcapwidth=\dimen174
+\LT@head=\box53
+\LT@firsthead=\box54
+\LT@foot=\box55
+\LT@lastfoot=\box56
+\LT@gbox=\box57
+\LT@cols=\count284
+\LT@rows=\count285
+\c@LT@tables=\count286
+\c@LT@chunks=\count287
+\LT@p@ftn=\toks26
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/hyperref/hyperref.sty
+Package: hyperref 2024-01-20 v7.01h Hypertext links for LaTeX
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty
+Package: kvsetkeys 2022-10-05 v1.19 Key value parser (HO)
+) (/usr/local/texlive/2024/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty
+Package: kvdefinekeys 2019-12-19 v1.6 Define keys (HO)
+) (/usr/local/texlive/2024/texmf-dist/tex/generic/pdfescape/pdfescape.sty
+Package: pdfescape 2019/12/09 v1.15 Implements pdfTeX's escape features (HO)
+ (/usr/local/texlive/2024/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty
+Package: ltxcmds 2023-12-04 v1.26 LaTeX kernel commands for general use (HO)
+) (/usr/local/texlive/2024/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+Package: pdftexcmds 2020-06-27 v0.33 Utility functions of pdfTeX for LuaTeX (HO)
+ (/usr/local/texlive/2024/texmf-dist/tex/generic/infwarerr/infwarerr.sty
+Package: infwarerr 2019/12/03 v1.5 Providing info/warning/error messages (HO)
+)
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+Package pdftexcmds Info: \pdfdraftmode found.
+)) (/usr/local/texlive/2024/texmf-dist/tex/latex/hycolor/hycolor.sty
+Package: hycolor 2020-01-27 v1.10 Color options for hyperref/bookmark (HO)
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/auxhook/auxhook.sty
+Package: auxhook 2019-12-17 v1.6 Hooks for auxiliary files (HO)
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/hyperref/nameref.sty
+Package: nameref 2023-11-26 v2.56 Cross-referencing by name of section
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/refcount/refcount.sty
+Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
+) (/usr/local/texlive/2024/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty
+Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/kvoptions/kvoptions.sty
+Package: kvoptions 2022-06-15 v3.15 Key value format for package options (HO)
+))
+\c@section@level=\count288
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/etoolbox/etoolbox.sty
+Package: etoolbox 2020/10/05 v2.5k e-TeX tools for LaTeX (JAW)
+\etb@tempcnta=\count289
+)
+\@linkdim=\dimen175
+\Hy@linkcounter=\count290
+\Hy@pagecounter=\count291
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/hyperref/pd1enc.def
+File: pd1enc.def 2024-01-20 v7.01h Hyperref: PDFDocEncoding definition (HO)
+Now handling font encoding PD1 ...
+... no UTF-8 mapping file for font encoding PD1
+) (/usr/local/texlive/2024/texmf-dist/tex/generic/intcalc/intcalc.sty
+Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
+)
+\Hy@SavedSpaceFactor=\count292
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/hyperref/puenc.def
+File: puenc.def 2024-01-20 v7.01h Hyperref: PDF Unicode definition (HO)
+Now handling font encoding PU ...
+... no UTF-8 mapping file for font encoding PU
+)
+Package hyperref Info: Hyper figures OFF on input line 4179.
+Package hyperref Info: Link nesting OFF on input line 4184.
+Package hyperref Info: Hyper index ON on input line 4187.
+Package hyperref Info: Plain pages OFF on input line 4194.
+Package hyperref Info: Backreferencing OFF on input line 4199.
+Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
+Package hyperref Info: Bookmarks ON on input line 4446.
+\c@Hy@tempcnt=\count293
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/url/url.sty
+\Urlmuskip=\muskip17
+Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
+)
+LaTeX Info: Redefining \url on input line 4784.
+\XeTeXLinkMargin=\dimen176
+ (/usr/local/texlive/2024/texmf-dist/tex/generic/bitset/bitset.sty
+Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
+ (/usr/local/texlive/2024/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty
+Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO)
+))
+\Fld@menulength=\count294
+\Field@Width=\dimen177
+\Fld@charsize=\dimen178
+Package hyperref Info: Hyper figures OFF on input line 6063.
+Package hyperref Info: Link nesting OFF on input line 6068.
+Package hyperref Info: Hyper index ON on input line 6071.
+Package hyperref Info: backreferencing OFF on input line 6078.
+Package hyperref Info: Link coloring OFF on input line 6083.
+Package hyperref Info: Link coloring with OCG OFF on input line 6088.
+Package hyperref Info: PDF/A mode OFF on input line 6093.
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/base/atbegshi-ltx.sty
+Package: atbegshi-ltx 2021/01/10 v1.0c Emulation of the original atbegshi
+package with kernel methods
+)
+\Hy@abspage=\count295
+\c@Item=\count296
+\c@Hfootnote=\count297
+)
+Package hyperref Info: Driver (autodetected): hpdftex.
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/hyperref/hpdftex.def
+File: hpdftex.def 2024-01-20 v7.01h Hyperref driver for pdfTeX
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/base/atveryend-ltx.sty
+Package: atveryend-ltx 2020/08/19 v1.0a Emulation of the original atveryend package
+with kernel methods
+)
+\Fld@listcount=\count298
+\c@bookmark@seq@number=\count299
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
+Package: rerunfilecheck 2022-07-10 v1.10 Rerun checks for auxiliary files (HO)
+ (/usr/local/texlive/2024/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty
+Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
+)
+Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 285.
+)
+\Hy@SectionHShift=\skip57
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty
+Package: fancyhdr 2022/11/09 v4.1 Extensive control of page headers and footers
+\f@nch@headwidth=\skip58
+\f@nch@O@elh=\skip59
+\f@nch@O@erh=\skip60
+\f@nch@O@olh=\skip61
+\f@nch@O@orh=\skip62
+\f@nch@O@elf=\skip63
+\f@nch@O@erf=\skip64
+\f@nch@O@olf=\skip65
+\f@nch@O@orf=\skip66
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/datetime/datetime.sty
+Package: datetime 2015/03/20 v2.60 Date Time Package
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/fmtcount/fmtcount.sty
+Package: fmtcount 2020/01/30 v3.07
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/base/ifthen.sty
+Package: ifthen 2022/04/13 v1.1d Standard LaTeX ifthen package (DPC)
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/xkeyval/xkeyval.sty
+Package: xkeyval 2022/06/16 v2.9 package option processing (HA)
+ (/usr/local/texlive/2024/texmf-dist/tex/generic/xkeyval/xkeyval.tex (/usr/local/texlive/2024/texmf-dist/tex/generic/xkeyval/xkvutils.tex
+\XKV@toks=\toks27
+\XKV@tempa@toks=\toks28
+)
+\XKV@depth=\count300
+File: xkeyval.tex 2014/12/03 v2.7a key=value parser (HA)
+)) (/usr/local/texlive/2024/texmf-dist/tex/latex/fmtcount/fcprefix.sty
+Package: fcprefix 2012/09/28
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/fmtcount/fcnumparser.sty
+Package: fcnumparser 2017/06/15
+\fc@digit@counter=\count301
+))
+\c@padzeroesN=\count302
+\fc@tmpcatcode=\count303
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/fmtcount/fc-english.def
+File: fc-english.def 2016/01/12
+)
+\@DT@modctr=\count304
+\@ordinalctr=\count305
+\@orgargctr=\count306
+\@strctr=\count307
+\@tmpstrctr=\count308
+\@DT@loopN=\count309
+\@DT@X=\count310
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/datetime/datetime-defaults.sty
+Package: datetime-defaults 2013/09/10
+)
+\@day=\count311
+\@month=\count312
+\@year=\count313
+\c@HOUR=\count314
+\c@HOURXII=\count315
+\c@MINUTE=\count316
+\c@TOHOUR=\count317
+\c@TOMINUTE=\count318
+\c@SECOND=\count319
+\currenthour=\count320
+\currentminute=\count321
+\currentsecond=\count322
+Package datetime Info: No datetime.cfg file found, using default settings on input line 308.
+\@dtctr=\count323
+\dayofyear=\count324
+\dayofweek=\count325
+LaTeX Info: Redefining \today on input line 736.
+\dt@a=\toks29
+\dt@b=\toks30
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/listings/listings.sty
+\lst@mode=\count326
+\lst@gtempboxa=\box58
+\lst@token=\toks31
+\lst@length=\count327
+\lst@currlwidth=\dimen179
+\lst@column=\count328
+\lst@pos=\count329
+\lst@lostspace=\dimen180
+\lst@width=\dimen181
+\lst@newlines=\count330
+\lst@lineno=\count331
+\lst@maxwidth=\dimen182
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/listings/lstpatch.sty
+File: lstpatch.sty 2024/02/21 1.10 (Carsten Heinz)
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/listings/lstmisc.sty
+File: lstmisc.sty 2024/02/21 1.10 (Carsten Heinz)
+\c@lstnumber=\count332
+\lst@skipnumbers=\count333
+\lst@framebox=\box59
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/listings/listings.cfg
+File: listings.cfg 2024/02/21 1.10 listings configuration
+))
+Package: listings 2024/02/21 1.10 (Carsten Heinz)
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/caption/subcaption.sty
+Package: subcaption 2023/07/28 v1.6b Sub-captions (AR)
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/caption/caption.sty
+Package: caption 2023/08/05 v3.6o Customizing captions (AR)
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/caption/caption3.sty
+Package: caption3 2023/07/31 v2.4d caption3 kernel (AR)
+\caption@tempdima=\dimen183
+\captionmargin=\dimen184
+\caption@leftmargin=\dimen185
+\caption@rightmargin=\dimen186
+\caption@width=\dimen187
+\caption@indent=\dimen188
+\caption@parindent=\dimen189
+\caption@hangindent=\dimen190
+Package caption Info: Standard document class detected.
+)
+\c@caption@flags=\count334
+\c@continuedfloat=\count335
+Package caption Info: hyperref package is loaded.
+Package caption Info: listings package is loaded.
+Package caption Info: longtable package is loaded.
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/caption/ltcaption.sty
+Package: ltcaption 2021/01/08 v1.4c longtable captions (AR)
+))
+Package caption Info: New subtype `subfigure' on input line 238.
+\c@subfigure=\count336
+Package caption Info: New subtype `subtable' on input line 238.
+\c@subtable=\count337
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/multirow/multirow.sty
+Package: multirow 2021/03/15 v2.8 Span multiple rows of a table
+\multirow@colwidth=\skip67
+\multirow@cntb=\count338
+\multirow@dima=\skip68
+\bigstrutjot=\dimen191
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/base/textcomp.sty
+Package: textcomp 2020/02/02 v2.0n Standard LaTeX package
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/float/float.sty
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count339
+\float@exts=\toks32
+\float@box=\box60
+\@float@everytoks=\toks33
+\@floatcapt=\box61
+)
+Package hyperref Info: Option `colorlinks' set `true' on input line 42.
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
+File: l3backend-pdftex.def 2024-02-20 L3 backend support: PDF output (pdfTeX)
+\l__color_backend_stack_int=\count340
+\l__pdf_internal_box=\box62
+)
+No file 5LF3_structure_report.aux.
+\openout1 = `5LF3_structure_report.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 52.
+LaTeX Font Info:    ... okay on input line 52.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 52.
+LaTeX Font Info:    ... okay on input line 52.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 52.
+LaTeX Font Info:    ... okay on input line 52.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 52.
+LaTeX Font Info:    ... okay on input line 52.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 52.
+LaTeX Font Info:    ... okay on input line 52.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 52.
+LaTeX Font Info:    ... okay on input line 52.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 52.
+LaTeX Font Info:    ... okay on input line 52.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 52.
+LaTeX Font Info:    ... okay on input line 52.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 52.
+LaTeX Font Info:    ... okay on input line 52.
+(/usr/local/texlive/2024/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count341
+\scratchdimen=\dimen192
+\scratchbox=\box63
+\nofMPsegments=\count342
+\nofMParguments=\count343
+\everyMPshowfont=\toks34
+\MPscratchCnt=\count344
+\MPscratchDim=\dimen193
+\MPnumerator=\count345
+\makeMPintoPDFobject=\count346
+\everyMPtoPDFconversion=\toks35
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
+Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
+Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 485.
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
+File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
+))
+*geometry* driver: auto-detecting
+*geometry* detected driver: pdftex
+*geometry* verbose mode - [ preamble ] result:
+* driver: pdftex
+* paper: a4paper
+* layout: <same size as paper>
+* layoutoffset:(h,v)=(0.0pt,0.0pt)
+* modes: 
+* h-part:(L,W,R)=(56.9055pt, 483.69687pt, 56.9055pt)
+* v-part:(T,H,B)=(56.9055pt, 731.23584pt, 56.9055pt)
+* \paperwidth=597.50787pt
+* \paperheight=845.04684pt
+* \textwidth=483.69687pt
+* \textheight=731.23584pt
+* \oddsidemargin=-15.36449pt
+* \evensidemargin=-15.36449pt
+* \topmargin=-52.36449pt
+* \headheight=12.0pt
+* \headsep=25.0pt
+* \topskip=11.0pt
+* \footskip=30.0pt
+* \marginparwidth=50.0pt
+* \marginparsep=10.0pt
+* \columnsep=10.0pt
+* \skip\footins=10.0pt plus 4.0pt minus 2.0pt
+* \hoffset=0.0pt
+* \voffset=0.0pt
+* \mag=1000
+* \@twocolumnfalse
+* \@twosidefalse
+* \@mparswitchfalse
+* \@reversemarginfalse
+* (1in=72.27pt=25.4mm, 1cm=28.453pt)
+
+Package hyperref Info: Link coloring ON on input line 52.
+\@outlinefile=\write3
+\openout3 = `5LF3_structure_report.out'.
+
+\c@lstlisting=\count347
+Package caption Info: Begin \AtBeginDocument code.
+Package caption Info: float package is loaded.
+Package caption Info: End \AtBeginDocument code.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 55.
+(/usr/local/texlive/2024/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Trying to load font information for U+msb on input line 55.
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+)
+No file 5LF3_structure_report.toc.
+\tf@toc=\write4
+\openout4 = `5LF3_structure_report.toc'.
+
+[1
+
+{/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:82: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.82 \item \textbf{β1 (Caspase-like):}
+                                        Cleaves after acidic residues
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:83: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.83 \item \textbf{β2 (Trypsin-like):}
+                                        Cleaves after basic residues
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:84: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.84 \item \textbf{β5 (Chymotrypsin-like):}
+                                             Cleaves after hydrophobic resid...
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:100: LaTeX Error: Unicode character α (U+03B1)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.100 ...omplex composed of four stacked rings (α
+                                                  7β7β7α7) with 28 subuni...
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:100: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.100 ...lex composed of four stacked rings (α7β
+                                                  7β7α7) with 28 subunits ...
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:100: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.100 ... composed of four stacked rings (α7β7β
+                                                  7α7) with 28 subunits tot...
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:100: LaTeX Error: Unicode character α (U+03B1)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.100 ...mposed of four stacked rings (α7β7β7α
+                                                  7) with 28 subunits total....
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:100: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.100 ...ytic chamber is sequestered within the β
+                                                  -rings, providing regulato...
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:118: LaTeX Error: Unicode character α (U+03B1)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.118 & α
+          =β=γ=90° \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:118: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.118 & α=β
+             =γ=90° \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:118: LaTeX Error: Unicode character γ (U+03B3)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.118 & α=β=γ
+                =90° \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:119: LaTeX Error: Unicode character α (U+03B1)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.119 Total Subunits & 28 (14 α
+                                 + 14 β subunits) \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:119: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.119 Total Subunits & 28 (14 α + 14 β
+                                         subunits) \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:121: LaTeX Error: Unicode character ⁻ (U+207B)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.121 ...esent & BO2 (Bortezomib), 1PE, 6V1, Cl⁻
+                                                  , K⁺, Mg²⁺ \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:121: LaTeX Error: Unicode character ⁺ (U+207A)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.121 ...& BO2 (Bortezomib), 1PE, 6V1, Cl⁻, K⁺
+                                                  , Mg²⁺ \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:121: LaTeX Error: Unicode character ⁺ (U+207A)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.121 ...rtezomib), 1PE, 6V1, Cl⁻, K⁺, Mg²⁺
+                                                   \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 13.60925pt, for example:
+(fancyhdr)                \setlength{\headheight}{13.60925pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-1.60925pt}.
+
+[2{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}]
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:138: LaTeX Error: Unicode character α (U+03B1)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.138 ...}{\textit{α-Ring Subunits (Regulatory)}}
+                                                   \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:140: LaTeX Error: Unicode character α (U+03B1)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.140 PSMA1 (α
+               6) & G, U & P60900 & Gate regulation, substrate recognition \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:141: LaTeX Error: Unicode character α (U+03B1)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.141 PSMA2 (α
+               2) & A, O & P25787 & Structural support, gate formation \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:142: LaTeX Error: Unicode character α (U+03B1)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.142 PSMA3 (α
+               7) & C, Q & O14818 & Gate control, allosteric regulation \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+Underfull \hbox (badness 5091) in paragraph at lines 142--143
+[]\OT1/cmr/m/n/10 Gate con-trol, al-losteric
+ []
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:143: LaTeX Error: Unicode character α (U+03B1)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.143 PSMA4 (α
+               3) & F, T & P25788 & Substrate channel formation \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:144: LaTeX Error: Unicode character α (U+03B1)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.144 PSMA5 (α
+               5) & D, R & P28066 & Structural integrity \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:145: LaTeX Error: Unicode character α (U+03B1)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.145 PSMA6 (α
+               1) & E, S & P25786 & Gate opening mechanism \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:146: LaTeX Error: Unicode character α (U+03B1)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.146 PSMA7 (α
+               4) & B, P & P25789 & Channel architecture \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:148: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.148 ...c}{\textit{β-Ring Subunits (Catalytic)}}
+                                                   \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:150: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.150 PSMB1 (β
+               6) & BA, N & P28072 & Non-catalytic, structural \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:151: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.151 PSMB2 (β
+               7) & H, V & Q99436 & Non-catalytic, structural \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:152: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.152 PSMB3 (β
+               3) & I, W & P49720 & Non-catalytic, structural \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:153: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.153 PSMB4 (β
+               2) & J, X & P49721 & Trypsin-like activity \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:154: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.154 PSMB5 (β
+               5) & K, Y & P28074 & \textcolor{mmred}{\textbf{Chymotrypsin-l...
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 154--155
+[][]\OT1/cmr/bx/n/10 Chymotrypsin-like
+ []
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:155: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.155 PSMB6 (β
+               1) & L, Z & P20618 & Caspase-like activity \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:156: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.156 PSMB7 (β
+               4) & AA, M & P28070 & Non-catalytic, structural \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:159: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.159 ...ed) is the primary target of Bortezomib.}
+                                                  
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:159: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.159 ...ed) is the primary target of Bortezomib.}
+                                                  
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+</Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure.png, id=28, 570.2103pt x 426.393pt>
+File: /Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure.png Graphic file (type png)
+<use /Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure.png>
+Package pdftex.def Info: /Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure.png  used on input line 166.
+(pdftex.def)             Requested size: 386.95897pt x 289.37085pt.
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:167: LaTeX Error: Unicode character α (U+03B1)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.167 ... is highlighted in cyan carbon coloring.}
+                                                  
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:167: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.167 ... is highlighted in cyan carbon coloring.}
+                                                  
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:167: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.167 ... is highlighted in cyan carbon coloring.}
+                                                  
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:167: LaTeX Error: Unicode character α (U+03B1)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.167 ... is highlighted in cyan carbon coloring.}
+                                                  
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:167: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.167 ... is highlighted in cyan carbon coloring.}
+                                                  
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:167: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.167 ... is highlighted in cyan carbon coloring.}
+                                                  
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 13.60925pt, for example:
+(fancyhdr)                \setlength{\headheight}{13.60925pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-1.60925pt}.
+
+[3]
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:174: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.174 ...ipeptide that specifically targets the β
+                                                  5 chymotrypsin-like active...
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+Overfull \hbox (12.70383pt too wide) in paragraph at lines 174--175
+\OT1/cmr/m/n/10.95 Bortezomib (N-[(1R)-1-(dihydroxyboryl)-3-methylbutyl]-N-(pyrazin-2-ylcarbonyl)-L-phenylalaninamide)
+ []
+
+
+Underfull \hbox (badness 3240) in paragraph at lines 190--191
+[]\OT1/cmr/bx/n/10.95 Interaction with Borte-
+ []
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:192: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.192 Thr1 & β
+               5 N-terminus & \textcolor{mmred}{\textbf{Covalent bond with b...
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 192--193
+[][]\OT1/cmr/bx/n/10.95 Covalent bond with
+ []
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:193: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.193 Gly47 & β
+                5 & Backbone H-bond, oxyanion hole \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:194: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.194 Ala49 & β
+                5 & Hydrophobic contact with leucine \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 194--195
+[]\OT1/cmr/m/n/10.95 Hydrophobic con-tact with
+ []
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:195: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.195 Ala20 & β
+                6 & S1 pocket formation \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:196: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.196 Val31 & β
+                6 & S3 pocket hydrophobic interaction \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:197: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.197 Ser129 & β
+                 5 & Secondary binding interaction \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:198: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.198 Met45 & β
+                5 & Hydrophobic stabilization \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:201: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.201 ...e and their interactions with Bortezomib}
+                                                  
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:201: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.201 ...e and their interactions with Bortezomib}
+                                                  
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 13.60925pt, for example:
+(fancyhdr)                \setlength{\headheight}{13.60925pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-1.60925pt}.
+
+[4 </Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure.png>]
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:204: Missing $ inserted.
+<inserted text> 
+                $
+l.204 BINDING_
+              SITE_ANALYSIS_PLACEHOLDER
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:205: Missing $ inserted.
+<inserted text> 
+                $
+l.205 
+      
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:212: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.212 ...dification:} Point mutations in PSMB5 (β
+                                                  5 subunit)
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:225: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.225 K (β
+           5) & 45 & A45T & Resistance & Reduced binding affinity, observed ...
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:226: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.226 K (β
+           5) & 49 & C49W & Resistance & Altered pocket geometry, moderate r...
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:227: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.227 Y (β
+           5) & 31 & M31V & Sensitivity & Enhanced drug binding, rare varian...
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:229: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.229 ...e β5 subunit and their clinical effects}
+                                                  
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:229: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.229 ...e β5 subunit and their clinical effects}
+                                                  
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:236: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.236 \item \textbf{Location:} β
+                                 5 subunit, near active site
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 13.60925pt, for example:
+(fancyhdr)                \setlength{\headheight}{13.60925pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-1.60925pt}.
+
+[5]
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:263: Missing $ inserted.
+<inserted text> 
+                $
+l.263 RESISTANCE_
+                 MECHANISMS_PLACEHOLDER
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:264: Missing $ inserted.
+<inserted text> 
+                $
+l.264 
+      
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\mathsurround' on input line 267.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\z@' on input line 267.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `superscript' on input line 267.
+
+
+Overfull \hbox (67.75737pt too wide) in paragraph at lines 271--272
+[]\OT1/cmr/bx/n/10.95 Chemical Name: \OT1/cmr/m/n/10.95 N-[(1R)-1-(dihydroxyboryl)-3-methylbutyl]-N-(pyrazin-2-ylcarbonyl)-L-phenylalaninamide 
+ []
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:273: LaTeX Error: Unicode character ₁ (U+2081)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.273 \item \textbf{Molecular Formula:} C₁
+                                            ₉H₂₅BN₄O₄
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:273: LaTeX Error: Unicode character ₉ (U+2089)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.273 \item \textbf{Molecular Formula:} C₁₉
+                                               H₂₅BN₄O₄
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:273: LaTeX Error: Unicode character ₂ (U+2082)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.273 ...m \textbf{Molecular Formula:} C₁₉H₂
+                                                  ₅BN₄O₄
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:273: LaTeX Error: Unicode character ₅ (U+2085)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.273 ...textbf{Molecular Formula:} C₁₉H₂₅
+                                                  BN₄O₄
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:273: LaTeX Error: Unicode character ₄ (U+2084)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.273 ...f{Molecular Formula:} C₁₉H₂₅BN₄
+                                                  O₄
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:273: LaTeX Error: Unicode character ₄ (U+2084)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.273 ...lecular Formula:} C₁₉H₂₅BN₄O₄
+                                                  
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:276: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.276 ...Reversible inhibitor of 26S proteasome β
+                                                  5 subunit
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 13.60925pt, for example:
+(fancyhdr)                \setlength{\headheight}{13.60925pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-1.60925pt}.
+
+[6]
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:305: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.305 Bortezomib & 1st & Boronic acid & β
+                                          5 & Approved & First-in-class \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:306: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.306 Carfilzomib & 2nd & Epoxyketone & β
+                                          5 & Approved & Irreversible bindin...
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:307: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.307 Ixazomib & 2nd & Boronic acid & β
+                                        5 & Approved & Oral administration \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 307--308
+[]\OT1/cmr/m/n/10 Oral ad-min-is-tra-
+ []
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:308: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.308 Marizomib & 2nd & β
+                          -lactone & β1,β2,β5 & Phase III & Multi-subunit...
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:308: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.308 Marizomib & 2nd & β-lactone & β
+                                       1,β2,β5 & Phase III & Multi-subunit...
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:308: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.308 Marizomib & 2nd & β-lactone & β1,β
+                                           2,β5 & Phase III & Multi-subunit...
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:308: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.308 Marizomib & 2nd & β-lactone & β1,β2,β
+                                               5 & Phase III & Multi-subunit...
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+Underfull \hbox (badness 3690) in paragraph at lines 308--309
+[]\OT1/cmr/m/n/10 Multi-subunit tar-
+ []
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:309: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.309 Oprozomib & 2nd & Epoxyketone & β
+                                        5 & Phase II & Oral, reduced neuropa...
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:310: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.310 Delanzomib & 2nd & Boronic acid & β
+                                          5 & Phase II & Enhanced selectivit...
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+Underfull \hbox (badness 1158) in paragraph at lines 310--311
+[]\OT1/cmr/m/n/10 Enhanced se-lec-tiv-
+ []
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:331: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.331 ...m \textbf{Selectivity:} Preference for β
+                                                  5 over β1/β2 subunits
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:331: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.331 ...{Selectivity:} Preference for β5 over β
+                                                  1/β2 subunits
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:331: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.331 ...ectivity:} Preference for β5 over β1/β
+                                                  2 subunits
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:344: LaTeX Error: Unicode character π (U+03C0)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.344 ...tbf{Important:} Aromatic ring provides π
+                                                  -π interactions in S3 poc...
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:344: LaTeX Error: Unicode character π (U+03C0)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.344 ...{Important:} Aromatic ring provides π-π
+                                                   interactions in S3 pocket \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 13.60925pt, for example:
+(fancyhdr)                \setlength{\headheight}{13.60925pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-1.60925pt}.
+
+[7]
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:354: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.354 ... \textbf{Enhanced Selectivity:} Target β
+                                                  5 while sparing β1/β2 to...
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:354: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.354 ...Selectivity:} Target β5 while sparing β
+                                                  1/β2 to reduce toxicity
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:354: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.354 ...ctivity:} Target β5 while sparing β1/β
+                                                  2 to reduce toxicity
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 13.60925pt, for example:
+(fancyhdr)                \setlength{\headheight}{13.60925pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-1.60925pt}.
+
+[8]
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:408: LaTeX Error: Unicode character ≥ (U+2265)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.408 \item \textbf{Response Rates:} ≥
+                                        VGPR in 70-80\% of patients
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:437: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.437 β
+        2-microglobulin & ISS staging & Risk stratification \\
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:448: LaTeX Error: Unicode character κ (U+03BA)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.448 \item \textbf{NF-κB Activity:}
+                                      Proteasome dependency marker
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:449: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.449 \item \textbf{Immunoproteasome:} β
+                                         5i expression affects PI selectivity
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 13.60925pt, for example:
+(fancyhdr)                \setlength{\headheight}{13.60925pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-1.60925pt}.
+
+[9]
+Underfull \hbox (badness 10000) in paragraph at lines 474--475
+[]\OT1/cmr/m/n/10 FDA ap-proved
+ []
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:497: LaTeX Error: Unicode character κ (U+03BA)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.497 \item \textbf{NF-κB activation:}
+                                        Add NF-κB pathway inhibitors
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:497: LaTeX Error: Unicode character κ (U+03BA)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.497 \item \textbf{NF-κB activation:} Add NF-κ
+                                                 B pathway inhibitors
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 13.60925pt, for example:
+(fancyhdr)                \setlength{\headheight}{13.60925pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-1.60925pt}.
+
+[10]
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:564: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.564 ...gment-based Design:} Screening against β
+                                                  5 active site
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 13.60925pt, for example:
+(fancyhdr)                \setlength{\headheight}{13.60925pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-1.60925pt}.
+
+[11]
+
+/Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:586: LaTeX Error: Unicode character β (U+03B2)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.586 ...ezomib's covalent interaction with the β
+                                                  5 catalytic subunit throug...
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 13.60925pt, for example:
+(fancyhdr)                \setlength{\headheight}{13.60925pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-1.60925pt}.
+
+[12]
+Overfull \hbox (13.12526pt too wide) in paragraph at lines 626--627
+[]\OT1/cmr/m/n/10.95 Full val-i-da-tion re-port: [][]$\OT1/cmtt/m/n/10.95 https : / / files . rcsb . org / pub / pdb / validation _ reports / lf / 5lf3 / 5lf3 _
+ []
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 13.60925pt, for example:
+(fancyhdr)                \setlength{\headheight}{13.60925pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-1.60925pt}.
+
+[13]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 13.60925pt, for example:
+(fancyhdr)                \setlength{\headheight}{13.60925pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-1.60925pt}.
+
+[14]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 13.60925pt, for example:
+(fancyhdr)                \setlength{\headheight}{13.60925pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-1.60925pt}.
+
+[15]
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 13.60925pt, for example:
+(fancyhdr)                \setlength{\headheight}{13.60925pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+(fancyhdr)                \addtolength{\topmargin}{-1.60925pt}.
+
+[16] (./5LF3_structure_report.aux)
+ ***********
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-02-20>
+ ***********
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+
+Package rerunfilecheck Warning: File `5LF3_structure_report.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `5LF3_structure_report.out':
+(rerunfilecheck)             Before: <no file>
+(rerunfilecheck)             After:  7B7028F6DC260DE33EE4312A014C414F;13510.
+ ) 
+Here is how much of TeX's memory you used:
+ 16069 strings out of 474116
+ 253894 string characters out of 5743682
+ 1942187 words of memory out of 5000000
+ 38048 multiletter control sequences out of 15000+600000
+ 570293 words of font info for 82 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 83i,15n,131p,1091b,553s stack positions out of 10000i,1000n,20000p,200000b,200000s
+</usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sfbx0800.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sfrm1095.pfb>
+Output written on 5LF3_structure_report.pdf (16 pages, 270221 bytes).
+PDF statistics:
+ 323 PDF objects out of 1000 (max. 8388607)
+ 276 compressed objects within 3 object streams
+ 160 named destinations out of 1000 (max. 500000)
+ 6 words of extra memory for PDF output out of 10000 (max. 10000000)
+

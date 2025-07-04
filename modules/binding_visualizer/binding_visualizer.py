@@ -23,11 +23,19 @@ import traceback
 import yaml
 import json
 import os
+import sys
 import datetime
 import platform
 import getpass
 import pkg_resources
 import hashlib
+import subprocess
+import shutil
+from jinja2 import Template
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+from io import BytesIO
+import base64
 
 print(Fore.CYAN + '[binding_visualizer] Starting script...' + Style.RESET_ALL)
 
@@ -100,38 +108,130 @@ def file_hash(path):
     return hash_val
 
 def parse_pdb_header(pdb_data):
-    """Extract method, resolution, ligands, chains from PDB header."""
-    print(Fore.CYAN + "[INFO] Parsing PDB header for metadata..." + Style.RESET_ALL)
-    method = None
-    resolution = None
-    ligands = set()
-    chains = set()
-    for line in pdb_data.splitlines():
-        if line.startswith('EXPDTA'):
-            method = line[10:].strip()
-        elif line.startswith('REMARK   2') and 'RESOLUTION.' in line:
-            parts = line.split()
-            for i, p in enumerate(parts):
-                if p == 'RESOLUTION.':
-                    try:
-                        resolution = parts[i+1] + ' ' + parts[i+2]
-                    except Exception:
-                        pass
+    """
+    Extract comprehensive metadata from PDB structure data.
+    
+    Args:
+        pdb_data (str): Raw PDB file content
+        
+    Returns:
+        dict: Extracted metadata including structural, experimental, and quality metrics
+    """
+    print(Fore.CYAN + "[INFO] Parsing PDB header for comprehensive metadata..." + Style.RESET_ALL)
+    
+    metadata = {
+        'method': 'N/A',
+        'resolution': 'N/A',
+        'space_group': 'N/A',
+        'unit_cell': 'N/A',
+        'chains': [],
+        'ligands': [],
+        'water_count': 0,
+        'total_atoms': 0,
+        'protein_chains': [],
+        'structure_quality': 'N/A',
+        'deposition_date': 'N/A',
+        'authors': 'N/A',
+        'organism': 'N/A',
+        'expression_system': 'N/A'
+    }
+    
+    ligand_codes = set()
+    chain_ids = set()
+    protein_chain_ids = set()
+    atom_count = 0
+    water_count = 0
+    
+    lines = pdb_data.split('\n')
+    
+    for line in lines:
+        # Basic structure information
+        if line.startswith('HEADER'):
+            metadata['deposition_date'] = line[50:59].strip() if len(line) > 58 else 'N/A'
+            
+        elif line.startswith('EXPDTA'):
+            metadata['method'] = line[10:].strip()
+            
+        elif line.startswith('REMARK   2 RESOLUTION'):
+            res_text = line[23:].strip()
+            if 'ANGSTROM' in res_text:
+                try:
+                    metadata['resolution'] = f"{float(res_text.split()[0]):.2f} Å"
+                except:
+                    metadata['resolution'] = res_text
+                    
+        elif line.startswith('CRYST1'):
+            # Unit cell parameters
+            try:
+                a = float(line[6:15].strip())
+                b = float(line[15:24].strip())
+                c = float(line[24:33].strip())
+                alpha = float(line[33:40].strip())
+                beta = float(line[40:47].strip())
+                gamma = float(line[47:54].strip())
+                space_group = line[55:66].strip()
+                
+                metadata['unit_cell'] = f"a={a:.1f} b={b:.1f} c={c:.1f} α={alpha:.1f}° β={beta:.1f}° γ={gamma:.1f}°"
+                metadata['space_group'] = space_group
+            except:
+                pass
+                
+        elif line.startswith('AUTHOR'):
+            if metadata['authors'] == 'N/A':
+                metadata['authors'] = line[10:].strip()
+            else:
+                metadata['authors'] += ', ' + line[10:].strip()
+                
+        elif line.startswith('SOURCE'):
+            if 'ORGANISM_SCIENTIFIC:' in line:
+                metadata['organism'] = line.split('ORGANISM_SCIENTIFIC:')[1].split(';')[0].strip()
+            elif 'EXPRESSION_SYSTEM:' in line:
+                metadata['expression_system'] = line.split('EXPRESSION_SYSTEM:')[1].split(';')[0].strip()
+                
+        elif line.startswith('ATOM') or line.startswith('HETATM'):
+            atom_count += 1
+            chain_id = line[21].strip()
+            chain_ids.add(chain_id)
+            
+            if line.startswith('ATOM'):
+                protein_chain_ids.add(chain_id)
+            elif line[17:20].strip() == 'HOH':
+                water_count += 1
+                
+        elif line.startswith('HETATM'):
+            ligand_code = line[17:20].strip()
+            if ligand_code not in ['HOH', 'WAT']:  # Exclude water
+                ligand_codes.add(ligand_code)
+        
         elif line.startswith('HET   '):
             het_code = line[7:10].strip()
             if het_code and het_code != 'HOH':
-                ligands.add(het_code)
-        elif line.startswith('COMPND') and 'CHAIN:' in line:
-            chain_part = line.split('CHAIN:')[1].split(';')[0]
-            for c in chain_part.split(','):
-                chains.add(c.strip())
-    print(Fore.GREEN + f"[SUCCESS] Parsed header: method={method}, resolution={resolution}, ligands={ligands}, chains={chains}" + Style.RESET_ALL)
-    return {
-        'method': method,
-        'resolution': resolution,
-        'ligands': sorted(ligands),
-        'chains': sorted(chains)
-    }
+                ligand_codes.add(het_code)
+    
+    metadata['chains'] = sorted(list(chain_ids))
+    metadata['protein_chains'] = sorted(list(protein_chain_ids))
+    metadata['ligands'] = sorted(list(ligand_codes))
+    metadata['total_atoms'] = atom_count
+    metadata['water_count'] = water_count
+    
+    # Calculate basic quality metrics
+    if metadata['resolution'] != 'N/A' and 'Å' in metadata['resolution']:
+        try:
+            res_value = float(metadata['resolution'].split()[0])
+            if res_value <= 1.5:
+                metadata['structure_quality'] = 'High (≤1.5Å)'
+            elif res_value <= 2.0:
+                metadata['structure_quality'] = 'Good (1.5-2.0Å)'
+            elif res_value <= 2.5:
+                metadata['structure_quality'] = 'Moderate (2.0-2.5Å)'
+            else:
+                metadata['structure_quality'] = 'Low (>2.5Å)'
+        except:
+            pass
+    
+    print(Fore.GREEN + f"[SUCCESS] Parsed comprehensive metadata: method={metadata['method']}, resolution={metadata['resolution']}, ligands={metadata['ligands']}, chains={metadata['chains']}" + Style.RESET_ALL)
+    
+    return metadata
 
 def visualize_structure(pdb_data, width, height, chain_style, residue_style, output_html):
     """
@@ -762,6 +862,11 @@ def main():
     try:
         print(Fore.CYAN + f"[DEBUG] About to fetch PDB data for {config['pdb_id']}..." + Style.RESET_ALL)
         pdb_data = fetch_pdb_data(config['pdb_id'])
+        
+        # Parse PDB metadata for report generation
+        print(Fore.CYAN + f"[DEBUG] Parsing PDB metadata for {config['pdb_id']}..." + Style.RESET_ALL)
+        pdb_metadata = parse_pdb_header(pdb_data)
+        
         print(Fore.CYAN + f"[DEBUG] About to visualize structure for {config['pdb_id']}..." + Style.RESET_ALL)
         output_html = os.path.join(this_script_folder_path, f"{config['pdb_id']}_structure_viewer.html")
         visualize_structure(
@@ -772,6 +877,21 @@ def main():
             config['visualization']['residue_style'], 
             output_html
         )
+        
+        # Generate PDF report if enabled in config
+        generate_pdf = config.get('generate_pdf', True)  # Default to True
+        if generate_pdf:
+            print(Fore.CYAN + f"[DEBUG] Generating PDF report for {config['pdb_id']}..." + Style.RESET_ALL)
+            try:
+                pdf_path = generate_pdf_report(config, pdb_data, pdb_metadata, this_script_folder_path)
+                if pdf_path:
+                    print(Fore.GREEN + f"[SUCCESS] PDF report generated: {pdf_path}" + Style.RESET_ALL)
+                else:
+                    print(Fore.YELLOW + "[WARNING] PDF generation failed, but LaTeX file is available for manual compilation" + Style.RESET_ALL)
+            except Exception as pdf_error:
+                print(Fore.YELLOW + f"[WARNING] PDF generation failed: {pdf_error}" + Style.RESET_ALL)
+                logging.warning("PDF generation failed: %s", pdf_error)
+        
         print(Fore.GREEN + f"[DEBUG] Workflow completed for {config['pdb_id']}!" + Style.RESET_ALL)
     except Exception as error:
         logging.error("An error occurred in the main function: %s", error)
@@ -780,3 +900,505 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+def generate_structure_image(pdb_data, width=800, height=600, output_path=None):
+    """
+    Generate a static image of the molecular structure for PDF inclusion.
+    
+    Args:
+        pdb_data (str): PDB structure data
+        width (int): Image width in pixels
+        height (int): Image height in pixels
+        output_path (str): Path to save the image (optional)
+    
+    Returns:
+        str: Base64 encoded image data or file path
+    """
+    print(Fore.CYAN + "[INFO] Generating static structure image for PDF..." + Style.RESET_ALL)
+    
+    try:
+        # Create a py3Dmol viewer for image generation
+        viewer = py3Dmol.view(width=width, height=height)
+        viewer.addModel(pdb_data, 'pdb')
+        
+        # Apply basic styling
+        viewer.setStyle({'chain': 'A'}, {'stick': {}})
+        viewer.setStyle({'resn': 'BOR'}, {'stick': {'colorscheme': 'cyanCarbon'}})
+        viewer.zoomTo()
+        viewer.setBackgroundColor('white')
+        viewer.render()
+        
+        # Get PNG data
+        png_data = viewer.png()
+        
+        if output_path:
+            # Save to file
+            with open(output_path, 'wb') as f:
+                f.write(png_data)
+            print(Fore.GREEN + f"[SUCCESS] Structure image saved to {output_path}" + Style.RESET_ALL)
+            return output_path
+        else:
+            # Return base64 encoded data
+            encoded_data = base64.b64encode(png_data).decode('utf-8')
+            print(Fore.GREEN + "[SUCCESS] Structure image generated as base64 data" + Style.RESET_ALL)
+            return encoded_data
+            
+    except Exception as e:
+        print(Fore.RED + f"[ERROR] Failed to generate structure image: {e}" + Style.RESET_ALL)
+        logging.error("Failed to generate structure image: %s", e)
+        return None
+
+def create_latex_template():
+    """
+    Create a LaTeX template for the molecular structure report.
+    
+    Returns:
+        str: LaTeX template as string
+    """
+    # Use the enhanced template from sources directory
+    sources_template_path = os.path.join(os.path.dirname(__file__), 'sources', 'binding_visualizer.py')
+    
+    if os.path.exists(sources_template_path):
+        # Read and execute the sources template function
+        with open(sources_template_path, 'r') as f:
+            sources_content = f.read()
+        
+        # Extract just the template function
+        import re
+        template_match = re.search(r'def create_latex_template\(\):.*?return template', sources_content, re.DOTALL)
+        if template_match:
+            # Execute the enhanced template function
+            exec_globals = {}
+            exec(template_match.group(0), exec_globals)
+            return exec_globals['create_latex_template']()
+    
+    # Fallback to a simple template
+    return r"""
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{datetime}
+\usepackage{listings}
+\usepackage{subcaption}
+\usepackage{multirow}
+\usepackage{textcomp}
+\usepackage{float}
+
+\geometry{margin=2cm}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textbf{MM Drug Discovery Report}}
+\fancyhead[R]{\today}
+\fancyfoot[C]{\thepage}
+\fancyfoot[L]{bmyCure4MM}
+\fancyfoot[R]{PDB: {{ pdb_id }}}
+
+\definecolor{mmblue}{RGB}{42,82,152}
+\definecolor{mmred}{RGB}{178,34,34}
+\definecolor{mmgreen}{RGB}{34,139,34}
+\definecolor{mmorange}{RGB}{255,140,0}
+\definecolor{mmgray}{RGB}{105,105,105}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=mmblue,
+    urlcolor=mmblue,
+    citecolor=mmblue
+}
+
+\title{\textbf{\Large Multiple Myeloma Drug Discovery Analysis\\
+\large Human 20S Proteasome Complex with {{ ligand }}\\
+\normalsize Structural Analysis Report: {{ pdb_id }}}}
+\author{\textbf{bmyCure4MM Analysis System}\\
+Multiple Myeloma Research Platform\\
+\textit{Computational Structural Biology \& Drug Discovery}}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This comprehensive report presents a detailed structural and therapeutic analysis of the human 20S proteasome complex with {{ ligand }} (PDB: {{ pdb_id }}) in the context of multiple myeloma (MM) drug discovery. The 20S proteasome represents a critical therapeutic target in MM treatment, with proteasome inhibitors being cornerstone therapies that have revolutionized MM treatment outcomes.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+\section{Executive Summary}
+
+\begin{itemize}
+\item \textbf{Target:} {{ pdb_id }} - High-resolution X-ray crystallography structure
+\item \textbf{Method:} {{ method }}
+\item \textbf{Resolution:} {{ resolution }}
+\item \textbf{Therapeutic Context:} Critical therapeutic target for multiple myeloma treatment
+\item \textbf{Drug Complex:} {{ ligand }} - Proteasome inhibitor for MM therapy
+\item \textbf{Clinical Significance:} Structure enabling rational drug design approaches
+\end{itemize}
+
+\section{Structure Overview}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Property} & \textbf{Value} \\
+\midrule
+PDB ID & \textbf{{{ pdb_id }}} \\
+Method & {{ method }} \\
+Resolution & {{ resolution }} \\
+Chains & {{ chains|length }} \\
+Ligands & {{ ligands|join(', ') if ligands else 'None' }} \\
+\bottomrule
+\end{tabular}
+\caption{Basic structural properties}
+\end{table}
+
+{% if structure_image_path %}
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{{ "{" }}{{ structure_image_path }}{{ "}" }}
+\caption{3D molecular structure visualization of {{ pdb_id }}. Structure shows proteasome architecture with {{ ligand }} binding site highlighted.}
+\label{fig:structure}
+\end{figure}
+{% else %}
+\begin{figure}[h!]
+\centering
+\textit{Structure image not available}
+\caption{3D molecular structure of {{ pdb_id }}}
+\label{fig:structure}
+\end{figure}
+{% endif %}
+
+\section{Therapeutic Analysis}
+
+\subsection{Multiple Myeloma Treatment Context}
+Multiple myeloma is a hematologic malignancy where proteasome inhibition has become a cornerstone of therapy. The proteasome system is critical for protein degradation and cellular homeostasis.
+
+{% if mutations %}
+\subsection{Resistance Mutations}
+
+\begin{longtable}{@{}llll@{}}
+\toprule
+\textbf{Chain} & \textbf{Position} & \textbf{Mutation} & \textbf{Effect} \\
+\midrule
+{% for mutation in mutations %}
+{{ mutation.chain }} & {{ mutation.resnum }} & {{ mutation.mutation }} & {{ mutation.effect }} \\
+{% endfor %}
+\bottomrule
+\caption{Identified mutations and their clinical effects}
+\end{longtable}
+{% endif %}
+
+{% if therapies %}
+\section{Therapeutic Compounds}
+
+{% for therapy in therapies %}
+\subsection{{{ therapy.name }}}
+
+\begin{itemize}
+\item \textbf{Clinical Phase:} {{ therapy.clinical_phase }}
+\item \textbf{Mechanism:} {{ therapy.mechanism }}
+\item \textbf{MM Relevance:} {{ therapy.mm_relevance }}
+{% if therapy.resistance_mutations %}
+\item \textbf{Resistance Mutations:} {{ therapy.resistance_mutations|join(', ') }}
+{% endif %}
+\end{itemize}
+{% endfor %}
+{% endif %}
+
+\section{Clinical Implications}
+
+This structural analysis provides important insights for:
+\begin{itemize}
+\item Understanding drug-target interactions
+\item Designing improved therapeutics
+\item Predicting and overcoming resistance
+\item Optimizing combination therapies
+\end{itemize}
+
+\section{Computational Analysis}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Parameter} & \textbf{Value} \\
+\midrule
+Analysis Date & \today \\
+Software Version & bmyCure4MM v2.0 \\
+Structure Source & RCSB PDB \\
+Visualization & py3Dmol \\
+{% if binding_site_detection.enabled %}
+Binding Site Detection & Enabled ({{ binding_site_detection.cutoff_angstrom }} \AA\ cutoff) \\
+{% endif %}
+\bottomrule
+\end{tabular}
+\caption{Analysis parameters and quality metrics}
+\end{table}
+
+\section{Conclusions}
+
+This structural analysis of {{ pdb_id }} demonstrates the molecular basis for proteasome inhibition in multiple myeloma therapy. The high-resolution structure provides critical insights for drug discovery and resistance mechanisms.
+
+\textbf{Key recommendations:}
+\begin{itemize}
+\item Monitor for resistance mutations in clinical practice
+\item Consider structure-guided drug development approaches
+\item Investigate combination therapies based on structural insights
+\item Implement biomarker-guided treatment selection
+\end{itemize}
+
+\section{References}
+
+\begin{enumerate}
+\item RCSB Protein Data Bank: \url{https://www.rcsb.org/}
+\item Multiple myeloma treatment guidelines and clinical studies
+\item Proteasome inhibitor mechanism and resistance studies
+\item Structure-based drug design methodologies
+\end{enumerate}
+
+\end{document}
+"""
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Property} & \textbf{Value} \\
+\midrule
+PDB ID & {{ pdb_id }} \\
+Experimental Method & {{ method or 'N/A' }} \\
+Resolution & {{ resolution or 'N/A' }} \\
+Number of Chains & {{ chains|length }} \\
+Ligands Present & {{ ligands|join(', ') if ligands else 'None' }} \\
+\bottomrule
+\end{tabular}
+\caption{Structure Properties}
+\end{table}
+
+\section{3D Structure Visualization}
+
+\begin{figure}[h!]
+\centering
+{% if structure_image_path %}
+\includegraphics[width=0.8\textwidth]{{ "{" }}{{ structure_image_path }}{{ "}" }}
+{% else %}
+\textit{Structure image not available}
+{% endif %}
+\caption{3D molecular structure of {{ pdb_id }}. {% if ligand %}Ligand {{ ligand }} is highlighted in cyan carbon coloring.{% endif %}}
+\label{fig:structure}
+\end{figure}
+
+{% if mutations %}
+\section{Mutation Analysis}
+
+\begin{longtable}{@{}llll@{}}
+\toprule
+\textbf{Chain} & \textbf{Position} & \textbf{Mutation} & \textbf{Effect} \\
+\midrule
+{% for mutation in mutations %}
+{{ mutation.chain }} & {{ mutation.resnum }} & {{ mutation.mutation }} & {{ mutation.effect }} \\
+{% endfor %}
+\bottomrule
+\caption{Identified mutations and their clinical effects}
+\end{longtable}
+{% endif %}
+
+{% if therapies %}
+\section{Therapeutic Information}
+
+{% for therapy in therapies %}
+\subsection{{ "{" }}{{ therapy.name }}{{ "}" }}
+
+\begin{itemize}
+\item \textbf{PDB Ligand Code:} {{ therapy.pdb_ligand }}
+\item \textbf{Clinical Phase:} {{ therapy.clinical_phase }}
+\item \textbf{Target:} {{ pdb_id }} binding site
+{% if therapy.mechanism %}
+\item \textbf{Mechanism:} {{ therapy.mechanism }}
+{% endif %}
+\end{itemize}
+{% endfor %}
+{% endif %}
+
+\section{Analysis Details}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Parameter} & \textbf{Value} \\
+\midrule
+Analysis Date & \today \\
+Software Version & bmyCure4MM v1.0.0 \\
+PDB Source & RCSB Protein Data Bank \\
+Visualization Tool & py3Dmol v2.4.2 \\
+{% if binding_site_detection.enabled %}
+Binding Site Detection & Enabled ({{ binding_site_detection.cutoff_angstrom }} \AA \ cutoff) \\
+{% endif %}
+\bottomrule
+\end{tabular}
+\caption{Analysis Parameters}
+\end{table}
+
+\section{Summary}
+
+This report presents the structural analysis of PDB {{ pdb_id }}{% if ligand %}, focusing on the binding interactions with ligand {{ ligand }}{% endif %}. The analysis was performed using the bmyCure4MM binding visualizer module, which combines 3D molecular visualization with mutation mapping and therapeutic information.
+
+{% if mutations %}
+The structure contains {{ mutations|length }} identified mutation(s) that may affect drug binding and resistance profiles. These mutations should be considered when evaluating therapeutic strategies.
+{% endif %}
+
+For interactive exploration of this structure, please refer to the accompanying HTML visualization file: \texttt{{ "{" }}{{ pdb_id }}_structure_viewer.html{{ "}" }}.
+
+\section{References}
+
+\begin{itemize}
+\item RCSB Protein Data Bank: \url{https://www.rcsb.org/}
+\item py3Dmol: \url{https://3dmol.csb.pitt.edu/}
+\item bmyCure4MM Project: Multiple Myeloma Drug Discovery Platform
+\end{itemize}
+
+\end{document}
+"""
+    return template
+
+def generate_pdf_report(config, pdb_data, pdb_metadata, output_dir=None):
+    """
+    Generate a PDF report from LaTeX template with molecular structure analysis.
+    
+    Args:
+        config (dict): Configuration dictionary
+        pdb_data (str): PDB structure data
+        pdb_metadata (dict): Parsed PDB metadata
+        output_dir (str): Output directory for PDF (optional)
+    
+    Returns:
+        str: Path to generated PDF file
+    """
+    print(Fore.CYAN + "[INFO] Generating PDF report from LaTeX..." + Style.RESET_ALL)
+    
+    if output_dir is None:
+        output_dir = this_script_folder_path
+    
+    pdb_id = config['pdb_id']
+    base_filename = f"{pdb_id}_structure_report";
+    
+    # Generate structure image
+    image_path = os.path.join(output_dir, f"{pdb_id}_structure.png")
+    structure_image = generate_structure_image(pdb_data, 800, 600, image_path)
+    
+    # Prepare template variables
+    template_vars = {
+        'title': f'Molecular Structure Analysis: {pdb_id}',
+        'pdb_id': pdb_id,
+        'method': pdb_metadata.get('method'),
+        'resolution': pdb_metadata.get('resolution'),
+        'chains': pdb_metadata.get('chains', []),
+        'ligands': pdb_metadata.get('ligands', []),
+        'ligand': config.get('ligand'),
+        'mutations': config.get('mutations', []),
+        'therapies': config.get('therapies', []),
+        'binding_site_detection': config.get('binding_site_detection', {}),
+        'structure_image_path': image_path if structure_image else None
+    }
+    
+    # Create LaTeX content
+    template = Template(create_latex_template())
+    latex_content = template.render(**template_vars)
+    
+    # Write LaTeX file
+    tex_path = os.path.join(output_dir, f"{base_filename}.tex")
+    with open(tex_path, 'w', encoding='utf-8') as f:
+        f.write(latex_content)
+    
+    print(Fore.GREEN + f"[SUCCESS] LaTeX file generated: {tex_path}" + Style.RESET_ALL)
+    
+    # Compile to PDF
+    pdf_path = compile_latex_to_pdf(tex_path, output_dir)
+    
+    return pdf_path
+
+def compile_latex_to_pdf(tex_path, output_dir):
+    """
+    Compile LaTeX file to PDF using pdflatex.
+    
+    Args:
+        tex_path (str): Path to LaTeX file
+        output_dir (str): Output directory
+    
+    Returns:
+        str: Path to generated PDF file or None if compilation failed
+    """
+    print(Fore.CYAN + "[INFO] Compiling LaTeX to PDF..." + Style.RESET_ALL)
+    
+    # Check if pdflatex is available
+    if not shutil.which('pdflatex'):
+        print(Fore.YELLOW + "[WARNING] pdflatex not found. Please install LaTeX distribution (e.g., TeX Live, MiKTeX)" + Style.RESET_ALL)
+        print(Fore.YELLOW + "[INFO] LaTeX file saved for manual compilation: " + tex_path + Style.RESET_ALL)
+        return None
+    
+    try:
+        # Change to output directory
+        original_dir = os.getcwd()
+        os.chdir(output_dir)
+        
+        # Get base filename
+        base_name = os.path.splitext(os.path.basename(tex_path))[0]
+        
+        # Compile LaTeX (run twice for proper references)
+        for run in range(2):
+            print(Fore.CYAN + f"[INFO] Running pdflatex (pass {run + 1}/2)..." + Style.RESET_ALL)
+            result = subprocess.run(
+                ['pdflatex', '-interaction=nonstopmode', f"{base_name}.tex"],
+                capture_output=True,
+                text=True,
+                timeout=60
+            )
+            
+            if result.returncode != 0:
+                print(Fore.RED + f"[ERROR] pdflatex compilation failed:" + Style.RESET_ALL)
+                print(Fore.YELLOW + result.stdout + Style.RESET_ALL)
+                print(Fore.RED + result.stderr + Style.RESET_ALL)
+                os.chdir(original_dir)
+                return None
+        
+        # Return to original directory
+        os.chdir(original_dir)
+        
+        pdf_path = os.path.join(output_dir, f"{base_name}.pdf")
+        
+        if os.path.exists(pdf_path):
+            print(Fore.GREEN + f"[SUCCESS] PDF report generated: {pdf_path}" + Style.RESET_ALL)
+            
+            # Clean up auxiliary files
+            cleanup_extensions = ['.aux', '.log', '.out', '.toc', '.fdb_latexmk', '.fls']
+            for ext in cleanup_extensions:
+                aux_file = os.path.join(output_dir, f"{base_name}{ext}")
+                if os.path.exists(aux_file):
+                    os.remove(aux_file)
+            
+            return pdf_path
+        else:
+            print(Fore.RED + "[ERROR] PDF file was not generated" + Style.RESET_ALL)
+            return None
+            
+    except subprocess.TimeoutExpired:
+        print(Fore.RED + "[ERROR] LaTeX compilation timed out" + Style.RESET_ALL)
+        os.chdir(original_dir)
+        return None
+    except Exception as e:
+        print(Fore.RED + f"[ERROR] LaTeX compilation failed: {e}" + Style.RESET_ALL)
+        os.chdir(original_dir)
+        return None
