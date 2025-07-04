@@ -1,0 +1,4 @@
+rdkit
+requests
+PyYAML
+colorama
