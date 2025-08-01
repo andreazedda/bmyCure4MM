@@ -63,4 +63,6 @@ for outputs and logs.
 
 The `lab` directory collects exploratory notebooks and prototypes.
 They require the packages listed in `lab/requirements.txt` and can be opened
-with Jupyter Lab or Jupyter Notebook after installing the environment.
+with Jupyter Lab or Jupyter Notebook after installing the environment.  A
+short description of each file is available in
+[lab_file_overview.md](lab_file_overview.md).
