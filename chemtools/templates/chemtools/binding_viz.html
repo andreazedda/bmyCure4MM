@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h1 class="h4 mb-3">Binding Visualizer</h1>
+                <p class="text-muted">Generate an interactive py3Dmol viewer and PDF-ready assets for a PDB structure.</p>
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                    {% endif %}
+                    {% for field in form %}
+                        <div class="mb-3">
+                            <label class="form-label" for="id_{{ field.name }}">{{ field.label }}{% if field.field.required %}<span class="text-danger"> *</span>{% endif %}</label>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <div class="form-text">{{ field.help_text }}</div>
+                            {% endif %}
+                            {% if field.errors %}
+                                <div class="invalid-feedback d-block">{{ field.errors|striptags }}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
+                            Run Visualization
+                        </button>
+                        <a href="{% url 'chemtools:tools_home' %}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+                <hr>
+                <p class="mb-0 small text-muted">PDB IDs are four characters starting with a digit (e.g., <code>5LF3</code>). Ligand codes are 1–3 characters (e.g., <code>BOR</code>).</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

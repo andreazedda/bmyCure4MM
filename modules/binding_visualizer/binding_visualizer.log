@@ -194,3 +194,6 @@
 2025-07-03 23:01:31,035 - INFO - PDB data fetched successfully.
 2025-07-03 23:01:31,166 - INFO - Initializing 3Dmol viewer.
 2025-07-03 23:01:36,111 - WARNING - PDF generation failed: name 'generate_pdf_report' is not defined
+2025-10-10 09:38:18,162 - INFO - Fetching PDB data for ID: 5LF3
+2025-10-10 09:38:19,748 - INFO - PDB data fetched successfully.
+2025-10-10 09:38:19,872 - INFO - Initializing 3Dmol viewer.

@@ -1,0 +1,139 @@
+from __future__ import annotations
+
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.http import HttpRequest, HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+
+from . import forms, models
+from .tasks import (
+    run_binding_viz_job,
+    run_drug_params_job,
+    run_similarity_job,
+)
+
+
+def _enqueue(task, job: models.ChemJob, *params) -> tuple[bool, bool]:
+    """Attempt to queue a Celery task; fallback to synchronous execution.
+
+    Returns a tuple ``(queued, failed)`` where ``queued`` indicates the task
+    was handed to Celery, and ``failed`` reflects the synchronous run status.
+    """
+    try:
+        task.delay(job.pk, *params)
+        return True, False
+    except Exception:  # pragma: no cover - fallback when broker unavailable
+        task.run(job.pk, *params)
+        job.refresh_from_db()
+        failed = bool(job.log and job.log.startswith("ERROR"))
+        return False, failed
+
+
+@login_required
+def tools_home(request: HttpRequest) -> HttpResponse:
+    jobs = models.ChemJob.objects.select_related("user").all()[:50]
+    return render(
+        request,
+        "chemtools/tools_home.html",
+        {
+            "jobs": jobs,
+        },
+    )
+
+
+@login_required
+def drug_params(request: HttpRequest) -> HttpResponse:
+    form = forms.DrugParamForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        smiles = (form.cleaned_data.get("smiles") or "").strip()
+        cid_value = form.cleaned_data.get("cid")
+        cid_str = str(cid_value) if cid_value else ""
+        job = models.ChemJob.objects.create(
+            kind=models.ChemJob.PARAM,
+            input_a=smiles,
+            input_b=cid_str,
+            user=request.user if request.user.is_authenticated else None,
+        )
+        queued, failed = _enqueue(run_drug_params_job, job, smiles, cid_str)
+        if queued:
+            messages.info(request, "Job queued. Refresh this page to monitor progress.")
+        elif failed:
+            messages.error(request, "Drug parameter evaluation failed. See log for details.")
+        else:
+            messages.success(request, "Drug parameter evaluation completed.")
+        return redirect(reverse("chemtools:tools_home"))
+    return render(request, "chemtools/drug_params.html", {"form": form})
+
+
+@login_required
+def binding_viz(request: HttpRequest) -> HttpResponse:
+    form = forms.BindingVizForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        pdb_id = form.cleaned_data["pdb_id"]
+        ligand = form.cleaned_data.get("ligand", "")
+        job = models.ChemJob.objects.create(
+            kind=models.ChemJob.BIND,
+            input_a=pdb_id,
+            input_b=ligand,
+            user=request.user if request.user.is_authenticated else None,
+        )
+        queued, failed = _enqueue(run_binding_viz_job, job, pdb_id, ligand)
+        if queued:
+            messages.info(request, "Binding visualization queued. Refresh shortly for results.")
+        elif failed:
+            messages.error(request, "Binding visualization failed. Check the job log for details.")
+        else:
+            messages.success(request, "Binding visualization completed.")
+        return redirect(reverse("chemtools:tools_home"))
+    return render(request, "chemtools/binding_viz.html", {"form": form})
+
+
+@login_required
+def similarity(request: HttpRequest) -> HttpResponse:
+    form = forms.SimilarityForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        smiles = form.cleaned_data["smiles"].strip()
+        job = models.ChemJob.objects.create(
+            kind=models.ChemJob.SIM,
+            input_a=smiles,
+            user=request.user if request.user.is_authenticated else None,
+        )
+        queued, failed = _enqueue(run_similarity_job, job, smiles)
+        if queued:
+            messages.info(request, "Similarity search queued. Refresh shortly for results.")
+        elif failed:
+            messages.error(request, "Similarity search failed. Review the job log for details.")
+        else:
+            messages.success(request, "Similarity search completed.")
+        return redirect(reverse("chemtools:tools_home"))
+    return render(request, "chemtools/similarity.html", {"form": form})
+
+
+@login_required
+def retry_job(request: HttpRequest, pk: int) -> HttpResponse:
+    job = get_object_or_404(models.ChemJob, pk=pk)
+    if job.kind == models.ChemJob.PARAM:
+        queued, failed = _enqueue(
+            run_drug_params_job,
+            job,
+            job.input_a or "",
+            job.input_b or "",
+        )
+    elif job.kind == models.ChemJob.BIND:
+        queued, failed = _enqueue(
+            run_binding_viz_job,
+            job,
+            job.input_a,
+            job.input_b or "",
+        )
+    else:
+        queued, failed = _enqueue(run_similarity_job, job, job.input_a)
+
+    if queued:
+        messages.info(request, "Job retry queued. Refresh to monitor progress.")
+    elif failed:
+        messages.error(request, "Job retry failed immediately. Check the log for details.")
+    else:
+        messages.success(request, "Job retry completed successfully.")
+    return redirect(reverse("chemtools:tools_home"))

@@ -950,166 +950,104 @@ def generate_structure_image(pdb_data, width=800, height=600, output_path=None):
 
 def create_latex_template():
     """
-    Create a LaTeX template for the molecular structure report.
-    
-    Returns:
-        str: LaTeX template as string
+    Return the LaTeX template used for PDF reporting.
+
+    The enhanced implementation available in ``modules/binding_visualizer/sources``
+    already contains a rich, well-tested template.  If that function is available
+    we reuse it directly; otherwise we fall back to a minimal local definition.
     """
-    # Use the enhanced template from sources directory
-    sources_template_path = os.path.join(os.path.dirname(__file__), 'sources', 'binding_visualizer.py')
-    
-    if os.path.exists(sources_template_path):
-        # Read and execute the sources template function
-        with open(sources_template_path, 'r') as f:
-            sources_content = f.read()
-        
-        # Extract just the template function
-        import re
-        template_match = re.search(r'def create_latex_template\(\):.*?return template', sources_content, re.DOTALL)
-        if template_match:
-            # Execute the enhanced template function
-            exec_globals = {}
-            exec(template_match.group(0), exec_globals)
-            return exec_globals['create_latex_template']()
-    
-    # Fallback to a simple template
+    parent_sources = os.path.join(
+        os.path.dirname(__file__),
+        "sources",
+    )
+    try:
+        sys.path.insert(0, parent_sources)
+        from binding_visualizer import create_latex_template as sources_template  # type: ignore
+
+        return sources_template()
+    except Exception:
+        pass
+    finally:
+        if parent_sources in sys.path:
+            sys.path.remove(parent_sources)
+
+    # Minimal fallback template.
     return r"""
 \documentclass[11pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
-\usepackage[english]{babel}
-\usepackage{amsmath}
-\usepackage{amsfonts}
-\usepackage{amssymb}
-\usepackage{graphicx}
 \usepackage{geometry}
-\usepackage{xcolor}
+\usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{longtable}
 \usepackage{hyperref}
+\usepackage{xcolor}
 \usepackage{fancyhdr}
-\usepackage{datetime}
-\usepackage{listings}
-\usepackage{subcaption}
-\usepackage{multirow}
-\usepackage{textcomp}
-\usepackage{float}
-
 \geometry{margin=2cm}
+
 \pagestyle{fancy}
 \fancyhf{}
 \fancyhead[L]{\textbf{MM Drug Discovery Report}}
 \fancyhead[R]{\today}
 \fancyfoot[C]{\thepage}
-\fancyfoot[L]{bmyCure4MM}
-\fancyfoot[R]{PDB: {{ pdb_id }}}
 
-\definecolor{mmblue}{RGB}{42,82,152}
-\definecolor{mmred}{RGB}{178,34,34}
-\definecolor{mmgreen}{RGB}{34,139,34}
-\definecolor{mmorange}{RGB}{255,140,0}
-\definecolor{mmgray}{RGB}{105,105,105}
-
-\hypersetup{
-    colorlinks=true,
-    linkcolor=mmblue,
-    urlcolor=mmblue,
-    citecolor=mmblue
-}
-
-\title{\textbf{\Large Multiple Myeloma Drug Discovery Analysis\\
-\large Human 20S Proteasome Complex with {{ ligand }}\\
-\normalsize Structural Analysis Report: {{ pdb_id }}}}
-\author{\textbf{bmyCure4MM Analysis System}\\
-Multiple Myeloma Research Platform\\
-\textit{Computational Structural Biology \& Drug Discovery}}
+\title{\textbf{\Large Structural Report: {{ pdb_id }}}}
+\author{bmyCure4MM Binding Visualizer}
 \date{\today}
 
 \begin{document}
-
 \maketitle
-
-\begin{abstract}
-This comprehensive report presents a detailed structural and therapeutic analysis of the human 20S proteasome complex with {{ ligand }} (PDB: {{ pdb_id }}) in the context of multiple myeloma (MM) drug discovery. The 20S proteasome represents a critical therapeutic target in MM treatment, with proteasome inhibitors being cornerstone therapies that have revolutionized MM treatment outcomes.
-\end{abstract}
-
 \tableofcontents
 \newpage
 
-\section{Executive Summary}
-
-\begin{itemize}
-\item \textbf{Target:} {{ pdb_id }} - High-resolution X-ray crystallography structure
-\item \textbf{Method:} {{ method }}
-\item \textbf{Resolution:} {{ resolution }}
-\item \textbf{Therapeutic Context:} Critical therapeutic target for multiple myeloma treatment
-\item \textbf{Drug Complex:} {{ ligand }} - Proteasome inhibitor for MM therapy
-\item \textbf{Clinical Significance:} Structure enabling rational drug design approaches
-\end{itemize}
-
 \section{Structure Overview}
-
 \begin{table}[h!]
 \centering
-\begin{tabular}{@{}ll@{}}
+\begin{tabular}{ll}
 \toprule
 \textbf{Property} & \textbf{Value} \\
 \midrule
-PDB ID & \textbf{{{ pdb_id }}} \\
-Method & {{ method }} \\
-Resolution & {{ resolution }} \\
+PDB ID & {{ pdb_id }} \\
+Method & {{ method or 'N/A' }} \\
+Resolution & {{ resolution or 'N/A' }} \\
 Chains & {{ chains|length }} \\
-Ligands & {{ ligands|join(', ') if ligands else 'None' }} \\
+Ligands & {{ ligands|join(', ') if ligands else 'None detected' }} \\
 \bottomrule
 \end{tabular}
-\caption{Basic structural properties}
+\caption{Key structural characteristics}
 \end{table}
 
+\section{Visualization}
 {% if structure_image_path %}
 \begin{figure}[h!]
 \centering
 \includegraphics[width=0.8\textwidth]{{ "{" }}{{ structure_image_path }}{{ "}" }}
-\caption{3D molecular structure visualization of {{ pdb_id }}. Structure shows proteasome architecture with {{ ligand }} binding site highlighted.}
-\label{fig:structure}
+\caption{Rendered structure of {{ pdb_id }}{% if ligand %} with ligand {{ ligand }} highlighted{% endif %}.}
 \end{figure}
 {% else %}
-\begin{figure}[h!]
-\centering
-\textit{Structure image not available}
-\caption{3D molecular structure of {{ pdb_id }}}
-\label{fig:structure}
-\end{figure}
+\noindent\textit{Structure snapshot unavailable.}
 {% endif %}
 
-\section{Therapeutic Analysis}
-
-\subsection{Multiple Myeloma Treatment Context}
-Multiple myeloma is a hematologic malignancy where proteasome inhibition has become a cornerstone of therapy. The proteasome system is critical for protein degradation and cellular homeostasis.
-
 {% if mutations %}
-\subsection{Resistance Mutations}
-
-\begin{longtable}{@{}llll@{}}
+\section{Mutation Highlights}
+\begin{longtable}{llll}
 \toprule
-\textbf{Chain} & \textbf{Position} & \textbf{Mutation} & \textbf{Effect} \\
+\textbf{Chain} & \textbf{Residue} & \textbf{Mutation} & \textbf{Effect} \\
 \midrule
 {% for mutation in mutations %}
 {{ mutation.chain }} & {{ mutation.resnum }} & {{ mutation.mutation }} & {{ mutation.effect }} \\
 {% endfor %}
 \bottomrule
-\caption{Identified mutations and their clinical effects}
 \end{longtable}
 {% endif %}
 
 {% if therapies %}
-\section{Therapeutic Compounds}
-
+\section{Therapeutic Context}
 {% for therapy in therapies %}
-\subsection{{{ therapy.name }}}
-
+\subsection*{{ "{" }}{{ therapy.name }}{{ "}" }}
 \begin{itemize}
 \item \textbf{Clinical Phase:} {{ therapy.clinical_phase }}
 \item \textbf{Mechanism:} {{ therapy.mechanism }}
-\item \textbf{MM Relevance:} {{ therapy.mm_relevance }}
+\item \textbf{Relevance:} {{ therapy.mm_relevance }}
 {% if therapy.resistance_mutations %}
 \item \textbf{Resistance Mutations:} {{ therapy.resistance_mutations|join(', ') }}
 {% endif %}
@@ -1117,163 +1055,20 @@ Multiple myeloma is a hematologic malignancy where proteasome inhibition has bec
 {% endfor %}
 {% endif %}
 
-\section{Clinical Implications}
-
-This structural analysis provides important insights for:
+\section{Analysis Notes}
 \begin{itemize}
-\item Understanding drug-target interactions
-\item Designing improved therapeutics
-\item Predicting and overcoming resistance
-\item Optimizing combination therapies
-\end{itemize}
-
-\section{Computational Analysis}
-
-\begin{table}[h!]
-\centering
-\begin{tabular}{@{}ll@{}}
-\toprule
-\textbf{Parameter} & \textbf{Value} \\
-\midrule
-Analysis Date & \today \\
-Software Version & bmyCure4MM v2.0 \\
-Structure Source & RCSB PDB \\
-Visualization & py3Dmol \\
-{% if binding_site_detection.enabled %}
-Binding Site Detection & Enabled ({{ binding_site_detection.cutoff_angstrom }} \AA\ cutoff) \\
-{% endif %}
-\bottomrule
-\end{tabular}
-\caption{Analysis parameters and quality metrics}
-\end{table}
-
-\section{Conclusions}
-
-This structural analysis of {{ pdb_id }} demonstrates the molecular basis for proteasome inhibition in multiple myeloma therapy. The high-resolution structure provides critical insights for drug discovery and resistance mechanisms.
-
-\textbf{Key recommendations:}
-\begin{itemize}
-\item Monitor for resistance mutations in clinical practice
-\item Consider structure-guided drug development approaches
-\item Investigate combination therapies based on structural insights
-\item Implement biomarker-guided treatment selection
+\item Binding site detection: {% if binding_site_detection.enabled %}Enabled ({{ binding_site_detection.cutoff_angstrom }}\,\AA{} cutoff){% else %}Disabled{% endif %}
+\item Report generated by bmyCure4MM Binding Visualizer.
 \end{itemize}
 
 \section{References}
-
 \begin{enumerate}
-\item RCSB Protein Data Bank: \url{https://www.rcsb.org/}
-\item Multiple myeloma treatment guidelines and clinical studies
-\item Proteasome inhibitor mechanism and resistance studies
-\item Structure-based drug design methodologies
+\item RCSB Protein Data Bank (\url{https://www.rcsb.org/})
+\item py3Dmol: Interactive molecular visualisation
+\item bmyCure4MM: Multiple Myeloma research toolkit
 \end{enumerate}
-
 \end{document}
 """
-
-\begin{table}[h!]
-\centering
-\begin{tabular}{@{}ll@{}}
-\toprule
-\textbf{Property} & \textbf{Value} \\
-\midrule
-PDB ID & {{ pdb_id }} \\
-Experimental Method & {{ method or 'N/A' }} \\
-Resolution & {{ resolution or 'N/A' }} \\
-Number of Chains & {{ chains|length }} \\
-Ligands Present & {{ ligands|join(', ') if ligands else 'None' }} \\
-\bottomrule
-\end{tabular}
-\caption{Structure Properties}
-\end{table}
-
-\section{3D Structure Visualization}
-
-\begin{figure}[h!]
-\centering
-{% if structure_image_path %}
-\includegraphics[width=0.8\textwidth]{{ "{" }}{{ structure_image_path }}{{ "}" }}
-{% else %}
-\textit{Structure image not available}
-{% endif %}
-\caption{3D molecular structure of {{ pdb_id }}. {% if ligand %}Ligand {{ ligand }} is highlighted in cyan carbon coloring.{% endif %}}
-\label{fig:structure}
-\end{figure}
-
-{% if mutations %}
-\section{Mutation Analysis}
-
-\begin{longtable}{@{}llll@{}}
-\toprule
-\textbf{Chain} & \textbf{Position} & \textbf{Mutation} & \textbf{Effect} \\
-\midrule
-{% for mutation in mutations %}
-{{ mutation.chain }} & {{ mutation.resnum }} & {{ mutation.mutation }} & {{ mutation.effect }} \\
-{% endfor %}
-\bottomrule
-\caption{Identified mutations and their clinical effects}
-\end{longtable}
-{% endif %}
-
-{% if therapies %}
-\section{Therapeutic Information}
-
-{% for therapy in therapies %}
-\subsection{{ "{" }}{{ therapy.name }}{{ "}" }}
-
-\begin{itemize}
-\item \textbf{PDB Ligand Code:} {{ therapy.pdb_ligand }}
-\item \textbf{Clinical Phase:} {{ therapy.clinical_phase }}
-\item \textbf{Target:} {{ pdb_id }} binding site
-{% if therapy.mechanism %}
-\item \textbf{Mechanism:} {{ therapy.mechanism }}
-{% endif %}
-\end{itemize}
-{% endfor %}
-{% endif %}
-
-\section{Analysis Details}
-
-\begin{table}[h!]
-\centering
-\begin{tabular}{@{}ll@{}}
-\toprule
-\textbf{Parameter} & \textbf{Value} \\
-\midrule
-Analysis Date & \today \\
-Software Version & bmyCure4MM v1.0.0 \\
-PDB Source & RCSB Protein Data Bank \\
-Visualization Tool & py3Dmol v2.4.2 \\
-{% if binding_site_detection.enabled %}
-Binding Site Detection & Enabled ({{ binding_site_detection.cutoff_angstrom }} \AA \ cutoff) \\
-{% endif %}
-\bottomrule
-\end{tabular}
-\caption{Analysis Parameters}
-\end{table}
-
-\section{Summary}
-
-This report presents the structural analysis of PDB {{ pdb_id }}{% if ligand %}, focusing on the binding interactions with ligand {{ ligand }}{% endif %}. The analysis was performed using the bmyCure4MM binding visualizer module, which combines 3D molecular visualization with mutation mapping and therapeutic information.
-
-{% if mutations %}
-The structure contains {{ mutations|length }} identified mutation(s) that may affect drug binding and resistance profiles. These mutations should be considered when evaluating therapeutic strategies.
-{% endif %}
-
-For interactive exploration of this structure, please refer to the accompanying HTML visualization file: \texttt{{ "{" }}{{ pdb_id }}_structure_viewer.html{{ "}" }}.
-
-\section{References}
-
-\begin{itemize}
-\item RCSB Protein Data Bank: \url{https://www.rcsb.org/}
-\item py3Dmol: \url{https://3dmol.csb.pitt.edu/}
-\item bmyCure4MM Project: Multiple Myeloma Drug Discovery Platform
-\end{itemize}
-
-\end{document}
-"""
-    return template
-
 def generate_pdf_report(config, pdb_data, pdb_metadata, output_dir=None):
     """
     Generate a PDF report from LaTeX template with molecular structure analysis.

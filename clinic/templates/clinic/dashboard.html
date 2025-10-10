@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row g-3 mb-3">
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h1 class="h5 text-muted">Total Patients</h1>
+                <p class="display-5 fw-semibold mb-0">{{ patient_count }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h2 class="h5 mb-0">Recent Assessments</h2>
+    </div>
+    <div class="card-body p-0">
+        {% if recent_assessments %}
+            <div class="table-responsive">
+                <table class="table table-striped table-sm align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">Date</th>
+                            <th scope="col">Patient</th>
+                            <th scope="col">M-Protein (g/dL)</th>
+                            <th scope="col">FLC Ratio</th>
+                            <th scope="col">Response</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for assessment in recent_assessments %}
+                            <tr>
+                                <td>{{ assessment.date }}</td>
+                                <td>
+                                    <a href="{% url 'clinic:patient_detail' assessment.patient.id %}" class="text-decoration-none">
+                                        {{ assessment.patient.last_name }}, {{ assessment.patient.first_name }}
+                                    </a>
+                                </td>
+                                <td>{{ assessment.m_protein_g_dl|default:"–" }}</td>
+                                <td>{{ assessment.flc_ratio|default:"–" }}</td>
+                                <td>{{ assessment.get_response_display|default:"–" }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="m-3 text-muted">No assessments recorded yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

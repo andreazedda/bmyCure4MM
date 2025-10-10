@@ -1,0 +1,6 @@
+2025-07-04 12:15:26,376 - ERROR - Error: 400 Client Error: PUGREST.BadRequest for url: https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/387447/property/CanonicalSMILES/JSON
+2025-07-04 12:21:30,000 - ERROR - Error: 400 Client Error: PUGREST.BadRequest for url: https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/387447/property/CanonicalSMILES/JSON
+2025-07-04 15:21:27,071 - ERROR - Error: 400 Client Error: PUGREST.BadRequest for url: https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/2244/property/CanonicalSMILES/JSON
+2025-07-04 15:24:17,020 - ERROR - Error: 400 Client Error: PUGREST.BadRequest for url: https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/2244/property/CanonicalSMILES/JSON
+2025-07-04 15:25:04,794 - ERROR - Error: 400 Client Error: PUGREST.BadRequest for url: https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/2244/property/IsomericSMILES,CanonicalSMILES/JSON
+2025-07-04 17:06:31,985 - INFO - Parameters: {'MolecularWeight': 180.15899999999996, 'LogP': 1.3101, 'NumHDonors': 1, 'NumHAcceptors': 3}

@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{% url 'clinic:patient_list' %}">Patients</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ patient.first_name }} {{ patient.last_name }}</li>
+    </ol>
+</nav>
+
+<div class="row g-3 mb-3">
+    <div class="col-lg-8">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h1 class="h4 mb-3">{{ patient.first_name }} {{ patient.last_name }}</h1>
+                <div class="row row-cols-1 row-cols-md-2 g-3">
+                    <div class="col">
+                        <div class="card border-0 bg-light h-100">
+                            <div class="card-body">
+                                <p class="mb-1 text-muted">MRN</p>
+                                <p class="fw-semibold mb-0">{{ patient.mrn }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card border-0 bg-light h-100">
+                            <div class="card-body">
+                                <p class="mb-1 text-muted">Age</p>
+                                <p class="fw-semibold mb-0">{{ patient.age }} years</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card border-0 bg-light h-100">
+                            <div class="card-body">
+                                <p class="mb-1 text-muted">Sex</p>
+                                <p class="fw-semibold mb-0">{{ patient.get_sex_display }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card border-0 bg-light h-100">
+                            <div class="card-body">
+                                <p class="mb-1 text-muted">Diagnosis date</p>
+                                <p class="fw-semibold mb-0">{{ patient.diagnosis_date }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% if patient.notes %}
+                    <hr>
+                    <h2 class="h5">Clinical Notes</h2>
+                    <p class="mb-0">{{ patient.notes }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h2 class="h5">Lab Trends</h2>
+                <canvas id="trendChart" height="220"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0">Assessments</h2>
+        <a class="btn btn-sm btn-primary" href="{% url 'clinic:assessment_new' patient.id %}">Add Assessment</a>
+    </div>
+    <div class="card-body p-0">
+        {% if assessments %}
+            <div class="table-responsive">
+                <table class="table table-striped table-sm align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">Date</th>
+                            <th scope="col">M-Protein (g/dL)</th>
+                            <th scope="col">FLC Ratio</th>
+                            <th scope="col">Response</th>
+                            <th scope="col">R-ISS</th>
+                            <th scope="col">Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for assessment in assessments %}
+                            <tr>
+                                <td>{{ assessment.date }}</td>
+                                <td>{{ assessment.m_protein_g_dl|default:"–" }}</td>
+                                <td>{{ assessment.flc_ratio|default:"–" }}</td>
+                                <td>{{ assessment.get_response_display|default:"–" }}</td>
+                                <td>{{ assessment.get_r_iss_display|default:"–" }}</td>
+                                <td>{{ assessment.notes|default:"–" }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="m-3 text-muted">No assessments recorded.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header">
+                <h2 class="h5 mb-0">Cytogenetics</h2>
+            </div>
+            <div class="card-body p-0">
+                {% if cytogenetics %}
+                    <div class="table-responsive">
+                        <table class="table table-sm table-striped align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Anomaly</th>
+                                    <th>Date</th>
+                                    <th>Method</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in cytogenetics %}
+                                    <tr>
+                                        <td>{{ record.abnormality.code }} — {{ record.abnormality.description }}</td>
+                                        <td>{{ record.detected_on }}</td>
+                                        <td>{{ record.method|default:"–" }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="m-3 text-muted">No cytogenetic findings recorded.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header">
+                <h2 class="h5 mb-0">Therapies</h2>
+            </div>
+            <div class="card-body p-0">
+                {% if therapies %}
+                    <div class="table-responsive">
+                        <table class="table table-sm table-striped align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Regimen</th>
+                                    <th>Start</th>
+                                    <th>End</th>
+                                    <th>Outcome</th>
+                                    <th>Adverse Events</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for therapy in therapies %}
+                                    <tr>
+                                        <td>{{ therapy.regimen.name }}</td>
+                                        <td>{{ therapy.start_date }}</td>
+                                        <td>{{ therapy.end_date|default:"Ongoing" }}</td>
+                                        <td>{{ therapy.outcome|default:"–" }}</td>
+                                        <td>{{ therapy.adverse_events|default:"–" }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="m-3 text-muted">No therapies recorded.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const points = {{ chart_points|safe }};
+if (points.length) {
+    const ctx = document.getElementById('trendChart').getContext('2d');
+    const labels = points.map(p => p.date);
+    const mProtein = points.map(p => p.m);
+    const flc = points.map(p => p.flc);
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: 'M-Protein (g/dL)',
+                    data: mProtein,
+                    spanGaps: true,
+                    borderColor: '#0d6efd',
+                    tension: 0.3,
+                    fill: false
+                },
+                {
+                    label: 'FLC Ratio',
+                    data: flc,
+                    spanGaps: true,
+                    borderColor: '#fd7e14',
+                    tension: 0.3,
+                    fill: false
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { title: { display: true, text: 'Date' } },
+                y: { title: { display: true, text: 'Value' } }
+            }
+        }
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h1 class="h4 mb-3">Ligand Similarity Search</h1>
+                <p class="text-muted">Search PubChem for similar ligands and compute key descriptors.</p>
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                    {% endif %}
+                    {% for field in form %}
+                        <div class="mb-3">
+                            <label class="form-label" for="id_{{ field.name }}">{{ field.label }}<span class="text-danger"> *</span></label>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <div class="form-text">{{ field.help_text }}</div>
+                            {% endif %}
+                            {% if field.errors %}
+                                <div class="invalid-feedback d-block">{{ field.errors|striptags }}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
+                            Run Search
+                        </button>
+                        <a href="{% url 'chemtools:tools_home' %}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+                <hr>
+                <p class="mb-0 small text-muted">Enter a canonical SMILES string (≤4096 characters). Results include similarity scores and RDKit descriptors.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
