@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-2 mb-3">
+    <div>
+        <h1 class="h3 mb-0">Scenario Management</h1>
+        <small class="text-muted">Configure cases, guidance notes, and recommended regimens.</small>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'simulator:regimen_list' %}" class="btn btn-outline-secondary">Regimens</a>
+        <a href="{% url 'simulator:scenario_create' %}" class="btn btn-primary">New Scenario</a>
+    </div>
+</div>
+
+{% if scenarios %}
+    <div class="row g-3">
+        {% for scenario in scenarios %}
+            <div class="col-xl-6">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h2 class="h5 mb-1">{{ scenario.title }}</h2>
+                                <span class="badge bg-secondary">{{ scenario.get_clinical_stage_display }}</span>
+                                {% if scenario.active %}
+                                    <span class="badge bg-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Inactive</span>
+                                {% endif %}
+                            </div>
+                            <span class="badge bg-info text-dark">Attempts: {{ scenario.attempt_count }}</span>
+                        </div>
+                        <p class="text-muted small mb-3">{{ scenario.summary|truncatewords:35 }}</p>
+                        <div class="mb-3">
+                            <strong class="small d-block text-uppercase text-muted">Guideline regimens</strong>
+                            {% if scenario.recommended_regimens.all %}
+                                <div class="d-flex flex-wrap gap-2 mt-1">
+                                    {% for regimen in scenario.recommended_regimens.all %}
+                                        <span class="badge bg-light text-dark border">{{ regimen.name }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <span class="text-muted small">None assigned</span>
+                            {% endif %}
+                        </div>
+                        <div class="mt-auto d-flex flex-wrap gap-2">
+                            <a href="{% url 'simulator:scenario_detail' scenario.pk %}" class="btn btn-outline-primary btn-sm">View</a>
+                            <a href="{% url 'simulator:scenario_edit' scenario.pk %}" class="btn btn-outline-secondary btn-sm">Edit</a>
+                            <form method="post" action="{% url 'simulator:scenario_duplicate' scenario.pk %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-dark btn-sm">Duplicate</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="alert alert-secondary" role="alert">
+        No scenarios configured yet. Create a new scenario to begin.
+    </div>
+{% endif %}
+{% endblock %}

@@ -14,6 +14,7 @@ urlpatterns = [
     path("chem/", include(("chemtools.urls", "chemtools"), namespace="chemtools")),
     path("sim/", include(("simulator.urls", "simulator"), namespace="simulator")),
     path("api/", include("clinic.api")),
+    path("api/chem/", include("chemtools.api")),
     path("healthz/", lambda request: JsonResponse({"ok": True})),
 ]
 

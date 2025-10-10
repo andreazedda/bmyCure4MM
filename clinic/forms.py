@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+
 from django import forms
+
+from mmportal.forms_mixins import BootstrapValidationMixin
 
 from . import models
 
 
-class AssessmentForm(forms.ModelForm):
+class AssessmentForm(BootstrapValidationMixin, forms.ModelForm):
     """Quick entry form for laboratory assessment."""
 
     date = forms.DateField(widget=forms.DateInput(attrs={"type": "date"}))
@@ -61,7 +64,7 @@ class AssessmentForm(forms.ModelForm):
         return cleaned
 
 
-class PatientTherapyForm(forms.ModelForm):
+class PatientTherapyForm(BootstrapValidationMixin, forms.ModelForm):
     """Manage therapy course entries."""
 
     start_date = forms.DateField(widget=forms.DateInput(attrs={"type": "date"}))

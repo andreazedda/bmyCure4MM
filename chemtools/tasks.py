@@ -2,40 +2,20 @@ from __future__ import annotations
 
 import shutil
 import tempfile
+import traceback
 from pathlib import Path
+from typing import Iterable
 
 from celery import shared_task
 from django.conf import settings
-import traceback
 
 from . import models, utils
-
-
-def _compose_log(stdout: str, stderr: str) -> str:
-    parts = []
-    if stdout:
-        parts.append(stdout)
-    if stderr:
-        parts.append("--- STDERR ---")
-        parts.append(stderr)
-    if parts:
-        return "\n".join(parts)
-    return "(no output captured)"
 
 
 def _job_media_dir(job_id: int) -> Path:
     base = Path(settings.MEDIA_ROOT) / "chem" / str(job_id)
     base.mkdir(parents=True, exist_ok=True)
     return base
-
-
-def _store_file(src: Path, dest: Path) -> str:
-    dest.parent.mkdir(parents=True, exist_ok=True)
-    if dest.exists():
-        dest.unlink()
-    shutil.move(str(src), str(dest))
-    relative = dest.relative_to(Path(settings.MEDIA_ROOT)).as_posix()
-    return relative
 
 
 def _ensure_placeholder_thumbnail(dest: Path) -> None:
@@ -48,31 +28,78 @@ def _ensure_placeholder_thumbnail(dest: Path) -> None:
     dest.write_bytes(placeholder)
 
 
+def _next_versioned_path(directory: Path, stem: str, suffix: str) -> Path:
+    suffix = suffix if suffix.startswith(".") else f".{suffix}"
+    highest = 0
+    for path in directory.glob(f"{stem}_v*{suffix}"):
+        try:
+            version_text = path.stem.rsplit("_v", 1)[1]
+            highest = max(highest, int(version_text))
+        except (IndexError, ValueError):
+            continue
+    return directory / f"{stem}_v{highest + 1}{suffix}"
+
+
+def _store_file(src: Path, dest: Path) -> str:
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    if dest.exists():
+        dest.unlink()
+    shutil.move(str(src), str(dest))
+    return dest.relative_to(Path(settings.MEDIA_ROOT)).as_posix()
+
+
+def _merge_logs(previous: str, entries: Iterable[str]) -> str:
+    new_entry = "\n---\n".join(part.strip() for part in entries if part and part.strip())
+    if not new_entry:
+        return previous
+    return f"{previous.strip()}\n---\n{new_entry}" if previous else new_entry
+
+
+def _error_entry(exc: Exception, detail: str = "") -> str:
+    pieces = [f"ERROR: {exc}"]
+    if detail:
+        pieces.append(detail)
+    pieces.append("--- TRACEBACK ---")
+    pieces.append(traceback.format_exc())
+    return "\n".join(pieces)
+
+
+def _append_log(job: models.ChemJob, previous: str, entries: Iterable[str]) -> None:
+    job.log = _merge_logs(previous, entries)
+
+
+def _run_setup(logs: list[str]) -> None:
+    for runner in (utils.run_settings_generator, utils.run_paths_generator):
+        result = runner()
+        if result:
+            logs.append(result)
+
+
 @shared_task
 def run_drug_params_job(job_id: int, smiles: str, cid: str) -> None:
     job = models.ChemJob.objects.get(pk=job_id)
     tmpdir = Path(tempfile.mkdtemp(prefix="chem_drug_"))
     previous_log = job.log or ""
+    logs: list[str] = []
     try:
-        utils.run_settings_generator()
-        utils.run_paths_generator()
+        _run_setup(logs)
         output_path, stdout, stderr = utils.run_drug_parameter_evaluator(
             smiles=smiles or None,
             cid=cid or None,
             outdir=tmpdir,
         )
-        new_log = _compose_log(stdout, stderr)
-        job.log = (previous_log + "\n---\n" + new_log).strip() if previous_log else new_log
+        logs.append(utils._compose_logs(stdout, stderr) or "(no output captured)")
         if output_path and output_path.is_file():
             job_dir = _job_media_dir(job.pk)
-            version = len(list(job_dir.glob("drug_*.html"))) + 1
-            filename = f"drug_{job.pk}.html" if version == 1 else f"drug_{job.pk}_v{version}.html"
-            dest = job_dir / filename
+            dest = _next_versioned_path(job_dir, f"drug_{job.pk}", ".html")
             job.out_html.name = _store_file(output_path, dest)
     except Exception as exc:  # pragma: no cover - defensive
-        error_entry = f"ERROR: {exc}"
-        job.log = (previous_log + "\n---\n" + error_entry).strip() if previous_log else error_entry
+        detail = ""
+        if isinstance(exc, utils.ToolRunError):
+            detail = utils._compose_logs(exc.stdout, exc.stderr)
+        logs.append(_error_entry(exc, detail))
     finally:
+        _append_log(job, previous_log, logs)
         job.save()
         shutil.rmtree(tmpdir, ignore_errors=True)
 
@@ -81,24 +108,19 @@ def run_drug_params_job(job_id: int, smiles: str, cid: str) -> None:
 def run_binding_viz_job(job_id: int, pdb_id: str, ligand: str) -> None:
     job = models.ChemJob.objects.get(pk=job_id)
     tmpdir = Path(tempfile.mkdtemp(prefix="chem_bind_"))
-    stdout = ""
-    stderr = ""
     previous_log = job.log or ""
+    logs: list[str] = []
+    job_dir = _job_media_dir(job.pk)
     try:
-        utils.run_settings_generator()
-        utils.run_paths_generator()
+        _run_setup(logs)
         output_path, stdout, stderr = utils.run_binding_visualizer(
             pdb_id=pdb_id,
             ligand=ligand or None,
             outdir=tmpdir,
         )
-        new_log = _compose_log(stdout, stderr)
-        job.log = (previous_log + "\n---\n" + new_log).strip() if previous_log else new_log
-        job_dir = _job_media_dir(job.pk)
+        logs.append(utils._compose_logs(stdout, stderr) or "(no output captured)")
         if output_path and output_path.is_file():
-            version = len(list(job_dir.glob("binding_*.html"))) + 1
-            base_name = f"binding_{pdb_id}.html" if version == 1 else f"binding_{pdb_id}_v{version}.html"
-            dest = job_dir / base_name
+            dest = _next_versioned_path(job_dir, f"binding_{pdb_id}", ".html")
             job.out_html.name = _store_file(output_path, dest)
 
         snapshot_path = tmpdir / f"{pdb_id}_structure.png"
@@ -107,12 +129,14 @@ def run_binding_viz_job(job_id: int, pdb_id: str, ligand: str) -> None:
             _store_file(snapshot_path, thumb_dest)
         else:
             _ensure_placeholder_thumbnail(thumb_dest)
-    except Exception as exc:  # pragma: no cover
-        error_log = _compose_log(stdout, stderr)
-        traceback_text = traceback.format_exc()
-        error_entry = f"ERROR: {exc}\n{error_log}\n--- TRACEBACK ---\n{traceback_text}"
-        job.log = (previous_log + "\n---\n" + error_entry).strip() if previous_log else error_entry
+    except Exception as exc:  # pragma: no cover - defensive
+        detail = ""
+        if isinstance(exc, utils.ToolRunError):
+            detail = utils._compose_logs(exc.stdout, exc.stderr)
+        logs.append(_error_entry(exc, detail))
+        _ensure_placeholder_thumbnail(job_dir / "thumb.png")
     finally:
+        _append_log(job, previous_log, logs)
         job.save()
         shutil.rmtree(tmpdir, ignore_errors=True)
 
@@ -122,22 +146,24 @@ def run_similarity_job(job_id: int, smiles: str) -> None:
     job = models.ChemJob.objects.get(pk=job_id)
     tmpdir = Path(tempfile.mkdtemp(prefix="chem_sim_"))
     previous_log = job.log or ""
+    logs: list[str] = []
     try:
+        _run_setup(logs)
         output_path, stdout, stderr = utils.run_similarity_search(
             smiles=smiles,
             out_csv=tmpdir,
         )
-        new_log = _compose_log(stdout, stderr)
-        job.log = (previous_log + "\n---\n" + new_log).strip() if previous_log else new_log
+        logs.append(utils._compose_logs(stdout, stderr) or "(no output captured)")
         if output_path and output_path.is_file():
             job_dir = _job_media_dir(job.pk)
-            version = len(list(job_dir.glob("sim_*.csv"))) + 1
-            filename = f"sim_{job.pk}.csv" if version == 1 else f"sim_{job.pk}_v{version}.csv"
-            dest = job_dir / filename
+            dest = _next_versioned_path(job_dir, f"sim_{job.pk}", ".csv")
             job.out_csv.name = _store_file(output_path, dest)
-    except Exception as exc:  # pragma: no cover
-        error_entry = f"ERROR: {exc}"
-        job.log = (previous_log + "\n---\n" + error_entry).strip() if previous_log else error_entry
+    except Exception as exc:  # pragma: no cover - defensive
+        detail = ""
+        if isinstance(exc, utils.ToolRunError):
+            detail = utils._compose_logs(exc.stdout, exc.stderr)
+        logs.append(_error_entry(exc, detail))
     finally:
+        _append_log(job, previous_log, logs)
         job.save()
         shutil.rmtree(tmpdir, ignore_errors=True)

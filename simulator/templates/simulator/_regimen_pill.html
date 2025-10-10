@@ -1,0 +1,14 @@
+<form method="post"
+      hx-post="{% url 'simulator:scenario_regimen_remove' scenario.pk %}"
+      hx-target="#{{ target_id }}"
+      hx-swap="innerHTML"
+      class="d-inline">
+    {% csrf_token %}
+    <input type="hidden" name="regimen_id" value="{{ regimen.pk }}">
+    <span class="badge bg-primary d-inline-flex align-items-center gap-2">
+        <span>{{ regimen.name }}</span>
+        <button type="submit" class="btn btn-sm btn-link text-white text-decoration-none p-0" aria-label="Remove {{ regimen.name }}">
+            &times;
+        </button>
+    </span>
+</form>

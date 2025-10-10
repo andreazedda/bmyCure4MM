@@ -1,0 +1,39 @@
+<div id="{{ target_id }}"{% if oob %} hx-swap-oob="true"{% endif %}>
+    {% if regimens %}
+        <div class="d-flex flex-wrap gap-2 mb-3">
+            {% for regimen in regimens %}
+                {% include "simulator/_regimen_pill.html" with regimen=regimen scenario=scenario target_id=target_id %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-muted small">No guideline regimens assigned yet.</p>
+    {% endif %}
+    {% if available_regimens %}
+        <form method="post"
+              hx-post="{% url 'simulator:scenario_regimen_add' scenario.pk %}"
+              hx-target="#{{ target_id }}"
+              hx-swap="innerHTML"
+              class="d-flex flex-column flex-md-row gap-2 align-items-start">
+            {% csrf_token %}
+            <div class="flex-grow-1 w-100">
+                <label class="form-label" for="{{ target_id }}-add-select">Add regimen</label>
+                <select id="{{ target_id }}-add-select"
+                        name="regimen_id"
+                        class="form-select"
+                        {% if allow_multiple %}multiple size="10"{% else %}size="5"{% endif %}>
+                    {% for regimen in available_regimens %}
+                        <option value="{{ regimen.pk }}">{{ regimen.name }}</option>
+                    {% endfor %}
+                </select>
+                <div class="form-text">Selected regimens will be added to this scenario.</div>
+            </div>
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary mt-md-4">{% if allow_multiple %}Add selected{% else %}Add{% endif %}</button>
+            </div>
+        </form>
+    {% else %}
+        <div class="alert alert-secondary small mb-0" role="alert">
+            All regimens are already linked to this scenario.
+        </div>
+    {% endif %}
+</div>

@@ -37,16 +37,16 @@
                     <tbody>
                         {% for job in jobs %}
                             {% with status=job.status_label %}
-                            <tr>
+                            <tr data-job-id="{{ job.pk }}" data-job-status="{{ status.0 }}"{% if status.0 == "Queued" %} hx-get="{% url 'chemtools:job_status' job.pk %}" hx-trigger="load, every 5s" hx-target="this" hx-swap="none"{% endif %}>
                                 <td>{{ job.created|date:"Y-m-d H:i" }}</td>
                                 <td>{{ job.get_kind_display }}</td>
-                                <td><span class="badge bg-{{ status.1 }}">{{ status.0 }}</span></td>
+                                <td data-cell="status"><span class="badge bg-{{ status.1 }}">{{ status.0 }}</span></td>
                                 <td>{% if job.user %}{{ job.user.username }}{% else %}–{% endif %}</td>
                                 <td>
                                     <div class="small text-muted">{{ job.input_a|default:"–" }}</div>
                                     {% if job.input_b %}<div class="small text-muted">{{ job.input_b }}</div>{% endif %}
                                 </td>
-                                <td>
+                                <td data-cell="outputs">
                                     <div class="btn-group btn-group-sm" role="group">
                                         {% if job.out_html %}
                                             <a class="btn btn-outline-primary" href="{{ job.out_html.url }}" target="_blank">View HTML</a>
@@ -59,9 +59,9 @@
                                         {% endif %}
                                     </div>
                                 </td>
-                                <td>
+                                <td data-cell="thumbnail">
                                     {% if job.thumbnail_url %}
-                                        <img src="{{ job.thumbnail_url }}" alt="thumbnail" class="img-thumbnail" style="max-width: 96px;">
+                                        <img src="{{ job.thumbnail_url }}" alt="thumbnail" class="img-thumbnail img-fluid" style="max-width: 96px;">
                                     {% else %}
                                         <span class="text-muted small">No preview</span>
                                     {% endif %}
@@ -105,4 +105,60 @@
         No jobs have been submitted yet.
     </div>
 {% endif %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+(() => {
+    const buildOutputs = (data) => {
+        if (!data.has_html && !data.has_csv) {
+            return '<span class="text-muted small">–</span>';
+        }
+        let html = '<div class="btn-group btn-group-sm" role="group">';
+        if (data.html_url) {
+            html += `<a class="btn btn-outline-primary" href="${data.html_url}" target="_blank">View HTML</a>`;
+        }
+        if (data.csv_url) {
+            html += `<a class="btn btn-outline-secondary" href="${data.csv_url}">Download CSV</a>`;
+        }
+        html += '</div>';
+        return html;
+    };
+
+    document.body.addEventListener('htmx:afterRequest', (event) => {
+        const detail = event.detail;
+        if (!detail || detail.mmMatchedPath !== 'chemtools') {
+            return;
+        }
+        const targetEl = detail.target || event.target;
+        const row = targetEl ? targetEl.closest('tr[data-job-id]') : null;
+        if (!row) {
+            return;
+        }
+        const data = detail.mmParsedJson;
+        if (!data) {
+            return;
+        }
+        const statusCell = row.querySelector('[data-cell="status"]');
+        if (statusCell) {
+            statusCell.innerHTML = `<span class="badge bg-${data.variant}">${data.status}</span>`;
+        }
+        const outputsCell = row.querySelector('[data-cell="outputs"]');
+        if (outputsCell) {
+            outputsCell.innerHTML = buildOutputs(data);
+        }
+        const thumbCell = row.querySelector('[data-cell="thumbnail"]');
+        if (thumbCell) {
+            thumbCell.innerHTML = data.thumbnail_url
+                ? `<img src="${data.thumbnail_url}" alt="thumbnail" class="img-thumbnail" style="max-width: 96px;">`
+                : '<span class="text-muted small">No preview</span>';
+        }
+        row.dataset.jobStatus = data.status;
+        if (data.status !== 'Queued') {
+            row.removeAttribute('hx-trigger');
+        }
+    });
+})();
+</script>
+{% endblock %}
 {% endblock %}

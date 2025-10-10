@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.views.decorators.http import require_GET
 
 from . import forms, models
 from .tasks import (
@@ -137,3 +138,20 @@ def retry_job(request: HttpRequest, pk: int) -> HttpResponse:
     else:
         messages.success(request, "Job retry completed successfully.")
     return redirect(reverse("chemtools:tools_home"))
+
+
+@login_required
+@require_GET
+def job_status(request: HttpRequest, pk: int) -> JsonResponse:
+    job = get_object_or_404(models.ChemJob, pk=pk)
+    status_text, status_variant = job.status_label()
+    data = {
+        "status": status_text,
+        "variant": status_variant,
+        "has_html": bool(job.out_html),
+        "has_csv": bool(job.out_csv),
+        "html_url": job.out_html.url if job.out_html else None,
+        "csv_url": job.out_csv.url if job.out_csv else None,
+        "thumbnail_url": job.thumbnail_url(),
+    }
+    return JsonResponse(data)

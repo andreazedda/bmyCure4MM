@@ -70,12 +70,35 @@ def fetch_drug_data(drug_id):
         logging.info("Fetching drug data for ID: %s", drug_id)
         response = requests.get(drug_url, timeout=10)
         response.raise_for_status()
-        smiles_data = response.json()['PropertyTable']['Properties'][0]['CanonicalSMILES']
-        logging.info("Drug data fetched successfully.")
+        payload = response.json()
+        properties = payload.get("PropertyTable", {}).get("Properties", [])
+        if not properties:
+            logging.warning("CanonicalSMILES unavailable in primary response for CID %s. Retrying with expanded property request.", drug_id)
+            # Retry with expanded property list (Canonical + Isomeric)
+            alt_url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/{drug_id}/property/CanonicalSMILES,IsomericSMILES/JSON"
+            alt_response = requests.get(alt_url, timeout=10)
+            alt_response.raise_for_status()
+            payload = alt_response.json()
+            properties = payload.get("PropertyTable", {}).get("Properties", [])
+            if not properties:
+                raise ValueError(f"PubChem returned no property records for CID {drug_id}.")
+
+        record = properties[0]
+        smiles_data = record.get("CanonicalSMILES") or record.get("IsomericSMILES")
+        if not smiles_data:
+            raise ValueError(
+                f"SMILES data unavailable for PubChem CID {drug_id}. Try providing a SMILES string manually."
+            )
+
+        logging.info("Drug data fetched successfully for CID %s.", drug_id)
         return smiles_data
     except requests.exceptions.RequestException as error:
         logging.error("Error fetching drug data: %s", error)
         print(Fore.RED + "Error fetching drug data. Check the log file for details." + Style.RESET_ALL)
+        raise
+    except ValueError as error:
+        logging.error("PubChem response missing SMILES information: %s", error)
+        print(Fore.RED + f"{error}" + Style.RESET_ALL)
         raise
 
 

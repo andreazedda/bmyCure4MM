@@ -2,10 +2,11 @@
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-lg-6">
+    <div class="col-lg-8 col-xl-7">
         <div class="card shadow-sm">
             <div class="card-body">
-                <h1 class="h4 mb-3">New Assessment for {{ patient.first_name }} {{ patient.last_name }}</h1>
+                <h1 class="h4 mb-3">{{ is_create|yesno:"Create Regimen,Update Regimen" }}</h1>
+                <p class="text-muted">Maintain standardised regimens for simulator scenarios and patient records.</p>
                 <form method="post" novalidate>
                     {% csrf_token %}
                     {% if form.non_field_errors %}
@@ -13,7 +14,7 @@
                     {% endif %}
                     {% for field in form %}
                         <div class="mb-3">
-                            <label class="form-label" for="id_{{ field.name }}">{{ field.label }}</label>
+                            <label class="form-label" for="id_{{ field.name }}">{{ field.label }}{% if field.field.required %}<span class="text-danger"> *</span>{% endif %}</label>
                             {{ field }}
                             {% if field.help_text %}
                                 <div class="form-text">{{ field.help_text }}</div>
@@ -24,8 +25,8 @@
                         </div>
                     {% endfor %}
                     <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">Save Assessment</button>
-                        <a href="{% url 'clinic:patient_detail' patient.id %}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">{{ is_create|yesno:"Create,Save changes" }}</button>
+                        <a href="{% url 'simulator:regimen_list' %}" class="btn btn-outline-secondary">Cancel</a>
                     </div>
                 </form>
             </div>

@@ -2,15 +2,18 @@ from __future__ import annotations
 
 from django import forms
 
+from mmportal.forms_mixins import BootstrapValidationMixin
+
 PDB_REGEX = r"^[0-9][A-Za-z0-9]{3}$"
 LIGAND_REGEX = r"^[A-Za-z0-9]{1,3}$"
 
 
-class DrugParamForm(forms.Form):
+class DrugParamForm(BootstrapValidationMixin, forms.Form):
     smiles = forms.CharField(
         label="SMILES",
         max_length=4096,
         required=False,
+        help_text="Provide a canonical SMILES string (≤4096 characters).",
         widget=forms.TextInput(
             attrs={
                 "placeholder": "Canonical SMILES (optional)",
@@ -23,6 +26,7 @@ class DrugParamForm(forms.Form):
         label="PubChem CID",
         required=False,
         min_value=1,
+        help_text="Optional positive PubChem compound identifier.",
         widget=forms.NumberInput(
             attrs={
                 "placeholder": "e.g., 2244",
@@ -35,27 +39,22 @@ class DrugParamForm(forms.Form):
 
     def clean(self):
         cleaned = super().clean()
-        smiles = cleaned.get("smiles", "") or ""
+        smiles = (cleaned.get("smiles") or "").strip()
         cid = cleaned.get("cid")
-        if smiles:
-            smiles = smiles.strip()
-            if not smiles:
-                smiles = ""
         if not smiles and cid is None:
             raise forms.ValidationError("Provide a SMILES string or a PubChem CID.")
-        if not smiles and not cid:
-            raise forms.ValidationError("Provide a SMILES string or a PubChem CID.")
-        cleaned["smiles"] = smiles
+        cleaned["smiles"] = smiles if smiles else ""
         cleaned["cid"] = cid
         return cleaned
 
 
-class BindingVizForm(forms.Form):
+class BindingVizForm(BootstrapValidationMixin, forms.Form):
     pdb_id = forms.RegexField(
         label="PDB ID",
         max_length=4,
         regex=PDB_REGEX,
         error_messages={"invalid": "Enter a valid 4-character PDB ID (e.g., 5LF3)."},
+        help_text="Four-character identifier beginning with a digit (e.g., 5LF3).",
         widget=forms.TextInput(
             attrs={
                 "placeholder": "e.g., 5LF3",
@@ -70,6 +69,7 @@ class BindingVizForm(forms.Form):
         regex=LIGAND_REGEX,
         required=False,
         error_messages={"invalid": "Ligand code must be 1–3 alphanumeric characters."},
+        help_text="Optional, uppercase 1–3 character ligand code (e.g., BOR).",
         widget=forms.TextInput(
             attrs={
                 "placeholder": "Optional (e.g., BOR)",
@@ -88,10 +88,11 @@ class BindingVizForm(forms.Form):
         return ligand.upper() if ligand else ""
 
 
-class SimilarityForm(forms.Form):
+class SimilarityForm(BootstrapValidationMixin, forms.Form):
     smiles = forms.CharField(
         label="SMILES",
         max_length=4096,
+        help_text="Canonical SMILES string (≤4096 characters).",
         widget=forms.TextInput(
             attrs={
                 "placeholder": "Canonical SMILES",

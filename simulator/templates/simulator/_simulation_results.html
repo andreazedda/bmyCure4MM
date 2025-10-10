@@ -1,0 +1,96 @@
+<!-- Fix overlapping cards and move progress bar inside results card -->
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h2 class="h6 mb-0">Simulation Results</h2>
+        <span class="badge bg-info text-dark">
+            {% if attempt %}
+                Run {{ attempt.submitted|date:"Y-m-d H:i" }}
+            {% else %}
+                Awaiting first run
+            {% endif %}
+        </span>
+    </div>
+    <div class="card-body">
+        {% if warnings %}
+            <div class="alert alert-warning d-flex flex-column gap-1" role="alert">
+                {% for warning in warnings %}
+                    <span>{{ warning }}</span>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% if summary %}
+            <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <tbody>
+                        <tr>
+                            <th scope="row">Tumor reduction</th>
+                            <td>
+                                {{ summary.tumor_reduction|floatformat:2 }} (fraction)
+                                {% if summary.tumor_reduction and summary.tumor_reduction > 0.9 %}
+                                    <span class="badge bg-success ms-2">Strong response</span>
+                                {% elif summary.tumor_reduction and summary.tumor_reduction > 0.7 %}
+                                    <span class="badge bg-info text-dark ms-2">Meaningful response</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Healthy loss</th>
+                            <td>
+                                {{ summary.healthy_loss|floatformat:2 }} (fraction)
+                                {% if summary.healthy_loss and summary.healthy_loss > 0.3 %}
+                                    <span class="badge bg-danger ms-2">High toxicity risk</span>
+                                {% elif summary.healthy_loss and summary.healthy_loss > 0.2 %}
+                                    <span class="badge bg-warning text-dark ms-2">Moderate toxicity</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Time to recurrence</th>
+                            <td>{% if summary.time_to_recurrence %}{{ summary.time_to_recurrence|floatformat:1 }} days{% else %}<span class="text-muted">Not reached within horizon</span>{% endif %}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Effective?</th>
+                            <td>
+                                {% if summary.effective %}
+                                    <span class="badge bg-success">Effective</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark">Monitor</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Drug exposure (AUC)</th>
+                            <td>
+                                <ul class="list-unstyled mb-0">
+                                    {% for drug, value in summary.auc.items %}
+                                        <li><strong>{{ drug|title }}</strong>: {{ value|floatformat:2 }} mg·day/L</li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="d-flex flex-wrap gap-2 mt-3">
+                {% if results.plot %}
+                    <a class="btn btn-outline-primary btn-sm" href="{{ results.plot }}" target="_blank" rel="noopener">View Plot</a>
+                {% endif %}
+                {% if results.csv %}
+                    <a class="btn btn-outline-secondary btn-sm" href="{{ results.csv }}" target="_blank" rel="noopener">Download CSV</a>
+                {% endif %}
+            </div>
+            <p class="small text-muted mt-3 mb-0">Tumor reduction reflects the modeled decrease in malignant plasma cells; healthy loss estimates collateral impact on normal plasma cells. Interpret alongside patient biomarkers and tolerance.</p>
+        {% else %}
+            <p class="text-muted mb-0">Simulation results will appear here once the model has been executed.</p>
+        {% endif %}
+    </div>
+    <div class="card-footer">
+        <div id="simulation-indicator" class="progress d-none" role="status" aria-live="polite">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%;"></div>
+        </div>
+        <div class="mt-3">
+            <label for="clinical-note" class="form-label small fw-semibold">Clinical note (not stored)</label>
+            <textarea id="clinical-note" class="form-control" rows="3" placeholder="Summarise interpretation, caveats, or follow-up actions (local use only)."></textarea>
+        </div>
+    </div>
+</div>

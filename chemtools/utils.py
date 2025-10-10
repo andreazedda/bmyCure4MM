@@ -7,7 +7,7 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-from typing import Dict, Iterable, Optional, Tuple
+from typing import Callable, Dict, Iterable, Optional, Tuple
 
 import yaml
 from django.conf import settings
@@ -71,7 +71,7 @@ def _sim_cache_dir() -> Path:
 
 
 @contextlib.contextmanager
-def temporary_yaml_override(path: Path, mutator) -> Iterable[None]:
+def temporary_yaml_override(path: Path, mutator: Callable[[dict], None]) -> Iterable[None]:
     original = path.read_text(encoding="utf-8")
     data = yaml.safe_load(original) if original.strip() else {}
     mutator(data)
@@ -138,11 +138,12 @@ def _new_files(before: Dict[Path, int], after: Iterable[Path]) -> list[Path]:
 
 
 def _resolve_outdir(outdir: Path | str | None, default_subdir: str) -> Path:
+    """Resolve an output directory honoring explicit args and MM_OUTDIR."""
     if outdir:
         resolved = Path(outdir)
     else:
         env_override = os.environ.get("MM_OUTDIR")
-    resolved = Path(env_override) if env_override else _chem_media_root() / default_subdir
+        resolved = Path(env_override) if env_override else _chem_media_root() / default_subdir
     resolved.mkdir(parents=True, exist_ok=True)
     return resolved
 
@@ -256,6 +257,8 @@ def run_binding_visualizer(
         "MM_LIGAND": ligand or "",
         "BROWSER": "true",
     }
+    if should_generate_pdf:
+        env["MM_BINDING_PDF"] = "1"
 
     with temporary_yaml_override(config_path, mutate_config):
         code, stdout, stderr = _run_command(

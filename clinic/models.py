@@ -118,6 +118,7 @@ class Regimen(models.Model):
     line = models.CharField(max_length=64, help_text="Line of therapy (e.g. frontline, salvage).")
     components = models.TextField(help_text="Comma-separated agents or regimen details.")
     intent = models.CharField(max_length=128, blank=True)
+    notes = models.TextField(blank=True)
 
     class Meta:
         ordering = ["name"]
@@ -141,4 +142,3 @@ class PatientTherapy(models.Model):
 
     def __str__(self) -> str:
         return f"{self.patient} - {self.regimen.name}"
-

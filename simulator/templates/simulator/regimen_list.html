@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-2 mb-3">
+    <div>
+        <h1 class="h3 mb-0">Regimens</h1>
+        <small class="text-muted">Therapy definitions available within simulator scenarios.</small>
+    </div>
+    {% if is_editor %}
+        <a href="{% url 'simulator:regimen_create' %}" class="btn btn-primary">New Regimen</a>
+    {% endif %}
+</div>
+
+<form method="get" class="row g-2 align-items-end mb-4">
+    <div class="col-md-5">
+        <label for="filter-q" class="form-label">Search</label>
+        <input type="text" id="filter-q" name="q" class="form-control" value="{{ filter_query }}" placeholder="Search name or components">
+    </div>
+    <div class="col-md-3">
+        <label for="filter-line" class="form-label">Line of therapy</label>
+        <select id="filter-line" name="line" class="form-select">
+            <option value="">All lines</option>
+            {% for line in line_choices %}
+                <option value="{{ line }}" {% if line == filter_line %}selected{% endif %}>{{ line }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label for="filter-intent" class="form-label">Intent</label>
+        <select id="filter-intent" name="intent" class="form-select">
+            <option value="">All intents</option>
+            {% for intent in intent_choices %}
+                <option value="{{ intent }}" {% if intent == filter_intent %}selected{% endif %}>{{ intent }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-1 d-grid">
+        <button type="submit" class="btn btn-outline-secondary">Filter</button>
+    </div>
+</form>
+
+{% if regimens %}
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover table-sm align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Line</th>
+                            <th scope="col">Intent</th>
+                            <th scope="col">Components</th>
+                            <th scope="col">Notes</th>
+                            {% if is_editor %}
+                                <th scope="col" class="text-end">Actions</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for regimen in regimens %}
+                            <tr>
+                                <td>{{ regimen.name }}</td>
+                                <td>{{ regimen.line|default:"—" }}</td>
+                                <td>{{ regimen.intent|default:"—" }}</td>
+                                <td class="small">{{ regimen.components }}</td>
+                                <td class="small text-muted">{{ regimen.notes|default:"—" }}</td>
+                                {% if is_editor %}
+                                    <td class="text-end">
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="{% url 'simulator:regimen_edit' regimen.pk %}" class="btn btn-outline-secondary">Edit</a>
+                                            <button type="button" class="btn btn-outline-danger"
+                                                hx-get="{% url 'simulator:regimen_delete' regimen.pk %}"
+                                                hx-target="#regimenDeleteModalContent"
+                                                hx-trigger="click"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#regimenDeleteModal">
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="alert alert-secondary" role="alert">
+        No regimens match your filters.
+    </div>
+{% endif %}
+
+{% if is_editor %}
+    <div class="modal fade" id="regimenDeleteModal" tabindex="-1" aria-labelledby="regimenDeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" id="regimenDeleteModalContent">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="regimenDeleteModalLabel">Delete Regimen</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">Select a regimen to delete from the list.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

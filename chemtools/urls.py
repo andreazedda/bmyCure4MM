@@ -8,4 +8,5 @@ urlpatterns = [
     path("binding/", views.binding_viz, name="binding_viz"),
     path("similarity/", views.similarity, name="similarity"),
     path("job/<int:pk>/retry/", views.retry_job, name="job_retry"),
+    path("job/<int:pk>/status.json", views.job_status, name="job_status"),
 ]
