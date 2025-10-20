@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Virtual Cohort - Simulator{% endblock %}
+
+{% block content %}
+<div class="container-fluid my-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h1 class="h2">
+                    <i class="bi bi-people-fill"></i> Virtual Cohort Runner
+                </h1>
+                <a href="{% url 'simulator:scenario_manage_list' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Scenarios
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Left panel: Configuration form -->
+        <div class="col-lg-5">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-sliders"></i> Cohort Configuration</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small">
+                        Run in-silico clinical trial with synthetic patient population. 
+                        Variability sampled from log-normal distributions for baseline cells, 
+                        growth rates, and PK/PD parameters.
+                    </p>
+
+                    <form id="cohort-form" hx-post="{% url 'simulator:cohort_run' %}" hx-target="#cohort-results" hx-swap="innerHTML">
+                        {% csrf_token %}
+                        
+                        <!-- Scenario selection -->
+                        <div class="mb-3">
+                            <label for="scenario_id" class="form-label">
+                                <strong>Scenario</strong>
+                            </label>
+                            <select class="form-select" id="scenario_id" name="scenario_id" required>
+                                <option value="" selected disabled>Select scenario...</option>
+                                {% for scenario in scenarios %}
+                                    <option value="{{ scenario.pk }}">{{ scenario.title }}</option>
+                                {% empty %}
+                                    <option value="" disabled>No active scenarios</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Cohort size -->
+                        <div class="mb-3">
+                            <label for="n_patients" class="form-label">
+                                <strong>Cohort Size</strong>
+                            </label>
+                            <input 
+                                type="number" 
+                                class="form-control" 
+                                id="n_patients" 
+                                name="n_patients" 
+                                value="100" 
+                                min="10" 
+                                max="1000" 
+                                required
+                            >
+                            <div class="form-text">Number of virtual patients (10-1000)</div>
+                        </div>
+
+                        <!-- Random seed -->
+                        <div class="mb-3">
+                            <label for="seed" class="form-label">
+                                <strong>Random Seed</strong>
+                            </label>
+                            <input 
+                                type="number" 
+                                class="form-control" 
+                                id="seed" 
+                                name="seed" 
+                                value="42" 
+                                required
+                            >
+                            <div class="form-text">For reproducibility</div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Regimen parameters -->
+                        <fieldset class="mb-3">
+                            <legend class="h6">Drug Doses</legend>
+                            
+                            <div class="mb-2">
+                                <label for="lenalidomide_dose" class="form-label">Lenalidomide (mg)</label>
+                                <input 
+                                    type="number" 
+                                    class="form-control form-control-sm" 
+                                    id="lenalidomide_dose" 
+                                    name="lenalidomide_dose" 
+                                    value="25.0" 
+                                    min="0" 
+                                    max="40" 
+                                    step="0.1"
+                                    required
+                                >
+                            </div>
+
+                            <div class="mb-2">
+                                <label for="bortezomib_dose" class="form-label">Bortezomib (mg/m²)</label>
+                                <input 
+                                    type="number" 
+                                    class="form-control form-control-sm" 
+                                    id="bortezomib_dose" 
+                                    name="bortezomib_dose" 
+                                    value="1.3" 
+                                    min="0" 
+                                    max="1.6" 
+                                    step="0.1"
+                                    required
+                                >
+                            </div>
+
+                            <div class="mb-2">
+                                <label for="daratumumab_dose" class="form-label">Daratumumab (mg/kg)</label>
+                                <input 
+                                    type="number" 
+                                    class="form-control form-control-sm" 
+                                    id="daratumumab_dose" 
+                                    name="daratumumab_dose" 
+                                    value="16.0" 
+                                    min="0" 
+                                    max="16" 
+                                    step="0.5"
+                                    required
+                                >
+                            </div>
+                        </fieldset>
+
+                        <fieldset class="mb-3">
+                            <legend class="h6">Schedule</legend>
+                            
+                            <div class="mb-2">
+                                <label for="len_on_days" class="form-label">Lenalidomide ON days</label>
+                                <input 
+                                    type="number" 
+                                    class="form-control form-control-sm" 
+                                    id="len_on_days" 
+                                    name="len_on_days" 
+                                    value="21" 
+                                    min="7" 
+                                    max="28"
+                                    required
+                                >
+                            </div>
+
+                            <div class="mb-2">
+                                <label for="bor_weekly" class="form-label">Bortezomib frequency (0=biweekly, 1=weekly)</label>
+                                <input 
+                                    type="number" 
+                                    class="form-control form-control-sm" 
+                                    id="bor_weekly" 
+                                    name="bor_weekly" 
+                                    value="0" 
+                                    min="0" 
+                                    max="2"
+                                    required
+                                >
+                            </div>
+
+                            <div class="mb-2">
+                                <label for="dara_interval" class="form-label">Daratumumab interval (days)</label>
+                                <input 
+                                    type="number" 
+                                    class="form-control form-control-sm" 
+                                    id="dara_interval" 
+                                    name="dara_interval" 
+                                    value="7" 
+                                    min="7" 
+                                    max="28"
+                                    required
+                                >
+                            </div>
+
+                            <div class="mb-2">
+                                <label for="time_horizon" class="form-label">Time Horizon (days)</label>
+                                <input 
+                                    type="number" 
+                                    class="form-control form-control-sm" 
+                                    id="time_horizon" 
+                                    name="time_horizon" 
+                                    value="168" 
+                                    min="56" 
+                                    max="365"
+                                    required
+                                >
+                            </div>
+                        </fieldset>
+
+                        <fieldset class="mb-3">
+                            <legend class="h6">Interactions</legend>
+                            
+                            <div class="mb-2">
+                                <label for="interaction_strength" class="form-label">Drug Interaction Strength</label>
+                                <input 
+                                    type="number" 
+                                    class="form-control form-control-sm" 
+                                    id="interaction_strength" 
+                                    name="interaction_strength" 
+                                    value="0.1" 
+                                    min="0" 
+                                    max="0.2" 
+                                    step="0.01"
+                                    required
+                                >
+                            </div>
+                        </fieldset>
+
+                        <hr>
+
+                        <!-- Submit button -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-info btn-lg text-white" id="run-cohort-btn">
+                                <i class="bi bi-play-fill"></i> Run Cohort
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Progress indicator -->
+                    <div id="cohort-progress" class="progress d-none mt-3">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" style="width:100%">
+                            Running simulations...
+                        </div>
+                    </div>
+
+                    <!-- Info box -->
+                    <div class="alert alert-light border mt-3" role="alert">
+                        <small>
+                            <strong>Parameter Variability:</strong>
+                            <ul class="mb-0">
+                                <li>Tumor baseline: ±50% CV (log-normal)</li>
+                                <li>Healthy baseline: ±30% CV</li>
+                                <li>Growth rates: ±40% CV</li>
+                                <li>PK clearance: ±25% CV</li>
+                            </ul>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right panel: Results -->
+        <div class="col-lg-7">
+            <div id="cohort-results">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <i class="bi bi-bar-chart text-muted" style="font-size: 3rem;"></i>
+                        <p class="text-muted mt-3">
+                            Configure cohort parameters and click <strong>Run Cohort</strong> to view results.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Show/hide progress indicator
+document.body.addEventListener('htmx:beforeRequest', function(evt) {
+    if (evt.detail.elt.id === 'cohort-form') {
+        document.getElementById('cohort-progress').classList.remove('d-none');
+        document.getElementById('run-cohort-btn').disabled = true;
+    }
+});
+
+document.body.addEventListener('htmx:afterRequest', function(evt) {
+    if (evt.detail.elt.id === 'cohort-form') {
+        document.getElementById('cohort-progress').classList.add('d-none');
+        document.getElementById('run-cohort-btn').disabled = false;
+    }
+});
+</script>
+{% endblock %}

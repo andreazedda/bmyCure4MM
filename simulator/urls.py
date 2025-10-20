@@ -1,7 +1,6 @@
 from django.urls import path
 
-from . import views
-from . import views_manage
+from . import views, views_cohort, views_manage
 
 urlpatterns = [
     path("", views.scenario_list, name="scenario_list"),
@@ -28,5 +27,12 @@ urlpatterns = [
     path("regimens/new/", views_manage.RegimenCreateView.as_view(), name="regimen_create"),
     path("regimens/<int:pk>/edit/", views_manage.RegimenUpdateView.as_view(), name="regimen_edit"),
     path("regimens/<int:pk>/delete/", views_manage.RegimenDeleteView.as_view(), name="regimen_delete"),
+    # Optimization experiments
+    path("experiments/", views_manage.ExperimentsView.as_view(), name="experiments"),
+    path("experiments/run/<int:pk>/", views_manage.run_experiment, name="run_experiment"),
+    # Virtual cohort (in-silico trials)
+    path("cohort/", views_cohort.CohortView.as_view(), name="cohort"),
+    path("cohort/run/", views_cohort.cohort_run, name="cohort_run"),
+    path("cohort/export/<str:cohort_id>/", views_cohort.cohort_export, name="cohort_export"),
     path("<int:pk>/", views.scenario_detail, name="scenario_detail"),
 ]

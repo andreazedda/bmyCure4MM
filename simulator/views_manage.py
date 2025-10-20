@@ -23,7 +23,7 @@ from django.core.exceptions import PermissionDenied
 
 from clinic.models import Regimen
 
-from . import forms, models
+from . import forms, models, optim
 from .permissions import is_editor
 
 
@@ -337,4 +337,75 @@ def simulate_scenario(request: HttpRequest, pk: int) -> HttpResponse:
         "warnings": parameter_warnings + summary_warnings,
     }
     html = render_to_string("simulator/_simulation_results.html", context, request=request)
+    return HttpResponse(html)
+
+
+# ────────────────────────────────────────────────────────────────────────────────
+# Experiments / Optimization Lab Views
+# ────────────────────────────────────────────────────────────────────────────────
+
+
+class ExperimentsView(LoginRequiredMixin, EditorRequiredMixin, TemplateView):
+    """
+    Research-grade optimization lab.
+    
+    Provides interface for multi-objective optimization experiments:
+    - Select scenario
+    - Configure trials count
+    - Run Optuna MOTPE sampler
+    - View Pareto frontier results
+    """
+    template_name = "simulator/experiments.html"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["scenarios"] = models.Scenario.objects.all().order_by("title")
+        return context
+
+
+@login_required
+def run_experiment(request: HttpRequest, pk: int) -> HttpResponse:
+    """
+    Run multi-objective optimization experiment.
+    
+    POST params:
+        - n_trials: int (default 100) - number of Optuna trials
+    
+    Returns:
+        HTMX partial: _pareto_panel.html with Pareto frontier table
+    """
+    if not is_editor(request.user):
+        raise PermissionDenied("Editor access required")
+    
+    if request.method != "POST":
+        return HttpResponseBadRequest("POST required")
+    
+    scenario = get_object_or_404(models.Scenario, pk=pk)
+    
+    # Extract trial count from form
+    try:
+        n_trials = int(request.POST.get("n_trials", 100))
+        if n_trials < 10:
+            n_trials = 10
+        elif n_trials > 500:
+            n_trials = 500
+    except (ValueError, TypeError):
+        n_trials = 100
+    
+    # Run optimization
+    result = optim.run_study(
+        scenario=scenario,
+        user_id=request.user.id,
+        n_trials=n_trials,
+        seed=42
+    )
+    
+    # Prepare context for Pareto panel
+    context = {
+        "scenario": scenario,
+        "result": result,
+        "pareto_solutions": result.get("pareto", []),
+    }
+    
+    html = render_to_string("simulator/_pareto_panel.html", context, request=request)
     return HttpResponse(html)

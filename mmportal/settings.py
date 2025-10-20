@@ -120,7 +120,7 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-STATICFILES_DIRS: list[Path] = []
+STATICFILES_DIRS: list[Path] = [BASE_DIR / "mmportal" / "static"]
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"

@@ -5,7 +5,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>MM Portal</title>
+    <link rel="icon" href="{% static 'img/favicon.ico' %}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link rel="stylesheet" href="{% static 'app/ui-guardrails.css' %}">
     {% block extra_head %}{% endblock %}
 </head>
@@ -31,6 +33,13 @@
                             <ul class="dropdown-menu" aria-labelledby="manageMenu">
                                 <li><a class="dropdown-item" href="{% url 'simulator:scenario_manage_list' %}">Scenarios</a></li>
                                 <li><a class="dropdown-item" href="{% url 'simulator:regimen_list' %}">Regimens</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'simulator:experiments' %}">
+                                    <i class="bi bi-graph-up"></i> Optimization Lab
+                                </a></li>
+                                <li><a class="dropdown-item" href="{% url 'simulator:cohort' %}">
+                                    <i class="bi bi-people-fill"></i> Virtual Cohort
+                                </a></li>
                             </ul>
                         </li>
                     {% endif %}

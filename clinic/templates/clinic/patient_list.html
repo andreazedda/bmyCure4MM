@@ -3,22 +3,45 @@
 {% block content %}
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
     <h1 class="h3 mb-0">Patients</h1>
-    <form method="get" class="row row-cols-1 row-cols-sm-auto g-2 align-items-center">
-        <div class="col">
-            <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search surname">
-        </div>
-        <div class="col">
-            {{ filterset.form.r_iss }}
-        </div>
-        <div class="col form-check">
-            {{ filterset.form.high_risk }}
-            <label class="form-check-label" for="{{ filterset.form.high_risk.id_for_label }}">High-risk cytogenetics</label>
-        </div>
-        <div class="col">
-            <button type="submit" class="btn btn-primary">Filter</button>
-        </div>
-    </form>
+    {% if user.is_staff %}
+    <a href="{% url 'clinic:patient_new' %}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> New Patient
+    </a>
+    {% endif %}
 </div>
+
+<form method="get" class="row g-2 align-items-end mb-3">
+    <div class="col-12 col-md-6">
+        <label for="q" class="form-label mb-1">Search surname</label>
+        <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input id="q" name="q" type="text" value="{{ request.GET.q }}"
+                   class="form-control" placeholder="e.g., Rossi">
+        </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+        <label for="r_iss" class="form-label mb-1">R-ISS Stage</label>
+        <select id="r_iss" name="r_iss" class="form-select">
+            <option value="">All</option>
+            <option value="I" {% if request.GET.r_iss == "I" %}selected{% endif %}>R-ISS I</option>
+            <option value="II" {% if request.GET.r_iss == "II" %}selected{% endif %}>R-ISS II</option>
+            <option value="III" {% if request.GET.r_iss == "III" %}selected{% endif %}>R-ISS III</option>
+        </select>
+    </div>
+
+    <div class="col-6 col-md-2">
+        <div class="form-check mt-4">
+            <input class="form-check-input" type="checkbox" value="true" id="high_risk"
+                   name="high_risk" {% if request.GET.high_risk %}checked{% endif %}>
+            <label class="form-check-label" for="high_risk">High-risk cytogenetics</label>
+        </div>
+    </div>
+
+    <div class="col-12 col-md-1 d-grid">
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </div>
+</form>
 
 {% if patients %}
     <div class="card shadow-sm">
@@ -61,6 +84,8 @@
         </div>
     </div>
 {% else %}
-    <div class="alert alert-secondary" role="alert">No patients found.</div>
+    <div class="alert alert-secondary" role="alert">
+        <i class="bi bi-info-circle me-2"></i>No patients found.
+    </div>
 {% endif %}
 {% endblock %}

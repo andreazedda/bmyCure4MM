@@ -113,6 +113,47 @@ def patient_detail(request: HttpRequest, pk: int) -> HttpResponse:
 
 @login_required
 @is_staff
+def patient_new(request: HttpRequest) -> HttpResponse:
+    """Create a new patient."""
+    if request.method == "POST":
+        form = forms.PatientForm(request.POST)
+        if form.is_valid():
+            patient = form.save()
+            return redirect(reverse("clinic:patient_detail", args=[patient.id]))
+    else:
+        form = forms.PatientForm()
+    
+    context = {
+        "form": form,
+        "title": "Add New Patient",
+    }
+    return render(request, "clinic/patient_form.html", context)
+
+
+@login_required
+@is_staff
+def patient_edit(request: HttpRequest, pk: int) -> HttpResponse:
+    """Edit an existing patient."""
+    patient = get_object_or_404(models.Patient, pk=pk)
+    
+    if request.method == "POST":
+        form = forms.PatientForm(request.POST, instance=patient)
+        if form.is_valid():
+            patient = form.save()
+            return redirect(reverse("clinic:patient_detail", args=[patient.id]))
+    else:
+        form = forms.PatientForm(instance=patient)
+    
+    context = {
+        "form": form,
+        "patient": patient,
+        "title": f"Edit Patient: {patient}",
+    }
+    return render(request, "clinic/patient_form.html", context)
+
+
+@login_required
+@is_staff
 def assessment_new(request: HttpRequest, patient_id: int) -> HttpResponse:
     patient = get_object_or_404(models.Patient, pk=patient_id)
     if request.method == "POST":

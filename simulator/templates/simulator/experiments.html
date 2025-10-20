@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Optimization Experiments - Simulator{% endblock %}
+
+{% block content %}
+<div class="container-fluid my-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h1 class="h2">
+                    <i class="bi bi-graph-up"></i> Optimization Experiments
+                </h1>
+                <a href="{% url 'simulator:scenario_manage_list' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Scenarios
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Left panel: Experiment configuration -->
+        <div class="col-md-5">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-sliders"></i> Configure Experiment</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        Run multi-objective optimization to find Pareto-optimal regimen plans. 
+                        The optimizer will balance <strong>efficacy</strong> (tumor reduction), 
+                        <strong>safety</strong> (healthy cell preservation), and 
+                        <strong>exposure</strong> (minimize AUC).
+                    </p>
+
+                    <form id="experiment-form" hx-post="" hx-target="#pareto-panel" hx-swap="innerHTML">
+                        {% csrf_token %}
+                        
+                        <!-- Scenario selection -->
+                        <div class="mb-3">
+                            <label for="scenario-select" class="form-label">
+                                <strong>Scenario</strong>
+                                <small class="text-muted">(patient context)</small>
+                            </label>
+                            <select class="form-select" id="scenario-select" required>
+                                <option value="" selected disabled>Select a scenario...</option>
+                                {% for scenario in scenarios %}
+                                    <option value="{{ scenario.pk }}">{{ scenario.title }}</option>
+                                {% empty %}
+                                    <option value="" disabled>No scenarios available</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">
+                                Defines patient baseline, tumor params, and drug pharmacokinetics.
+                            </div>
+                        </div>
+
+                        <!-- Trials count -->
+                        <div class="mb-3">
+                            <label for="n-trials" class="form-label">
+                                <strong>Number of Trials</strong>
+                            </label>
+                            <input 
+                                type="number" 
+                                class="form-control" 
+                                id="n-trials" 
+                                name="n_trials" 
+                                value="100" 
+                                min="10" 
+                                max="500" 
+                                step="10"
+                                required
+                            >
+                            <div class="form-text">
+                                More trials explore the search space better (10-500 recommended).
+                            </div>
+                        </div>
+
+                        <!-- Submit button -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg" id="run-btn">
+                                <i class="bi bi-play-fill"></i> Run Optimization
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Info box -->
+                    <div class="alert alert-info mt-3" role="alert">
+                        <small>
+                            <strong>How it works:</strong>
+                            <ul class="mb-0">
+                                <li>Uses Optuna MOTPE sampler (Tree-Parzen Estimator)</li>
+                                <li>Explores 8D parameter space (doses, schedules, time horizon)</li>
+                                <li>Enforces toxicity constraint (healthy loss ≤ 25%)</li>
+                                <li>Returns non-dominated Pareto frontier</li>
+                            </ul>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right panel: Pareto frontier results -->
+        <div class="col-md-7">
+            <div id="pareto-panel">
+                <div class="card shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <i class="bi bi-stars text-muted" style="font-size: 3rem;"></i>
+                        <p class="text-muted mt-3">
+                            Select a scenario and click <strong>Run Optimization</strong> to view Pareto frontier.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Update HTMX form action when scenario changes
+document.getElementById('scenario-select').addEventListener('change', function() {
+    const scenarioId = this.value;
+    if (scenarioId) {
+        const form = document.getElementById('experiment-form');
+        form.setAttribute('hx-post', `/simulator/experiments/run/${scenarioId}/`);
+        htmx.process(form); // Re-process HTMX attributes
+    }
+});
+
+// Disable button during request
+document.body.addEventListener('htmx:beforeRequest', function(evt) {
+    if (evt.detail.elt.id === 'experiment-form') {
+        const btn = document.getElementById('run-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Running...';
+    }
+});
+
+// Re-enable button after response
+document.body.addEventListener('htmx:afterRequest', function(evt) {
+    if (evt.detail.elt.id === 'experiment-form') {
+        const btn = document.getElementById('run-btn');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-play-fill"></i> Run Optimization';
+    }
+});
+</script>
+{% endblock %}

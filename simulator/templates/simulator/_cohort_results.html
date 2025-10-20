@@ -1,0 +1,107 @@
+{% load static %}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0">
+            <i class="bi bi-check-circle"></i> Cohort Results
+            <span class="badge bg-light text-dark ms-2">n={{ n_patients }}</span>
+        </h5>
+    </div>
+    <div class="card-body">
+        <p class="text-muted">
+            Simulated <strong>{{ n_patients }}</strong> virtual patients with parameter variability. 
+            Results aggregated below.
+        </p>
+
+        <!-- KPI Summary Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="card border-primary">
+                    <div class="card-body">
+                        <h6 class="card-subtitle text-muted mb-2">
+                            <i class="bi bi-arrow-up-circle"></i> Efficacy
+                        </h6>
+                        <div class="h4 text-primary mb-1">{{ result.aggregates.efficacy_mean|floatformat:3 }}</div>
+                        <small class="text-muted">
+                            P05: {{ result.aggregates.efficacy_p05|floatformat:3 }} | 
+                            P95: {{ result.aggregates.efficacy_p95|floatformat:3 }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card border-warning">
+                    <div class="card-body">
+                        <h6 class="card-subtitle text-muted mb-2">
+                            <i class="bi bi-shield-exclamation"></i> Toxicity
+                        </h6>
+                        <div class="h4 text-warning mb-1">{{ result.aggregates.toxicity_mean|floatformat:3 }}</div>
+                        <small class="text-muted">
+                            P05: {{ result.aggregates.toxicity_p05|floatformat:3 }} | 
+                            P95: {{ result.aggregates.toxicity_p95|floatformat:3 }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card border-danger">
+                    <div class="card-body">
+                        <h6 class="card-subtitle text-muted mb-2">
+                            <i class="bi bi-arrow-counterclockwise"></i> Recurrence
+                        </h6>
+                        <div class="h4 text-danger mb-1">{{ result.aggregates.recurrence_rate|floatformat:1 }}%</div>
+                        <small class="text-muted">
+                            Fraction with time_to_recurrence
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Distribution placeholder -->
+        <div class="alert alert-info" role="alert">
+            <strong><i class="bi bi-graph-up"></i> Distributions:</strong>
+            Violin/box plots for efficacy and toxicity will be added in next iteration with Plotly.
+        </div>
+
+        <!-- Regimen summary -->
+        <div class="card bg-light mt-3">
+            <div class="card-body">
+                <h6 class="card-title">Regimen Parameters</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <small>
+                            <strong>Lenalidomide:</strong> {{ regimen_params.lenalidomide_dose }}mg × {{ regimen_params.len_on_days }}d<br>
+                            <strong>Bortezomib:</strong> {{ regimen_params.bortezomib_dose }}mg/m² (freq: {{ regimen_params.bor_weekly }})<br>
+                            <strong>Daratumumab:</strong> {{ regimen_params.daratumumab_dose }}mg/kg q{{ regimen_params.dara_interval }}d
+                        </small>
+                    </div>
+                    <div class="col-md-6">
+                        <small>
+                            <strong>Horizon:</strong> {{ regimen_params.time_horizon }} days<br>
+                            <strong>Interaction:</strong> {{ regimen_params.interaction_strength|floatformat:3 }}<br>
+                            <strong>Seed:</strong> {{ result.seed }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export CSV button -->
+        <div class="d-grid mt-3">
+            <a href="{% url 'simulator:cohort_export' result.cohort_id %}" class="btn btn-outline-success">
+                <i class="bi bi-download"></i> Download CSV
+            </a>
+        </div>
+    </div>
+
+    <div class="card-footer text-muted">
+        <small>
+            <i class="bi bi-info-circle"></i> 
+            Cohort ID: <code>{{ result.cohort_id }}</code> | 
+            Scenario: <strong>{{ scenario.title }}</strong>
+        </small>
+    </div>
+</div>

@@ -48,6 +48,7 @@ import traceback
 import yaml
 import json
 import os
+import time
 from rdkit import Chem
 from rdkit.Chem import Descriptors
 import processes_utils as pu
@@ -60,46 +61,77 @@ module_name = os.path.splitext(os.path.basename(__file__))[0]
 with open(os.path.join(general_settings['configs_path'], module_name + ".yaml"), "r") as config_file:
     config = yaml.safe_load(config_file)
 
+PUBCHEM_BASE = "https://pubchem.ncbi.nlm.nih.gov/rest/pug"
+HDRS = {
+    "User-Agent": "MM-Portal/1.0 (+https://example.org) Python-requests",
+    "Accept": "application/json",
+    "Accept-Encoding": "gzip, deflate",
+}
 
-def fetch_drug_data(drug_id):
+def _get_json(url: str, *, tries: int = 3, timeout: float = 10.0) -> dict:
+    last = None
+    for i in range(tries):
+        try:
+            r = requests.get(url, headers=HDRS, timeout=timeout)
+            r.raise_for_status()
+            return r.json()
+        except requests.RequestException as e:
+            last = e
+            time.sleep(0.6 * (i + 1))
+    raise last  # type: ignore[misc]
+
+
+def fetch_drug_data(drug_id: str) -> str:
     """
-    Fetches SMILES data for the given drug ID from PubChem or another database.
+    Return CanonicalSMILES for a PubChem CID.
+    Fallbacks: (1) property Canonical+Isomeric, (2) record JSON parsing, (3) TXT endpoint.
     """
-    drug_url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/{drug_id}/property/CanonicalSMILES/JSON"
+    cid = str(drug_id).strip()
+    # 1) canonical + isomeric in one call
+    url = f"{PUBCHEM_BASE}/compound/cid/{cid}/property/CanonicalSMILES,IsomericSMILES/JSON"
     try:
-        logging.info("Fetching drug data for ID: %s", drug_id)
-        response = requests.get(drug_url, timeout=10)
-        response.raise_for_status()
-        payload = response.json()
-        properties = payload.get("PropertyTable", {}).get("Properties", [])
-        if not properties:
-            logging.warning("CanonicalSMILES unavailable in primary response for CID %s. Retrying with expanded property request.", drug_id)
-            # Retry with expanded property list (Canonical + Isomeric)
-            alt_url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/{drug_id}/property/CanonicalSMILES,IsomericSMILES/JSON"
-            alt_response = requests.get(alt_url, timeout=10)
-            alt_response.raise_for_status()
-            payload = alt_response.json()
-            properties = payload.get("PropertyTable", {}).get("Properties", [])
-            if not properties:
-                raise ValueError(f"PubChem returned no property records for CID {drug_id}.")
+        payload = _get_json(url)
+        props = payload.get("PropertyTable", {}).get("Properties", [])
+        if props:
+            rec = props[0]
+            smiles = rec.get("CanonicalSMILES") or rec.get("IsomericSMILES")
+            if smiles:
+                return smiles
+    except Exception:
+        pass
 
-        record = properties[0]
-        smiles_data = record.get("CanonicalSMILES") or record.get("IsomericSMILES")
-        if not smiles_data:
-            raise ValueError(
-                f"SMILES data unavailable for PubChem CID {drug_id}. Try providing a SMILES string manually."
-            )
+    # 2) full record JSON (PC_Compounds)
+    try:
+        rec = _get_json(f"{PUBCHEM_BASE}/compound/cid/{cid}/JSON")
+        comps = rec.get("PC_Compounds") or []
+        # walk for a SMILES string in computed props
+        for c in comps:
+            for prop in (c.get("props") or []):
+                urn = prop.get("urn", {})
+                if urn.get("label") == "SMILES" and urn.get("name") in ("Canonical", "Isomeric"):
+                    val = prop.get("value", {})
+                    if "sval" in val and val["sval"]:
+                        return val["sval"]
+    except Exception:
+        pass
 
-        logging.info("Drug data fetched successfully for CID %s.", drug_id)
-        return smiles_data
-    except requests.exceptions.RequestException as error:
-        logging.error("Error fetching drug data: %s", error)
-        print(Fore.RED + "Error fetching drug data. Check the log file for details." + Style.RESET_ALL)
-        raise
-    except ValueError as error:
-        logging.error("PubChem response missing SMILES information: %s", error)
-        print(Fore.RED + f"{error}" + Style.RESET_ALL)
-        raise
+    # 3) plain text as last resort
+    try:
+        txt = requests.get(
+            f"{PUBCHEM_BASE}/compound/cid/{cid}/property/CanonicalSMILES/TXT",
+            headers=HDRS, timeout=10.0
+        )
+        txt.raise_for_status()
+        line = (txt.text or "").strip()
+        if line:
+            return line
+    except Exception:
+        pass
+
+    raise ValueError(
+        f"Could not retrieve SMILES for PubChem CID {cid}. "
+        "Try entering a SMILES manually."
+    )
 
 
 def calculate_drug_parameters(smiles):

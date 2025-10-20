@@ -1,0 +1,47 @@
+/* UI Guardrails for bmyCure4MM */
+
+/* Form validation states */
+.is-warning {
+    border-color: #ffc107 !important;
+    box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25) !important;
+}
+
+/* Simulation result badges */
+.badge.bg-warning.text-dark {
+    background-color: #fff3cd !important;
+    border: 1px solid #ffeaa7;
+}
+
+.badge.bg-success {
+    background-color: #d1e7dd !important;
+}
+
+.badge.bg-danger {
+    background-color: #f8d7da !important;
+}
+
+/* Responsive form improvements */
+@media (max-width: 576px) {
+    .input-group .form-control { 
+        min-height: 42px; 
+    }
+    .form-label { 
+        font-size: .9rem; 
+    }
+}
+
+/* Card spacing improvements */
+.card + .card {
+    margin-top: 1rem;
+}
+
+/* Simulation panel improvements */
+#simulateScenarioPanel .card {
+    border: 1px solid #e3f2fd;
+    background-color: #fafafa;
+}
+
+/* Offcanvas z-index fix */
+.offcanvas {
+    z-index: 1055;
+}

@@ -40,7 +40,14 @@
                             <tr data-job-id="{{ job.pk }}" data-job-status="{{ status.0 }}"{% if status.0 == "Queued" %} hx-get="{% url 'chemtools:job_status' job.pk %}" hx-trigger="load, every 5s" hx-target="this" hx-swap="none"{% endif %}>
                                 <td>{{ job.created|date:"Y-m-d H:i" }}</td>
                                 <td>{{ job.get_kind_display }}</td>
-                                <td data-cell="status"><span class="badge bg-{{ status.1 }}">{{ status.0 }}</span></td>
+                                <td data-cell="status">
+                                    <span class="badge bg-{{ status.1 }}">
+                                        {{ status.0 }}
+                                        {% if status.0 == "Queued" %}
+                                            <span class="spinner-border spinner-border-sm ms-1" role="status" aria-hidden="true"></span>
+                                        {% endif %}
+                                    </span>
+                                </td>
                                 <td>{% if job.user %}{{ job.user.username }}{% else %}–{% endif %}</td>
                                 <td>
                                     <div class="small text-muted">{{ job.input_a|default:"–" }}</div>

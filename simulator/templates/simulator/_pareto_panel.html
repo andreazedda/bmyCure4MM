@@ -1,0 +1,144 @@
+{% load static %}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0">
+            <i class="bi bi-trophy"></i> Pareto Frontier 
+            <span class="badge bg-light text-dark ms-2">{{ pareto_solutions|length }} solutions</span>
+        </h5>
+    </div>
+    <div class="card-body">
+        {% if pareto_solutions %}
+            <p class="text-muted">
+                Found <strong>{{ pareto_solutions|length }}</strong> non-dominated solution(s) 
+                from <strong>{{ result.n_trials }}</strong> trial(s). 
+                Each row represents an optimal trade-off between efficacy, safety, and exposure.
+            </p>
+
+            <div class="table-responsive">
+                <table class="table table-hover table-sm align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col" style="width: 5%;">#</th>
+                            <th scope="col" style="width: 12%;">
+                                Efficacy ↑
+                                <br><small class="text-muted fw-normal">Tumor Reduction</small>
+                            </th>
+                            <th scope="col" style="width: 12%;">
+                                Safety ↑
+                                <br><small class="text-muted fw-normal">Healthy Preserved</small>
+                            </th>
+                            <th scope="col" style="width: 12%;">
+                                Exposure ↓
+                                <br><small class="text-muted fw-normal">AUC</small>
+                            </th>
+                            <th scope="col" style="width: 35%;">
+                                Plan
+                                <br><small class="text-muted fw-normal">Doses & Schedule</small>
+                            </th>
+                            <th scope="col" style="width: 14%;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for solution in pareto_solutions %}
+                        <tr>
+                            <td class="text-center">
+                                <strong>{{ forloop.counter }}</strong>
+                            </td>
+                            <td>
+                                <span class="badge bg-primary">
+                                    {{ solution.efficacy|floatformat:3 }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-success">
+                                    {{ solution.safety|floatformat:3 }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-warning text-dark">
+                                    {{ solution.exposure|floatformat:1 }}
+                                </span>
+                            </td>
+                            <td>
+                                <small>
+                                    <strong>Len:</strong> {{ solution.params.lenalidomide_dose|floatformat:1 }}mg 
+                                    × {{ solution.params.len_on_days }}d
+                                    <br>
+                                    <strong>Bor:</strong> {{ solution.params.bortezomib_dose|floatformat:2 }}mg/m² 
+                                    {% if solution.params.bor_weekly %}weekly{% else %}biweekly{% endif %}
+                                    <br>
+                                    <strong>Dara:</strong> {{ solution.params.daratumumab_dose|floatformat:1 }}mg/kg 
+                                    q{{ solution.params.dara_interval }}d
+                                    <br>
+                                    <strong>Horizon:</strong> {{ solution.params.time_horizon }}d
+                                    <br>
+                                    <strong>Interact:</strong> {{ solution.params.interaction_strength|floatformat:3 }}
+                                </small>
+                            </td>
+                            <td>
+                                <form method="post" action="{% url 'simulator:scenario_simulate' scenario.pk %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="lenalidomide_dose" value="{{ solution.params.lenalidomide_dose }}">
+                                    <input type="hidden" name="bortezomib_dose" value="{{ solution.params.bortezomib_dose }}">
+                                    <input type="hidden" name="daratumumab_dose" value="{{ solution.params.daratumumab_dose }}">
+                                    <input type="hidden" name="time_horizon" value="{{ solution.params.time_horizon }}">
+                                    <input type="hidden" name="len_on_days" value="{{ solution.params.len_on_days }}">
+                                    <input type="hidden" name="bor_weekly" value="{{ solution.params.bor_weekly|yesno:'true,false' }}">
+                                    <input type="hidden" name="dara_interval" value="{{ solution.params.dara_interval }}">
+                                    <input type="hidden" name="interaction_strength" value="{{ solution.params.interaction_strength }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary" title="Simulate this plan">
+                                        <i class="bi bi-play-circle"></i> Simulate
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Legend -->
+            <div class="alert alert-light border mt-3" role="alert">
+                <small>
+                    <strong>Legend:</strong>
+                    <ul class="mb-0">
+                        <li><strong>Efficacy ↑</strong>: Higher is better (tumor shrinkage relative to initial burden)</li>
+                        <li><strong>Safety ↑</strong>: Higher is better (1 - healthy_loss, so closer to 1 means less toxicity)</li>
+                        <li><strong>Exposure ↓</strong>: Lower is better (cumulative drug AUC)</li>
+                        <li>Click <strong>Simulate</strong> to run full dynamics with this parameter set</li>
+                    </ul>
+                </small>
+            </div>
+
+            <!-- Uncertainty note -->
+            <div class="alert alert-info mt-2" role="alert">
+                <small>
+                    <i class="bi bi-info-circle"></i> 
+                    <strong>Next steps:</strong> 
+                    Use the <strong>Simulate</strong> button to validate these solutions with full temporal dynamics. 
+                    Consider running uncertainty quantification (Monte Carlo replicates) to assess robustness.
+                </small>
+            </div>
+        {% else %}
+            <div class="text-center py-4">
+                <i class="bi bi-exclamation-triangle text-warning" style="font-size: 2rem;"></i>
+                <p class="text-muted mt-2">
+                    No feasible solutions found. Try:
+                    <ul class="text-start">
+                        <li>Increasing <code>n_trials</code> for more exploration</li>
+                        <li>Relaxing toxicity constraints in <code>objectives.py</code></li>
+                        <li>Checking scenario parameters (drug PK, tumor growth rates)</li>
+                    </ul>
+                </p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="card-footer text-muted">
+        <small>
+            <i class="bi bi-clock"></i> 
+            Completed {{ result.n_trials }} trials for scenario: <strong>{{ scenario.title }}</strong>
+        </small>
+    </div>
+</div>
