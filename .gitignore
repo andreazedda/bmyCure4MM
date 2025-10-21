@@ -157,3 +157,4 @@ secrets.json
 db.sqlite3
 *.sqlite3
 db.*
+*.log
