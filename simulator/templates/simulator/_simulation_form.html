@@ -1,28 +1,16 @@
+{% load simulator_extras %}
 <div id="simulation-form-container">
-    <!-- Align simulation form indicator with embedded progress bar -->
-    <div class="accordion mb-3" id="modelOverview">
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingOverview">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOverview" aria-expanded="false" aria-controls="collapseOverview">
-                    🧬 About This Simulation
-                </button>
-            </h2>
-            <div id="collapseOverview" class="accordion-collapse collapse" aria-labelledby="headingOverview" data-bs-parent="#modelOverview">
-                <div class="accordion-body small text-muted">
-                    This model couples pharmacokinetic (drug concentration) and pharmacodynamic (drug effect) equations to estimate how malignant and healthy plasma cells evolve when exposed to Lenalidomide, Bortezomib, and Daratumumab. Adjust the parameters to explore induction, consolidation, or maintenance strategies. Results support decision making and do not constitute medical advice.
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="d-flex justify-content-end mb-3">
         <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#referenceRangesModal">
             Reference ranges
         </button>
     </div>
-
-    <!-- Remove nested card-body; content is already inside parent card-body -->
-    <form method="post" id="simulation-form">
+    <form id="simulation-parameters-form"
+          method="post"
+          hx-post="{% url 'simulator:scenario_simulate' scenario.pk %}"
+          hx-target="#simulation-results"
+          hx-indicator="#simulation-indicator"
+          hx-disabled-elt="button, input, select, textarea">
         {% csrf_token %}
         {% if warnings %}
             <div class="alert alert-warning" role="alert">
@@ -34,25 +22,171 @@
         {% if form.non_field_errors %}
             <div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>
         {% endif %}
-        {% for field in form %}
-            <div class="mb-3">
-                <label class="form-label" for="id_{{ field.name }}">{{ field.label }}{% if field.field.required %}<span class="text-danger"> *</span>{% endif %}
-                    {% if field.help_text %}
-                        <span class="ms-1 text-muted" role="img" aria-label="Help" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ field.help_text }}">&#9432;</span>
-                    {% endif %}
-                </label>
-                {{ field }}
-                {% if field.help_text %}
-                    <div class="form-text">{{ field.help_text }}</div>
-                {% endif %}
-                {% if field.errors %}
-                    <div class="invalid-feedback d-block">{{ field.errors|striptags }}</div>
-                {% endif %}
+
+        <fieldset class="mb-4">
+            <legend class="h6 mb-3">1. <span class="t-en">Baseline</span><span class="t-it">Baseline</span></legend>
+            <div class="novice-tip alert alert-info mb-3">
+                <span class="t-en">Baseline locks labs, preset and tumor burden before dosage.</span>
+                <span class="t-it">La baseline definisce esami, preset e carico tumorale prima del dosaggio.</span>
             </div>
-        {% endfor %}
-        <div class="d-flex justify-content-end mt-3">
-            <button type="button" class="btn btn-outline-secondary me-2" data-bs-toggle="collapse" data-bs-target="#simulateScenarioPanel" aria-label="Close">Close</button>
-            <button type="submit" class="btn btn-primary">Run Simulation</button>
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    {% include "simulator/_form_field.html" with field=form.preset help_en=helptext_en|dict_get:'preset' help_it=helptext_it|dict_get:'preset' %}
+                </div>
+                <div class="col-12 col-md-6">
+                    {% include "simulator/_form_field.html" with field=form.baseline_tumor_cells help_en=helptext_en|dict_get:'baseline_tumor_cells' help_it=helptext_it|dict_get:'baseline_tumor_cells' unit="cells" %}
+                </div>
+                <div class="col-12 col-md-6">
+                    {% include "simulator/_form_field.html" with field=form.baseline_healthy_cells help_en=helptext_en|dict_get:'baseline_healthy_cells' help_it=helptext_it|dict_get:'baseline_healthy_cells' unit="cells" %}
+                </div>
+                <div class="col-12 col-md-6">
+                    {% include "simulator/_form_field.html" with field=form.creatinine_clearance help_en=helptext_en|dict_get:'creatinine_clearance' help_it=helptext_it|dict_get:'creatinine_clearance' unit="ml/min" %}
+                </div>
+                <div class="col-12 col-md-6">
+                    {% include "simulator/_form_field.html" with field=form.neuropathy_grade help_en=helptext_en|dict_get:'neuropathy_grade' help_it=helptext_it|dict_get:'neuropathy_grade' %}
+                </div>
+                <div class="col-12 col-md-6">
+                    {% include "simulator/_form_field.html" with field=form.anc help_en=helptext_en|dict_get:'anc' help_it=helptext_it|dict_get:'anc' unit="×10⁹/L" %}
+                </div>
+                <div class="col-12 col-md-6">
+                    {% include "simulator/_form_field.html" with field=form.platelets help_en=helptext_en|dict_get:'platelets' help_it=helptext_it|dict_get:'platelets' unit="×10⁹/L" %}
+                </div>
+                <div class="col-12">
+                    <div class="form-check form-switch">
+                        {{ form.pregnancy }}
+                        <label class="form-check-label" for="{{ form.pregnancy.id_for_label }}">{{ form.pregnancy.label }}</label>
+                    </div>
+                    <div class="form-text">
+                        <span class="t-en">{{ helptext_en|dict_get:'pregnancy' }}</span>
+                        <span class="t-it">{{ helptext_it|dict_get:'pregnancy' }}</span>
+                    </div>
+                    {% if form.pregnancy.errors %}
+                        <div class="invalid-feedback d-block">{{ form.pregnancy.errors|striptags }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset class="mb-4">
+            <legend class="h6 mb-3">2. <span class="t-en">Doses & Schedule</span><span class="t-it">Dosi & Schedula</span></legend>
+            <div class="novice-tip alert alert-info mb-3">
+                <span class="t-en">Stay within preset ranges; schedules follow validated clinical patterns.</span>
+                <span class="t-it">Rimani nei range dei preset; le schedulazioni seguono pattern clinici validati.</span>
+            </div>
+            <div class="row g-3">
+                <div class="col-12 col-md-4">
+                    {% with profile=drug_profiles.lenalidomide %}
+                        {% if profile %}
+                            {% include "simulator/_form_field.html" with field=form.lenalidomide_dose help_en=helptext_en|dict_get:'lenalidomide_dose' help_it=helptext_it|dict_get:'lenalidomide_dose' unit="mg" append_en=profile.range_en append_it=profile.range_it %}
+                        {% else %}
+                            {% include "simulator/_form_field.html" with field=form.lenalidomide_dose help_en=helptext_en|dict_get:'lenalidomide_dose' help_it=helptext_it|dict_get:'lenalidomide_dose' unit="mg" %}
+                        {% endif %}
+                    {% endwith %}
+                </div>
+                <div class="col-12 col-md-4">
+                    {% with profile=drug_profiles.bortezomib %}
+                        {% if profile %}
+                            {% include "simulator/_form_field.html" with field=form.bortezomib_dose help_en=helptext_en|dict_get:'bortezomib_dose' help_it=helptext_it|dict_get:'bortezomib_dose' unit="mg/m²" append_en=profile.range_en append_it=profile.range_it %}
+                        {% else %}
+                            {% include "simulator/_form_field.html" with field=form.bortezomib_dose help_en=helptext_en|dict_get:'bortezomib_dose' help_it=helptext_it|dict_get:'bortezomib_dose' unit="mg/m²" %}
+                        {% endif %}
+                    {% endwith %}
+                </div>
+                <div class="col-12 col-md-4">
+                    {% with profile=drug_profiles.daratumumab %}
+                        {% if profile %}
+                            {% include "simulator/_form_field.html" with field=form.daratumumab_dose help_en=helptext_en|dict_get:'daratumumab_dose' help_it=helptext_it|dict_get:'daratumumab_dose' unit="mg/kg" append_en=profile.range_en append_it=profile.range_it %}
+                        {% else %}
+                            {% include "simulator/_form_field.html" with field=form.daratumumab_dose help_en=helptext_en|dict_get:'daratumumab_dose' help_it=helptext_it|dict_get:'daratumumab_dose' unit="mg/kg" %}
+                        {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+            <div class="alert alert-info novice-tip mt-3 mb-0">
+                <span class="t-en"><strong>Why it matters:</strong> Higher AUC tends to increase toxicity—balance exposure vs efficacy.</span>
+                <span class="t-it"><strong>Perché conta:</strong> AUC più alta aumenta la tossicità—bilancia esposizione ed efficacia.</span>
+            </div>
+        </fieldset>
+
+        <fieldset class="mb-4">
+            <legend class="h6 mb-3">3. <span class="t-en">Horizon & Uncertainty</span><span class="t-it">Orizzonte & Incertezza</span></legend>
+            <div class="novice-tip alert alert-info mb-3">
+                <span class="t-en">Bigger cohorts show variability bands but take longer. Start small, then scale.</span>
+                <span class="t-it">Coorti più grandi mostrano la variabilità ma richiedono più tempo. Inizia piccolo, poi scala.</span>
+            </div>
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    {% include "simulator/_form_field.html" with field=form.time_horizon help_en=helptext_en|dict_get:'time_horizon' help_it=helptext_it|dict_get:'time_horizon' unit="days" %}
+                </div>
+                <div class="col-12 col-md-6">
+                    {% include "simulator/_form_field.html" with field=form.cohort_size help_en=helptext_en|dict_get:'cohort_size' help_it=helptext_it|dict_get:'cohort_size' %}
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset class="mb-4">
+            <legend class="h6 mb-3">4. <span class="t-en">Advanced</span><span class="t-it">Avanzate</span></legend>
+            <div class="novice-tip alert alert-info mb-3">
+                <span class="t-en">Tweak biology and interactions cautiously; pair with Patient Twin for lab-driven values.</span>
+                <span class="t-it">Modifica biologia e interazioni con cautela; usa il Gemello Paziente per valori guidati dai lab.</span>
+            </div>
+            <div class="row g-3">
+                <div class="col-12 col-md-4">
+                    {% include "simulator/_form_field.html" with field=form.tumor_growth_rate help_en=helptext_en|dict_get:'tumor_growth_rate' help_it=helptext_it|dict_get:'tumor_growth_rate' unit="day⁻¹" %}
+                </div>
+                <div class="col-12 col-md-4">
+                    {% include "simulator/_form_field.html" with field=form.healthy_growth_rate help_en=helptext_en|dict_get:'healthy_growth_rate' help_it=helptext_it|dict_get:'healthy_growth_rate' unit="day⁻¹" %}
+                </div>
+                <div class="col-12 col-md-4">
+                    <div id="interaction-strength-wrapper">
+                        {% include "simulator/_form_field.html" with field=form.interaction_strength help_en=helptext_en|dict_get:'interaction_strength' help_it=helptext_it|dict_get:'interaction_strength' %}
+                    </div>
+                    <span id="interaction-strength-badge" class="badge bg-success"></span>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="form-check form-switch">
+                        {{ form.use_twin }}
+                        <label class="form-check-label" for="{{ form.use_twin.id_for_label }}">
+                            <span class="t-en">Use Patient Twin (auto-derive biology)</span>
+                            <span class="t-it">Usa Gemello Paziente (deriva dai lab)</span>
+                        </label>
+                    </div>
+                    <div class="form-text">
+                        <span class="t-en">{{ helptext_en|dict_get:'use_twin' }}</span>
+                        <span class="t-it">{{ helptext_it|dict_get:'use_twin' }}</span>
+                    </div>
+                    {% if form.use_twin.errors %}
+                        <div class="invalid-feedback d-block">{{ form.use_twin.errors|striptags }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-12 col-md-6">
+                    {% include "simulator/_form_field.html" with field=form.seed help_en=helptext_en|dict_get:'seed' help_it=helptext_it|dict_get:'seed' %}
+                </div>
+            </div>
+        </fieldset>
+
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <button type="button" class="btn btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#simulateScenarioPanel" aria-label="Close">
+                <span class="t-en">Close</span><span class="t-it">Chiudi</span>
+            </button>
+            <button type="reset" class="btn btn-outline-dark">
+                <span class="t-en">Reset to preset</span><span class="t-it">Reset al preset</span>
+            </button>
+            <button type="submit" class="btn btn-primary">
+                <span class="t-en">Run simulation</span><span class="t-it">Esegui simulazione</span>
+            </button>
+            {% if is_editor %}
+                <button type="button"
+                        class="btn btn-outline-primary"
+                        hx-post="{% url 'simulator:run_experiment' scenario.pk %}"
+                        hx-include="#simulation-parameters-form"
+                        hx-target="#pareto-panel"
+                        hx-indicator="#simulation-indicator">
+                    <span class="t-en">Optimize regimen</span><span class="t-it">Ottimizza regime</span>
+                </button>
+            {% endif %}
+            <div id="simulation-indicator" class="htmx-indicator spinner-border spinner-border-sm text-primary d-none" role="status" aria-hidden="true"></div>
+            <span class="text-muted small" id="last-run"></span>
         </div>
     </form>
 
@@ -64,7 +198,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p class="small text-muted">Typical parameter ranges compiled from NCCN 2025 guidance and peer-reviewed pharmacology studies.</p>
+                    <p class="small text-muted">Typical parameter ranges compiled from NCCN 2025 guidance and peer-reviewed studies.</p>
                     <div class="table-responsive">
                         <table class="table table-sm table-striped align-middle mb-0">
                             <thead class="table-light">
@@ -123,15 +257,38 @@
 </div>
 
 <script>
-(() => {
-    const thresholds = {
+(function () {
+    const warningLimits = {
         lenalidomide_dose: 40,
         bortezomib_dose: 1.5,
         daratumumab_dose: 16,
-        interaction_strength: 0.15,
+        interaction_strength: 0.2,
     };
+    const badge = document.getElementById('interaction-strength-badge');
+    const interactionField = document.getElementById('{{ form.interaction_strength.id_for_label }}');
+
+    const updateBadge = () => {
+        if (!badge || !interactionField) return;
+        const value = parseFloat(interactionField.value);
+        const lang = getCurrentLang ? getCurrentLang() : 'en';
+        let textEn = 'Safe';
+        let textIt = 'Sicuro';
+        let cls = 'bg-success';
+        if (Number.isFinite(value) && value >= 0.1 && value <= 0.2) {
+            textEn = 'Borderline';
+            textIt = 'Attenzione';
+            cls = 'bg-warning text-dark';
+        } else if (Number.isFinite(value) && value > 0.2) {
+            textEn = 'Unsafe';
+            textIt = 'Rischioso';
+            cls = 'bg-danger';
+        }
+        badge.className = `badge ${cls}`;
+        badge.textContent = lang === 'it' ? textIt : textEn;
+    };
+
     const applyWarnings = (input) => {
-        const limit = thresholds[input.name];
+        const limit = warningLimits[input.name];
         if (limit === undefined) {
             input.classList.remove('is-warning');
             return;
@@ -143,11 +300,42 @@
             input.classList.remove('is-warning');
         }
     };
-    // Fix selector to match form id
-    document.querySelectorAll('#simulation-form .form-control').forEach((input) => {
+
+    document.querySelectorAll('#simulation-parameters-form .form-control').forEach((input) => {
         applyWarnings(input);
-        input.addEventListener('input', () => applyWarnings(input));
+        input.addEventListener('input', () => {
+            applyWarnings(input);
+            if (input === interactionField) {
+                updateBadge();
+            }
+        });
         input.addEventListener('blur', () => applyWarnings(input));
+    });
+
+    if (interactionField) {
+        updateBadge();
+    }
+
+    document.getElementById('simulation-parameters-form').addEventListener('reset', () => {
+        setTimeout(() => {
+            document.querySelectorAll('#simulation-parameters-form .form-control').forEach(applyWarnings);
+            updateBadge();
+        }, 0);
+    });
+
+    document.body.addEventListener('htmx:afterRequest', (event) => {
+        if (!event.detail || !event.detail.target) {
+            return;
+        }
+        if (event.detail.target.id === 'simulation-results') {
+            const badgeEl = document.getElementById('last-run');
+            if (badgeEl) {
+                const lang = getCurrentLang ? getCurrentLang() : 'en';
+                const label = lang === 'it' ? 'Ultima esecuzione: ' : 'Last run: ';
+                badgeEl.textContent = `${label}${new Date().toLocaleTimeString()}`;
+            }
+            event.detail.target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
     });
 })();
 </script>

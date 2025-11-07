@@ -1,12 +1,15 @@
-<!-- Fix overlapping cards and move progress bar inside results card -->
 <div class="card shadow-sm">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h2 class="h6 mb-0">Simulation Results</h2>
+        <h2 class="h6 mb-0">
+            <span class="t-en">Simulation Results</span>
+            <span class="t-it">Risultati della simulazione</span>
+        </h2>
         <span class="badge bg-info text-dark">
             {% if attempt %}
-                Run {{ attempt.submitted|date:"Y-m-d H:i" }}
+                {{ attempt.submitted|date:"Y-m-d H:i" }}
             {% else %}
-                Awaiting first run
+                <span class="t-en">Awaiting first run</span>
+                <span class="t-it">In attesa della prima esecuzione</span>
             {% endif %}
         </span>
     </div>
@@ -23,43 +26,52 @@
                 <table class="table table-sm align-middle">
                     <tbody>
                         <tr>
-                            <th scope="row">Tumor reduction</th>
+                            <th scope="row">
+                                <span class="t-en" data-bs-toggle="tooltip" title="{{ kpi.tumor_reduction.en }}" aria-label="{{ kpi.tumor_reduction.en }}">Tumor reduction</span>
+                                <span class="t-it" data-bs-toggle="tooltip" title="{{ kpi.tumor_reduction.it }}" aria-label="{{ kpi.tumor_reduction.it }}">Riduzione tumorale</span>
+                            </th>
                             <td>
-                                {{ summary.tumor_reduction|floatformat:2 }} (fraction)
+                                {{ summary.tumor_reduction|floatformat:2 }}
                                 {% if summary.tumor_reduction and summary.tumor_reduction > 0.9 %}
-                                    <span class="badge bg-success ms-2">Strong response</span>
+                                    <span class="badge bg-success ms-2">90%+</span>
                                 {% elif summary.tumor_reduction and summary.tumor_reduction > 0.7 %}
-                                    <span class="badge bg-info text-dark ms-2">Meaningful response</span>
+                                    <span class="badge bg-info text-dark ms-2">70%+</span>
                                 {% endif %}
                             </td>
                         </tr>
                         <tr>
-                            <th scope="row">Healthy loss</th>
+                            <th scope="row">
+                                <span class="t-en" data-bs-toggle="tooltip" title="{{ kpi.healthy_loss.en }}" aria-label="{{ kpi.healthy_loss.en }}">Healthy loss</span>
+                                <span class="t-it" data-bs-toggle="tooltip" title="{{ kpi.healthy_loss.it }}" aria-label="{{ kpi.healthy_loss.it }}">Perdita cellule sane</span>
+                            </th>
                             <td>
-                                {{ summary.healthy_loss|floatformat:2 }} (fraction)
+                                {{ summary.healthy_loss|floatformat:2 }}
                                 {% if summary.healthy_loss and summary.healthy_loss > 0.3 %}
-                                    <span class="badge bg-danger ms-2">High toxicity risk</span>
+                                    <span class="badge bg-danger ms-2">>30%</span>
                                 {% elif summary.healthy_loss and summary.healthy_loss > 0.2 %}
-                                    <span class="badge bg-warning text-dark ms-2">Moderate toxicity</span>
+                                    <span class="badge bg-warning text-dark ms-2">>20%</span>
                                 {% endif %}
                             </td>
                         </tr>
                         <tr>
-                            <th scope="row">Time to recurrence</th>
-                            <td>{% if summary.time_to_recurrence %}{{ summary.time_to_recurrence|floatformat:1 }} days{% else %}<span class="text-muted">Not reached within horizon</span>{% endif %}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Effective?</th>
+                            <th scope="row">
+                                <span class="t-en" data-bs-toggle="tooltip" title="{{ kpi.time_to_recurrence.en }}" aria-label="{{ kpi.time_to_recurrence.en }}">Time to recurrence</span>
+                                <span class="t-it" data-bs-toggle="tooltip" title="{{ kpi.time_to_recurrence.it }}" aria-label="{{ kpi.time_to_recurrence.it }}">Tempo alla recidiva</span>
+                            </th>
                             <td>
-                                {% if summary.effective %}
-                                    <span class="badge bg-success">Effective</span>
+                                {% if summary.time_to_recurrence %}
+                                    {{ summary.time_to_recurrence|floatformat:1 }} <span class="t-en">days</span><span class="t-it">giorni</span>
                                 {% else %}
-                                    <span class="badge bg-warning text-dark">Monitor</span>
+                                    <span class="text-muted t-en">Not reached within horizon</span>
+                                    <span class="text-muted t-it">Non raggiunto nell’orizzonte</span>
                                 {% endif %}
                             </td>
                         </tr>
                         <tr>
-                            <th scope="row">Drug exposure (AUC)</th>
+                            <th scope="row">
+                                <span class="t-en" data-bs-toggle="tooltip" title="{{ kpi.auc.en }}" aria-label="{{ kpi.auc.en }}">Drug exposure (AUC)</span>
+                                <span class="t-it" data-bs-toggle="tooltip" title="{{ kpi.auc.it }}" aria-label="{{ kpi.auc.it }}">Esposizione ai farmaci (AUC)</span>
+                            </th>
                             <td>
                                 <ul class="list-unstyled mb-0">
                                     {% for drug, value in summary.auc.items %}
@@ -68,29 +80,66 @@
                                 </ul>
                             </td>
                         </tr>
+                        <tr>
+                            <th scope="row">
+                                <span class="t-en">Effective?</span>
+                                <span class="t-it">Efficace?</span>
+                            </th>
+                            <td>
+                                {% if summary.effective %}
+                                    <span class="badge bg-success t-en">Effective</span>
+                                    <span class="badge bg-success t-it">Efficace</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark t-en">Monitor</span>
+                                    <span class="badge bg-warning text-dark t-it">Monitorare</span>
+                                {% endif %}
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
             <div class="d-flex flex-wrap gap-2 mt-3">
                 {% if results.plot %}
-                    <a class="btn btn-outline-primary btn-sm" href="{{ results.plot }}" target="_blank" rel="noopener">View Plot</a>
+                    <a class="btn btn-outline-primary btn-sm" href="{{ results.plot }}" target="_blank" rel="noopener">
+                        <span class="t-en">View plot</span><span class="t-it">Apri grafico</span>
+                    </a>
                 {% endif %}
                 {% if results.csv %}
-                    <a class="btn btn-outline-secondary btn-sm" href="{{ results.csv }}" target="_blank" rel="noopener">Download CSV</a>
+                    <a class="btn btn-outline-secondary btn-sm" href="{{ results.csv }}" target="_blank" rel="noopener">
+                        <span class="t-en">Download CSV</span><span class="t-it">Scarica CSV</span>
+                    </a>
                 {% endif %}
             </div>
-            <p class="small text-muted mt-3 mb-0">Tumor reduction reflects the modeled decrease in malignant plasma cells; healthy loss estimates collateral impact on normal plasma cells. Interpret alongside patient biomarkers and tolerance.</p>
+            <div class="novice-tip alert alert-info mt-3">
+                <div class="t-en">
+                    <strong>What next:</strong>
+                    <ul class="mb-0">
+                        <li>If Healthy loss &gt; 0.25, lower doses or shorten the horizon.</li>
+                        <li>If Tumor reduction &lt; 0.70, launch the Optimization Lab.</li>
+                        <li>Enable Patient Twin for lab-driven biology.</li>
+                    </ul>
+                </div>
+                <div class="t-it">
+                    <strong>Prossimi passi:</strong>
+                    <ul class="mb-0">
+                        <li>Se Perdita sani &gt; 0.25, riduci le dosi o accorcia l’orizzonte.</li>
+                        <li>Se Riduzione tumorale &lt; 0.70, usa l’Optimization Lab.</li>
+                        <li>Attiva il Gemello Paziente per parametri basati sui lab.</li>
+                    </ul>
+                </div>
+            </div>
         {% else %}
-            <p class="text-muted mb-0">Simulation results will appear here once the model has been executed.</p>
+            <p class="text-muted mb-0">
+                <span class="t-en">Simulation results will appear here once the model has been executed.</span>
+                <span class="t-it">I risultati appariranno qui dopo l’esecuzione del modello.</span>
+            </p>
         {% endif %}
     </div>
     <div class="card-footer">
-        <div id="simulation-indicator" class="progress d-none" role="status" aria-live="polite">
-            <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%;"></div>
-        </div>
-        <div class="mt-3">
-            <label for="clinical-note" class="form-label small fw-semibold">Clinical note (not stored)</label>
-            <textarea id="clinical-note" class="form-control" rows="3" placeholder="Summarise interpretation, caveats, or follow-up actions (local use only)."></textarea>
-        </div>
+        <label for="clinical-note" class="form-label small fw-semibold">
+            <span class="t-en">Clinical note (not stored)</span>
+            <span class="t-it">Nota clinica (non salvata)</span>
+        </label>
+        <textarea id="clinical-note" class="form-control" rows="3" placeholder="Summarise interpretation or follow-up actions."></textarea>
     </div>
 </div>

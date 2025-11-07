@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Iterable, Tuple
+from typing import Callable, Dict, Iterable, Tuple
 
 import numpy as np
 import pandas as pd
@@ -23,6 +23,10 @@ class MathematicalModel:
     carrying_capacity_factor_tumor: float = 10.0
     carrying_capacity_factor_healthy: float = 1.2
     evaluation_points: int = 200
+    carrying_capacity_tumor: float | None = None
+    carrying_capacity_healthy: float | None = None
+    immune_compromise_index: float = 1.0
+    dose_functions: Dict[str, Callable[[float], float]] | None = None
 
     def simulate(self) -> pd.DataFrame:
         """Integrate the coupled system and return trajectories."""
@@ -46,6 +50,12 @@ class MathematicalModel:
         dose_rates = {
             drug: max(dose, 0.0) / max(time_horizon, 1e-6) for drug, dose in self.drug_doses.items()
         }
+        schedule_functions: dict[str, Callable[[float], float]] = {}
+        if self.dose_functions:
+            for drug in drug_names:
+                fn = self.dose_functions.get(drug)
+                if callable(fn):
+                    schedule_functions[drug] = fn
 
         def initial_concentrations() -> Iterable[float]:
             concentrations: list[float] = []
@@ -68,8 +78,16 @@ class MathematicalModel:
             )
         )
 
-        carrying_t = self.baseline_tumor_cells * self.carrying_capacity_factor_tumor
-        carrying_h = self.baseline_healthy_cells * self.carrying_capacity_factor_healthy
+        carrying_t = (
+            float(self.carrying_capacity_tumor)
+            if self.carrying_capacity_tumor is not None
+            else self.baseline_tumor_cells * self.carrying_capacity_factor_tumor
+        )
+        carrying_h = (
+            float(self.carrying_capacity_healthy)
+            if self.carrying_capacity_healthy is not None
+            else self.baseline_healthy_cells * self.carrying_capacity_factor_healthy
+        )
 
         def pkpd_effects(concentrations: np.ndarray) -> np.ndarray:
             effects = np.zeros_like(concentrations, dtype=float)
@@ -89,6 +107,7 @@ class MathematicalModel:
             effects = pkpd_effects(concentrations)
             total_effect = effects.sum()
             toxicity_effect = effects.mean() if effects.size else 0.0
+            immune_index = max(self.immune_compromise_index, 0.1)
             d_tumor = (
                 self.growth_rates.get("tumor", 0.0)
                 * tumor
@@ -99,7 +118,7 @@ class MathematicalModel:
                 self.growth_rates.get("healthy", 0.0)
                 * healthy
                 * (1.0 - healthy / max(carrying_h, 1e-6))
-                - toxicity_effect * healthy
+                - immune_index * toxicity_effect * healthy
             )
             d_concentrations = np.zeros_like(concentrations)
             for idx, drug in enumerate(drug_names):
@@ -107,7 +126,11 @@ class MathematicalModel:
                 half_life_hours = pk.get("half_life", 24.0)
                 half_life_days = half_life_hours / 24.0
                 k_elim = pk.get("k_elim", np.log(2) / max(half_life_days, 1e-6))
-                input_rate = dose_rates[drug]
+                schedule_fn = schedule_functions.get(drug)
+                if schedule_fn:
+                    input_rate = max(schedule_fn(_t), 0.0)
+                else:
+                    input_rate = dose_rates[drug]
                 d_concentrations[idx] = -k_elim * concentrations[idx] + input_rate
             return np.concatenate(([d_tumor, d_healthy], d_concentrations))
 

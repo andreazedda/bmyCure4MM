@@ -23,7 +23,8 @@ from django.core.exceptions import PermissionDenied
 
 from clinic.models import Regimen
 
-from . import forms, models, optim
+from . import explain, forms, models, optim
+from .pharmaco import registry as pharmaco_registry
 from .permissions import is_editor
 
 
@@ -291,10 +292,35 @@ def simulate_scenario(request: HttpRequest, pk: int) -> HttpResponse:
         return HttpResponseBadRequest("Invalid request method.")
     scenario = get_object_or_404(models.Scenario, pk=pk, active=True)
     form = forms.SimulationParameterForm(request.POST)
+
+    def _profile_with_ranges(drug: str):
+        profile = pharmaco_registry.get_drug_profile(drug)
+        if not profile:
+            return None
+        profile_copy = dict(profile)
+        dose = profile_copy.get("dose_range", {})
+        span = f"{dose.get('min')}–{dose.get('max')} {profile_copy.get('unit', '')}".strip()
+        profile_copy["range_en"] = f"Allowed: {span}"
+        profile_copy["range_it"] = f"Consentito: {span}"
+        return profile_copy
+
+    drug_profiles = {
+        "lenalidomide": _profile_with_ranges("lenalidomide"),
+        "bortezomib": _profile_with_ranges("bortezomib"),
+        "daratumumab": _profile_with_ranges("daratumumab"),
+    }
     if not form.is_valid():
         html = render_to_string(
             "simulator/_simulation_form.html",
-            {"form": form, "scenario": scenario, "warnings": getattr(form, "warnings", [])},
+            {
+                "form": form,
+                "scenario": scenario,
+                "warnings": getattr(form, "warnings", []),
+                "drug_profiles": drug_profiles,
+                "helptext_it": forms.SIMULATION_FORM_HELP_TEXT_IT,
+                "helptext_en": forms.SIMULATION_FORM_HELP_TEXT_EN,
+                "is_editor": is_editor(request.user),
+            },
             request=request,
         )
         response = HttpResponse(html, status=400)
@@ -307,6 +333,8 @@ def simulate_scenario(request: HttpRequest, pk: int) -> HttpResponse:
         scenario=scenario,
         user=request.user,
         parameters=form.cleaned_data,
+        cohort_size=form.cleaned_data.get("cohort_size", 1),
+        seed=form.cleaned_data.get("seed"),
     )
     try:
         attempt.run_model()
@@ -335,6 +363,7 @@ def simulate_scenario(request: HttpRequest, pk: int) -> HttpResponse:
         "summary": attempt.results_summary,
         "results": attempt.results,
         "warnings": parameter_warnings + summary_warnings,
+        "kpi": explain.KPI,
     }
     html = render_to_string("simulator/_simulation_results.html", context, request=request)
     return HttpResponse(html)

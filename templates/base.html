@@ -25,6 +25,7 @@
                     <li class="nav-item"><a class="nav-link" href="{% url 'clinic:patient_list' %}">Patients</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'chemtools:tools_home' %}">Chem Tools</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'simulator:scenario_list' %}">Simulator</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'docs' %}">Docs</a></li>
                     {% if request.user.is_authenticated and user_is_simulator_editor %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="manageMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -85,6 +86,64 @@
                 {% endfor %}
             </div>
         {% endif %}
+        <div class="d-flex align-items-center gap-2 mb-2">
+            <div class="btn-group btn-group-sm" role="group" aria-label="Language">
+                <button type="button" class="btn btn-outline-secondary" data-lang="en" id="lang-en">EN</button>
+                <button type="button" class="btn btn-outline-secondary" data-lang="it" id="lang-it">IT</button>
+            </div>
+            <div class="form-check form-switch ms-3">
+                <input class="form-check-input" type="checkbox" id="novice-mode" checked>
+                <label class="form-check-label" for="novice-mode">
+                    Novice Mode
+                </label>
+            </div>
+        </div>
+        <script>
+          (function(){
+            const langButtons = {
+              en: document.getElementById('lang-en'),
+              it: document.getElementById('lang-it'),
+            };
+            const setActiveLang = (lang) => {
+              document.documentElement.setAttribute('data-lang', lang);
+              document.documentElement.lang = lang;
+              Object.entries(langButtons).forEach(([key, btn]) => {
+                if (!btn) return;
+                if (key === lang) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+              });
+            };
+            if (langButtons.en) {
+              langButtons.en.onclick = () => setActiveLang('en');
+            }
+            if (langButtons.it) {
+              langButtons.it.onclick = () => setActiveLang('it');
+            }
+            document.addEventListener('change', (e)=>{
+              if (e.target && e.target.id === 'novice-mode') {
+                if (e.target.checked) {
+                  document.documentElement.setAttribute('data-novice', '');
+                } else {
+                  document.documentElement.removeAttribute('data-novice');
+                }
+              }
+            });
+            setActiveLang('en');
+            document.documentElement.setAttribute('data-novice','');
+          })();
+        </script>
+        <style>
+          [data-lang="en"] .t-it { display:none !important; }
+          [data-lang="it"] .t-en { display:none !important; }
+          html[data-novice] .novice-tip { display:block; }
+          .novice-tip { display:none; font-size:0.92rem; }
+        </style>
+        <script>
+          document.documentElement.lang = document.documentElement.getAttribute('data-lang') || 'en';
+        </script>
         {% block content %}{% endblock %}
     </div>
 
@@ -96,9 +155,45 @@
         </div>
     </footer>
 
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index:1080">
+        <div id="toast-status" class="toast align-items-center text-bg-secondary border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="toast-message">Working…</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/htmx.org@1.9.12"></script>
     <script>
+    const getCurrentLang = () => document.documentElement.getAttribute('data-lang') || 'en';
+    const showToast = (msg, variant='secondary') => {
+        const toastEl = document.getElementById('toast-status');
+        if (!toastEl || typeof bootstrap === 'undefined') {
+            return;
+        }
+        toastEl.className = `toast align-items-center text-bg-${variant} border-0`;
+        const body = document.getElementById('toast-message');
+        if (body) {
+            body.textContent = msg;
+        }
+        const toast = bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 2500 });
+        toast.show();
+    };
+    document.body.addEventListener('htmx:beforeRequest', () => {
+        const message = getCurrentLang() === 'it' ? 'Simulazione in corso…' : 'Running simulation…';
+        showToast(message, 'secondary');
+    });
+    document.body.addEventListener('htmx:responseError', () => {
+        const message = getCurrentLang() === 'it' ? 'Errore nella simulazione' : 'Simulation error';
+        showToast(message, 'danger');
+    });
+    document.body.addEventListener('htmx:afterOnLoad', () => {
+        const message = getCurrentLang() === 'it' ? 'Completato' : 'Completed';
+        showToast(message, 'success');
+    });
+
     document.addEventListener('DOMContentLoaded', () => {
         const offcanvasTriggers = document.querySelectorAll('[data-bs-toggle="offcanvas"]');
         offcanvasTriggers.forEach((trigger) => {
@@ -142,8 +237,12 @@
             }
         });
 
-        const tooltipTriggerList = Array.prototype.slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        tooltipTriggerList.forEach((el) => new bootstrap.Tooltip(el));
+        const initTooltips = () => {
+            const tooltipTriggerList = Array.prototype.slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.forEach((el) => new bootstrap.Tooltip(el));
+        };
+        initTooltips();
+        document.body.addEventListener('htmx:afterSwap', initTooltips);
     });
     </script>
     {% block extra_js %}{% endblock %}

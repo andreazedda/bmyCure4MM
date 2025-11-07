@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h1 class="h4 mb-3">Predictive Lab Docs</h1>
+                <p class="text-muted">Build locally with <code>mkdocs build</code> or <code>mkdocs serve</code>. Quickstart guides are available in English and Italian.</p>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <h2 class="h6">English</h2>
+                        <ul class="list-unstyled mb-0">
+                            <li><strong>Quickstart</strong> – docs/en/quickstart.md</li>
+                            <li>Simulator – docs/en/simulator.md</li>
+                            <li>Optimization Lab – docs/en/optimization_lab.md</li>
+                            <li>Patient Twin – docs/en/patient_twin.md</li>
+                            <li>PK/PD Presets – docs/en/pkpd_presets.md</li>
+                            <li>Pipelines – docs/en/pipelines.md</li>
+                            <li>API – docs/en/api.md</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h2 class="h6">Italiano</h2>
+                        <ul class="list-unstyled mb-0">
+                            <li><strong>Avvio rapido</strong> – docs/it/avvio_rapido.md</li>
+                            <li>Simulatore – docs/it/simulatore.md</li>
+                            <li>Optimization Lab – docs/it/optimization_lab.md</li>
+                            <li>Gemello Paziente – docs/it/gemello_paziente.md</li>
+                            <li>Preset PK/PD – docs/it/pkpd_preset.md</li>
+                            <li>Pipeline – docs/it/pipeline.md</li>
+                            <li>API – docs/it/api.md</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="alert alert-info mt-3">
+                    <strong>Tip:</strong> Run <code>mkdocs serve</code> to preview the site locally.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

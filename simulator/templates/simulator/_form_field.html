@@ -1,0 +1,30 @@
+{% load simulator_extras %}
+<div class="mb-3">
+    <label class="form-label" for="{{ field.id_for_label }}">
+        {{ label|default:field.label }}
+        {% if unit %}
+            <small class="text-muted ms-1">{{ unit }}</small>
+        {% endif %}
+    </label>
+    {{ field }}
+    {% if append_en or append_it %}
+        <small class="text-muted d-block mt-1">
+            {% if append_en %}<span class="t-en">{{ append_en }}</span>{% endif %}
+            {% if append_it %}<span class="t-it">{{ append_it }}</span>{% endif %}
+        </small>
+    {% endif %}
+    {% if badge %}
+        <div class="mt-1">{{ badge|safe }}</div>
+    {% endif %}
+    {% with help_en=help_en|default_if_none:"" help_it=help_it|default_if_none:"" %}
+        {% if help_en or help_it %}
+            <div class="form-text">
+                {% if help_en %}<span class="t-en">{{ help_en }}</span>{% endif %}
+                {% if help_it %}<span class="t-it">{{ help_it }}</span>{% endif %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    {% if field.errors %}
+        <div class="invalid-feedback d-block">{{ field.errors|striptags }}</div>
+    {% endif %}
+</div>

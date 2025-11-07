@@ -10,6 +10,48 @@ from clinic.models import Assessment, Regimen
 from . import models
 from .presets import PRESETS
 
+SIMULATION_FORM_HELP_TEXT_EN = {
+    "preset": "Clinical preset with guardrailed defaults for common regimens.",
+    "creatinine_clearance": "Renal function estimate driving lenalidomide adjustments (thresholds at 60 and 30 ml/min).",
+    "neuropathy_grade": "CTCAE sensory neuropathy grade (0–3). Grades ≥2 restrict bortezomib to ≤1.0 mg/m².",
+    "anc": "ANC <1.0 ×10⁹/L blocks the simulation because of neutropenia.",
+    "platelets": "Platelets <75 ×10⁹/L block the simulation (bleeding risk).",
+    "pregnancy": "Pregnancy is a contraindication for IMiDs; simulations are blocked when flagged.",
+    "baseline_tumor_cells": "Estimated malignant plasma cell burden (cells).",
+    "baseline_healthy_cells": "Approximate pool of normal plasma cells (cells).",
+    "lenalidomide_dose": "Standard induction dose: 25 mg/day (21 days on, 7 off). Adjustments are limited to preset bounds.",
+    "bortezomib_dose": "Typical SC dosing 1.3 mg/m² on scheduled days; stay within ±20% to avoid toxicity.",
+    "daratumumab_dose": "Loading dose 16 mg/kg; higher exposure raises immunosuppression risk.",
+    "time_horizon": "Length of the virtual treatment window (days). Longer horizons increase numerical stiffness.",
+    "tumor_growth_rate": "Logistic growth rate of malignant plasma cells. Values >0.05 day⁻¹ are rare.",
+    "healthy_growth_rate": "Marrow recovery kinetics for healthy plasma cells (≈0.01–0.02 day⁻¹).",
+    "interaction_strength": "Synergy/toxicity coupling between agents (dimensionless).",
+    "cohort_size": "Number of virtual subjects sampled for uncertainty bands.",
+    "use_twin": "Enable the Patient Twin to auto-derive biology from the latest labs.",
+    "seed": "Optional seed for reproducible virtual cohorts and solver noise.",
+}
+
+SIMULATION_FORM_HELP_TEXT_IT = {
+    "preset": "Preset clinico con default protetti per i regimi più comuni.",
+    "creatinine_clearance": "Stima della funzione renale che guida gli aggiustamenti di lenalidomide (soglie a 60 e 30 ml/min).",
+    "neuropathy_grade": "Grado di neuropatia sensitiva CTCAE (0–3). Gradi ≥2 limitano bortezomib a ≤1.0 mg/m².",
+    "anc": "ANC <1.0 ×10⁹/L indica neutropenia clinicamente significativa e blocca la simulazione.",
+    "platelets": "Piastrine <75 ×10⁹/L rappresentano un alto rischio emorragico e bloccano la simulazione.",
+    "pregnancy": "La gravidanza è una controindicazione per gli IMiD; le prove virtuali vengono bloccate quando selezionata.",
+    "baseline_tumor_cells": "Stima del carico di cellule plasmatiche maligne (cellule).",
+    "baseline_healthy_cells": "Pool approssimativo di cellule plasmatiche sane (cellule).",
+    "lenalidomide_dose": "Dose standard: 25 mg/die (21 giorni su 28). Il preset limita l’aggiustamento controllato.",
+    "bortezomib_dose": "Dose SC tipica 1.3 mg/m² nei giorni programmati; restare entro ±20% evita tossicità.",
+    "daratumumab_dose": "Dose di carico 16 mg/kg; variazioni maggiori aumentano il rischio d’immunosoppressione.",
+    "time_horizon": "Durata della finestra terapeutica virtuale (giorni). Orizzonti lunghi aumentano l’incertezza.",
+    "tumor_growth_rate": "Velocità logistica di crescita del tumore. Valori >0.05 day⁻¹ sono rari.",
+    "healthy_growth_rate": "Cinetica di recupero per le cellule sane. Tipicamente 0.01–0.02 day⁻¹.",
+    "interaction_strength": "Ampiezza della sinergia/tossicità tra i farmaci (senza unità).",
+    "cohort_size": "Numero di pazienti virtuali campionati per stimare le bande di incertezza.",
+    "use_twin": "Attiva il Gemello Paziente per riempire automaticamente i parametri biologici dai laboratori disponibili.",
+    "seed": "Seed opzionale per rendere ripetibili coorti virtuali e solver.",
+}
+
 
 class RegimenForm(BootstrapValidationMixin, forms.ModelForm):
     """Editor form for maintaining regimens."""
@@ -236,6 +278,14 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
         label="Simulation horizon (days)",
         help_text="Length of the virtual treatment window (days). Limits ensure numerical stability and clinical realism.",
     )
+    cohort_size = forms.TypedChoiceField(
+        choices=[(1, "1"), (10, "10"), (50, "50"), (200, "200")],
+        coerce=int,
+        initial=1,
+        label="Virtual cohort size",
+        widget=forms.Select(attrs={"class": "form-select"}),
+        help_text="Number of virtual subjects sampled for uncertainty bands (larger takes longer).",
+    )
     tumor_growth_rate = forms.FloatField(
         min_value=0.0,
         widget=forms.NumberInput(
@@ -280,6 +330,27 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
         ),
         label="Drug interaction strength",
         help_text="Synergy/toxicity coupling between agents (dimensionless). Values >0.2 are unsupported.",
+    )
+    use_twin = forms.BooleanField(
+        required=False,
+        initial=True,
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        label="Use Patient Twin",
+        help_text="Auto-derive biology from linked laboratory assessments when available.",
+    )
+    seed = forms.IntegerField(
+        required=False,
+        min_value=0,
+        widget=forms.NumberInput(
+            attrs={
+                "class": "form-control",
+                "step": "1",
+                "min": "0",
+                "inputmode": "numeric",
+            }
+        ),
+        label="Random seed",
+        help_text="Leave blank for stochastic runs; set a value to reproduce cohorts/optimizations.",
     )
 
     def __init__(self, *args, **kwargs):

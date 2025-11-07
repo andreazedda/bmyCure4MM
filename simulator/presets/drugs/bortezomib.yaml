@@ -1,0 +1,17 @@
+name: bortezomib
+display_name: Bortezomib
+unit: mg/m2
+schema: BIW
+pk:
+  half_life: 40.0
+  Vd: 20.0
+pd:
+  Emax: 0.9
+  EC50: 0.2
+dose_range:
+  min: 0.3
+  max: 1.5
+schedule:
+  type: weekly
+  days: [1, 4]
+  administration_window_days: 0.5

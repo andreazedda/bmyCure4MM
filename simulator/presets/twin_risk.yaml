@@ -1,0 +1,37 @@
+weights:
+  riss: 0.35
+  ldh: 0.2
+  beta2m: 0.25
+  flc_ratio: 0.2
+r_iss_map:
+  I: 0.1
+  II: 0.6
+  III: 1.0
+ldh_breakpoints:
+  normal_upper: 250
+  high: 550
+beta2m_range:
+  min: 2.0
+  max: 15.0
+flc_ratio_range:
+  normal_low: 0.26
+  normal_high: 1.65
+  min: 0.05
+  max: 20.0
+growth_mapping:
+  tumor_growth_rate:
+    min: 0.017
+    max: 0.04
+  healthy_growth_rate:
+    min: 0.012
+    max: 0.02
+carrying_capacity:
+  tumor:
+    min: 5.0e8
+    max: 2.5e9
+  healthy:
+    min: 2.5e11
+    max: 6.0e11
+immune_compromise_index:
+  min: 0.85
+  max: 1.3

@@ -1,0 +1,18 @@
+name: lenalidomide
+display_name: Lenalidomide
+unit: mg
+schema: 21on/7off
+pk:
+  half_life: 9.0
+  Vd: 60.0
+pd:
+  Emax: 0.85
+  EC50: 8.0
+dose_range:
+  min: 5.0
+  max: 30.0
+schedule:
+  type: cycle
+  cycle_length: 28
+  days_on: 21
+  administration_window_days: 1.0

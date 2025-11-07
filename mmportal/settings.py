@@ -21,7 +21,13 @@ SECRET_KEY = os.environ.get(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
 
-ALLOWED_HOSTS: list[str] = []
+_hosts = os.environ.get("ALLOWED_HOSTS")
+ALLOWED_HOSTS: list[str] = [host.strip() for host in _hosts.split(",") if host.strip()] if _hosts else []
+
+_trusted = os.environ.get("CSRF_TRUSTED_ORIGINS")
+CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in _trusted.split(",") if origin.strip()] if _trusted else []
+
+PREDLAB_V2 = os.environ.get("PREDLAB_V2", "0") == "1"
 
 
 # Application definition

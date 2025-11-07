@@ -1,0 +1,26 @@
+site_name: Predictive Lab Docs
+nav:
+  - EN:
+      - Quickstart: en/quickstart.md
+      - Simulator: en/simulator.md
+      - Optimization Lab: en/optimization_lab.md
+      - Patient Twin: en/patient_twin.md
+      - PK/PD Presets: en/pkpd_presets.md
+      - Pipelines: en/pipelines.md
+      - API: en/api.md
+  - IT:
+      - Avvio rapido: it/avvio_rapido.md
+      - Simulatore: it/simulatore.md
+      - Optimization Lab: it/optimization_lab.md
+      - Gemello Paziente: it/gemello_paziente.md
+      - Preset PK/PD: it/pkpd_preset.md
+      - Pipeline: it/pipeline.md
+      - API: it/api.md
+theme:
+  name: material
+plugins:
+  - search
+markdown_extensions:
+  - toc
+  - admonition
+  - tables

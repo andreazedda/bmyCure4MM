@@ -10,3 +10,4 @@ redis>=4.5.0
 django-filter>=23.0
 djangorestframework>=3.14.0
 optuna>=3.6.0
+PyYAML>=6.0

@@ -7,7 +7,8 @@ from django.urls import reverse
 
 from clinic.models import Regimen
 
-from . import forms, models
+from . import explain, forms, models
+from .pharmaco import registry as pharmaco_registry
 from .permissions import is_editor
 
 
@@ -70,6 +71,22 @@ def scenario_detail(request, pk: int):
         tumor_reduction = latest_summary.get("tumor_reduction")
         if tumor_reduction is not None and tumor_reduction < 0:
             latest_warnings.append("Latest simulation predicted tumor regrowth (negative reduction). Adjust parameters and re-run.")
+    def _profile_with_ranges(drug: str):
+        profile = pharmaco_registry.get_drug_profile(drug)
+        if not profile:
+            return None
+        profile_copy = dict(profile)
+        dose = profile_copy.get("dose_range", {})
+        span = f"{dose.get('min')}–{dose.get('max')} {profile_copy.get('unit', '')}".strip()
+        profile_copy["range_en"] = f"Allowed: {span}"
+        profile_copy["range_it"] = f"Consentito: {span}"
+        return profile_copy
+
+    drug_profiles = {
+        "lenalidomide": _profile_with_ranges("lenalidomide"),
+        "bortezomib": _profile_with_ranges("bortezomib"),
+        "daratumumab": _profile_with_ranges("daratumumab"),
+    }
     context = {
         "scenario": scenario,
         "attempts": attempts,
@@ -83,5 +100,9 @@ def scenario_detail(request, pk: int):
         "latest_simulation_summary": latest_summary,
         "latest_simulation_results": latest_results,
         "latest_simulation_warnings": latest_warnings,
+        "drug_profiles": drug_profiles,
+        "sim_form_help_it": forms.SIMULATION_FORM_HELP_TEXT_IT,
+        "sim_form_help_en": forms.SIMULATION_FORM_HELP_TEXT_EN,
+        "kpi": explain.KPI,
     }
     return render(request, "simulator/scenario_detail.html", context)
