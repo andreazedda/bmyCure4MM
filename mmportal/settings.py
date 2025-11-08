@@ -27,6 +27,11 @@ ALLOWED_HOSTS: list[str] = [host.strip() for host in _hosts.split(",") if host.s
 _trusted = os.environ.get("CSRF_TRUSTED_ORIGINS")
 CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in _trusted.split(",") if origin.strip()] if _trusted else []
 
+if DEBUG:
+    for host in ("localhost", "127.0.0.1", "testserver"):
+        if host not in ALLOWED_HOSTS:
+            ALLOWED_HOSTS.append(host)
+
 PREDLAB_V2 = os.environ.get("PREDLAB_V2", "0") == "1"
 
 
@@ -154,6 +159,11 @@ LOGGING = {
     },
     "loggers": {
         "activity": {
+            "handlers": ["activity_file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "ux.education": {
             "handlers": ["activity_file"],
             "level": "INFO",
             "propagate": False,

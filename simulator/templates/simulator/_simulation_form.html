@@ -31,30 +31,58 @@
             </div>
             <div class="row g-3">
                 <div class="col-12 col-md-6">
-                    {% include "simulator/_form_field.html" with field=form.preset help_en=helptext_en|dict_get:'preset' help_it=helptext_it|dict_get:'preset' %}
+                    {% include "simulator/_form_field.html" with field=form.preset help_en=helptext_en|dict_get:'preset' help_it=helptext_it|dict_get:'preset' help_slug="quickstart" %}
+                    <div id="preset-explainer" class="alert alert-primary mt-2 d-none">
+                        <h6 class="story-title fw-bold mb-2"></h6>
+                        <div class="story-background mb-2"></div>
+                        <div class="story-challenge alert alert-warning mb-2"></div>
+                        <div class="story-why mb-2">
+                            <strong>💡 <span class="t-en">Why these drugs?</span><span class="t-it">Perché questi farmaci?</span></strong>
+                            <p class="story-why-text mb-0"></p>
+                        </div>
+                        <div class="story-outcome mb-2">
+                            <strong>🎯 <span class="t-en">Expected Outcome:</span><span class="t-it">Risultato Atteso:</span></strong>
+                            <p class="story-outcome-text mb-0"></p>
+                        </div>
+                        <details class="story-learning">
+                            <summary class="fw-semibold" style="cursor: pointer;">
+                                📚 <span class="t-en">Learning Points (click to expand)</span><span class="t-it">Punti di Apprendimento (clicca per espandere)</span>
+                            </summary>
+                            <ul class="story-learning-list mt-2 mb-0"></ul>
+                        </details>
+                        <small class="d-block mt-2">
+                            <a href="#" data-help="quickstart">
+                                <span class="t-en">📖 More guidance</span>
+                                <span class="t-it">📖 Più indicazioni</span>
+                            </a>
+                        </small>
+                    </div>
                 </div>
                 <div class="col-12 col-md-6">
-                    {% include "simulator/_form_field.html" with field=form.baseline_tumor_cells help_en=helptext_en|dict_get:'baseline_tumor_cells' help_it=helptext_it|dict_get:'baseline_tumor_cells' unit="cells" %}
+                    {% include "simulator/_form_field.html" with field=form.baseline_tumor_cells help_en=helptext_en|dict_get:'baseline_tumor_cells' help_it=helptext_it|dict_get:'baseline_tumor_cells' unit="cells" help_slug="quickstart" %}
                 </div>
                 <div class="col-12 col-md-6">
-                    {% include "simulator/_form_field.html" with field=form.baseline_healthy_cells help_en=helptext_en|dict_get:'baseline_healthy_cells' help_it=helptext_it|dict_get:'baseline_healthy_cells' unit="cells" %}
+                    {% include "simulator/_form_field.html" with field=form.baseline_healthy_cells help_en=helptext_en|dict_get:'baseline_healthy_cells' help_it=helptext_it|dict_get:'baseline_healthy_cells' unit="cells" help_slug="quickstart" %}
                 </div>
                 <div class="col-12 col-md-6">
-                    {% include "simulator/_form_field.html" with field=form.creatinine_clearance help_en=helptext_en|dict_get:'creatinine_clearance' help_it=helptext_it|dict_get:'creatinine_clearance' unit="ml/min" %}
+                    {% include "simulator/_form_field.html" with field=form.creatinine_clearance help_en=helptext_en|dict_get:'creatinine_clearance' help_it=helptext_it|dict_get:'creatinine_clearance' unit="ml/min" help_slug="doses" %}
                 </div>
                 <div class="col-12 col-md-6">
-                    {% include "simulator/_form_field.html" with field=form.neuropathy_grade help_en=helptext_en|dict_get:'neuropathy_grade' help_it=helptext_it|dict_get:'neuropathy_grade' %}
+                    {% include "simulator/_form_field.html" with field=form.neuropathy_grade help_en=helptext_en|dict_get:'neuropathy_grade' help_it=helptext_it|dict_get:'neuropathy_grade' help_slug="doses" %}
                 </div>
                 <div class="col-12 col-md-6">
-                    {% include "simulator/_form_field.html" with field=form.anc help_en=helptext_en|dict_get:'anc' help_it=helptext_it|dict_get:'anc' unit="×10⁹/L" %}
+                    {% include "simulator/_form_field.html" with field=form.anc help_en=helptext_en|dict_get:'anc' help_it=helptext_it|dict_get:'anc' unit="×10⁹/L" help_slug="doses" %}
                 </div>
                 <div class="col-12 col-md-6">
-                    {% include "simulator/_form_field.html" with field=form.platelets help_en=helptext_en|dict_get:'platelets' help_it=helptext_it|dict_get:'platelets' unit="×10⁹/L" %}
+                    {% include "simulator/_form_field.html" with field=form.platelets help_en=helptext_en|dict_get:'platelets' help_it=helptext_it|dict_get:'platelets' unit="×10⁹/L" help_slug="doses" %}
                 </div>
                 <div class="col-12">
                     <div class="form-check form-switch">
                         {{ form.pregnancy }}
-                        <label class="form-check-label" for="{{ form.pregnancy.id_for_label }}">{{ form.pregnancy.label }}</label>
+                        <label class="form-check-label" for="{{ form.pregnancy.id_for_label }}">
+                            {{ form.pregnancy.label }}
+                            <a href="#" class="ms-1 small" data-help="pregnancy" aria-label="Help">?</a>
+                        </label>
                     </div>
                     <div class="form-text">
                         <span class="t-en">{{ helptext_en|dict_get:'pregnancy' }}</span>
@@ -76,29 +104,17 @@
             <div class="row g-3">
                 <div class="col-12 col-md-4">
                     {% with profile=drug_profiles.lenalidomide %}
-                        {% if profile %}
-                            {% include "simulator/_form_field.html" with field=form.lenalidomide_dose help_en=helptext_en|dict_get:'lenalidomide_dose' help_it=helptext_it|dict_get:'lenalidomide_dose' unit="mg" append_en=profile.range_en append_it=profile.range_it %}
-                        {% else %}
-                            {% include "simulator/_form_field.html" with field=form.lenalidomide_dose help_en=helptext_en|dict_get:'lenalidomide_dose' help_it=helptext_it|dict_get:'lenalidomide_dose' unit="mg" %}
-                        {% endif %}
+                        {% include "simulator/_form_field.html" with field=form.lenalidomide_dose help_en=helptext_en|dict_get:'lenalidomide_dose' help_it=helptext_it|dict_get:'lenalidomide_dose' unit="mg" append_en=profile|dict_get:'range_en' append_it=profile|dict_get:'range_it' help_slug="dose_ranges_lenalidomide" add_badge=True %}
                     {% endwith %}
                 </div>
                 <div class="col-12 col-md-4">
                     {% with profile=drug_profiles.bortezomib %}
-                        {% if profile %}
-                            {% include "simulator/_form_field.html" with field=form.bortezomib_dose help_en=helptext_en|dict_get:'bortezomib_dose' help_it=helptext_it|dict_get:'bortezomib_dose' unit="mg/m²" append_en=profile.range_en append_it=profile.range_it %}
-                        {% else %}
-                            {% include "simulator/_form_field.html" with field=form.bortezomib_dose help_en=helptext_en|dict_get:'bortezomib_dose' help_it=helptext_it|dict_get:'bortezomib_dose' unit="mg/m²" %}
-                        {% endif %}
+                        {% include "simulator/_form_field.html" with field=form.bortezomib_dose help_en=helptext_en|dict_get:'bortezomib_dose' help_it=helptext_it|dict_get:'bortezomib_dose' unit="mg/m²" append_en=profile|dict_get:'range_en' append_it=profile|dict_get:'range_it' help_slug="dose_ranges_bortezomib" add_badge=True %}
                     {% endwith %}
                 </div>
                 <div class="col-12 col-md-4">
                     {% with profile=drug_profiles.daratumumab %}
-                        {% if profile %}
-                            {% include "simulator/_form_field.html" with field=form.daratumumab_dose help_en=helptext_en|dict_get:'daratumumab_dose' help_it=helptext_it|dict_get:'daratumumab_dose' unit="mg/kg" append_en=profile.range_en append_it=profile.range_it %}
-                        {% else %}
-                            {% include "simulator/_form_field.html" with field=form.daratumumab_dose help_en=helptext_en|dict_get:'daratumumab_dose' help_it=helptext_it|dict_get:'daratumumab_dose' unit="mg/kg" %}
-                        {% endif %}
+                        {% include "simulator/_form_field.html" with field=form.daratumumab_dose help_en=helptext_en|dict_get:'daratumumab_dose' help_it=helptext_it|dict_get:'daratumumab_dose' unit="mg/kg" append_en=profile|dict_get:'range_en' append_it=profile|dict_get:'range_it' help_slug="dose_ranges_daratumumab" add_badge=True %}
                     {% endwith %}
                 </div>
             </div>
@@ -116,10 +132,10 @@
             </div>
             <div class="row g-3">
                 <div class="col-12 col-md-6">
-                    {% include "simulator/_form_field.html" with field=form.time_horizon help_en=helptext_en|dict_get:'time_horizon' help_it=helptext_it|dict_get:'time_horizon' unit="days" %}
+                    {% include "simulator/_form_field.html" with field=form.time_horizon help_en=helptext_en|dict_get:'time_horizon' help_it=helptext_it|dict_get:'time_horizon' unit="days" help_slug="horizon_cohort" %}
                 </div>
                 <div class="col-12 col-md-6">
-                    {% include "simulator/_form_field.html" with field=form.cohort_size help_en=helptext_en|dict_get:'cohort_size' help_it=helptext_it|dict_get:'cohort_size' %}
+                    {% include "simulator/_form_field.html" with field=form.cohort_size help_en=helptext_en|dict_get:'cohort_size' help_it=helptext_it|dict_get:'cohort_size' help_slug="horizon_cohort" %}
                 </div>
             </div>
         </fieldset>
@@ -132,14 +148,14 @@
             </div>
             <div class="row g-3">
                 <div class="col-12 col-md-4">
-                    {% include "simulator/_form_field.html" with field=form.tumor_growth_rate help_en=helptext_en|dict_get:'tumor_growth_rate' help_it=helptext_it|dict_get:'tumor_growth_rate' unit="day⁻¹" %}
+                    {% include "simulator/_form_field.html" with field=form.tumor_growth_rate help_en=helptext_en|dict_get:'tumor_growth_rate' help_it=helptext_it|dict_get:'tumor_growth_rate' unit="day⁻¹" help_slug="twin" %}
                 </div>
                 <div class="col-12 col-md-4">
-                    {% include "simulator/_form_field.html" with field=form.healthy_growth_rate help_en=helptext_en|dict_get:'healthy_growth_rate' help_it=helptext_it|dict_get:'healthy_growth_rate' unit="day⁻¹" %}
+                    {% include "simulator/_form_field.html" with field=form.healthy_growth_rate help_en=helptext_en|dict_get:'healthy_growth_rate' help_it=helptext_it|dict_get:'healthy_growth_rate' unit="day⁻¹" help_slug="twin" %}
                 </div>
                 <div class="col-12 col-md-4">
                     <div id="interaction-strength-wrapper">
-                        {% include "simulator/_form_field.html" with field=form.interaction_strength help_en=helptext_en|dict_get:'interaction_strength' help_it=helptext_it|dict_get:'interaction_strength' %}
+                        {% include "simulator/_form_field.html" with field=form.interaction_strength help_en=helptext_en|dict_get:'interaction_strength' help_it=helptext_it|dict_get:'interaction_strength' help_slug="interaction_strength" add_badge=True %}
                     </div>
                     <span id="interaction-strength-badge" class="badge bg-success"></span>
                 </div>
@@ -149,6 +165,7 @@
                         <label class="form-check-label" for="{{ form.use_twin.id_for_label }}">
                             <span class="t-en">Use Patient Twin (auto-derive biology)</span>
                             <span class="t-it">Usa Gemello Paziente (deriva dai lab)</span>
+                            <a href="#" class="ms-1 small" data-help="use_twin" aria-label="Help">?</a>
                         </label>
                     </div>
                     <div class="form-text">
@@ -160,7 +177,7 @@
                     {% endif %}
                 </div>
                 <div class="col-12 col-md-6">
-                    {% include "simulator/_form_field.html" with field=form.seed help_en=helptext_en|dict_get:'seed' help_it=helptext_it|dict_get:'seed' %}
+                    {% include "simulator/_form_field.html" with field=form.seed help_en=helptext_en|dict_get:'seed' help_it=helptext_it|dict_get:'seed' help_slug="quickstart" %}
                 </div>
             </div>
         </fieldset>
@@ -172,16 +189,17 @@
             <button type="reset" class="btn btn-outline-dark">
                 <span class="t-en">Reset to preset</span><span class="t-it">Reset al preset</span>
             </button>
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" class="btn btn-primary novice-submit">
                 <span class="t-en">Run simulation</span><span class="t-it">Esegui simulazione</span>
             </button>
             {% if is_editor %}
                 <button type="button"
-                        class="btn btn-outline-primary"
+                        class="btn btn-outline-primary novice-submit"
                         hx-post="{% url 'simulator:run_experiment' scenario.pk %}"
                         hx-include="#simulation-parameters-form"
                         hx-target="#pareto-panel"
-                        hx-indicator="#simulation-indicator">
+                        hx-indicator="#simulation-indicator"
+                        data-audit="optimize_click">
                     <span class="t-en">Optimize regimen</span><span class="t-it">Ottimizza regime</span>
                 </button>
             {% endif %}
@@ -256,6 +274,9 @@
     </div>
 </div>
 
+{{ drug_profiles|json_script:"dose-ranges-json" }}
+{{ preset_descriptions|json_script:"preset-descriptions-json" }}
+
 <script>
 (function () {
     const warningLimits = {
@@ -264,27 +285,129 @@
         daratumumab_dose: 16,
         interaction_strength: 0.2,
     };
-    const badge = document.getElementById('interaction-strength-badge');
-    const interactionField = document.getElementById('{{ form.interaction_strength.id_for_label }}');
+    const doseRangesEl = document.getElementById('dose-ranges-json');
+    const doseRanges = doseRangesEl ? JSON.parse(doseRangesEl.textContent) : {};
+    const presetDescEl = document.getElementById('preset-descriptions-json');
+    const presetDescriptions = presetDescEl ? JSON.parse(presetDescEl.textContent) : {};
+    const presetCard = document.getElementById('preset-explainer');
+    const presetInput = document.getElementById('id_preset');
 
-    const updateBadge = () => {
-        if (!badge || !interactionField) return;
+    const DOSE_FIELD_MAP = {
+        lenalidomide_dose: 'lenalidomide',
+        bortezomib_dose: 'bortezomib',
+        daratumumab_dose: 'daratumumab',
+    };
+    const DOSE_HELP_SLUG = {
+        lenalidomide_dose: 'dose_ranges_lenalidomide',
+        bortezomib_dose: 'dose_ranges_bortezomib',
+        daratumumab_dose: 'dose_ranges_daratumumab',
+    };
+    const STATUS_CLASSES = {
+        safe: 'badge bg-success',
+        warn: 'badge bg-warning text-dark',
+        danger: 'badge bg-danger',
+    };
+    const DOSE_BADGE_COPY = {
+        safe: {
+            en: 'Within preset guardrail.',
+            it: 'Entro il guardrail del preset.',
+        },
+        warn: {
+            en: 'Near the limit — monitor closely. {help}',
+            it: 'Vicino al limite — monitora attentamente. {help}',
+        },
+        danger: {
+            en: 'Outside guardrail — adjust dose. {help}',
+            it: 'Fuori guardrail — rivedi la dose. {help}',
+        },
+        unknown: {
+            en: '',
+            it: '',
+        },
+    };
+    const INTERACTION_COPY = {
+        safe: {
+            en: 'Coupling within safe band.',
+            it: 'Accoppiamento entro la banda sicura.',
+        },
+        warn: {
+            en: 'Borderline synergy — watch toxicity. {help}',
+            it: 'Sinergia borderline — osserva la tossicità. {help}',
+        },
+        danger: {
+            en: 'High synergy/toxicity — reduce doses. {help}',
+            it: 'Sinergia/tossicità alta — riduci le dosi. {help}',
+        },
+        unknown: {
+            en: '',
+            it: '',
+        },
+    };
+
+    const setContextBadge = (inputId, status, html) => {
+        const badgeEl = document.getElementById(`badge-${inputId}`);
+        if (!badgeEl) {
+            return;
+        }
+        if (!html) {
+            badgeEl.textContent = '';
+            badgeEl.className = 'context-badge small mt-1 d-none';
+            return;
+        }
+        badgeEl.className = `context-badge small mt-1 ${STATUS_CLASSES[status] || 'badge bg-secondary'}`;
+        badgeEl.innerHTML = html;
+    };
+
+    const formatCopy = (copySet, lang, slug) => {
+        if (!copySet) {
+            return '';
+        }
+        const tpl = copySet[lang] || copySet.en || '';
+        return tpl.replace('{help}', `<a data-help="${slug}">${lang === 'it' ? 'Guida' : 'Help'}</a>`);
+    };
+
+    const updateDoseContext = (fieldName) => {
+        const fieldKey = DOSE_FIELD_MAP[fieldName];
+        const input = document.getElementById(`id_${fieldName}`);
+        if (!fieldKey || !input) {
+            return;
+        }
+        const profile = doseRanges[fieldKey] || {};
+        const range = profile.dose_range || {};
+        const min = parseFloat(range.min);
+        const max = parseFloat(range.max);
+        const value = parseFloat(input.value);
+        const status = (window.BadgeUtils && window.BadgeUtils.computeDoseStatus(value, min, max)) || 'unknown';
+        const lang = getCurrentLang ? getCurrentLang() : 'en';
+        const html = formatCopy(DOSE_BADGE_COPY[status], lang, DOSE_HELP_SLUG[fieldName]);
+        setContextBadge(input.id, status, html);
+    };
+
+    const updateAllDoseContexts = () => {
+        Object.keys(DOSE_FIELD_MAP).forEach(updateDoseContext);
+    };
+
+    const interactionField = document.getElementById('{{ form.interaction_strength.id_for_label }}');
+    const interactionBadge = document.getElementById('interaction-strength-badge');
+
+    const updateInteractionContext = () => {
+        if (!interactionField) {
+            return;
+        }
         const value = parseFloat(interactionField.value);
         const lang = getCurrentLang ? getCurrentLang() : 'en';
-        let textEn = 'Safe';
-        let textIt = 'Sicuro';
-        let cls = 'bg-success';
-        if (Number.isFinite(value) && value >= 0.1 && value <= 0.2) {
-            textEn = 'Borderline';
-            textIt = 'Attenzione';
-            cls = 'bg-warning text-dark';
-        } else if (Number.isFinite(value) && value > 0.2) {
-            textEn = 'Unsafe';
-            textIt = 'Rischioso';
-            cls = 'bg-danger';
+        const status = (window.BadgeUtils && window.BadgeUtils.computeInteractionStatus(value)) || 'unknown';
+        const html = formatCopy(INTERACTION_COPY[status], lang, 'interaction_strength');
+        setContextBadge(interactionField.id, status, html);
+        if (interactionBadge) {
+            const textMap = {
+                safe: { en: 'Safe', it: 'Sicuro' },
+                warn: { en: 'Borderline', it: 'Attenzione' },
+                danger: { en: 'Unsafe', it: 'Rischioso' },
+            };
+            interactionBadge.className = `badge ${STATUS_CLASSES[status] || 'bg-secondary'}`;
+            interactionBadge.textContent = (textMap[status] || textMap.safe)[lang];
         }
-        badge.className = `badge ${cls}`;
-        badge.textContent = lang === 'it' ? textIt : textEn;
     };
 
     const applyWarnings = (input) => {
@@ -306,21 +429,92 @@
         input.addEventListener('input', () => {
             applyWarnings(input);
             if (input === interactionField) {
-                updateBadge();
+                updateInteractionContext();
             }
         });
         input.addEventListener('blur', () => applyWarnings(input));
     });
 
     if (interactionField) {
-        updateBadge();
+        updateInteractionContext();
+    }
+    updateAllDoseContexts();
+
+    const formEl = document.getElementById('simulation-parameters-form');
+    if (formEl) {
+        formEl.addEventListener('reset', () => {
+            setTimeout(() => {
+                document.querySelectorAll('#simulation-parameters-form .form-control').forEach(applyWarnings);
+                updateInteractionContext();
+                updateAllDoseContexts();
+                renderPresetCard(getCurrentLang ? getCurrentLang() : 'en');
+            }, 0);
+        });
     }
 
-    document.getElementById('simulation-parameters-form').addEventListener('reset', () => {
-        setTimeout(() => {
-            document.querySelectorAll('#simulation-parameters-form .form-control').forEach(applyWarnings);
-            updateBadge();
-        }, 0);
+    const renderPresetCard = (lang) => {
+        if (!presetCard || !presetInput) {
+            return;
+        }
+        const desc = presetDescriptions[presetInput.value];
+        if (!desc) {
+            presetCard.classList.add('d-none');
+            return;
+        }
+        
+        // Get story data for current language
+        const story = desc[`story_${lang}`] || desc.story_en || {};
+        
+        // If no story available, fallback to simple description
+        if (!story.title) {
+            const enNode = presetCard.querySelector('.t-en');
+            const itNode = presetCard.querySelector('.t-it');
+            if (enNode) enNode.textContent = desc.en || '';
+            if (itNode) itNode.textContent = desc.it || '';
+            presetCard.classList.remove('d-none');
+            return;
+        }
+        
+        // Render full storyline
+        const titleEl = presetCard.querySelector('.story-title');
+        if (titleEl) titleEl.textContent = story.title || '';
+        
+        const bgEl = presetCard.querySelector('.story-background');
+        if (bgEl) bgEl.textContent = story.background || '';
+        
+        const challengeEl = presetCard.querySelector('.story-challenge');
+        if (challengeEl) challengeEl.textContent = story.challenge || '';
+        
+        const whyTextEl = presetCard.querySelector('.story-why-text');
+        if (whyTextEl) whyTextEl.textContent = story.why_these_drugs || '';
+        
+        const outcomeTextEl = presetCard.querySelector('.story-outcome-text');
+        if (outcomeTextEl) outcomeTextEl.textContent = story.expected_outcome || '';
+        
+        const learningListEl = presetCard.querySelector('.story-learning-list');
+        if (learningListEl && Array.isArray(story.learning_points)) {
+            learningListEl.innerHTML = '';
+            story.learning_points.forEach(point => {
+                const li = document.createElement('li');
+                li.textContent = point;
+                learningListEl.appendChild(li);
+            });
+        }
+        
+        presetCard.classList.remove('d-none');
+    };
+
+    if (presetInput) {
+        presetInput.addEventListener('change', () => {
+            renderPresetCard(getCurrentLang ? getCurrentLang() : 'en');
+        });
+        renderPresetCard(getCurrentLang ? getCurrentLang() : 'en');
+    }
+
+    document.addEventListener('language-changed', (event) => {
+        renderPresetCard(event.detail.lang);
+        updateAllDoseContexts();
+        updateInteractionContext();
     });
 
     document.body.addEventListener('htmx:afterRequest', (event) => {

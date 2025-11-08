@@ -1,0 +1,66 @@
+<div class="card shadow-sm mb-3" id="simulation-wizard">
+    <div class="card-header">
+        <h2 class="h6 mb-0">
+            <span class="t-en">First-time walkthrough</span>
+            <span class="t-it">Procedura guidata iniziale</span>
+        </h2>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="card h-100 border-primary">
+                    <div class="card-body">
+                        <h3 class="h6">
+                            <span class="t-en">1. Enable the Twin</span>
+                            <span class="t-it">1. Attiva il Gemello</span>
+                        </h3>
+                        <p class="small mb-3">
+                            <span class="t-en">Sync biology from <span data-gkey="riss">R-ISS</span>/<span data-gkey="ldh">LDH</span>/<span data-gkey="b2m">β2M</span>/<span data-gkey="flc">FLC</span>.</span>
+                            <span class="t-it">Sincronizza la biologia da <span data-gkey="riss">R-ISS</span>/<span data-gkey="ldh">LDH</span>/<span data-gkey="b2m">β2M</span>/<span data-gkey="flc">FLC</span>.</span>
+                        </p>
+                        <button class="btn btn-sm btn-outline-primary" onclick="scrollToField('#simulation-parameters-form input#id_use_twin','use_twin')">
+                            <span class="t-en">Go to Twin</span>
+                            <span class="t-it">Vai al Gemello</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-primary">
+                    <div class="card-body">
+                        <h3 class="h6">
+                            <span class="t-en">2. Set safe doses</span>
+                            <span class="t-it">2. Imposta dosi sicure</span>
+                        </h3>
+                        <p class="small mb-3">
+                            <span class="t-en">Stay within preset guardrails; watch the badge color.</span>
+                            <span class="t-it">Rimani nei guardrail del preset; controlla il colore del badge.</span>
+                        </p>
+                        <button class="btn btn-sm btn-outline-primary" onclick="scrollToField('#id_lenalidomide_dose','dose_ranges_lenalidomide')">
+                            <span class="t-en">Adjust doses</span>
+                            <span class="t-it">Modifica le dosi</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-primary">
+                    <div class="card-body">
+                        <h3 class="h6">
+                            <span class="t-en">3. Run &amp; review</span>
+                            <span class="t-it">3. Esegui &amp; rivedi</span>
+                        </h3>
+                        <p class="small mb-3">
+                            <span class="t-en">Choose horizon/cohort, run once, then inspect Explain links.</span>
+                            <span class="t-it">Scegli orizzonte/coorte, esegui, quindi usa i link Explain.</span>
+                        </p>
+                        <button class="btn btn-sm btn-outline-primary" onclick="scrollToField('#simulation-parameters-form','quickstart')">
+                            <span class="t-en">Start run</span>
+                            <span class="t-it">Avvia simulazione</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -21,7 +21,7 @@
                 {% endfor %}
             </div>
         {% endif %}
-        {% if summary %}
+            {% if summary %}
             <div class="table-responsive">
                 <table class="table table-sm align-middle">
                     <tbody>
@@ -29,6 +29,9 @@
                             <th scope="row">
                                 <span class="t-en" data-bs-toggle="tooltip" title="{{ kpi.tumor_reduction.en }}" aria-label="{{ kpi.tumor_reduction.en }}">Tumor reduction</span>
                                 <span class="t-it" data-bs-toggle="tooltip" title="{{ kpi.tumor_reduction.it }}" aria-label="{{ kpi.tumor_reduction.it }}">Riduzione tumorale</span>
+                                <button type="button" class="btn btn-link btn-sm p-0 ms-2" data-help="kpi_tumor_reduction" aria-controls="helpDrawer">
+                                    <span class="t-en">Explain</span><span class="t-it">Spiega</span>
+                                </button>
                             </th>
                             <td>
                                 {{ summary.tumor_reduction|floatformat:2 }}
@@ -43,6 +46,9 @@
                             <th scope="row">
                                 <span class="t-en" data-bs-toggle="tooltip" title="{{ kpi.healthy_loss.en }}" aria-label="{{ kpi.healthy_loss.en }}">Healthy loss</span>
                                 <span class="t-it" data-bs-toggle="tooltip" title="{{ kpi.healthy_loss.it }}" aria-label="{{ kpi.healthy_loss.it }}">Perdita cellule sane</span>
+                                <button type="button" class="btn btn-link btn-sm p-0 ms-2" data-help="kpi_healthy_loss" aria-controls="helpDrawer">
+                                    <span class="t-en">Explain</span><span class="t-it">Spiega</span>
+                                </button>
                             </th>
                             <td>
                                 {{ summary.healthy_loss|floatformat:2 }}
@@ -57,10 +63,13 @@
                             <th scope="row">
                                 <span class="t-en" data-bs-toggle="tooltip" title="{{ kpi.time_to_recurrence.en }}" aria-label="{{ kpi.time_to_recurrence.en }}">Time to recurrence</span>
                                 <span class="t-it" data-bs-toggle="tooltip" title="{{ kpi.time_to_recurrence.it }}" aria-label="{{ kpi.time_to_recurrence.it }}">Tempo alla recidiva</span>
+                                <button type="button" class="btn btn-link btn-sm p-0 ms-2" data-help="kpi_time_to_recurrence" aria-controls="helpDrawer">
+                                    <span class="t-en">Explain</span><span class="t-it">Spiega</span>
+                                </button>
                             </th>
                             <td>
                                 {% if summary.time_to_recurrence %}
-                                    {{ summary.time_to_recurrence|floatformat:1 }} <span class="t-en">days</span><span class="t-it">giorni</span>
+                                    {{ summary.time_to_recurrence|floatformat:1 }} <span class="t-en">days after <span data-gkey="nadir">nadir</span></span><span class="t-it">giorni dopo il <span data-gkey="nadir">nadir</span></span>
                                 {% else %}
                                     <span class="text-muted t-en">Not reached within horizon</span>
                                     <span class="text-muted t-it">Non raggiunto nell’orizzonte</span>
@@ -71,11 +80,19 @@
                             <th scope="row">
                                 <span class="t-en" data-bs-toggle="tooltip" title="{{ kpi.auc.en }}" aria-label="{{ kpi.auc.en }}">Drug exposure (AUC)</span>
                                 <span class="t-it" data-bs-toggle="tooltip" title="{{ kpi.auc.it }}" aria-label="{{ kpi.auc.it }}">Esposizione ai farmaci (AUC)</span>
+                                <button type="button" class="btn btn-link btn-sm p-0 ms-2" data-help="kpi_auc" aria-controls="helpDrawer">
+                                    <span class="t-en">Explain</span><span class="t-it">Spiega</span>
+                                </button>
                             </th>
                             <td>
                                 <ul class="list-unstyled mb-0">
                                     {% for drug, value in summary.auc.items %}
-                                        <li><strong>{{ drug|title }}</strong>: {{ value|floatformat:2 }} mg·day/L</li>
+                                        <li>
+                                            <strong>{{ drug|title }}</strong>: {{ value|floatformat:2 }} mg·day/L <span data-gkey="auc">AUC</span>
+                                            <button type="button" class="btn btn-link btn-sm p-0 ms-1" data-help="kpi_auc" aria-controls="helpDrawer">
+                                                <span class="t-en">Explain</span><span class="t-it">Spiega</span>
+                                            </button>
+                                        </li>
                                     {% endfor %}
                                 </ul>
                             </td>
@@ -107,6 +124,11 @@
                 {% if results.csv %}
                     <a class="btn btn-outline-secondary btn-sm" href="{{ results.csv }}" target="_blank" rel="noopener">
                         <span class="t-en">Download CSV</span><span class="t-it">Scarica CSV</span>
+                    </a>
+                {% endif %}
+                {% if attempt %}
+                    <a class="btn btn-outline-dark btn-sm" href="{% url 'simulator:attempt_export' attempt.pk %}" target="_blank" rel="noopener" data-audit="export_study">
+                        <span class="t-en">Export study</span><span class="t-it">Esporta studio</span>
                     </a>
                 {% endif %}
             </div>

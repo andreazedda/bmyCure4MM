@@ -8,6 +8,8 @@ from django.urls import reverse
 from clinic.models import Regimen
 
 from . import explain, forms, models
+from .presets import PRESETS
+from .models_help import HelpArticle
 from .pharmaco import registry as pharmaco_registry
 from .permissions import is_editor
 
@@ -87,6 +89,31 @@ def scenario_detail(request, pk: int):
         "bortezomib": _profile_with_ranges("bortezomib"),
         "daratumumab": _profile_with_ranges("daratumumab"),
     }
+    guide_slugs = ["quickstart", "optimization_lab"]
+    guides: dict[str, dict[str, dict[str, str]]] = {}
+    articles = {article.slug: article for article in HelpArticle.objects.filter(slug__in=guide_slugs)}
+    for slug in guide_slugs:
+        article = articles.get(slug)
+        if not article:
+            continue
+        guides[slug] = {
+            "en": article.as_lang("en"),
+            "it": article.as_lang("it"),
+        }
+    preset_descriptions = {
+        key: {
+            "en": preset.get("description_en", ""),
+            "it": preset.get("description_it", ""),
+            "story_en": preset.get("story_en", {}),
+            "story_it": preset.get("story_it", {}),
+        }
+        for key, preset in PRESETS.items()
+    }
+    help_index = [
+        {"slug": article.slug, "title_en": article.title_en, "title_it": article.title_it}
+        for article in HelpArticle.objects.order_by("slug")
+    ]
+
     context = {
         "scenario": scenario,
         "attempts": attempts,
@@ -104,5 +131,8 @@ def scenario_detail(request, pk: int):
         "sim_form_help_it": forms.SIMULATION_FORM_HELP_TEXT_IT,
         "sim_form_help_en": forms.SIMULATION_FORM_HELP_TEXT_EN,
         "kpi": explain.KPI,
+        "guide_articles": guides,
+        "help_index": help_index,
+        "preset_descriptions": preset_descriptions,
     }
     return render(request, "simulator/scenario_detail.html", context)

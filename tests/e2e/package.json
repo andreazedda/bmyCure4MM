@@ -1,0 +1,16 @@
+{
+  "name": "bmycure4mm-e2e-tests",
+  "version": "1.0.0",
+  "description": "End-to-end tests for MM Portal",
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.8.0",
+    "@playwright/test": "^1.40.0",
+    "playwright": "^1.40.0"
+  }
+}

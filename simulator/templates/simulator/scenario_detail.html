@@ -100,6 +100,9 @@
             <div id="simulation-results" class="mt-3">
                 {% include "simulator/_simulation_results.html" with scenario=scenario attempt=latest_simulation summary=latest_simulation_summary results=latest_simulation_results kpi=kpi %}
             </div>
+            {% if not latest_simulation %}
+                {% include "simulator/_simulation_wizard.html" %}
+            {% endif %}
         {% endif %}
         {% if is_editor %}
             <div id="pareto-panel" class="mt-3"></div>
@@ -122,6 +125,62 @@
         {% endif %}
     </div>
 </div>
+
+{% if guide_articles %}
+<div class="card shadow-sm mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h2 class="h6 mb-0">Guide</h2>
+        <button type="button" class="btn btn-outline-primary btn-sm" onclick="Tour.open()" data-audit="tour_start">
+            <span class="t-en">Start Tutorial</span><span class="t-it">Avvia Tutorial</span>
+        </button>
+    </div>
+    <div class="card-body">
+        <ul class="nav nav-tabs mb-3" id="guideTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="guide-en-tab" data-bs-toggle="tab" data-bs-target="#guide-en" type="button" role="tab" aria-controls="guide-en" aria-selected="true">EN</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="guide-it-tab" data-bs-toggle="tab" data-bs-target="#guide-it" type="button" role="tab" aria-controls="guide-it" aria-selected="false">IT</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="guide-index-tab" data-bs-toggle="tab" data-bs-target="#guide-index" type="button" role="tab" aria-controls="guide-index" aria-selected="false">
+                    <span class="t-en">Field Reference</span>
+                    <span class="t-it">Riferimenti</span>
+                </button>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="guide-en" role="tabpanel">
+                {% for slug, data in guide_articles.items %}
+                    <h3 class="h6">{{ data.en.title }}</h3>
+                    <div class="small text-body mb-3">{{ data.en.body|safe }}</div>
+                {% endfor %}
+            </div>
+            <div class="tab-pane fade" id="guide-it" role="tabpanel">
+                {% for slug, data in guide_articles.items %}
+                    <h3 class="h6">{{ data.it.title }}</h3>
+                    <div class="small text-body mb-3">{{ data.it.body|safe }}</div>
+                {% endfor %}
+            </div>
+            <div class="tab-pane fade" id="guide-index" role="tabpanel">
+                <div class="list-group">
+                    {% for item in help_index %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="fw-semibold">{{ item.title_en }}</div>
+                                <div class="text-muted small">{{ item.title_it }}</div>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary" data-help="{{ item.slug }}">
+                                <span class="t-en">Open</span><span class="t-it">Apri</span>
+                            </button>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 
 <div class="card shadow-sm mb-3">
     <div class="card-header d-flex justify-content-between align-items-center">
@@ -204,7 +263,7 @@
         </div>
         <div class="card-body">
             {% include "simulator/_onboarding.html" %}
-            {% include "simulator/_simulation_form.html" with form=simulation_parameter_form scenario=scenario drug_profiles=drug_profiles helptext_it=sim_form_help_it helptext_en=sim_form_help_en is_editor=is_editor %}
+            {% include "simulator/_simulation_form.html" with form=simulation_parameter_form scenario=scenario drug_profiles=drug_profiles helptext_it=sim_form_help_it helptext_en=sim_form_help_en is_editor=is_editor preset_descriptions=preset_descriptions %}
         </div>
     </div>
 </div>

@@ -5,6 +5,9 @@
         {% if unit %}
             <small class="text-muted ms-1">{{ unit }}</small>
         {% endif %}
+        {% if help_slug %}
+            <button type="button" class="btn btn-link btn-sm p-0 align-baseline help-inline" data-testid="help-open-{{ help_slug }}" data-help="{{ help_slug }}" aria-label="Help" aria-controls="helpDrawer">?</button>
+        {% endif %}
     </label>
     {{ field }}
     {% if append_en or append_it %}
@@ -24,7 +27,15 @@
             </div>
         {% endif %}
     {% endwith %}
+    {% if add_badge %}
+        <div class="context-badge small mt-1" id="badge-{{ field.id_for_label }}" data-testid="badge-{{ field.id_for_label }}"></div>
+    {% endif %}
     {% if field.errors %}
         <div class="invalid-feedback d-block">{{ field.errors|striptags }}</div>
+        {% if help_slug %}
+            <a href="#" class="small" data-help="{{ help_slug }}">
+                <span class="t-en">Why?</span><span class="t-it">Perché?</span>
+            </a>
+        {% endif %}
     {% endif %}
 </div>

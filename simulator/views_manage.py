@@ -11,6 +11,7 @@ from django.http import (
     HttpRequest,
     HttpResponse,
     HttpResponseBadRequest,
+    HttpResponseForbidden,
     JsonResponse,
 )
 from django.shortcuts import get_object_or_404, redirect, render
@@ -26,6 +27,7 @@ from clinic.models import Regimen
 from . import explain, forms, models, optim
 from .pharmaco import registry as pharmaco_registry
 from .permissions import is_editor
+from .presets import PRESETS
 
 
 class EditorRequiredMixin(UserPassesTestMixin):
@@ -286,6 +288,16 @@ def _distinct_values(queryset: Iterable[Regimen], field: str) -> list[str]:
     return [value for value in values if value]
 
 
+def _preset_descriptions() -> dict[str, dict[str, str]]:
+    return {
+        key: {
+            "en": preset.get("description_en", ""),
+            "it": preset.get("description_it", ""),
+        }
+        for key, preset in PRESETS.items()
+    }
+
+
 @login_required
 def simulate_scenario(request: HttpRequest, pk: int) -> HttpResponse:
     if request.method != "POST":
@@ -320,6 +332,7 @@ def simulate_scenario(request: HttpRequest, pk: int) -> HttpResponse:
                 "helptext_it": forms.SIMULATION_FORM_HELP_TEXT_IT,
                 "helptext_en": forms.SIMULATION_FORM_HELP_TEXT_EN,
                 "is_editor": is_editor(request.user),
+                "preset_descriptions": _preset_descriptions(),
             },
             request=request,
         )
@@ -367,6 +380,24 @@ def simulate_scenario(request: HttpRequest, pk: int) -> HttpResponse:
     }
     html = render_to_string("simulator/_simulation_results.html", context, request=request)
     return HttpResponse(html)
+
+
+@login_required
+def export_attempt(request: HttpRequest, pk: int) -> HttpResponse:
+    attempt = get_object_or_404(models.SimulationAttempt, pk=pk)
+    if attempt.user_id and attempt.user_id != request.user.id and not is_editor(request.user):
+        return HttpResponseForbidden("Not allowed")
+    payload = {
+        "id": attempt.pk,
+        "scenario": attempt.scenario_id,
+        "submitted": attempt.submitted.isoformat() if attempt.submitted else None,
+        "parameters": attempt.parameters,
+        "results_summary": attempt.results_summary,
+        "results": attempt.results,
+        "artifacts": attempt.artifacts,
+        "seed": attempt.seed,
+    }
+    return JsonResponse(payload)
 
 
 # ────────────────────────────────────────────────────────────────────────────────

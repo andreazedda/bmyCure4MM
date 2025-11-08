@@ -7,8 +7,11 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.http import JsonResponse
 from django.urls import include, path
+from django.http import JsonResponse
 
 from simulator.api import drugs, glossary
+from simulator.api_help import help_item, help_search
+from simulator.api_ux import audit as ux_audit
 from .views import DocsIndexView
 
 urlpatterns = [
@@ -20,6 +23,9 @@ urlpatterns = [
     path("api/", include("clinic.api")),
     path("api/glossary/", glossary, name="api_glossary"),
     path("api/drugs/", drugs, name="api_drugs"),
+    path("api/help/search/", help_search, name="api_help_search"),
+    path("api/help/<slug:slug>/", help_item, name="api_help_item"),
+    path("api/ux/audit/", ux_audit, name="api_ux_audit"),
     path("api/chem/", include("chemtools.api")),
     path("healthz/", lambda request: JsonResponse({"ok": True})),
 ]

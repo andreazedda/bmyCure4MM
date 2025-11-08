@@ -298,7 +298,10 @@ class SimulationAttempt(models.Model):
 
         self.results = result_payload
         self.results_summary = summary
-        self.artifacts = {key: value for key, value in result_payload.items() if key != "generated_at"}
+        artifacts = {key: value for key, value in result_payload.items() if key != "generated_at"}
+        if self.seed is not None:
+            artifacts["seed"] = self.seed
+        self.artifacts = artifacts
         self.save(update_fields=["results", "results_summary", "artifacts"])
         return summary
 

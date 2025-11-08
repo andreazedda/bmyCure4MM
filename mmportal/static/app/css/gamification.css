@@ -1,0 +1,464 @@
+/* 🎮 Gamification System Styles */
+
+/* Preset Storyline Cards */
+#preset-explainer {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-left: 4px solid #667eea;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+#preset-explainer .story-title {
+  color: #667eea;
+  font-size: 1.1rem;
+}
+
+#preset-explainer .story-challenge {
+  background: linear-gradient(135deg, #fff7e6 0%, #ffe4a3 100%);
+  border-left: 3px solid #ff9800;
+  padding: 0.75rem;
+  border-radius: 6px;
+}
+
+#preset-explainer .story-why,
+#preset-explainer .story-outcome {
+  background: rgba(255, 255, 255, 0.7);
+  padding: 0.75rem;
+  border-radius: 6px;
+}
+
+#preset-explainer .story-learning summary {
+  color: #764ba2;
+  padding: 0.5rem;
+  background: rgba(118, 75, 162, 0.1);
+  border-radius: 6px;
+  transition: background 0.3s ease;
+}
+
+#preset-explainer .story-learning summary:hover {
+  background: rgba(118, 75, 162, 0.2);
+}
+
+#preset-explainer .story-learning-list {
+  padding-left: 1.5rem;
+  list-style: none;
+}
+
+#preset-explainer .story-learning-list li {
+  position: relative;
+  padding: 0.5rem 0;
+}
+
+#preset-explainer .story-learning-list li::before {
+  content: "✓";
+  position: absolute;
+  left: -1.5rem;
+  color: #4caf50;
+  font-weight: bold;
+}
+
+/* Achievement Notification */
+.achievement-notification {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 2000;
+  opacity: 0;
+  transform: translateX(400px);
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.achievement-notification.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.achievement-toast {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 320px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.achievement-icon {
+  font-size: 3rem;
+  animation: bounce 0.6s ease;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+.achievement-content {
+  flex: 1;
+}
+
+.achievement-title {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+}
+
+.achievement-description {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.achievement-points {
+  margin-top: 0.5rem;
+  font-weight: bold;
+  color: #ffd700;
+  font-size: 0.95rem;
+}
+
+/* Progress Badge */
+#progress-badge {
+  background: white;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+}
+
+.level-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.level-icon {
+  font-size: 1.5rem;
+}
+
+.level-name {
+  font-weight: 600;
+  color: #4a5568;
+  flex: 1;
+}
+
+.level-points {
+  font-size: 0.875rem;
+  color: #718096;
+  font-weight: 500;
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  transition: width 0.5s ease;
+  border-radius: 4px;
+}
+
+/* Tutorial Overlay */
+.tutorial-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 1900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.tutorial-overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.tutorial-card {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 600px;
+  margin: 2rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  position: relative;
+  animation: slideIn 0.5s ease;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.tutorial-icon {
+  font-size: 4rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.tutorial-title {
+  font-size: 1.75rem;
+  font-weight: bold;
+  text-align: center;
+  color: #2d3748;
+  margin-bottom: 1rem;
+}
+
+.tutorial-content {
+  font-size: 1rem;
+  color: #4a5568;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.tutorial-steps {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0;
+}
+
+.tutorial-steps li {
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  background: #f7fafc;
+  border-left: 4px solid #667eea;
+  border-radius: 4px;
+}
+
+.tutorial-steps li strong {
+  color: #667eea;
+}
+
+.tutorial-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.tutorial-button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tutorial-button-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.tutorial-button-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.tutorial-button-secondary {
+  background: #e2e8f0;
+  color: #4a5568;
+}
+
+.tutorial-button-secondary:hover {
+  background: #cbd5e0;
+}
+
+/* Tip of the Day */
+.tip-of-the-day {
+  background: linear-gradient(135deg, #f6f8fb 0%, #e9ecef 100%);
+  border-left: 4px solid #667eea;
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  display: flex;
+  align-items: start;
+  gap: 0.75rem;
+}
+
+.tip-icon {
+  font-size: 1.5rem;
+}
+
+.tip-content {
+  flex: 1;
+  color: #4a5568;
+  line-height: 1.5;
+}
+
+/* Welcome Banner */
+.welcome-banner {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+}
+
+.welcome-banner h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.75rem;
+}
+
+.welcome-banner p {
+  margin: 0;
+  opacity: 0.95;
+  font-size: 1.05rem;
+}
+
+/* Challenge Card */
+.challenge-card {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  transition: all 0.3s ease;
+}
+
+.challenge-card:hover {
+  border-color: #667eea;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+  transform: translateY(-2px);
+}
+
+.challenge-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.challenge-icon {
+  font-size: 2rem;
+}
+
+.challenge-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #2d3748;
+  flex: 1;
+}
+
+.challenge-difficulty {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.challenge-difficulty.easy {
+  background: #c6f6d5;
+  color: #276749;
+}
+
+.challenge-difficulty.medium {
+  background: #feebc8;
+  color: #c05621;
+}
+
+.challenge-difficulty.hard {
+  background: #fed7d7;
+  color: #c53030;
+}
+
+.challenge-objective {
+  color: #4a5568;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.challenge-rewards {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.challenge-reward {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #718096;
+}
+
+.challenge-reward strong {
+  color: #ffd700;
+}
+
+/* Results Celebration */
+.results-celebration {
+  text-align: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+  border-radius: 12px;
+  margin: 1rem 0;
+}
+
+.results-celebration-icon {
+  font-size: 4rem;
+  animation: tada 1s ease;
+}
+
+@keyframes tada {
+  0% { transform: scale(1) rotate(0deg); }
+  10%, 20% { transform: scale(0.9) rotate(-3deg); }
+  30%, 50%, 70%, 90% { transform: scale(1.1) rotate(3deg); }
+  40%, 60%, 80% { transform: scale(1.1) rotate(-3deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.results-celebration-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #2d3748;
+  margin: 1rem 0 0.5rem 0;
+}
+
+.results-celebration-message {
+  color: #4a5568;
+  font-size: 1.05rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .achievement-notification {
+    right: 10px;
+    left: 10px;
+  }
+  
+  .achievement-toast {
+    min-width: auto;
+  }
+  
+  .tutorial-card {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+}
