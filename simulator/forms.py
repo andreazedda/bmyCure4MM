@@ -464,45 +464,90 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
             errors["baseline_healthy_cells"] = ValidationError(
                 "Healthy plasma cell pool must be ≤ 1×10¹³ cells."
             )
+        # 🎓 Educational error messages with explanations
         if len_dose > 50:
-            errors["lenalidomide_dose"] = ValidationError("Lenalidomide dose must be ≤ 50 mg/day.")
+            errors["lenalidomide_dose"] = ValidationError(
+                "Lenalidomide dose must be ≤ 50 mg/day. "
+                "💡 Why? Doses >50mg cause severe neutropenia (low white blood cells) in most patients. "
+                "Try the standard dose of 25mg/day used in clinical trials."
+            )
         if bor_dose > 2:
-            errors["bortezomib_dose"] = ValidationError("Bortezomib dose must be ≤ 2 mg/m² per week.")
+            errors["bortezomib_dose"] = ValidationError(
+                "Bortezomib dose must be ≤ 2 mg/m² per week. "
+                "💡 Why? Higher doses dramatically increase peripheral neuropathy risk (nerve damage). "
+                "Standard dosing is 1.3 mg/m² which balances efficacy and safety."
+            )
         if dara_dose > 20:
-            errors["daratumumab_dose"] = ValidationError("Daratumumab dose must be ≤ 20 mg/kg.")
+            errors["daratumumab_dose"] = ValidationError(
+                "Daratumumab dose must be ≤ 20 mg/kg. "
+                "💡 Why? Doses beyond 20mg/kg don't improve outcomes but increase infusion reactions. "
+                "Clinical trials use 16 mg/kg loading dose."
+            )
         if time_horizon > 365:
-            errors["time_horizon"] = ValidationError("Simulation horizon is limited to 365 days.")
+            errors["time_horizon"] = ValidationError(
+                "Simulation horizon is limited to 365 days. "
+                "💡 Why? Long-term predictions become unreliable beyond 1 year due to disease evolution. "
+                "Try 180 days (6 months) for a realistic treatment cycle."
+            )
         if tumor_growth > 0.1:
-            errors["tumor_growth_rate"] = ValidationError("Tumor growth rate must be ≤ 0.10 day⁻¹.")
+            errors["tumor_growth_rate"] = ValidationError(
+                "Tumor growth rate must be ≤ 0.10 day⁻¹. "
+                "💡 Why? This represents doubling time <7 days, extremely aggressive even for advanced myeloma. "
+                "Typical range is 0.015-0.03 day⁻¹ (doubling every 23-46 days)."
+            )
         if healthy_growth > 0.05:
-            errors["healthy_growth_rate"] = ValidationError("Healthy growth rate must be ≤ 0.05 day⁻¹.")
+            errors["healthy_growth_rate"] = ValidationError(
+                "Healthy growth rate must be ≤ 0.05 day⁻¹. "
+                "💡 Why? Bone marrow regenerates slower than tumor cells. "
+                "Use 0.01-0.02 day⁻¹ for realistic marrow recovery."
+            )
         if interaction_strength > 0.2:
-            errors["interaction_strength"] = ValidationError("Interaction strength must be ≤ 0.2.")
+            errors["interaction_strength"] = ValidationError(
+                "Interaction strength must be ≤ 0.2. "
+                "💡 Why? Values >0.2 imply unrealistic competition between cell types. "
+                "Try 0.05-0.15 for moderate interaction effects."
+            )
 
         if creatinine is not None:
             if creatinine < 30 and len_dose > 10:
                 errors["lenalidomide_dose"] = ValidationError(
-                    "Creatinine clearance <30 ml/min requires lenalidomide dose ≤10 mg."
+                    "Creatinine clearance <30 ml/min requires lenalidomide dose ≤10 mg. "
+                    "💡 Why? Kidneys eliminate lenalidomide—poor kidney function causes drug accumulation and toxicity. "
+                    "Dose reduction prevents life-threatening side effects."
                 )
             elif creatinine < 60 and len_dose > 15:
                 errors["lenalidomide_dose"] = ValidationError(
-                    "Creatinine clearance <60 ml/min requires lenalidomide dose ≤15 mg."
+                    "Creatinine clearance <60 ml/min requires lenalidomide dose ≤15 mg. "
+                    "💡 Why? Moderately impaired kidneys need dose adjustment to avoid myelosuppression."
                 )
 
         if neuropathy >= 2 and bor_dose > 1.0:
             errors["bortezomib_dose"] = ValidationError(
-                "Peripheral neuropathy grade ≥2 mandates bortezomib dose ≤1.0 mg/m²."
+                "Peripheral neuropathy grade ≥2 mandates bortezomib dose ≤1.0 mg/m². "
+                "💡 Why? Bortezomib causes nerve damage—continuing high doses with existing neuropathy leads to irreversible disability. "
+                "Dose reduction or drug holiday preserves quality of life."
             )
 
         if anc is not None and anc < 1.0:
-            raise ValidationError("Simulation blocked: absolute neutrophil count <1.0 ×10⁹/L (myelosuppression).")
+            raise ValidationError(
+                "Simulation blocked: absolute neutrophil count <1.0 ×10⁹/L (myelosuppression). "
+                "💡 Why? Dangerously low white blood cells mean infection risk is too high to start treatment. "
+                "Use growth factors (G-CSF) to raise counts first."
+            )
         if platelets is not None and platelets < 75:
-            raise ValidationError("Simulation blocked: platelets <75 ×10⁹/L (thrombocytopenia).")
+            raise ValidationError(
+                "Simulation blocked: platelets <75 ×10⁹/L (thrombocytopenia). "
+                "💡 Why? Low platelets cause bleeding risk—treatment would worsen this. "
+                "Wait for platelet recovery >75 or use platelet transfusion."
+            )
 
         if len_dose > 40 and bor_dose > 1.5:
             raise ValidationError(
-                "Combined high doses of lenalidomide (>40 mg) and bortezomib (>1.5 mg/m²) may exceed safe toxicity bounds."
+                "Combined high doses of lenalidomide (>40 mg) and bortezomib (>1.5 mg/m²) may exceed safe toxicity bounds. "
+                "💡 Why? Both drugs suppress bone marrow—combining high doses compounds neutropenia and thrombocytopenia risk. "
+                "Reduce at least one drug to stay within safe margins."
             )
+
 
         if interaction_strength > 0.15:
             self.warnings.append("Interaction strength above 0.15 implies potent synergy—monitor toxicity closely.")

@@ -1963,3 +1963,215 @@
 2025-11-08 14:17:25,974 [INFO] user=admin method=GET path=/chem/job/1/status.json status=200 duration_ms=4.79 ip=127.0.0.1
 2025-11-08 14:17:26,862 [INFO] user=admin method=GET path=/sim/ status=200 duration_ms=8.57 ip=127.0.0.1
 2025-11-08 14:17:28,603 [INFO] user=admin method=GET path=/sim/1/ status=200 duration_ms=118.69 ip=127.0.0.1
+2025-11-08 14:18:19,468 [INFO] user=admin method=GET path=/sim/experiments/ status=200 duration_ms=28.74 ip=127.0.0.1
+2025-11-08 14:18:31,393 [INFO] user=admin method=GET path=/sim/cohort/ status=200 duration_ms=22.37 ip=127.0.0.1
+2025-11-08 14:19:08,442 [INFO] user=admin method=GET path=/docs/ status=200 duration_ms=29.61 ip=127.0.0.1
+2025-11-08 14:19:09,591 [INFO] user=admin method=GET path=/sim/ status=200 duration_ms=16.66 ip=127.0.0.1
+2025-11-08 14:19:10,728 [INFO] user=admin method=GET path=/chem/ status=200 duration_ms=26.71 ip=127.0.0.1
+2025-11-08 14:19:10,761 [INFO] user=admin method=GET path=/chem/job/1/status.json status=200 duration_ms=3.82 ip=127.0.0.1
+2025-11-08 14:19:13,170 [INFO] user=admin method=GET path=/patients/ status=200 duration_ms=351.76 ip=127.0.0.1
+2025-11-08 14:20:00,835 [INFO] user=admin method=GET path=/patients/new/ status=200 duration_ms=71.57 ip=127.0.0.1
+2025-11-08 14:20:47,919 [INFO] user=admin method=POST path=/patients/new/ status=302 duration_ms=27.97 ip=127.0.0.1
+2025-11-08 14:20:47,941 [INFO] user=admin method=GET path=/patients/2/ status=200 duration_ms=16.20 ip=127.0.0.1
+2025-11-08 14:20:53,724 [INFO] user=admin method=GET path=/patients/ status=200 duration_ms=20.52 ip=127.0.0.1
+2025-11-08 14:20:58,259 [INFO] user=admin method=GET path=/patients/1/ status=200 duration_ms=17.32 ip=127.0.0.1
+2025-11-08 14:20:59,482 [INFO] user=admin method=GET path=/patients/1/edit/ status=200 duration_ms=11.53 ip=127.0.0.1
+2025-11-08 14:21:04,167 [INFO] user=admin method=POST path=/patients/1/edit/ status=302 duration_ms=20.74 ip=127.0.0.1
+2025-11-08 14:21:04,181 [INFO] user=admin method=GET path=/patients/1/ status=200 duration_ms=9.75 ip=127.0.0.1
+2025-11-08 14:21:06,707 [INFO] user=admin method=GET path=/patients/ status=200 duration_ms=20.60 ip=127.0.0.1
+2025-11-08 14:21:32,493 [INFO] user=admin method=GET path=/sim/ status=200 duration_ms=29.05 ip=127.0.0.1
+2025-11-08 14:21:33,213 [INFO] user=admin method=GET path=/chem/ status=200 duration_ms=42.11 ip=127.0.0.1
+2025-11-08 14:21:33,260 [INFO] user=admin method=GET path=/chem/job/1/status.json status=200 duration_ms=3.56 ip=127.0.0.1
+2025-11-08 14:21:36,110 [INFO] user=admin method=GET path=/sim/manage/ status=200 duration_ms=23.32 ip=127.0.0.1
+2025-11-08 14:21:37,896 [INFO] user=admin method=GET path=/sim/scenarios/new/ status=200 duration_ms=27.26 ip=127.0.0.1
+2025-11-08 14:21:56,358 [INFO] user=admin method=GET path=/patients/ status=200 duration_ms=22.87 ip=127.0.0.1
+2025-11-08 14:21:57,421 [INFO] user=admin method=GET path=/sim/ status=200 duration_ms=5.60 ip=127.0.0.1
+2025-11-08 14:21:58,299 [INFO] user=admin method=GET path=/docs/ status=200 duration_ms=16.79 ip=127.0.0.1
+2025-11-08 14:22:02,062 [INFO] user=admin method=GET path=/sim/experiments/ status=200 duration_ms=23.23 ip=127.0.0.1
+2025-11-08 14:28:23,447 [INFO] user=admin method=GET path=/ status=200 duration_ms=56.72 ip=127.0.0.1
+2025-11-08 14:28:57,000 [INFO] user=admin method=GET path=/sim/ status=200 duration_ms=25.88 ip=127.0.0.1
+2025-11-08 14:29:01,120 [INFO] user=admin method=GET path=/sim/1/ status=500 duration_ms=195.52 ip=127.0.0.1
+2025-11-08 14:30:35,460 [INFO] user=anonymous method=GET path=/api/help/test_article/?lang=en status=200 duration_ms=1.51 ip=127.0.0.1
+2025-11-08 14:30:35,467 [INFO] user=anonymous method=GET path=/api/help/test_article/?lang=en status=200 duration_ms=0.43 ip=127.0.0.1
+2025-11-08 14:30:35,468 [INFO] user=anonymous method=GET path=/api/help/test_article/?lang=en status=304 duration_ms=0.30 ip=127.0.0.1
+2025-11-08 14:30:35,470 [INFO] user=anonymous method=GET path=/api/help/test_article/?lang=en status=200 duration_ms=0.30 ip=127.0.0.1
+2025-11-08 14:30:35,472 [INFO] user=anonymous method=GET path=/api/help/test_article/?lang=en status=200 duration_ms=0.36 ip=127.0.0.1
+2025-11-08 14:30:35,473 [INFO] user=anonymous method=GET path=/api/help/test_article/?lang=en status=200 duration_ms=0.30 ip=127.0.0.1
+2025-11-08 14:30:35,474 [INFO] user=anonymous method=GET path=/api/help/test_article/?lang=en status=200 duration_ms=0.28 ip=127.0.0.1
+2025-11-08 14:30:35,476 [INFO] user=anonymous method=GET path=/api/help/test_article/?lang=en status=200 duration_ms=0.30 ip=127.0.0.1
+2025-11-08 14:30:35,476 [INFO] user=anonymous method=GET path=/api/help/test_article/?lang=it status=200 duration_ms=0.40 ip=127.0.0.1
+2025-11-08 14:30:35,720 [INFO] user=anonymous method=GET path=/api/help/search/?q=lenalidomide&lang=en status=200 duration_ms=0.79 ip=127.0.0.1
+2025-11-08 14:30:35,830 [INFO] user=anonymous method=GET path=/api/help/search/?q=title&lang=en status=200 duration_ms=0.79 ip=127.0.0.1
+2025-11-08 14:30:35,832 [INFO] user=anonymous method=GET path=/api/help/search/?q=duplicate&lang=en status=200 duration_ms=0.53 ip=127.0.0.1
+2025-11-08 14:30:35,972 [INFO] user=anonymous method=GET path=/api/help/search/?lang=en status=200 duration_ms=0.55 ip=127.0.0.1
+2025-11-08 14:30:35,974 [INFO] user=anonymous method=GET path=/api/help/search/?q=english&lang=en status=200 duration_ms=0.54 ip=127.0.0.1
+2025-11-08 14:30:35,975 [INFO] user=anonymous method=GET path=/api/help/search/?q=italiano&lang=it status=200 duration_ms=0.50 ip=127.0.0.1
+2025-11-08 14:30:39,454 [INFO] user=tester method=GET path=/sim/cohort/export/435db470-b722-44ff-bc8e-80aab77fcdfb/ status=200 duration_ms=0.84 ip=127.0.0.1
+2025-11-08 14:30:39,838 [INFO] user=tester method=POST path=/sim/cohort/run/ status=400 duration_ms=1.07 ip=127.0.0.1
+2025-11-08 14:30:41,022 [INFO] user=tester method=POST path=/sim/cohort/run/ status=200 duration_ms=799.54 ip=127.0.0.1
+2025-11-08 14:30:41,405 [INFO] user=tester method=GET path=/sim/cohort/ status=200 duration_ms=16.32 ip=127.0.0.1
+2025-11-08 14:30:41,768 [INFO] user=anonymous method=GET path=/sim/cohort/ status=302 duration_ms=0.24 ip=127.0.0.1
+2025-11-08 14:30:41,770 [INFO] user=anonymous method=GET path=/api/help/test_help/?lang=en status=200 duration_ms=0.38 ip=127.0.0.1
+2025-11-08 14:30:41,771 [INFO] user=anonymous method=GET path=/api/help/test_help/?lang=it status=200 duration_ms=0.39 ip=127.0.0.1
+2025-11-08 14:30:41,772 [INFO] user=anonymous method=GET path=/api/help/search/?q=lenalidomide&lang=en status=200 duration_ms=0.49 ip=127.0.0.1
+2025-11-08 14:30:41,773 [INFO] user=anonymous method=GET path=/api/help/search/?q=kpi_auc&lang=en status=200 duration_ms=0.44 ip=127.0.0.1
+2025-11-08 14:30:41,775 [INFO] user=anonymous method=GET path=/api/help/search/?q=test&lang=en status=200 duration_ms=0.53 ip=127.0.0.1
+2025-11-08 14:30:41,777 [INFO] user=anonymous method=GET path=/api/help/search/?q=VRd&lang=en status=200 duration_ms=0.49 ip=127.0.0.1
+2025-11-08 14:30:42,140 [INFO] user=demo method=GET path=/sim/1/ status=500 duration_ms=137.89 ip=127.0.0.1
+2025-11-08 14:30:42,934 [INFO] user=editor method=POST path=/sim/regimens/new/ status=302 duration_ms=1.44 ip=127.0.0.1
+2025-11-08 14:30:42,936 [INFO] user=editor method=GET path=/sim/regimens/3/delete/ status=200 duration_ms=2.00 ip=127.0.0.1
+2025-11-08 14:30:42,939 [INFO] user=editor method=POST path=/sim/regimens/3/delete/ status=200 duration_ms=1.96 ip=127.0.0.1
+2025-11-08 14:30:43,303 [INFO] user=editor method=POST path=/sim/scenarios/1/duplicate/ status=302 duration_ms=2.11 ip=127.0.0.1
+2025-11-08 14:30:43,671 [INFO] user=editor method=POST path=/sim/scenarios/1/regimens/add/ status=200 duration_ms=6.29 ip=127.0.0.1
+2025-11-08 14:30:44,049 [INFO] user=viewer method=POST path=/sim/scenarios/1/regimens/add/ status=403 duration_ms=7.69 ip=127.0.0.1
+2025-11-08 14:30:44,419 [INFO] user=viewer method=POST path=/sim/regimens/new/ status=403 duration_ms=8.68 ip=127.0.0.1
+2025-11-08 14:30:51,027 [INFO] user=simuser method=POST path=/sim/scenarios/1/simulate/ status=400 duration_ms=17.19 ip=127.0.0.1
+2025-11-08 14:30:51,518 [INFO] user=anonymous method=POST path=/api/ux/audit/ status=400 duration_ms=0.11 ip=127.0.0.1
+2025-11-08 14:30:51,519 [INFO] user=anonymous method=POST path=/api/ux/audit/ status=400 duration_ms=0.07 ip=127.0.0.1
+2025-11-08 14:30:51,520 [INFO] ux_event=test_event detail={'key': 'value'} ts=1234567890 ip=127.0.0.1
+2025-11-08 14:30:51,520 [INFO] user=anonymous method=POST path=/api/ux/audit/ status=200 duration_ms=0.11 ip=127.0.0.1
+2025-11-08 14:30:51,521 [INFO] user=anonymous method=POST path=/api/ux/audit/ status=400 duration_ms=0.07 ip=127.0.0.1
+2025-11-08 14:30:51,522 [INFO] ux_event=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx detail={} ts=1234567890 ip=127.0.0.1
+2025-11-08 14:30:51,522 [INFO] user=anonymous method=POST path=/api/ux/audit/ status=200 duration_ms=0.11 ip=127.0.0.1
+2025-11-08 14:30:51,523 [INFO] ux_event= detail={'key': 'value'} ts=1234567890 ip=127.0.0.1
+2025-11-08 14:30:51,523 [INFO] user=anonymous method=POST path=/api/ux/audit/ status=200 duration_ms=0.10 ip=127.0.0.1
+2025-11-08 14:30:51,524 [INFO] ux_event=test_event detail={} ts=1234567890 ip=127.0.0.1
+2025-11-08 14:30:51,525 [INFO] user=anonymous method=POST path=/api/ux/audit/ status=200 duration_ms=0.10 ip=127.0.0.1
+2025-11-08 14:30:51,525 [INFO] ux_event=emoji_test detail={'message': 'Hello 👋 世界'} ts=1234567890 ip=127.0.0.1
+2025-11-08 14:30:51,526 [INFO] user=anonymous method=POST path=/api/ux/audit/ status=200 duration_ms=0.10 ip=127.0.0.1
+2025-11-08 14:30:51,526 [INFO] ux_event=ip_test detail={} ts=1234567890 ip=192.168.1.100
+2025-11-08 14:30:51,526 [INFO] user=anonymous method=POST path=/api/ux/audit/ status=200 duration_ms=0.09 ip=192.168.1.100
+2025-11-08 14:30:51,527 [INFO] ux_event= detail={} ts=None ip=127.0.0.1
+2025-11-08 14:30:51,528 [INFO] user=anonymous method=POST path=/api/ux/audit/ status=200 duration_ms=0.11 ip=127.0.0.1
+2025-11-08 14:30:51,529 [INFO] user=anonymous method=GET path=/ status=302 duration_ms=0.17 ip=127.0.0.1
+2025-11-08 14:30:51,532 [INFO] user=anonymous method=GET path=/ status=302 duration_ms=0.15 ip=127.0.0.1
+2025-11-08 14:30:51,535 [INFO] user=anonymous method=GET path=/ status=302 duration_ms=0.15 ip=127.0.0.1
+2025-11-08 14:30:51,538 [INFO] user=anonymous method=GET path=/ status=302 duration_ms=0.16 ip=127.0.0.1
+2025-11-08 14:30:51,541 [INFO] user=anonymous method=GET path=/ status=302 duration_ms=0.14 ip=127.0.0.1
+2025-11-08 14:30:51,543 [INFO] user=anonymous method=GET path=/ status=302 duration_ms=0.16 ip=127.0.0.1
+2025-11-08 14:31:02,201 [INFO] user=anonymous method=GET path=/api/help/test_article/?lang=en status=200 duration_ms=1.56 ip=127.0.0.1
+2025-11-08 14:31:02,208 [INFO] user=anonymous method=GET path=/api/help/test_article/?lang=en status=200 duration_ms=0.38 ip=127.0.0.1
+2025-11-08 14:31:02,209 [INFO] user=anonymous method=GET path=/api/help/test_article/?lang=en status=304 duration_ms=0.28 ip=127.0.0.1
+2025-11-08 14:31:02,211 [INFO] user=anonymous method=GET path=/api/help/test_article/?lang=en status=200 duration_ms=0.31 ip=127.0.0.1
+2025-11-08 14:31:02,212 [INFO] user=anonymous method=GET path=/api/help/test_article/?lang=en status=200 duration_ms=0.30 ip=127.0.0.1
+2025-11-08 14:31:02,214 [INFO] user=anonymous method=GET path=/api/help/test_article/?lang=en status=200 duration_ms=0.30 ip=127.0.0.1
+2025-11-08 14:31:02,215 [INFO] user=anonymous method=GET path=/api/help/test_article/?lang=en status=200 duration_ms=0.37 ip=127.0.0.1
+2025-11-08 14:31:02,216 [INFO] user=anonymous method=GET path=/api/help/test_article/?lang=en status=200 duration_ms=0.34 ip=127.0.0.1
+2025-11-08 14:31:02,217 [INFO] user=anonymous method=GET path=/api/help/test_article/?lang=it status=200 duration_ms=0.29 ip=127.0.0.1
+2025-11-08 14:31:02,225 [INFO] user=anonymous method=GET path=/api/help/search/?q=lenalidomide&lang=en status=200 duration_ms=0.73 ip=127.0.0.1
+2025-11-08 14:31:02,231 [INFO] user=anonymous method=GET path=/api/help/search/?q=title&lang=en status=200 duration_ms=0.65 ip=127.0.0.1
+2025-11-08 14:31:02,233 [INFO] user=anonymous method=GET path=/api/help/search/?q=duplicate&lang=en status=200 duration_ms=0.48 ip=127.0.0.1
+2025-11-08 14:31:02,238 [INFO] user=anonymous method=GET path=/api/help/search/?lang=en status=200 duration_ms=0.45 ip=127.0.0.1
+2025-11-08 14:31:02,240 [INFO] user=anonymous method=GET path=/api/help/search/?q=english&lang=en status=200 duration_ms=0.54 ip=127.0.0.1
+2025-11-08 14:31:02,241 [INFO] user=anonymous method=GET path=/api/help/search/?q=italiano&lang=it status=200 duration_ms=0.43 ip=127.0.0.1
+2025-11-08 14:31:05,396 [INFO] user=tester method=GET path=/sim/cohort/export/013a21e2-76eb-487e-9d64-aa7a68f51c68/ status=200 duration_ms=0.91 ip=127.0.0.1
+2025-11-08 14:31:05,758 [INFO] user=tester method=POST path=/sim/cohort/run/ status=400 duration_ms=1.02 ip=127.0.0.1
+2025-11-08 14:31:06,875 [INFO] user=tester method=POST path=/sim/cohort/run/ status=200 duration_ms=754.43 ip=127.0.0.1
+2025-11-08 14:31:07,261 [INFO] user=tester method=GET path=/sim/cohort/ status=200 duration_ms=14.89 ip=127.0.0.1
+2025-11-08 14:31:07,623 [INFO] user=anonymous method=GET path=/sim/cohort/ status=302 duration_ms=0.20 ip=127.0.0.1
+2025-11-08 14:31:07,625 [INFO] user=anonymous method=GET path=/api/help/test_help/?lang=en status=200 duration_ms=0.34 ip=127.0.0.1
+2025-11-08 14:31:07,625 [INFO] user=anonymous method=GET path=/api/help/test_help/?lang=it status=200 duration_ms=0.39 ip=127.0.0.1
+2025-11-08 14:31:07,627 [INFO] user=anonymous method=GET path=/api/help/search/?q=lenalidomide&lang=en status=200 duration_ms=0.48 ip=127.0.0.1
+2025-11-08 14:31:07,628 [INFO] user=anonymous method=GET path=/api/help/search/?q=kpi_auc&lang=en status=200 duration_ms=0.43 ip=127.0.0.1
+2025-11-08 14:31:07,629 [INFO] user=anonymous method=GET path=/api/help/search/?q=test&lang=en status=200 duration_ms=0.53 ip=127.0.0.1
+2025-11-08 14:31:07,631 [INFO] user=anonymous method=GET path=/api/help/search/?q=VRd&lang=en status=200 duration_ms=0.44 ip=127.0.0.1
+2025-11-08 14:31:07,972 [INFO] user=demo method=GET path=/sim/1/ status=500 duration_ms=121.38 ip=127.0.0.1
+2025-11-08 14:31:08,552 [INFO] user=editor method=POST path=/sim/regimens/new/ status=302 duration_ms=1.46 ip=127.0.0.1
+2025-11-08 14:31:08,557 [INFO] user=editor method=GET path=/sim/regimens/3/delete/ status=200 duration_ms=4.50 ip=127.0.0.1
+2025-11-08 14:31:08,560 [INFO] user=editor method=POST path=/sim/regimens/3/delete/ status=200 duration_ms=2.05 ip=127.0.0.1
+2025-11-08 14:31:08,922 [INFO] user=editor method=POST path=/sim/scenarios/1/duplicate/ status=302 duration_ms=2.05 ip=127.0.0.1
+2025-11-08 14:31:09,301 [INFO] user=editor method=POST path=/sim/scenarios/1/regimens/add/ status=200 duration_ms=18.45 ip=127.0.0.1
+2025-11-08 14:31:09,674 [INFO] user=viewer method=POST path=/sim/scenarios/1/regimens/add/ status=403 duration_ms=8.43 ip=127.0.0.1
+2025-11-08 14:31:10,044 [INFO] user=viewer method=POST path=/sim/regimens/new/ status=403 duration_ms=8.62 ip=127.0.0.1
+2025-11-08 14:31:16,571 [INFO] user=simuser method=POST path=/sim/scenarios/1/simulate/ status=400 duration_ms=15.83 ip=127.0.0.1
+2025-11-08 14:31:17,060 [INFO] user=anonymous method=POST path=/api/ux/audit/ status=400 duration_ms=0.12 ip=127.0.0.1
+2025-11-08 14:31:17,061 [INFO] user=anonymous method=POST path=/api/ux/audit/ status=400 duration_ms=0.08 ip=127.0.0.1
+2025-11-08 14:31:17,063 [INFO] ux_event=test_event detail={'key': 'value'} ts=1234567890 ip=127.0.0.1
+2025-11-08 14:31:17,063 [INFO] user=anonymous method=POST path=/api/ux/audit/ status=200 duration_ms=0.12 ip=127.0.0.1
+2025-11-08 14:31:17,064 [INFO] user=anonymous method=POST path=/api/ux/audit/ status=400 duration_ms=0.08 ip=127.0.0.1
+2025-11-08 14:31:17,065 [INFO] ux_event=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx detail={} ts=1234567890 ip=127.0.0.1
+2025-11-08 14:31:17,065 [INFO] user=anonymous method=POST path=/api/ux/audit/ status=200 duration_ms=0.10 ip=127.0.0.1
+2025-11-08 14:31:17,066 [INFO] ux_event= detail={'key': 'value'} ts=1234567890 ip=127.0.0.1
+2025-11-08 14:31:17,066 [INFO] user=anonymous method=POST path=/api/ux/audit/ status=200 duration_ms=0.12 ip=127.0.0.1
+2025-11-08 14:31:17,067 [INFO] ux_event=test_event detail={} ts=1234567890 ip=127.0.0.1
+2025-11-08 14:31:17,067 [INFO] user=anonymous method=POST path=/api/ux/audit/ status=200 duration_ms=0.10 ip=127.0.0.1
+2025-11-08 14:31:17,068 [INFO] ux_event=emoji_test detail={'message': 'Hello 👋 世界'} ts=1234567890 ip=127.0.0.1
+2025-11-08 14:31:17,068 [INFO] user=anonymous method=POST path=/api/ux/audit/ status=200 duration_ms=0.11 ip=127.0.0.1
+2025-11-08 14:31:17,069 [INFO] ux_event=ip_test detail={} ts=1234567890 ip=192.168.1.100
+2025-11-08 14:31:17,069 [INFO] user=anonymous method=POST path=/api/ux/audit/ status=200 duration_ms=0.10 ip=192.168.1.100
+2025-11-08 14:31:17,070 [INFO] ux_event= detail={} ts=None ip=127.0.0.1
+2025-11-08 14:31:17,070 [INFO] user=anonymous method=POST path=/api/ux/audit/ status=200 duration_ms=0.11 ip=127.0.0.1
+2025-11-08 14:31:17,072 [INFO] user=anonymous method=GET path=/ status=302 duration_ms=0.17 ip=127.0.0.1
+2025-11-08 14:31:17,073 [INFO] user=anonymous method=GET path=/ status=302 duration_ms=0.12 ip=127.0.0.1
+2025-11-08 14:31:17,075 [INFO] user=anonymous method=GET path=/ status=302 duration_ms=0.12 ip=127.0.0.1
+2025-11-08 14:31:17,076 [INFO] user=anonymous method=GET path=/ status=302 duration_ms=0.12 ip=127.0.0.1
+2025-11-08 14:31:17,077 [INFO] user=anonymous method=GET path=/ status=302 duration_ms=0.12 ip=127.0.0.1
+2025-11-08 14:31:17,079 [INFO] user=anonymous method=GET path=/ status=302 duration_ms=0.12 ip=127.0.0.1
+2025-11-08 14:36:26,637 [INFO] user=anonymous method=GET path=/api/help/test_article/?lang=en status=200 duration_ms=1.57 ip=127.0.0.1
+2025-11-08 14:36:26,645 [INFO] user=anonymous method=GET path=/api/help/test_article/?lang=en status=200 duration_ms=0.36 ip=127.0.0.1
+2025-11-08 14:36:26,646 [INFO] user=anonymous method=GET path=/api/help/test_article/?lang=en status=304 duration_ms=0.28 ip=127.0.0.1
+2025-11-08 14:36:26,647 [INFO] user=anonymous method=GET path=/api/help/test_article/?lang=en status=200 duration_ms=0.30 ip=127.0.0.1
+2025-11-08 14:36:26,649 [INFO] user=anonymous method=GET path=/api/help/test_article/?lang=en status=200 duration_ms=0.30 ip=127.0.0.1
+2025-11-08 14:36:26,650 [INFO] user=anonymous method=GET path=/api/help/test_article/?lang=en status=200 duration_ms=0.36 ip=127.0.0.1
+2025-11-08 14:36:26,651 [INFO] user=anonymous method=GET path=/api/help/test_article/?lang=en status=200 duration_ms=0.39 ip=127.0.0.1
+2025-11-08 14:36:26,653 [INFO] user=anonymous method=GET path=/api/help/test_article/?lang=en status=200 duration_ms=0.29 ip=127.0.0.1
+2025-11-08 14:36:26,653 [INFO] user=anonymous method=GET path=/api/help/test_article/?lang=it status=200 duration_ms=0.28 ip=127.0.0.1
+2025-11-08 14:36:26,661 [INFO] user=anonymous method=GET path=/api/help/search/?q=lenalidomide&lang=en status=200 duration_ms=0.73 ip=127.0.0.1
+2025-11-08 14:36:26,667 [INFO] user=anonymous method=GET path=/api/help/search/?q=title&lang=en status=200 duration_ms=0.66 ip=127.0.0.1
+2025-11-08 14:36:26,669 [INFO] user=anonymous method=GET path=/api/help/search/?q=duplicate&lang=en status=200 duration_ms=0.48 ip=127.0.0.1
+2025-11-08 14:36:26,674 [INFO] user=anonymous method=GET path=/api/help/search/?lang=en status=200 duration_ms=0.46 ip=127.0.0.1
+2025-11-08 14:36:26,676 [INFO] user=anonymous method=GET path=/api/help/search/?q=english&lang=en status=200 duration_ms=0.54 ip=127.0.0.1
+2025-11-08 14:36:26,677 [INFO] user=anonymous method=GET path=/api/help/search/?q=italiano&lang=it status=200 duration_ms=0.43 ip=127.0.0.1
+2025-11-08 14:36:29,795 [INFO] user=tester method=GET path=/sim/cohort/export/620e8611-e228-4ede-af71-3f91d5dd63c7/ status=200 duration_ms=0.80 ip=127.0.0.1
+2025-11-08 14:36:30,157 [INFO] user=tester method=POST path=/sim/cohort/run/ status=400 duration_ms=1.00 ip=127.0.0.1
+2025-11-08 14:36:31,251 [INFO] user=tester method=POST path=/sim/cohort/run/ status=200 duration_ms=731.33 ip=127.0.0.1
+2025-11-08 14:36:31,640 [INFO] user=tester method=GET path=/sim/cohort/ status=200 duration_ms=12.26 ip=127.0.0.1
+2025-11-08 14:36:32,001 [INFO] user=anonymous method=GET path=/sim/cohort/ status=302 duration_ms=0.21 ip=127.0.0.1
+2025-11-08 14:36:32,003 [INFO] user=anonymous method=GET path=/api/help/test_help/?lang=en status=200 duration_ms=0.37 ip=127.0.0.1
+2025-11-08 14:36:32,004 [INFO] user=anonymous method=GET path=/api/help/test_help/?lang=it status=200 duration_ms=0.39 ip=127.0.0.1
+2025-11-08 14:36:32,005 [INFO] user=anonymous method=GET path=/api/help/search/?q=lenalidomide&lang=en status=200 duration_ms=0.47 ip=127.0.0.1
+2025-11-08 14:36:32,006 [INFO] user=anonymous method=GET path=/api/help/search/?q=kpi_auc&lang=en status=200 duration_ms=0.42 ip=127.0.0.1
+2025-11-08 14:36:32,008 [INFO] user=anonymous method=GET path=/api/help/search/?q=test&lang=en status=200 duration_ms=0.53 ip=127.0.0.1
+2025-11-08 14:36:32,009 [INFO] user=anonymous method=GET path=/api/help/search/?q=VRd&lang=en status=200 duration_ms=0.44 ip=127.0.0.1
+2025-11-08 14:36:32,353 [INFO] user=demo method=GET path=/sim/1/ status=500 duration_ms=124.37 ip=127.0.0.1
+2025-11-08 14:36:32,935 [INFO] user=editor method=POST path=/sim/regimens/new/ status=302 duration_ms=1.49 ip=127.0.0.1
+2025-11-08 14:36:32,941 [INFO] user=editor method=GET path=/sim/regimens/3/delete/ status=200 duration_ms=4.59 ip=127.0.0.1
+2025-11-08 14:36:32,943 [INFO] user=editor method=POST path=/sim/regimens/3/delete/ status=200 duration_ms=2.05 ip=127.0.0.1
+2025-11-08 14:36:33,306 [INFO] user=editor method=POST path=/sim/scenarios/1/duplicate/ status=302 duration_ms=2.08 ip=127.0.0.1
+2025-11-08 14:36:33,682 [INFO] user=editor method=POST path=/sim/scenarios/1/regimens/add/ status=200 duration_ms=14.61 ip=127.0.0.1
+2025-11-08 14:36:34,054 [INFO] user=viewer method=POST path=/sim/scenarios/1/regimens/add/ status=403 duration_ms=7.94 ip=127.0.0.1
+2025-11-08 14:36:34,424 [INFO] user=viewer method=POST path=/sim/regimens/new/ status=403 duration_ms=8.94 ip=127.0.0.1
+2025-11-08 14:36:40,930 [INFO] user=simuser method=POST path=/sim/scenarios/1/simulate/ status=400 duration_ms=17.19 ip=127.0.0.1
+2025-11-08 14:36:41,418 [INFO] user=anonymous method=POST path=/api/ux/audit/ status=400 duration_ms=0.11 ip=127.0.0.1
+2025-11-08 14:36:41,419 [INFO] user=anonymous method=POST path=/api/ux/audit/ status=400 duration_ms=0.07 ip=127.0.0.1
+2025-11-08 14:36:41,420 [INFO] ux_event=test_event detail={'key': 'value'} ts=1234567890 ip=127.0.0.1
+2025-11-08 14:36:41,420 [INFO] user=anonymous method=POST path=/api/ux/audit/ status=200 duration_ms=0.11 ip=127.0.0.1
+2025-11-08 14:36:41,421 [INFO] user=anonymous method=POST path=/api/ux/audit/ status=400 duration_ms=0.08 ip=127.0.0.1
+2025-11-08 14:36:41,422 [INFO] ux_event=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx detail={} ts=1234567890 ip=127.0.0.1
+2025-11-08 14:36:41,422 [INFO] user=anonymous method=POST path=/api/ux/audit/ status=200 duration_ms=0.10 ip=127.0.0.1
+2025-11-08 14:36:41,423 [INFO] ux_event= detail={'key': 'value'} ts=1234567890 ip=127.0.0.1
+2025-11-08 14:36:41,423 [INFO] user=anonymous method=POST path=/api/ux/audit/ status=200 duration_ms=0.10 ip=127.0.0.1
+2025-11-08 14:36:41,424 [INFO] ux_event=test_event detail={} ts=1234567890 ip=127.0.0.1
+2025-11-08 14:36:41,424 [INFO] user=anonymous method=POST path=/api/ux/audit/ status=200 duration_ms=0.11 ip=127.0.0.1
+2025-11-08 14:36:41,425 [INFO] ux_event=emoji_test detail={'message': 'Hello 👋 世界'} ts=1234567890 ip=127.0.0.1
+2025-11-08 14:36:41,425 [INFO] user=anonymous method=POST path=/api/ux/audit/ status=200 duration_ms=0.10 ip=127.0.0.1
+2025-11-08 14:36:41,426 [INFO] ux_event=ip_test detail={} ts=1234567890 ip=192.168.1.100
+2025-11-08 14:36:41,426 [INFO] user=anonymous method=POST path=/api/ux/audit/ status=200 duration_ms=0.09 ip=192.168.1.100
+2025-11-08 14:36:41,427 [INFO] ux_event= detail={} ts=None ip=127.0.0.1
+2025-11-08 14:36:41,427 [INFO] user=anonymous method=POST path=/api/ux/audit/ status=200 duration_ms=0.09 ip=127.0.0.1
+2025-11-08 14:36:41,428 [INFO] user=anonymous method=GET path=/ status=302 duration_ms=0.14 ip=127.0.0.1
+2025-11-08 14:36:41,430 [INFO] user=anonymous method=GET path=/ status=302 duration_ms=0.12 ip=127.0.0.1
+2025-11-08 14:36:41,431 [INFO] user=anonymous method=GET path=/ status=302 duration_ms=0.12 ip=127.0.0.1
+2025-11-08 14:36:41,433 [INFO] user=anonymous method=GET path=/ status=302 duration_ms=0.12 ip=127.0.0.1
+2025-11-08 14:36:41,434 [INFO] user=anonymous method=GET path=/ status=302 duration_ms=0.15 ip=127.0.0.1
+2025-11-08 14:36:41,435 [INFO] user=anonymous method=GET path=/ status=302 duration_ms=0.12 ip=127.0.0.1
+2025-11-08 14:37:20,771 [INFO] user=viewer method=GET path=/chem/job/1/status.json status=200 duration_ms=2.04 ip=127.0.0.1
+2025-11-08 14:37:20,957 [INFO] user=tester method=GET path=/chem/job/1/retry/ status=302 duration_ms=0.89 ip=127.0.0.1
+2025-11-08 14:37:20,984 [INFO] user=tester method=GET path=/chem/ status=200 duration_ms=26.20 ip=127.0.0.1
+2025-11-08 14:37:21,167 [INFO] user=tester method=GET path=/chem/job/1/retry/ status=302 duration_ms=0.85 ip=127.0.0.1
+2025-11-08 14:37:21,170 [INFO] user=tester method=GET path=/chem/ status=200 duration_ms=2.45 ip=127.0.0.1
+2025-11-08 14:37:27,404 [INFO] user=admin method=GET path=/sim/ status=200 duration_ms=23.41 ip=127.0.0.1
+2025-11-08 14:37:28,278 [INFO] user=admin method=GET path=/chem/ status=200 duration_ms=29.07 ip=127.0.0.1
+2025-11-08 14:37:28,357 [INFO] user=admin method=GET path=/chem/job/1/status.json status=200 duration_ms=3.81 ip=127.0.0.1
+2025-11-08 14:37:29,613 [INFO] user=admin method=GET path=/sim/ status=200 duration_ms=9.59 ip=127.0.0.1
+2025-11-08 14:37:32,103 [INFO] user=admin method=GET path=/sim/1/ status=500 duration_ms=122.04 ip=127.0.0.1

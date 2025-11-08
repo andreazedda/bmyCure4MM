@@ -17,6 +17,12 @@ class SimulationParameterValidationTests(TestCase):
             "tumor_growth_rate": 0.023,
             "healthy_growth_rate": 0.015,
             "interaction_strength": 0.05,
+            "preset": "VRd",  # Valid preset key from PRESETS dictionary (case-sensitive!)
+            "creatinine_clearance": 90.0,
+            "neuropathy_grade": 0,
+            "anc": 2.0,
+            "platelets": 150,
+            "cohort_size": 1,
         }
 
     def test_form_rejects_extreme_values(self) -> None:
@@ -38,6 +44,7 @@ class SimulationParameterValidationTests(TestCase):
         payload = self._base_payload()
         payload["lenalidomide_dose"] = 38.0
         form = forms.SimulationParameterForm(data=payload)
-        self.assertTrue(form.is_valid())
-        self.assertTrue(form.warnings)
-        self.assertTrue(any("Lenalidomide dose" in warning for warning in form.warnings))
+        self.assertTrue(form.is_valid(), f"Form should be valid but got errors: {dict(form.errors)}")
+        self.assertTrue(form.warnings, "Form should have warnings")
+        self.assertTrue(any("Lenalidomide dose" in warning for warning in form.warnings),
+                        f"Warning about Lenalidomide dose not found in: {form.warnings}")

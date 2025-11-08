@@ -381,6 +381,48 @@
         const lang = getCurrentLang ? getCurrentLang() : 'en';
         const html = formatCopy(DOSE_BADGE_COPY[status], lang, DOSE_HELP_SLUG[fieldName]);
         setContextBadge(input.id, status, html);
+
+        // 🎨 Apply visual zone coloring
+        applyDoseZoneColor(input, value, min, max, profile);
+    };
+
+    /**
+     * Apply visual color zones to dose inputs based on value relative to preset range
+     * @param {HTMLElement} input - The input element
+     * @param {number} value - Current input value
+     * @param {number} min - Minimum safe dose from preset
+     * @param {number} max - Maximum safe dose from preset
+     * @param {object} profile - Drug profile with optimal_dose
+     */
+    const applyDoseZoneColor = (input, value, min, max, profile) => {
+        if (!Number.isFinite(value) || !Number.isFinite(min) || !Number.isFinite(max)) {
+            input.classList.remove('zone-safe', 'zone-caution', 'zone-danger', 'zone-optimal', 'dose-input');
+            return;
+        }
+
+        input.classList.add('dose-input');
+        input.classList.remove('zone-safe', 'zone-caution', 'zone-danger', 'zone-optimal');
+
+        // Check if value is optimal dose (within 5% tolerance)
+        const optimalDose = parseFloat(profile.optimal_dose);
+        if (Number.isFinite(optimalDose) && Math.abs(value - optimalDose) / optimalDose < 0.05) {
+            input.classList.add('zone-optimal');
+            return;
+        }
+
+        const rangeSize = max - min;
+        const safeThreshold = min + rangeSize * 0.80;  // 0-80% of range = safe (green)
+        const cautionThreshold = min + rangeSize * 0.95; // 80-95% = caution (yellow)
+
+        if (value < min || value > max) {
+            input.classList.add('zone-danger');  // Outside preset range = danger (red)
+        } else if (value <= safeThreshold) {
+            input.classList.add('zone-safe');    // 0-80% = safe (green)
+        } else if (value <= cautionThreshold) {
+            input.classList.add('zone-caution'); // 80-95% = caution (yellow)
+        } else {
+            input.classList.add('zone-danger');  // 95-100% = danger (red)
+        }
     };
 
     const updateAllDoseContexts = () => {

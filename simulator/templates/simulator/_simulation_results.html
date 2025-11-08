@@ -151,10 +151,46 @@
                 </div>
             </div>
         {% else %}
-            <p class="text-muted mb-0">
-                <span class="t-en">Simulation results will appear here once the model has been executed.</span>
-                <span class="t-it">I risultati appariranno qui dopo l’esecuzione del modello.</span>
-            </p>
+                                </ul>
+                </div>
+            </div>
+        {% else %}
+            <!-- 🎨 Improved Empty State with Actionable Guidance -->
+            <div class="empty-state">
+                <div class="empty-state-icon">🧪</div>
+                <h3>
+                    <span class="t-en">Ready to Run Your First Simulation!</span>
+                    <span class="t-it">Pronto per la Prima Simulazione!</span>
+                </h3>
+                <p class="text-muted">
+                    <span class="t-en">Results will appear here once you execute the model. Here's your checklist:</span>
+                    <span class="t-it">I risultati appariranno dopo l'esecuzione. Ecco la checklist:</span>
+                </p>
+                <ul class="checklist">
+                    <li>
+                        <span class="t-en">✓ Pick a <strong>preset regimen</strong> (try VRd for beginners)</span>
+                        <span class="t-it">✓ Scegli un <strong>regime preimpostato</strong> (prova VRd per iniziare)</span>
+                    </li>
+                    <li>
+                        <span class="t-en">✓ Adjust <strong>doses</strong> if needed (watch the colored zones!)</span>
+                        <span class="t-it">✓ Aggiusta le <strong>dosi</strong> se necessario (osserva le zone colorate!)</span>
+                    </li>
+                    <li>
+                        <span class="t-en">✓ Enable <strong>Digital Twin</strong> for personalized predictions</span>
+                        <span class="t-it">✓ Abilita <strong>Digital Twin</strong> per previsioni personalizzate</span>
+                    </li>
+                    <li>
+                        <span class="t-en">✓ Click <strong>Run Simulation</strong> button above</span>
+                        <span class="t-it">✓ Clicca il pulsante <strong>Esegui Simulazione</strong> sopra</span>
+                    </li>
+                </ul>
+                <button type="button" class="btn btn-primary mt-3" onclick="if(typeof Tour !== 'undefined') Tour.open();">
+                    <span class="t-en">📘 Show Me How</span>
+                    <span class="t-it">📘 Mostrami Come</span>
+                </button>
+            </div>
+        {% endif %}
+
         {% endif %}
     </div>
     <div class="card-footer">
