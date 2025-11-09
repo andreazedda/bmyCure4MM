@@ -2,19 +2,58 @@
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-lg-6">
+    <div class="col-lg-8">
         <div class="card shadow-sm">
             <div class="card-body">
-                <h1 class="h4 mb-3">Ligand Similarity Search</h1>
+                <h1 class="h4 mb-3">
+                    <i class="bi bi-search"></i> Ligand Similarity Search
+                </h1>
                 <p class="text-muted">Search PubChem for similar ligands and compute key descriptors.</p>
-                <form method="post" novalidate>
+                
+                <!-- Quick Examples for Similarity Search -->
+                <div class="alert alert-primary border-0 mb-4">
+                    <h6 class="alert-heading">
+                        <i class="bi bi-stars"></i> Search Similar to / Cerca Simili a
+                    </h6>
+                    <p class="small mb-2">Find molecules similar to these Multiple Myeloma drugs:</p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="button" class="btn btn-sm btn-outline-primary try-similarity"
+                                data-smiles="O=C1CCC(=O)N1c2cncc3n2c(nc3N4CCOCC4)N"
+                                data-threshold="0.7"
+                                data-name="Lenalidomide">
+                            <i class="bi bi-capsule-pill"></i> Lenalidomide
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-primary try-similarity"
+                                data-smiles="CC(C)C[C@H](NC(=O)[C@H](Cc1ccccc1)NC(=O)c2cnccn2)B(O)O"
+                                data-threshold="0.8"
+                                data-name="Bortezomib">
+                            <i class="bi bi-capsule-pill"></i> Bortezomib
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-info try-similarity"
+                                data-smiles="CC1=C(C(=O)N(N1C)C2=CC=CC=C2)N(C)CS(=O)(=O)O"
+                                data-threshold="0.75"
+                                data-name="Melphalan-like">
+                            <i class="bi bi-diagram-3"></i> Melphalan-like
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-success try-similarity"
+                                data-smiles="c1ccccc1"
+                                data-threshold="0.6"
+                                data-name="Benzene (Broad)">
+                            <i class="bi bi-hexagon"></i> Benzene (Broad)
+                        </button>
+                    </div>
+                </div>
+                
+                <form method="post" novalidate id="similarityForm">
                     {% csrf_token %}
                     {% if form.non_field_errors %}
                         <div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>
                     {% endif %}
                     {% for field in form %}
                         <div class="mb-3">
-                            <label class="form-label" for="id_{{ field.name }}">{{ field.label }}<span class="text-danger"> *</span></label>
+                            <label class="form-label" for="id_{{ field.name }}">
+                                {{ field.label }}<span class="text-danger"> *</span>
+                            </label>
                             {{ field }}
                             {% if field.help_text %}
                                 <div class="form-text">{{ field.help_text }}</div>
@@ -24,18 +63,120 @@
                             {% endif %}
                         </div>
                     {% endfor %}
+                    
+                    <!-- Threshold Guide -->
+                    <div class="alert alert-light border">
+                        <h6 class="small fw-bold mb-2">
+                            <i class="bi bi-sliders"></i> Threshold Guide / Guida Soglia
+                        </h6>
+                        <div class="row small">
+                            <div class="col-md-4">
+                                <span class="badge bg-success">0.9 - 1.0</span>
+                                <div>Very Similar / Molto Simile</div>
+                                <small class="text-muted">Structural analogs</small>
+                            </div>
+                            <div class="col-md-4">
+                                <span class="badge bg-primary">0.7 - 0.9</span>
+                                <div>Similar / Simile</div>
+                                <small class="text-muted">Recommended</small>
+                            </div>
+                            <div class="col-md-4">
+                                <span class="badge bg-warning text-dark">0.5 - 0.7</span>
+                                <div>Broad Search / Ricerca Ampia</div>
+                                <small class="text-muted">More results</small>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary">
-                            <span class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
-                            Run Search
+                            <i class="bi bi-search"></i> Run Search
                         </button>
-                        <a href="{% url 'chemtools:tools_home' %}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="button" class="btn btn-outline-warning" id="clearSimilarityForm">
+                            <i class="bi bi-x-circle"></i> Clear
+                        </button>
+                        <a href="{% url 'chemtools:tools_home' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Cancel
+                        </a>
                     </div>
                 </form>
+                
                 <hr>
-                <p class="mb-0 small text-muted">Enter a canonical SMILES string (≤4096 characters). Results include similarity scores and RDKit descriptors.</p>
+                <div class="card border-info">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <i class="bi bi-lightbulb"></i> Tips for Better Results / Consigli
+                        </h6>
+                        <ul class="small mb-0">
+                            <li>
+                                <strong>Higher threshold (>0.8):</strong> Finds very similar molecules, 
+                                useful for finding close analogs
+                            </li>
+                            <li>
+                                <strong>Medium threshold (0.7):</strong> Balanced results, 
+                                good for drug discovery
+                            </li>
+                            <li>
+                                <strong>Lower threshold (<0.7):</strong> Broader search, 
+                                finds more diverse structures
+                            </li>
+                            <li>Results include Tanimoto similarity scores and key molecular descriptors</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Try Similarity buttons
+    document.querySelectorAll('.try-similarity').forEach(button => {
+        button.addEventListener('click', function() {
+            const smiles = this.dataset.smiles;
+            const threshold = this.dataset.threshold;
+            const name = this.dataset.name;
+            
+            document.getElementById('id_smiles').value = smiles;
+            document.getElementById('id_threshold').value = threshold;
+            
+            // Visual feedback
+            this.classList.add('active');
+            setTimeout(() => this.classList.remove('active'), 300);
+            
+            // Show notification
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-success alert-dismissible fade show mt-3';
+            alert.innerHTML = `
+                <i class="bi bi-check-circle"></i> 
+                <strong>Searching for molecules similar to:</strong> ${name} 
+                (threshold: ${threshold})
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.getElementById('similarityForm').insertAdjacentElement('beforebegin', alert);
+            setTimeout(() => alert.remove(), 5000);
+        });
+    });
+    
+    // Clear form button
+    document.getElementById('clearSimilarityForm').addEventListener('click', function() {
+        document.getElementById('id_smiles').value = '';
+        document.getElementById('id_threshold').value = '0.7';
+    });
+});
+</script>
+
+<style>
+.try-similarity {
+    transition: all 0.2s ease;
+}
+.try-similarity:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.try-similarity.active {
+    transform: scale(0.95);
+}
+</style>
 {% endblock %}

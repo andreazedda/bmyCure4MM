@@ -2,19 +2,70 @@
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-lg-6">
+    <div class="col-lg-8">
         <div class="card shadow-sm">
             <div class="card-body">
-                <h1 class="h4 mb-3">Drug Parameter Evaluation</h1>
+                <h1 class="h4 mb-3">
+                    <i class="bi bi-capsule"></i> Drug Parameter Evaluation
+                </h1>
                 <p class="text-muted">Fetch PubChem data, calculate RDKit descriptors, and render 3D visualisations.</p>
-                <form method="post" novalidate>
+                
+                <!-- Quick Examples Section -->
+                <div class="alert alert-info border-0 mb-4">
+                    <h6 class="alert-heading">
+                        <i class="bi bi-lightbulb"></i> Try These Examples / Prova Questi Esempi
+                    </h6>
+                    <p class="small mb-2">Click to auto-fill the form with common drugs:</p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="button" class="btn btn-sm btn-outline-primary try-example" 
+                                data-smiles="O=C1CCC(=O)N1c2cncc3n2c(nc3N4CCOCC4)N"
+                                data-cid="216326"
+                                data-name="Lenalidomide">
+                            💊 Lenalidomide
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-primary try-example"
+                                data-smiles="CC(C)C[C@H](NC(=O)[C@H](Cc1ccccc1)NC(=O)c2cnccn2)B(O)O"
+                                data-cid="387447"
+                                data-name="Bortezomib">
+                            💊 Bortezomib
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-success try-example"
+                                data-smiles="CC(=O)Oc1ccccc1C(=O)O"
+                                data-cid="2244"
+                                data-name="Aspirin">
+                            🟢 Aspirin
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-success try-example"
+                                data-smiles="CC(C)Cc1ccc(cc1)C(C)C(=O)O"
+                                data-cid="3672"
+                                data-name="Ibuprofen">
+                            🟢 Ibuprofen
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-info try-example"
+                                data-smiles="CN1C=NC2=C1C(=O)N(C(=O)N2C)C"
+                                data-cid="2519"
+                                data-name="Caffeine">
+                            ☕ Caffeine
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary try-example"
+                                data-smiles="CCO"
+                                data-cid="702"
+                                data-name="Ethanol">
+                            🧪 Ethanol
+                        </button>
+                    </div>
+                </div>
+                
+                <form method="post" novalidate id="drugParamsForm">
                     {% csrf_token %}
                     {% if form.non_field_errors %}
                         <div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>
                     {% endif %}
                     {% for field in form %}
                         <div class="mb-3">
-                            <label class="form-label" for="id_{{ field.name }}">{{ field.label }}{% if field.field.required %}<span class="text-danger"> *</span>{% endif %}</label>
+                            <label class="form-label" for="id_{{ field.name }}">
+                                {{ field.label }}{% if field.field.required %}<span class="text-danger"> *</span>{% endif %}
+                            </label>
                             {{ field }}
                             {% if field.help_text %}
                                 <div class="form-text">{{ field.help_text }}</div>
@@ -26,19 +77,92 @@
                     {% endfor %}
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary">
-                            <span class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
-                            Run Evaluation
+                            <i class="bi bi-play-circle"></i> Run Evaluation
                         </button>
-                        <a href="{% url 'chemtools:tools_home' %}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="button" class="btn btn-outline-warning" id="clearForm">
+                            <i class="bi bi-x-circle"></i> Clear
+                        </button>
+                        <a href="{% url 'chemtools:tools_home' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Cancel
+                        </a>
                     </div>
                 </form>
+                
                 <hr>
-                <ul class="small text-muted mb-0">
-                    <li>Provide a canonical SMILES string (≤4096 characters) or a PubChem CID (positive integer).</li>
-                    <li>When both are supplied, the SMILES string takes precedence.</li>
-                </ul>
+                <div class="card border-info">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <i class="bi bi-info-circle"></i> How to Use / Come Usare
+                        </h6>
+                        <ul class="small text-muted mb-0">
+                            <li>
+                                <strong>SMILES:</strong> Simplified Molecular Input Line Entry System 
+                                (e.g., <code>CCO</code> for ethanol)
+                            </li>
+                            <li>
+                                <strong>PubChem CID:</strong> Compound ID from PubChem database 
+                                (e.g., <code>2244</code> for aspirin)
+                            </li>
+                            <li>When both are supplied, the SMILES string takes precedence</li>
+                            <li>
+                                <strong>Results:</strong> Molecular weight, LogP, H-bonds, 3D structure, 
+                                and more will be calculated
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Try Example buttons
+    document.querySelectorAll('.try-example').forEach(button => {
+        button.addEventListener('click', function() {
+            const smiles = this.dataset.smiles;
+            const cid = this.dataset.cid;
+            const name = this.dataset.name;
+            
+            document.getElementById('id_smiles').value = smiles;
+            document.getElementById('id_cid').value = cid;
+            
+            // Visual feedback
+            this.classList.add('active');
+            setTimeout(() => this.classList.remove('active'), 300);
+            
+            // Show notification
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-success alert-dismissible fade show mt-3';
+            alert.innerHTML = `
+                <i class="bi bi-check-circle"></i> 
+                <strong>Example loaded:</strong> ${name} (SMILES: ${smiles}, CID: ${cid})
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.getElementById('drugParamsForm').insertAdjacentElement('beforebegin', alert);
+            setTimeout(() => alert.remove(), 5000);
+        });
+    });
+    
+    // Clear form button
+    document.getElementById('clearForm').addEventListener('click', function() {
+        document.getElementById('id_smiles').value = '';
+        document.getElementById('id_cid').value = '';
+    });
+});
+</script>
+
+<style>
+.try-example {
+    transition: all 0.2s ease;
+}
+.try-example:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.try-example.active {
+    transform: scale(0.95);
+}
+</style>
 {% endblock %}

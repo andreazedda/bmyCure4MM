@@ -1,8 +1,64 @@
 {% extends "base.html" %}
 
 {% block content %}
+<!-- Welcome Banner -->
+<div class="alert alert-primary border-0 shadow-sm mb-4">
+    <div class="d-flex align-items-center mb-2">
+        <i class="bi bi-people-fill fs-4 me-2"></i>
+        <h1 class="h4 mb-0">📋 Patient Registry / Registro Pazienti</h1>
+    </div>
+    <p class="mb-0 small">
+        <strong>EN:</strong> Manage Multiple Myeloma patients. Track demographics, assessments, therapies, and lab results.
+        <br>
+        <strong>IT:</strong> Gestisci pazienti con Mieloma Multiplo. Monitora dati demografici, valutazioni, terapie e risultati di laboratorio.
+    </p>
+</div>
+
+<!-- Quick Guide Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card border-primary h-100 hover-card">
+            <div class="card-body">
+                <h5 class="card-title">🔍 Search & Filter</h5>
+                <p class="card-text small">
+                    <strong>Surname:</strong> Find patients by last name<br>
+                    <strong>R-ISS Stage:</strong> Filter by risk level (I/II/III)<br>
+                    <strong>High-risk:</strong> Show only cytogenetic high-risk patients
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-success h-100 hover-card">
+            <div class="card-body">
+                <h5 class="card-title">📊 R-ISS Staging</h5>
+                <p class="card-text small">
+                    <strong>R-ISS I:</strong> Low risk (best prognosis)<br>
+                    <strong>R-ISS II:</strong> Intermediate risk<br>
+                    <strong>R-ISS III:</strong> High risk (requires intensive therapy)
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-info h-100 hover-card">
+            <div class="card-body">
+                <h5 class="card-title">💊 Response Codes</h5>
+                <p class="card-text small">
+                    <strong>CR:</strong> Complete Response<br>
+                    <strong>PR:</strong> Partial Response<br>
+                    <strong>PD:</strong> Progressive Disease<br>
+                    <strong>SD:</strong> Stable Disease
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
-    <h1 class="h3 mb-0">Patients</h1>
+    <h2 class="h5 mb-0">
+        <i class="bi bi-funnel"></i> Filter Patients
+    </h2>
     {% if user.is_staff %}
     <a href="{% url 'clinic:patient_new' %}" class="btn btn-primary">
         <i class="bi bi-plus-circle"></i> New Patient
@@ -10,69 +66,129 @@
     {% endif %}
 </div>
 
-<form method="get" class="row g-2 align-items-end mb-3">
-    <div class="col-12 col-md-6">
-        <label for="q" class="form-label mb-1">Search surname</label>
-        <div class="input-group">
-            <span class="input-group-text"><i class="bi bi-search"></i></span>
-            <input id="q" name="q" type="text" value="{{ request.GET.q }}"
-                   class="form-control" placeholder="e.g., Rossi">
+<form method="get" class="card shadow-sm mb-4">
+    <div class="card-body">
+        <div class="row g-3 align-items-end">
+            <div class="col-12 col-md-5">
+                <label for="q" class="form-label mb-1">
+                    <i class="bi bi-search"></i> Search by Surname / Cerca per Cognome
+                </label>
+                <input id="q" name="q" type="text" value="{{ request.GET.q }}"
+                       class="form-control" placeholder="e.g., Rossi, Smith, García">
+                <small class="form-text text-muted">
+                    💡 Enter any part of the last name (case-insensitive)
+                </small>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <label for="r_iss" class="form-label mb-1">
+                    <i class="bi bi-clipboard-data"></i> R-ISS Stage / Stadio
+                </label>
+                <select id="r_iss" name="r_iss" class="form-select">
+                    <option value="">All Stages / Tutti</option>
+                    <option value="I" {% if request.GET.r_iss == "I" %}selected{% endif %}>
+                        R-ISS I (Low Risk / Basso Rischio)
+                    </option>
+                    <option value="II" {% if request.GET.r_iss == "II" %}selected{% endif %}>
+                        R-ISS II (Intermediate / Intermedio)
+                    </option>
+                    <option value="III" {% if request.GET.r_iss == "III" %}selected{% endif %}>
+                        R-ISS III (High Risk / Alto Rischio)
+                    </option>
+                </select>
+            </div>
+
+            <div class="col-6 col-md-2">
+                <label class="form-label mb-1 d-block">
+                    <i class="bi bi-exclamation-triangle"></i> High-risk
+                </label>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="true" id="high_risk"
+                           name="high_risk" {% if request.GET.high_risk %}checked{% endif %}>
+                    <label class="form-check-label" for="high_risk">
+                        Cytogenetics / Citogenetica
+                    </label>
+                </div>
+                <small class="form-text text-muted">
+                    del(17p), t(4;14), t(14;16)
+                </small>
+            </div>
+
+            <div class="col-12 col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-funnel-fill"></i> Filter / Filtra
+                </button>
+            </div>
         </div>
-    </div>
-
-    <div class="col-6 col-md-3">
-        <label for="r_iss" class="form-label mb-1">R-ISS Stage</label>
-        <select id="r_iss" name="r_iss" class="form-select">
-            <option value="">All</option>
-            <option value="I" {% if request.GET.r_iss == "I" %}selected{% endif %}>R-ISS I</option>
-            <option value="II" {% if request.GET.r_iss == "II" %}selected{% endif %}>R-ISS II</option>
-            <option value="III" {% if request.GET.r_iss == "III" %}selected{% endif %}>R-ISS III</option>
-        </select>
-    </div>
-
-    <div class="col-6 col-md-2">
-        <div class="form-check mt-4">
-            <input class="form-check-input" type="checkbox" value="true" id="high_risk"
-                   name="high_risk" {% if request.GET.high_risk %}checked{% endif %}>
-            <label class="form-check-label" for="high_risk">High-risk cytogenetics</label>
-        </div>
-    </div>
-
-    <div class="col-12 col-md-1 d-grid">
-        <button type="submit" class="btn btn-primary">Filter</button>
     </div>
 </form>
 
 {% if patients %}
     <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="h6 mb-0">
+                    <i class="bi bi-table"></i> Patient List / Lista Pazienti
+                </h3>
+                <span class="badge bg-primary">{{ patients|length }} patient{{ patients|length|pluralize }}</span>
+            </div>
+        </div>
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-striped table-hover table-sm align-middle mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th scope="col">MRN</th>
-                            <th scope="col">Name</th>
-                            <th scope="col">Assessments</th>
-                            <th scope="col">Latest Response</th>
+                            <th scope="col">
+                                <i class="bi bi-hash"></i> MRN
+                                <small class="text-muted d-block">Medical Record Number</small>
+                            </th>
+                            <th scope="col">
+                                <i class="bi bi-person"></i> Name / Nome
+                                <small class="text-muted d-block">Click to view details</small>
+                            </th>
+                            <th scope="col">
+                                <i class="bi bi-clipboard-check"></i> Assessments / Valutazioni
+                                <small class="text-muted d-block">Total count</small>
+                            </th>
+                            <th scope="col">
+                                <i class="bi bi-activity"></i> Latest Response / Ultima Risposta
+                                <small class="text-muted d-block">Most recent result</small>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for patient in patients %}
-                            <tr>
-                                <td>{{ patient.mrn }}</td>
+                            <tr class="hover-row">
+                                <td><strong>{{ patient.mrn }}</strong></td>
                                 <td>
-                                    <a href="{% url 'clinic:patient_detail' patient.id %}" class="text-decoration-none">
+                                    <a href="{% url 'clinic:patient_detail' patient.id %}" 
+                                       class="text-decoration-none fw-semibold">
                                         {{ patient.last_name }}, {{ patient.first_name }}
+                                        <i class="bi bi-arrow-right-circle ms-1"></i>
                                     </a>
                                 </td>
-                                <td>{{ patient.assessment_count }}</td>
+                                <td>
+                                    <span class="badge bg-info">{{ patient.assessment_count }}</span>
+                                </td>
                                 <td>
                                     {% with latest=patient.assessments.first %}
                                         {% if latest %}
-                                            <span class="badge bg-secondary">{{ latest.get_response_display|default:"–" }}</span>
-                                            <small class="text-muted">{{ latest.date }}</small>
+                                            {% if latest.response == 'CR' %}
+                                                <span class="badge bg-success">{{ latest.get_response_display|default:"–" }}</span>
+                                            {% elif latest.response == 'PD' %}
+                                                <span class="badge bg-danger">{{ latest.get_response_display|default:"–" }}</span>
+                                            {% elif latest.response == 'PR' %}
+                                                <span class="badge bg-primary">{{ latest.get_response_display|default:"–" }}</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">{{ latest.get_response_display|default:"–" }}</span>
+                                            {% endif %}
+                                            <small class="text-muted ms-2">
+                                                <i class="bi bi-calendar3"></i> {{ latest.date }}
+                                            </small>
                                         {% else %}
-                                            <span class="text-muted">–</span>
+                                            <span class="text-muted">
+                                                <i class="bi bi-dash-circle"></i> No assessments
+                                            </span>
                                         {% endif %}
                                     {% endwith %}
                                 </td>
@@ -84,8 +200,38 @@
         </div>
     </div>
 {% else %}
-    <div class="alert alert-secondary" role="alert">
-        <i class="bi bi-info-circle me-2"></i>No patients found.
+    <div class="alert alert-info border-0 shadow-sm" role="alert">
+        <div class="d-flex align-items-center mb-2">
+            <i class="bi bi-info-circle fs-4 me-2"></i>
+            <h5 class="mb-0">No Patients Found / Nessun Paziente Trovato</h5>
+        </div>
+        <p class="mb-2">
+            <strong>EN:</strong> No patients match your search criteria. Try adjusting your filters or create a new patient.
+            <br>
+            <strong>IT:</strong> Nessun paziente corrisponde ai criteri di ricerca. Prova a modificare i filtri o crea un nuovo paziente.
+        </p>
+        {% if user.is_staff %}
+        <a href="{% url 'clinic:patient_new' %}" class="btn btn-primary btn-sm mt-2">
+            <i class="bi bi-plus-circle"></i> Create First Patient / Crea Primo Paziente
+        </a>
+        {% endif %}
     </div>
 {% endif %}
+
+<style>
+.hover-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+.hover-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+}
+.hover-row {
+    transition: background-color 0.2s ease;
+}
+.hover-row:hover {
+    background-color: rgba(13, 110, 253, 0.05) !important;
+}
+</style>
 {% endblock %}
