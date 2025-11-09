@@ -15,7 +15,7 @@ services:
 
   celery:
     build: .
-    command: celery -A mmportal worker --loglevel=info
+    command: celery -A mmportal worker --loglevel=info --pool=solo
     volumes:
       - .:/app
       - ./logs:/app/logs

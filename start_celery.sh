@@ -5,11 +5,11 @@
 # Activate virtual environment
 source venv/bin/activate
 
-# Start Celery worker
+# Start Celery worker with solo pool (avoids fork issues with RDKit)
 echo "Starting Celery worker..."
 echo "Make sure Redis is running: redis-server"
 echo ""
 
-celery -A mmportal worker --loglevel=info
+celery -A mmportal worker --loglevel=info --pool=solo
 
 # Press Ctrl+C to stop

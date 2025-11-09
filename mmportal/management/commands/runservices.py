@@ -148,8 +148,9 @@ class Command(BaseCommand):
             logs_dir = Path('logs')
             logs_dir.mkdir(exist_ok=True)
 
+            # Use solo pool to avoid fork issues with RDKit and scientific libraries
             self.celery_process = subprocess.Popen(
-                ['celery', '-A', 'mmportal', 'worker', '--loglevel=info'],
+                ['celery', '-A', 'mmportal', 'worker', '--loglevel=info', '--pool=solo'],
                 stdout=open(logs_dir / 'celery.log', 'w'),
                 stderr=subprocess.STDOUT,
             )

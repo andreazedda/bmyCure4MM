@@ -67,9 +67,10 @@ def _start_background_services():
         logs_dir.mkdir(exist_ok=True)
         
         # Use sys.executable to ensure same Python interpreter
+        # Use solo pool to avoid fork issues with RDKit/scientific libraries
         python_exe = sys.executable
         _celery_process = subprocess.Popen(
-            [python_exe, '-m', 'celery', '-A', 'mmportal', 'worker', '--loglevel=info'],
+            [python_exe, '-m', 'celery', '-A', 'mmportal', 'worker', '--loglevel=info', '--pool=solo'],
             stdout=open(logs_dir / 'celery.log', 'w'),
             stderr=subprocess.STDOUT,
         )
