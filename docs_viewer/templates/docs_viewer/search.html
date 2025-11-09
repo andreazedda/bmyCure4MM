@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results - Documentation{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <span class="t-en">Search Results</span>
+                <span class="t-it">Risultati Ricerca</span>
+            </h1>
+            
+            <form action="{% url 'docs_viewer:search' %}" method="get" class="mb-4">
+                <div class="input-group input-group-lg">
+                    <input 
+                        type="search" 
+                        name="q" 
+                        class="form-control" 
+                        placeholder="Search docs..."
+                        value="{{ query }}"
+                        autofocus
+                    >
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i>
+                        <span class="t-en">Search</span>
+                        <span class="t-it">Cerca</span>
+                    </button>
+                </div>
+            </form>
+            
+            {% if results %}
+            <div class="alert alert-success">
+                <span class="t-en">
+                    Found <strong>{{ total_results }}</strong> document(s) matching "<strong>{{ query }}</strong>"
+                </span>
+                <span class="t-it">
+                    Trovati <strong>{{ total_results }}</strong> documento/i corrispondenti a "<strong>{{ query }}</strong>"
+                </span>
+            </div>
+            
+            <div class="list-group">
+                {% for result in results %}
+                <a href="{{ result.url }}" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">
+                            <i class="bi bi-file-earmark-text"></i>
+                            {{ result.name }}
+                        </h5>
+                        <span class="badge bg-primary rounded-pill">{{ result.matches }} match{{ result.matches|pluralize:"es" }}</span>
+                    </div>
+                    <p class="mb-1 text-muted">
+                        <small>{{ result.path }}</small>
+                    </p>
+                    <p class="mb-0">
+                        <small>{{ result.preview }}...</small>
+                    </p>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-warning">
+                <h4 class="alert-heading">
+                    <span class="t-en">No Results Found</span>
+                    <span class="t-it">Nessun Risultato</span>
+                </h4>
+                <p class="mb-0">
+                    <span class="t-en">
+                        No documents found matching "<strong>{{ query }}</strong>". 
+                        Try different keywords or <a href="{% url 'docs_viewer:index' %}" class="alert-link">browse all documentation</a>.
+                    </span>
+                    <span class="t-it">
+                        Nessun documento trovato per "<strong>{{ query }}</strong>". 
+                        Prova parole chiave diverse o <a href="{% url 'docs_viewer:index' %}" class="alert-link">naviga tutta la documentazione</a>.
+                    </span>
+                </p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "clinic",
     "chemtools",
     "simulator",
+    "docs_viewer",
     "rest_framework",
 ]
 

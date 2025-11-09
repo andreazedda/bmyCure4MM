@@ -9,19 +9,23 @@ from simulator.models_help import HelpArticle
 
 def test_search_matches_articles_by_slug(client, db):
     """Verify that search matches articles by slug."""
-    HelpArticle.objects.create(
+    HelpArticle.objects.get_or_create(
         slug="lenalidomide_dose",
-        title_en="Lenalidomide Dose",
-        body_en="Content about lenalidomide.",
-        title_it="Dose Lenalidomide",
-        body_it="Contenuto su lenalidomide.",
+        defaults={
+            "title_en": "Lenalidomide Dose",
+            "body_en": "Content about lenalidomide.",
+            "title_it": "Dose Lenalidomide",
+            "body_it": "Contenuto su lenalidomide.",
+        }
     )
-    HelpArticle.objects.create(
+    HelpArticle.objects.get_or_create(
         slug="bortezomib_dose",
-        title_en="Bortezomib Dose",
-        body_en="Content about bortezomib.",
-        title_it="Dose Bortezomib",
-        body_it="Contenuto su bortezomib.",
+        defaults={
+            "title_en": "Bortezomib Dose",
+            "body_en": "Content about bortezomib.",
+            "title_it": "Dose Bortezomib",
+            "body_it": "Contenuto su bortezomib.",
+        }
     )
     url = reverse("api_help_search")
     response = client.get(url, {"q": "lenali", "lang": "en"})
@@ -34,12 +38,14 @@ def test_search_matches_articles_by_slug(client, db):
 
 def test_search_matches_articles_by_title(client, db):
     """Verify that search matches articles by title."""
-    HelpArticle.objects.create(
+    HelpArticle.objects.get_or_create(
         slug="dose_calc",
-        title_en="Lenalidomide Calculator",
-        body_en="Content about calculator.",
-        title_it="Calcolatore Lenalidomide",
-        body_it="Contenuto sul calcolatore.",
+        defaults={
+            "title_en": "Lenalidomide Calculator",
+            "body_en": "Content about calculator.",
+            "title_it": "Calcolatore Lenalidomide",
+            "body_it": "Contenuto sul calcolatore.",
+        }
     )
     url = reverse("api_help_search")
     response = client.get(url, {"q": "lenalidomide", "lang": "en"})
@@ -51,12 +57,14 @@ def test_search_matches_articles_by_title(client, db):
 
 def test_search_matches_presets(client, db, settings):
     """Verify that search matches presets and prioritizes them."""
-    HelpArticle.objects.create(
+    HelpArticle.objects.get_or_create(
         slug="lenalidomide_dose",
-        title_en="Lenalidomide Dose",
-        body_en="Content.",
-        title_it="Dose",
-        body_it="Contenuto.",
+        defaults={
+            "title_en": "Lenalidomide Dose",
+            "body_en": "Content.",
+            "title_it": "Dose",
+            "body_it": "Contenuto.",
+        }
     )
     url = reverse("api_help_search")
     response = client.get(url, {"q": "standard", "lang": "en"})
@@ -70,14 +78,16 @@ def test_search_matches_presets(client, db, settings):
 
 def test_search_cutoff_at_20_results(client, db):
     """Verify that search returns at most 20 results."""
-    # Create 30 articles
+    # Create 30 articles with unique slugs
     for i in range(30):
-        HelpArticle.objects.create(
-            slug=f"article_{i}",
-            title_en=f"Title {i}",
-            body_en="Content.",
-            title_it=f"Titolo {i}",
-            body_it="Contenuto.",
+        HelpArticle.objects.get_or_create(
+            slug=f"test_article_{i}",
+            defaults={
+                "title_en": f"Title {i}",
+                "body_en": "Content.",
+                "title_it": f"Titolo {i}",
+                "body_it": "Contenuto.",
+            }
         )
     url = reverse("api_help_search")
     response = client.get(url, {"q": "title", "lang": "en"})
@@ -106,12 +116,14 @@ def test_search_deduplication(client, db):
 
 def test_search_returns_type_field(client, db):
     """Verify that search results include type field."""
-    HelpArticle.objects.create(
+    HelpArticle.objects.get_or_create(
         slug="kpi_tumor_reduction",
-        title_en="Tumor Reduction",
-        body_en="Content.",
-        title_it="Riduzione Tumorale",
-        body_it="Contenuto.",
+        defaults={
+            "title_en": "Tumor Reduction",
+            "body_en": "Content.",
+            "title_it": "Riduzione Tumorale",
+            "body_it": "Contenuto.",
+        }
     )
     url = reverse("api_help_search")
     response = client.get(url, {"q": "tumor", "lang": "en"})
@@ -125,12 +137,14 @@ def test_search_returns_type_field(client, db):
 def test_search_empty_query_returns_first_20(client, db):
     """Verify that empty query returns first 20 articles ordered by slug."""
     for i in range(25):
-        HelpArticle.objects.create(
-            slug=f"z_article_{i:02d}",
-            title_en=f"Title {i}",
-            body_en="Content.",
-            title_it=f"Titolo {i}",
-            body_it="Contenuto.",
+        HelpArticle.objects.get_or_create(
+            slug=f"z_test_article_{i:02d}",
+            defaults={
+                "title_en": f"Title {i}",
+                "body_en": "Content.",
+                "title_it": f"Titolo {i}",
+                "body_it": "Contenuto.",
+            }
         )
     url = reverse("api_help_search")
     response = client.get(url, {"lang": "en"})

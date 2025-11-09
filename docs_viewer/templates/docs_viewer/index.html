@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Documentation - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="mb-0">📚 Documentation</h1>
+                <form action="{% url 'docs_viewer:search' %}" method="get" class="d-flex gap-2">
+                    <input 
+                        type="search" 
+                        name="q" 
+                        class="form-control" 
+                        placeholder="Search docs..."
+                        style="width: 300px;"
+                    >
+                    <button type="submit" class="btn btn-primary">
+                        <span class="t-en">Search</span>
+                        <span class="t-it">Cerca</span>
+                    </button>
+                </form>
+            </div>
+
+            <div class="alert alert-info">
+                <span class="t-en">
+                    <strong>{{ total_docs }}</strong> documentation files available. 
+                    Click any document to view it with syntax highlighting.
+                </span>
+                <span class="t-it">
+                    <strong>{{ total_docs }}</strong> file di documentazione disponibili. 
+                    Clicca su un documento per visualizzarlo con evidenziazione sintassi.
+                </span>
+            </div>
+
+            {% for directory, docs in organized_docs.items %}
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h3 class="mb-0">📁 {{ directory }}</h3>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for doc in docs %}
+                        <a href="{{ doc.url }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="bi bi-file-earmark-text"></i>
+                                <strong>{{ doc.name }}</strong>
+                                <br>
+                                <small class="text-muted">{{ doc.path }}</small>
+                            </div>
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

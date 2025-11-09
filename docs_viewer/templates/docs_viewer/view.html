@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Documentation{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<style>
+    .doc-sidebar {
+        position: sticky;
+        top: 20px;
+        max-height: calc(100vh - 100px);
+        overflow-y: auto;
+    }
+    
+    .doc-content {
+        max-width: 900px;
+    }
+    
+    .doc-content img {
+        max-width: 100%;
+        height: auto;
+    }
+    
+    .doc-content table {
+        width: 100%;
+        margin: 1rem 0;
+        border-collapse: collapse;
+    }
+    
+    .doc-content table th,
+    .doc-content table td {
+        padding: 0.5rem;
+        border: 1px solid #dee2e6;
+    }
+    
+    .doc-content pre {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 1rem;
+        overflow-x: auto;
+    }
+    
+    .doc-content code {
+        background: #f8f9fa;
+        padding: 0.2rem 0.4rem;
+        border-radius: 3px;
+        font-size: 0.9em;
+    }
+    
+    .doc-content pre code {
+        background: transparent;
+        padding: 0;
+    }
+    
+    .breadcrumb {
+        background: #f8f9fa;
+        border-radius: 4px;
+        padding: 0.75rem 1rem;
+    }
+    
+    .toc-nav a {
+        text-decoration: none;
+        color: #495057;
+        padding: 0.25rem 0;
+        display: block;
+    }
+    
+    .toc-nav a:hover {
+        color: #007bff;
+    }
+    
+    .headerlink {
+        opacity: 0;
+        margin-left: 0.5rem;
+        text-decoration: none;
+    }
+    
+    h1:hover .headerlink,
+    h2:hover .headerlink,
+    h3:hover .headerlink {
+        opacity: 1;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Sidebar with TOC -->
+        <div class="col-md-3">
+            <div class="doc-sidebar">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <span class="t-en">Navigation</span>
+                            <span class="t-it">Navigazione</span>
+                        </h6>
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0">
+                                {% for crumb_text, crumb_type in breadcrumbs %}
+                                    {% if crumb_type == 'index' %}
+                                        <li class="breadcrumb-item"><a href="{% url 'docs_viewer:index' %}">{{ crumb_text }}</a></li>
+                                    {% elif crumb_type %}
+                                        <li class="breadcrumb-item"><a href="{{ crumb_type }}">{{ crumb_text }}</a></li>
+                                    {% else %}
+                                        <li class="breadcrumb-item active" aria-current="page">{{ crumb_text }}</li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+                
+                {% if toc %}
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <span class="t-en">Table of Contents</span>
+                            <span class="t-it">Indice</span>
+                        </h6>
+                        <nav class="toc-nav">
+                            {{ toc|safe }}
+                        </nav>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Main content -->
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h1 class="h3 mb-0">{{ title }}</h1>
+                    <div class="btn-group">
+                        <a href="{{ raw_url }}" class="btn btn-sm btn-outline-secondary" download>
+                            <i class="bi bi-download"></i>
+                            <span class="t-en">Download Raw</span>
+                            <span class="t-it">Scarica Sorgente</span>
+                        </a>
+                        <a href="{% url 'docs_viewer:index' %}" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-arrow-left"></i>
+                            <span class="t-en">Back to Index</span>
+                            <span class="t-it">Torna all'Indice</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if broken_links %}
+                    <div class="alert alert-warning">
+                        <strong><span class="t-en">Warning:</span><span class="t-it">Attenzione:</span></strong>
+                        <span class="t-en">This document contains {{ broken_links|length }} broken link(s):</span>
+                        <span class="t-it">Questo documento contiene {{ broken_links|length }} link non funzionante/i:</span>
+                        <ul class="mb-0 mt-2">
+                            {% for link in broken_links %}
+                            <li><code>{{ link }}</code></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="doc-content">
+                        {{ content|safe }}
+                    </div>
+                </div>
+                <div class="card-footer text-muted">
+                    <small>
+                        <span class="t-en">Document path:</span>
+                        <span class="t-it">Percorso documento:</span>
+                        <code>{{ path }}</code>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>
+    // Highlight code blocks
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('pre code').forEach((block) => {
+            hljs.highlightElement(block);
+        });
+    });
+</script>
+{% endblock %}

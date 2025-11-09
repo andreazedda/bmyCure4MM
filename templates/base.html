@@ -25,7 +25,7 @@
                     <li class="nav-item"><a class="nav-link" href="{% url 'clinic:patient_list' %}">Patients</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'chemtools:tools_home' %}">Chem Tools</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'simulator:scenario_list' %}">Simulator</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'docs' %}">Docs</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'docs_viewer:index' %}">Docs</a></li>
                     {% if request.user.is_authenticated and user_is_simulator_editor %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="manageMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">

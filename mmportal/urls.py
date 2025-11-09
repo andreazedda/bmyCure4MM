@@ -12,14 +12,13 @@ from django.http import JsonResponse
 from simulator.api import drugs, glossary
 from simulator.api_help import help_item, help_search
 from simulator.api_ux import audit as ux_audit
-from .views import DocsIndexView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include(("clinic.urls", "clinic"), namespace="clinic")),
     path("chem/", include(("chemtools.urls", "chemtools"), namespace="chemtools")),
     path("sim/", include(("simulator.urls", "simulator"), namespace="simulator")),
-    path("docs/", DocsIndexView.as_view(), name="docs"),
+    path("docs/", include(("docs_viewer.urls", "docs_viewer"), namespace="docs_viewer")),
     path("api/", include("clinic.api")),
     path("api/glossary/", glossary, name="api_glossary"),
     path("api/drugs/", drugs, name="api_drugs"),

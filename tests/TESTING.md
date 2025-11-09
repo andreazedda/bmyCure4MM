@@ -32,8 +32,46 @@ pytest -n auto
 ### E2E Tests (Playwright)
 
 ```bash
+# Install Python Playwright dependencies
+pip install playwright pytest-playwright
+
+# Install Playwright browsers
+playwright install chromium
+
+# Run all E2E tests (headless)
+pytest tests/e2e/
+
+# Run with visible browser (headed mode)
+pytest tests/e2e/ --headed
+
+# Run specific test class
+pytest tests/e2e/test_ui_improvements.py::TestDoseColorZones
+
+# Run specific test method
+pytest tests/e2e/test_ui_improvements.py::TestDoseColorZones::test_dose_input_shows_green_zone_for_safe_values
+
+# Run with slow motion (500ms delays for debugging)
+pytest tests/e2e/ --slowmo 500
+
+# Generate video recordings
+pytest tests/e2e/ --video on
+
+# Run with screenshots on failure
+pytest tests/e2e/ --screenshot on
+
+# Debug mode with browser devtools
+pytest tests/e2e/ --headed --slowmo 1000
+```
+
+**Note**: E2E tests use pytest-django's `live_server` fixture (automatically starts test server).
+
+### Old E2E Tests (TypeScript/Node - Deprecated)
+
+For legacy TypeScript E2E tests:
+
+```bash
 # Navigate to e2e directory
-cd tests/e2e
+cd tests/e2e_legacy
 
 # Install Node dependencies
 npm install
@@ -43,18 +81,6 @@ npx playwright install --with-deps
 
 # Run E2E tests
 npm run test:e2e
-
-# Run with UI mode (interactive)
-npm run test:e2e:ui
-
-# Run in headed mode (see browser)
-npm run test:e2e:headed
-
-# Debug mode
-npm run test:e2e:debug
-
-# Run specific test
-npx playwright test test_help_and_focus_trap.spec.ts
 ```
 
 ## Test Structure
