@@ -82,22 +82,32 @@ def run_drug_params_job(job_id: int, smiles: str, cid: str) -> None:
     previous_log = job.log or ""
     logs: list[str] = []
     try:
+        job.update_progress(10, "Initializing pipeline...")
         _run_setup(logs)
+        
+        job.update_progress(30, "Fetching molecular data...")
         output_path, stdout, stderr = utils.run_drug_parameter_evaluator(
             smiles=smiles or None,
             cid=cid or None,
             outdir=tmpdir,
         )
+        
+        job.update_progress(70, "Calculating properties...")
         logs.append(utils._compose_logs(stdout, stderr) or "(no output captured)")
+        
         if output_path and output_path.is_file():
+            job.update_progress(90, "Saving results...")
             job_dir = _job_media_dir(job.pk)
             dest = _next_versioned_path(job_dir, f"drug_{job.pk}", ".html")
             job.out_html.name = _store_file(output_path, dest)
+        
+        job.update_progress(100, "Completed!")
     except Exception as exc:  # pragma: no cover - defensive
         detail = ""
         if isinstance(exc, utils.ToolRunError):
             detail = utils._compose_logs(exc.stdout, exc.stderr)
         logs.append(_error_entry(exc, detail))
+        job.update_progress(0, "Failed")
     finally:
         _append_log(job, previous_log, logs)
         job.save()
@@ -112,29 +122,40 @@ def run_binding_viz_job(job_id: int, pdb_id: str, ligand: str) -> None:
     logs: list[str] = []
     job_dir = _job_media_dir(job.pk)
     try:
+        job.update_progress(10, "Initializing visualization...")
         _run_setup(logs)
+        
+        job.update_progress(30, f"Downloading PDB structure {pdb_id}...")
         output_path, stdout, stderr = utils.run_binding_visualizer(
             pdb_id=pdb_id,
             ligand=ligand or None,
             outdir=tmpdir,
         )
+        
+        job.update_progress(60, "Rendering 3D structure...")
         logs.append(utils._compose_logs(stdout, stderr) or "(no output captured)")
+        
         if output_path and output_path.is_file():
+            job.update_progress(80, "Saving visualization...")
             dest = _next_versioned_path(job_dir, f"binding_{pdb_id}", ".html")
             job.out_html.name = _store_file(output_path, dest)
 
+        job.update_progress(90, "Generating thumbnail...")
         snapshot_path = tmpdir / f"{pdb_id}_structure.png"
         thumb_dest = job_dir / "thumb.png"
         if snapshot_path.exists():
             _store_file(snapshot_path, thumb_dest)
         else:
             _ensure_placeholder_thumbnail(thumb_dest)
+        
+        job.update_progress(100, "Completed!")
     except Exception as exc:  # pragma: no cover - defensive
         detail = ""
         if isinstance(exc, utils.ToolRunError):
             detail = utils._compose_logs(exc.stdout, exc.stderr)
         logs.append(_error_entry(exc, detail))
         _ensure_placeholder_thumbnail(job_dir / "thumb.png")
+        job.update_progress(0, "Failed")
     finally:
         _append_log(job, previous_log, logs)
         job.save()
@@ -148,21 +169,31 @@ def run_similarity_job(job_id: int, smiles: str) -> None:
     previous_log = job.log or ""
     logs: list[str] = []
     try:
+        job.update_progress(10, "Initializing similarity search...")
         _run_setup(logs)
+        
+        job.update_progress(30, "Generating molecular fingerprint...")
         output_path, stdout, stderr = utils.run_similarity_search(
             smiles=smiles,
             out_csv=tmpdir,
         )
+        
+        job.update_progress(60, "Searching database for similar compounds...")
         logs.append(utils._compose_logs(stdout, stderr) or "(no output captured)")
+        
         if output_path and output_path.is_file():
+            job.update_progress(90, "Saving results...")
             job_dir = _job_media_dir(job.pk)
             dest = _next_versioned_path(job_dir, f"sim_{job.pk}", ".csv")
             job.out_csv.name = _store_file(output_path, dest)
+        
+        job.update_progress(100, "Completed!")
     except Exception as exc:  # pragma: no cover - defensive
         detail = ""
         if isinstance(exc, utils.ToolRunError):
             detail = utils._compose_logs(exc.stdout, exc.stderr)
         logs.append(_error_entry(exc, detail))
+        job.update_progress(0, "Failed")
     finally:
         _append_log(job, previous_log, logs)
         job.save()

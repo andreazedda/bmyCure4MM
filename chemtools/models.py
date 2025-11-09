@@ -34,6 +34,10 @@ class ChemJob(models.Model):
         blank=True,
         related_name="chem_jobs",
     )
+    
+    # Progress tracking fields
+    progress_percent = models.IntegerField(default=0)
+    progress_message = models.CharField(max_length=255, blank=True)
 
     class Meta:
         ordering = ["-created"]
@@ -58,3 +62,9 @@ class ChemJob(models.Model):
         if self.out_html or self.out_csv:
             return "Completed", "success"
         return "Queued", "secondary"
+    
+    def update_progress(self, percent: int, message: str = "") -> None:
+        """Update job progress."""
+        self.progress_percent = min(100, max(0, percent))
+        self.progress_message = message
+        self.save(update_fields=['progress_percent', 'progress_message'])

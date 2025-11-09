@@ -154,5 +154,7 @@ def job_status(request: HttpRequest, pk: int) -> JsonResponse:
         "html_url": job.out_html.url if job.out_html else None,
         "csv_url": job.out_csv.url if job.out_csv else None,
         "thumbnail_url": job.thumbnail_url(),
+        "progress_percent": job.progress_percent,
+        "progress_message": job.progress_message,
     }
     return JsonResponse(data)
