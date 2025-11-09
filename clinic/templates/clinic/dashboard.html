@@ -1,20 +1,179 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row g-3 mb-3">
-    <div class="col-md-4">
-        <div class="card shadow-sm h-100">
-            <div class="card-body">
-                <h1 class="h5 text-muted">Total Patients</h1>
-                <p class="display-5 fw-semibold mb-0">{{ patient_count }}</p>
+<!-- Welcome Banner -->
+<div class="alert alert-primary border-primary mb-4">
+    <div class="d-flex align-items-start gap-3">
+        <div style="font-size: 3rem;">🏥</div>
+        <div class="flex-grow-1">
+            <h1 class="h3 alert-heading mb-2">
+                <span class="t-en">Welcome to bmyCure4MM Platform</span>
+                <span class="t-it">Benvenuto sulla Piattaforma bmyCure4MM</span>
+            </h1>
+            <div class="t-en">
+                <p class="mb-2"><strong>What is this platform?</strong> A complete system for Multiple Myeloma research and treatment simulation.</p>
+                <p class="mb-2"><strong>What you can do here:</strong></p>
+                <ul class="mb-0">
+                    <li><strong>Manage Patients:</strong> Track patient records and assessments</li>
+                    <li><strong>Simulate Treatments:</strong> Test drug combinations on virtual patients (🧪 Simulator)</li>
+                    <li><strong>Discover Drugs:</strong> Search for similar molecules and analyze binding (💊 Drug Discovery)</li>
+                    <li><strong>Learn:</strong> Access complete documentation and tutorials (📚 Docs)</li>
+                </ul>
+            </div>
+            <div class="t-it">
+                <p class="mb-2"><strong>Cos'è questa piattaforma?</strong> Un sistema completo per ricerca e simulazione trattamenti Mieloma Multiplo.</p>
+                <p class="mb-2"><strong>Cosa puoi fare qui:</strong></p>
+                <ul class="mb-0">
+                    <li><strong>Gestire Pazienti:</strong> Tracciare record pazienti e valutazioni</li>
+                    <li><strong>Simulare Trattamenti:</strong> Testare combinazioni farmaci su pazienti virtuali (🧪 Simulator)</li>
+                    <li><strong>Scoprire Farmaci:</strong> Cercare molecole simili e analizzare binding (💊 Drug Discovery)</li>
+                    <li><strong>Imparare:</strong> Accedere a documentazione completa e tutorial (📚 Docs)</li>
+                </ul>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Quick Actions -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card h-100 border-success hover-card" style="cursor: pointer;" onclick="window.location='{% url 'simulator:scenario_list' %}'">
+            <div class="card-body text-center">
+                <div class="display-4 mb-2">🧪</div>
+                <h3 class="h6">
+                    <span class="t-en">Treatment Simulator</span>
+                    <span class="t-it">Simulatore Trattamenti</span>
+                </h3>
+                <p class="small text-muted mb-2">
+                    <span class="t-en">Test drug combinations on virtual patients</span>
+                    <span class="t-it">Testa combinazioni farmaci su pazienti virtuali</span>
+                </p>
+                <a href="{% url 'simulator:scenario_list' %}" class="btn btn-sm btn-success w-100">
+                    <span class="t-en">Open Simulator</span>
+                    <span class="t-it">Apri Simulatore</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card h-100 border-primary hover-card" style="cursor: pointer;" onclick="window.location='{% url 'chemtools:tools_home' %}'">
+            <div class="card-body text-center">
+                <div class="display-4 mb-2">💊</div>
+                <h3 class="h6">
+                    <span class="t-en">Drug Discovery</span>
+                    <span class="t-it">Ricerca Farmaci</span>
+                </h3>
+                <p class="small text-muted mb-2">
+                    <span class="t-en">Search similar molecules and analyze binding</span>
+                    <span class="t-it">Cerca molecole simili e analizza binding</span>
+                </p>
+                <a href="{% url 'chemtools:tools_home' %}" class="btn btn-sm btn-primary w-100">
+                    <span class="t-en">Open Tools</span>
+                    <span class="t-it">Apri Strumenti</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card h-100 border-info hover-card" style="cursor: pointer;" onclick="window.location='{% url 'docs_viewer:index' %}'">
+            <div class="card-body text-center">
+                <div class="display-4 mb-2">📚</div>
+                <h3 class="h6">
+                    <span class="t-en">Documentation</span>
+                    <span class="t-it">Documentazione</span>
+                </h3>
+                <p class="small text-muted mb-2">
+                    <span class="t-en">Complete guides and tutorials</span>
+                    <span class="t-it">Guide complete e tutorial</span>
+                </p>
+                <a href="{% url 'docs_viewer:index' %}" class="btn btn-sm btn-info w-100">
+                    <span class="t-en">View Docs</span>
+                    <span class="t-it">Vedi Docs</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card h-100 border-warning hover-card" style="cursor: pointer;" onclick="window.location='{% url 'clinic:patient_list' %}'">
+            <div class="card-body text-center">
+                <div class="display-4 mb-2">🏥</div>
+                <h3 class="h6">
+                    <span class="t-en">Patient Management</span>
+                    <span class="t-it">Gestione Pazienti</span>
+                </h3>
+                <p class="small text-muted mb-2">
+                    <span class="t-en">View and manage patient records</span>
+                    <span class="t-it">Visualizza e gestisci record pazienti</span>
+                </p>
+                <a href="{% url 'clinic:patient_list' %}" class="btn btn-sm btn-warning w-100">
+                    <span class="t-en">View Patients</span>
+                    <span class="t-it">Vedi Pazienti</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics -->
+<div class="row g-3 mb-3">
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span style="font-size: 1.5rem;">👥</span>
+                    <h2 class="h5 text-muted mb-0">
+                        <span class="t-en">Total Patients</span>
+                        <span class="t-it">Pazienti Totali</span>
+                    </h2>
+                </div>
+                <p class="display-5 fw-semibold mb-2">{{ patient_count }}</p>
+                <p class="small text-muted mb-0">
+                    <span class="t-en">Patients tracked in the system</span>
+                    <span class="t-it">Pazienti tracciati nel sistema</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Assessments Table -->
 <div class="card shadow-sm">
-    <div class="card-header">
-        <h2 class="h5 mb-0">Recent Assessments</h2>
+    <div class="card-header bg-light">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2 class="h5 mb-0">
+                <span class="t-en">📋 Recent Assessments</span>
+                <span class="t-it">📋 Valutazioni Recenti</span>
+            </h2>
+            <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#assessmentsHelp">
+                <span class="t-en">❓ What is this?</span>
+                <span class="t-it">❓ Cos'è questo?</span>
+            </button>
+        </div>
+    </div>
+    <div class="collapse mb-2" id="assessmentsHelp">
+        <div class="card-body bg-light border-bottom">
+            <div class="t-en">
+                <p class="mb-2"><strong>What are assessments?</strong> Medical evaluations tracking patient progress over time.</p>
+                <p class="mb-2"><strong>Key Metrics Explained:</strong></p>
+                <ul class="small mb-0">
+                    <li><strong>M-Protein:</strong> Abnormal protein produced by myeloma cells (lower is better, normal: 0 g/dL)</li>
+                    <li><strong>FLC Ratio:</strong> Free Light Chain ratio (normal: 0.26-1.65, abnormal values indicate disease)</li>
+                    <li><strong>Response:</strong> How well treatment is working (CR=Complete Response, PR=Partial Response, etc.)</li>
+                </ul>
+            </div>
+            <div class="t-it">
+                <p class="mb-2"><strong>Cosa sono le valutazioni?</strong> Valutazioni mediche che tracciano progresso paziente nel tempo.</p>
+                <p class="mb-2"><strong>Metriche Chiave Spiegate:</strong></p>
+                <ul class="small mb-0">
+                    <li><strong>M-Protein:</strong> Proteina anomala prodotta da cellule mieloma (più basso è meglio, normale: 0 g/dL)</li>
+                    <li><strong>FLC Ratio:</strong> Rapporto catene leggere libere (normale: 0.26-1.65, valori anomali indicano malattia)</li>
+                    <li><strong>Response:</strong> Quanto bene funziona il trattamento (CR=Risposta Completa, PR=Risposta Parziale, ecc.)</li>
+                </ul>
+            </div>
+        </div>
     </div>
     <div class="card-body p-0">
         {% if recent_assessments %}
@@ -22,11 +181,20 @@
                 <table class="table table-striped table-sm align-middle mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th scope="col">Date</th>
-                            <th scope="col">Patient</th>
+                            <th scope="col">
+                                <span class="t-en">Date</span>
+                                <span class="t-it">Data</span>
+                            </th>
+                            <th scope="col">
+                                <span class="t-en">Patient</span>
+                                <span class="t-it">Paziente</span>
+                            </th>
                             <th scope="col">M-Protein (g/dL)</th>
                             <th scope="col">FLC Ratio</th>
-                            <th scope="col">Response</th>
+                            <th scope="col">
+                                <span class="t-en">Response</span>
+                                <span class="t-it">Risposta</span>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -47,8 +215,21 @@
                 </table>
             </div>
         {% else %}
-            <p class="m-3 text-muted">No assessments recorded yet.</p>
+            <p class="m-3 text-muted">
+                <span class="t-en">No assessments recorded yet.</span>
+                <span class="t-it">Nessuna valutazione registrata ancora.</span>
+            </p>
         {% endif %}
     </div>
 </div>
+
+<style>
+.hover-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.hover-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2) !important;
+}
+</style>
 {% endblock %}

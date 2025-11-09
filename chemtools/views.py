@@ -33,7 +33,8 @@ def _enqueue(task, job: models.ChemJob, *params) -> tuple[bool, bool]:
 
 @login_required
 def tools_home(request: HttpRequest) -> HttpResponse:
-    jobs = models.ChemJob.objects.select_related("user").all()[:50]
+    # Filter jobs by current user for privacy
+    jobs = models.ChemJob.objects.filter(user=request.user).select_related("user").order_by('-created')[:50]
     return render(
         request,
         "chemtools/tools_home.html",

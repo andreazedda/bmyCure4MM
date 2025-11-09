@@ -8,6 +8,325 @@
     </ol>
 </nav>
 
+<!-- START: Complete Explanation Section -->
+<div class="alert alert-info mb-4">
+    <div class="d-flex align-items-start gap-3">
+        <div style="font-size: 2rem;">💡</div>
+        <div class="flex-grow-1">
+            <h4 class="alert-heading">
+                <span class="t-en">How to Simulate a Therapy - Complete Guide</span>
+                <span class="t-it">Come Simulare una Terapia - Guida Completa</span>
+            </h4>
+            <hr>
+            <div class="t-en">
+                <p class="mb-2"><strong>What is this page?</strong></p>
+                <p>This is a <strong>virtual patient</strong> called "<em>{{ scenario.title }}</em>". You'll test drug combinations on this patient to see what happens - but it's completely safe because it's simulated!</p>
+                
+                <p class="mb-2 mt-3"><strong>How do I simulate a therapy? (4 Simple Steps)</strong></p>
+                <ol class="mb-0">
+                    <li><strong>Check the patient's lab values</strong> below (in "Key Laboratory Snapshot") - if values are out of safe range, the system blocks the simulation for safety</li>
+                    <li><strong>Click "Run Simulation"</strong> button (blue button at top right)</li>
+                    <li><strong>Choose your drugs and doses</strong> in the form that appears - see drug details below!</li>
+                    <li><strong>Click "Run Simulation"</strong> at the bottom of the form - results appear in 5-30 seconds</li>
+                </ol>
+
+                <div class="alert alert-success mt-3 mb-0">
+                    <strong>🎯 Quick Tip:</strong> First time? Use the preset "Standard" doses - they're safe starting values!
+                </div>
+            </div>
+            <div class="t-it">
+                <p class="mb-2"><strong>Cos'è questa pagina?</strong></p>
+                <p>Questo è un <strong>paziente virtuale</strong> chiamato "<em>{{ scenario.title }}</em>". Testerai combinazioni di farmaci su questo paziente per vedere cosa succede - ma è completamente sicuro perché è simulato!</p>
+                
+                <p class="mb-2 mt-3"><strong>Come simulo una terapia? (4 Passi Semplici)</strong></p>
+                <ol class="mb-0">
+                    <li><strong>Controlla i valori di laboratorio</strong> del paziente qui sotto (in "Key Laboratory Snapshot") - se i valori sono fuori dal range sicuro, il sistema blocca la simulazione per sicurezza</li>
+                    <li><strong>Clicca "Run Simulation"</strong> (bottone blu in alto a destra)</li>
+                    <li><strong>Scegli farmaci e dosi</strong> nel form che appare - vedi dettagli farmaci sotto!</li>
+                    <li><strong>Clicca "Run Simulation"</strong> in fondo al form - risultati appaiono in 5-30 secondi</li>
+                </ol>
+
+                <div class="alert alert-success mt-3 mb-0">
+                    <strong>🎯 Consiglio Rapido:</strong> Prima volta? Usa il preset "Standard" - sono dosi sicure di partenza!
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Drug Information Cards -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-primary text-white">
+        <h3 class="h5 mb-0">
+            <span class="t-en">💊 Available Drugs - What They Do & How to Dose</span>
+            <span class="t-it">💊 Farmaci Disponibili - Cosa Fanno e Come Dosarli</span>
+        </h3>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <!-- Lenalidomide -->
+            <div class="col-md-4">
+                <div class="card h-100 border-primary">
+                    <div class="card-header bg-primary bg-opacity-10">
+                        <h4 class="h6 mb-0">
+                            <span class="t-en">Lenalidomide (Revlimid)</span>
+                            <span class="t-it">Lenalidomide (Revlimid)</span>
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-2"><strong class="t-en">Trade Name:</strong><strong class="t-it">Nome Commerciale:</strong> <span class="badge bg-info">Revlimid</span></p>
+                        
+                        <p class="mb-2"><strong class="t-en">What it does:</strong><strong class="t-it">Cosa fa:</strong></p>
+                        <ul class="small mb-2">
+                            <li class="t-en">Wakes up your immune system to attack myeloma cells</li>
+                            <li class="t-en">Stops new blood vessels from feeding the tumor</li>
+                            <li class="t-it">Sveglia il sistema immunitario per attaccare le cellule del mieloma</li>
+                            <li class="t-it">Blocca nuovi vasi sanguigni che nutrono il tumore</li>
+                        </ul>
+
+                        <p class="mb-2"><strong class="t-en">How to use:</strong><strong class="t-it">Come si usa:</strong></p>
+                        <ul class="small mb-2">
+                            <li class="t-en">💊 Oral pill (capsule)</li>
+                            <li class="t-en">📅 Daily for 21 days, then 7 days off (28-day cycle)</li>
+                            <li class="t-it">💊 Pastiglia orale (capsula)</li>
+                            <li class="t-it">📅 Ogni giorno per 21 giorni, poi 7 giorni di pausa (ciclo 28 giorni)</li>
+                        </ul>
+
+                        <p class="mb-2"><strong class="t-en">Typical Doses:</strong><strong class="t-it">Dosi Tipiche:</strong></p>
+                        <table class="table table-sm table-bordered mb-2">
+                            <tr>
+                                <td class="t-en">Normal kidneys</td>
+                                <td class="t-it">Reni normali</td>
+                                <td><strong>25 mg/day</strong></td>
+                            </tr>
+                            <tr>
+                                <td class="t-en">Mild kidney problems</td>
+                                <td class="t-it">Problemi renali lievi</td>
+                                <td><strong>15 mg/day</strong></td>
+                            </tr>
+                            <tr>
+                                <td class="t-en">Severe kidney problems</td>
+                                <td class="t-it">Problemi renali gravi</td>
+                                <td><strong>10 mg/day</strong></td>
+                            </tr>
+                        </table>
+
+                        <div class="alert alert-warning alert-sm mb-0">
+                            <small><strong class="t-en">⚠️ Important:</strong><strong class="t-it">⚠️ Importante:</strong> <span class="t-en">Reduce dose if kidneys don't work well (check Creatinine Clearance)</span><span class="t-it">Riduci la dose se i reni non funzionano bene (controlla Creatinina Clearance)</span></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bortezomib -->
+            <div class="col-md-4">
+                <div class="card h-100 border-success">
+                    <div class="card-header bg-success bg-opacity-10">
+                        <h4 class="h6 mb-0">
+                            <span class="t-en">Bortezomib (Velcade)</span>
+                            <span class="t-it">Bortezomib (Velcade)</span>
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-2"><strong class="t-en">Trade Name:</strong><strong class="t-it">Nome Commerciale:</strong> <span class="badge bg-success">Velcade</span></p>
+                        
+                        <p class="mb-2"><strong class="t-en">What it does:</strong><strong class="t-it">Cosa fa:</strong></p>
+                        <ul class="small mb-2">
+                            <li class="t-en">Blocks the "waste disposal" system of myeloma cells</li>
+                            <li class="t-en">Cells fill with toxic waste and die</li>
+                            <li class="t-it">Blocca il sistema di "smaltimento rifiuti" delle cellule del mieloma</li>
+                            <li class="t-it">Le cellule si riempiono di rifiuti tossici e muoiono</li>
+                        </ul>
+
+                        <p class="mb-2"><strong class="t-en">How to use:</strong><strong class="t-it">Come si usa:</strong></p>
+                        <ul class="small mb-2">
+                            <li class="t-en">💉 Injection (under skin or IV)</li>
+                            <li class="t-en">📅 Twice per week (Day 1, 4, 8, 11 of 21-day cycle)</li>
+                            <li class="t-it">💉 Iniezione (sottocute o endovena)</li>
+                            <li class="t-it">📅 Due volte a settimana (Giorno 1, 4, 8, 11 di ciclo 21 giorni)</li>
+                        </ul>
+
+                        <p class="mb-2"><strong class="t-en">Typical Doses:</strong><strong class="t-it">Dosi Tipiche:</strong></p>
+                        <table class="table table-sm table-bordered mb-2">
+                            <tr>
+                                <td class="t-en">Standard dose</td>
+                                <td class="t-it">Dose standard</td>
+                                <td><strong>1.3 mg/m²</strong></td>
+                            </tr>
+                            <tr>
+                                <td class="t-en">If neuropathy (tingling)</td>
+                                <td class="t-it">Se neuropatia (formicolio)</td>
+                                <td><strong>1.0 mg/m²</strong></td>
+                            </tr>
+                            <tr>
+                                <td class="t-en">Elderly/frail patient</td>
+                                <td class="t-it">Paziente anziano/fragile</td>
+                                <td><strong>1.0 mg/m²</strong></td>
+                            </tr>
+                        </table>
+
+                        <div class="alert alert-warning alert-sm mb-0">
+                            <small><strong class="t-en">⚠️ Watch for:</strong><strong class="t-it">⚠️ Attenzione a:</strong> <span class="t-en">Tingling/numbness in hands/feet (neuropathy) - reduce dose if it happens</span><span class="t-it">Formicolio/intorpidimento mani/piedi (neuropatia) - riduci dose se capita</span></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Daratumumab -->
+            <div class="col-md-4">
+                <div class="card h-100 border-danger">
+                    <div class="card-header bg-danger bg-opacity-10">
+                        <h4 class="h6 mb-0">
+                            <span class="t-en">Daratumumab (Darzalex)</span>
+                            <span class="t-it">Daratumumab (Darzalex)</span>
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-2"><strong class="t-en">Trade Name:</strong><strong class="t-it">Nome Commerciale:</strong> <span class="badge bg-danger">Darzalex</span></p>
+                        
+                        <p class="mb-2"><strong class="t-en">What it does:</strong><strong class="t-it">Cosa fa:</strong></p>
+                        <ul class="small mb-2">
+                            <li class="t-en">Antibody that sticks to myeloma cells</li>
+                            <li class="t-en">Marks them so immune system destroys them</li>
+                            <li class="t-it">Anticorpo che si attacca alle cellule del mieloma</li>
+                            <li class="t-it">Le marca così il sistema immunitario le distrugge</li>
+                        </ul>
+
+                        <p class="mb-2"><strong class="t-en">How to use:</strong><strong class="t-it">Come si usa:</strong></p>
+                        <ul class="small mb-2">
+                            <li class="t-en">💉 IV infusion (slow drip, 3-7 hours first time)</li>
+                            <li class="t-en">📅 Weekly for 8 weeks, then every 2 weeks, then monthly</li>
+                            <li class="t-it">💉 Infusione endovenosa (goccia lenta, 3-7 ore prima volta)</li>
+                            <li class="t-it">📅 Settimanale per 8 settimane, poi ogni 2 settimane, poi mensile</li>
+                        </ul>
+
+                        <p class="mb-2"><strong class="t-en">Typical Doses:</strong><strong class="t-it">Dosi Tipiche:</strong></p>
+                        <table class="table table-sm table-bordered mb-2">
+                            <tr>
+                                <td class="t-en">Standard dose</td>
+                                <td class="t-it">Dose standard</td>
+                                <td><strong>16 mg/kg</strong></td>
+                            </tr>
+                            <tr>
+                                <td class="t-en">Example: 70 kg patient</td>
+                                <td class="t-it">Esempio: paziente 70 kg</td>
+                                <td><strong>1120 mg total</strong></td>
+                            </tr>
+                        </table>
+
+                        <div class="alert alert-info alert-sm mb-0">
+                            <small><strong class="t-en">ℹ️ Note:</strong><strong class="t-it">ℹ️ Nota:</strong> <span class="t-en">Dose doesn't change based on kidney/liver function - it's based on body weight only</span><span class="t-it">La dose non cambia in base a funzione reni/fegato - si basa solo sul peso corporeo</span></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert alert-primary mt-3 mb-0">
+            <h5 class="alert-heading">
+                <span class="t-en">🤝 How to Combine These Drugs (Drug Combos)</span>
+                <span class="t-it">🤝 Come Combinare Questi Farmaci (Combinazioni)</span>
+            </h5>
+            <p class="t-en mb-2">When you click "Run Simulation", you'll see a form with 3 sections for the 3 drugs. You can:</p>
+            <p class="t-it mb-2">Quando clicchi "Run Simulation", vedrai un form con 3 sezioni per i 3 farmaci. Puoi:</p>
+            <ul class="mb-2">
+                <li class="t-en"><strong>Use all 3 together</strong> (Triplet therapy - Len + Bort + Dara) = Most powerful!</li>
+                <li class="t-en"><strong>Use 2 drugs</strong> (Doublet therapy - Len + Dara OR Len + Bort) = Good balance</li>
+                <li class="t-en"><strong>Use 1 drug</strong> (Monotherapy - Just Lenalidomide) = For maintenance or frail patients</li>
+                <li class="t-it"><strong>Usa tutti e 3 insieme</strong> (Tripletta - Len + Bort + Dara) = Più potente!</li>
+                <li class="t-it"><strong>Usa 2 farmaci</strong> (Doppietta - Len + Dara O Len + Bort) = Buon equilibrio</li>
+                <li class="t-it"><strong>Usa 1 farmaco</strong> (Monoterapia - Solo Lenalidomide) = Per mantenimento o pazienti fragili</li>
+            </ul>
+            <p class="mb-0">
+                <strong class="t-en">💡 Tip:</strong><strong class="t-it">💡 Consiglio:</strong> 
+                <span class="t-en">Set a drug dose to <code>0</code> if you don't want to use it. For example: Lenalidomide = 25, Bortezomib = 1.3, Daratumumab = 0 means you're using only Len + Bort.</span>
+                <span class="t-it">Imposta la dose di un farmaco a <code>0</code> se non vuoi usarlo. Per esempio: Lenalidomide = 25, Bortezomib = 1.3, Daratumumab = 0 significa che usi solo Len + Bort.</span>
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Virtual Patient Cohort Explanation -->
+<div class="card shadow-sm mb-4 border-warning">
+    <div class="card-header bg-warning bg-opacity-10">
+        <h3 class="h5 mb-0">
+            <span class="t-en">👥 What are "Virtual Patients"? (Cohort Explained)</span>
+            <span class="t-it">👥 Cosa sono i "Pazienti Virtuali"? (Coorte Spiegata)</span>
+        </h3>
+    </div>
+    <div class="card-body">
+        <div class="t-en">
+            <p class="mb-2"><strong>What you see on this page:</strong> 1 patient profile ("<em>{{ scenario.title }}</em>") with specific lab values</p>
+            
+            <p class="mb-2"><strong>What the simulator actually tests:</strong> Not just 1 patient, but a whole GROUP (called "cohort") of similar patients!</p>
+            
+            <p class="mb-3"><strong>Why?</strong> Because in real life, even 2 patients with identical lab values respond differently. So we simulate 30-100 virtual patients with slight variations to get realistic average results.</p>
+            
+            <div class="card bg-light mb-3">
+                <div class="card-body">
+                    <h6>📊 Mathematical Characteristics of Each Virtual Patient:</h6>
+                    <p class="mb-2">Each virtual patient in the cohort has these parameters (slightly randomized):</p>
+                    <ul class="small mb-0">
+                        <li><strong>Initial Tumor Cells:</strong> Based on disease stage (Low Risk: ~1M cells, High Risk: ~5M cells)</li>
+                        <li><strong>Initial Healthy Cells:</strong> Based on lab values (ANC, Platelets)</li>
+                        <li><strong>Tumor Growth Rate:</strong> How fast myeloma cells multiply (0.05-0.15/day)</li>
+                        <li><strong>Healthy Cell Growth Rate:</strong> How fast healthy cells recover (0.1-0.2/day)</li>
+                        <li><strong>Drug Sensitivity:</strong> How well each drug works on this patient (EC50 values)</li>
+                        <li><strong>Drug Clearance:</strong> How fast kidneys/liver eliminate drugs (based on Creatinine Clearance)</li>
+                        <li><strong>Interaction Strength:</strong> How much tumor cells compete with healthy cells</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="alert alert-success mb-0">
+                <strong>🎯 When you run a simulation:</strong>
+                <ol class="mb-0">
+                    <li>System creates 30-100 virtual patients (you choose "Cohort Size" in the form)</li>
+                    <li>Each has slightly different parameters (randomized within realistic ranges)</li>
+                    <li>System simulates treatment on ALL of them</li>
+                    <li>Results show the AVERAGE outcome + variation range</li>
+                </ol>
+                <p class="mb-0 mt-2"><strong>Example:</strong> If you test on 100 virtual patients and get "Tumor Reduction: 75%", it means on average across all 100 patients, the tumor shrank by 75%. Some patients had 80% reduction, some had 70%, but average is 75%.</p>
+            </div>
+        </div>
+        <div class="t-it">
+            <p class="mb-2"><strong>Cosa vedi in questa pagina:</strong> 1 profilo paziente ("<em>{{ scenario.title }}</em>") con valori di laboratorio specifici</p>
+            
+            <p class="mb-2"><strong>Cosa testa realmente il simulatore:</strong> Non solo 1 paziente, ma un intero GRUPPO (chiamato "coorte") di pazienti simili!</p>
+            
+            <p class="mb-3"><strong>Perché?</strong> Perché nella vita reale, anche 2 pazienti con valori di laboratorio identici rispondono diversamente. Quindi simuliamo 30-100 pazienti virtuali con leggere variazioni per ottenere risultati medi realistici.</p>
+            
+            <div class="card bg-light mb-3">
+                <div class="card-body">
+                    <h6>📊 Caratteristiche Matematiche di Ogni Paziente Virtuale:</h6>
+                    <p class="mb-2">Ogni paziente virtuale nella coorte ha questi parametri (leggermente randomizzati):</p>
+                    <ul class="small mb-0">
+                        <li><strong>Cellule Tumorali Iniziali:</strong> Basato su stadio malattia (Basso Rischio: ~1M cellule, Alto Rischio: ~5M cellule)</li>
+                        <li><strong>Cellule Sane Iniziali:</strong> Basato su valori di laboratorio (ANC, Piastrine)</li>
+                        <li><strong>Velocità Crescita Tumore:</strong> Quanto velocemente si moltiplicano le cellule mieloma (0.05-0.15/giorno)</li>
+                        <li><strong>Velocità Crescita Cellule Sane:</strong> Quanto velocemente si riprendono le cellule sane (0.1-0.2/giorno)</li>
+                        <li><strong>Sensibilità ai Farmaci:</strong> Quanto bene funziona ogni farmaco su questo paziente (valori EC50)</li>
+                        <li><strong>Eliminazione Farmaci:</strong> Quanto velocemente reni/fegato eliminano i farmaci (basato su Creatinina Clearance)</li>
+                        <li><strong>Forza Interazione:</strong> Quanto le cellule tumorali competono con quelle sane</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="alert alert-success mb-0">
+                <strong>🎯 Quando esegui una simulazione:</strong>
+                <ol class="mb-0">
+                    <li>Il sistema crea 30-100 pazienti virtuali (tu scegli "Cohort Size" nel form)</li>
+                    <li>Ognuno ha parametri leggermente diversi (randomizzati entro range realistici)</li>
+                    <li>Il sistema simula il trattamento su TUTTI loro</li>
+                    <li>I risultati mostrano l'esito MEDIO + range di variazione</li>
+                </ol>
+                <p class="mb-0 mt-2"><strong>Esempio:</strong> Se testi su 100 pazienti virtuali e ottieni "Riduzione Tumore: 75%", significa che in media su tutti i 100 pazienti, il tumore si è ridotto del 75%. Alcuni pazienti avevano riduzione 80%, altri 70%, ma la media è 75%.</p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END: Complete Explanation Section -->
+
 <div class="row g-3 mb-3">
     <div class="col-lg-8">
         <div class="card shadow-sm h-100">

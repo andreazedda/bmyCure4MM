@@ -14,18 +14,46 @@
 <body class="bg-light">
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container-fluid">
-            <a class="navbar-brand fw-semibold" href="{% url 'clinic:dashboard' %}">MM Portal</a>
+            <a class="navbar-brand fw-semibold" href="{% url 'clinic:dashboard' %}">
+                MM Portal
+                <span class="badge bg-light text-primary ms-2" style="font-size: 0.6rem;">
+                    <span class="t-en">Multiple Myeloma Treatment Platform</span>
+                    <span class="t-it">Piattaforma Trattamenti Mieloma Multiplo</span>
+                </span>
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="mainNavbar">
                 {% simulator_is_editor request.user as user_is_simulator_editor %}
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link" href="{% url 'clinic:dashboard' %}">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'clinic:patient_list' %}">Patients</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'chemtools:tools_home' %}">Chem Tools</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'simulator:scenario_list' %}">Simulator</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'docs_viewer:index' %}">Docs</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'clinic:dashboard' %}">
+                            📊 Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'clinic:patient_list' %}">
+                            🏥 Patients
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'chemtools:tools_home' %}">
+                            💊 Drug Discovery
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fw-bold" href="{% url 'simulator:scenario_list' %}" 
+                           data-bs-toggle="tooltip" 
+                           title="Test drug combinations on virtual patients">
+                            🧪 Simulator
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'docs_viewer:index' %}">
+                            📚 Docs
+                        </a>
+                    </li>
                     {% if request.user.is_authenticated and user_is_simulator_editor %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="manageMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">

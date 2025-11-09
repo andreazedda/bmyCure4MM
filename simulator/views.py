@@ -21,6 +21,12 @@ def scenario_list(request):
 
 
 @login_required
+def getting_started(request):
+    """Getting started page with tutorials and practice scenarios."""
+    return render(request, "simulator/getting_started.html")
+
+
+@login_required
 def scenario_detail(request, pk: int):
     scenario = get_object_or_404(
         models.Scenario.objects.prefetch_related("recommended_regimens", "attempts__selected_regimen", "attempts__user"),

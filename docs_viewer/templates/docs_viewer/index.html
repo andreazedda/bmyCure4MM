@@ -4,10 +4,115 @@
 
 {% block content %}
 <div class="container-fluid py-4">
+    <!-- Main Explanation Banner -->
+    <div class="alert alert-primary border-primary mb-4">
+        <div class="d-flex align-items-start gap-3">
+            <div style="font-size: 3rem;">📚</div>
+            <div class="flex-grow-1">
+                <h1 class="h3 alert-heading mb-2">
+                    <span class="t-en">Complete Documentation Library</span>
+                    <span class="t-it">Libreria Documentazione Completa</span>
+                </h1>
+                <div class="t-en">
+                    <p class="mb-2"><strong>What is this?</strong> This is your complete reference library for learning every feature of the platform.</p>
+                    <p class="mb-2"><strong>What you'll find:</strong></p>
+                    <ul class="mb-2">
+                        <li><strong>Simulator Guides:</strong> How to test drug combinations, understand mathematical models, interpret results</li>
+                        <li><strong>Patient Twin:</strong> How the virtual patient system works, parameter explanations</li>
+                        <li><strong>Optimization Lab:</strong> How to find the best drug doses automatically</li>
+                        <li><strong>Drug Discovery:</strong> How to search for new molecules and analyze similarity</li>
+                    </ul>
+                    <p class="mb-0"><strong>💡 Tip:</strong> All guides are written in simple language with step-by-step examples!</p>
+                </div>
+                <div class="t-it">
+                    <p class="mb-2"><strong>Cos'è questo?</strong> Questa è la tua libreria di riferimento completa per imparare ogni funzionalità della piattaforma.</p>
+                    <p class="mb-2"><strong>Cosa troverai:</strong></p>
+                    <ul class="mb-2">
+                        <li><strong>Guide Simulatore:</strong> Come testare combinazioni farmaci, capire modelli matematici, interpretare risultati</li>
+                        <li><strong>Gemello Paziente:</strong> Come funziona il sistema paziente virtuale, spiegazioni parametri</li>
+                        <li><strong>Laboratorio Ottimizzazione:</strong> Come trovare le migliori dosi farmaci automaticamente</li>
+                        <li><strong>Ricerca Farmaci:</strong> Come cercare nuove molecole e analizzare similarità</li>
+                    </ul>
+                    <p class="mb-0"><strong>💡 Consiglio:</strong> Tutte le guide sono scritte in linguaggio semplice con esempi passo-passo!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card h-100 border-success hover-card" style="cursor: pointer;">
+                <div class="card-body text-center">
+                    <div class="display-4 mb-2">🧪</div>
+                    <h3 class="h6">
+                        <span class="t-en">Simulator Guide</span>
+                        <span class="t-it">Guida Simulatore</span>
+                    </h3>
+                    <p class="small text-muted mb-2">
+                        <span class="t-en">Learn how to simulate treatments step-by-step</span>
+                        <span class="t-it">Impara a simulare trattamenti passo-passo</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card h-100 border-info hover-card" style="cursor: pointer;">
+                <div class="card-body text-center">
+                    <div class="display-4 mb-2">👤</div>
+                    <h3 class="h6">
+                        <span class="t-en">Patient Twin</span>
+                        <span class="t-it">Gemello Paziente</span>
+                    </h3>
+                    <p class="small text-muted mb-2">
+                        <span class="t-en">Understand virtual patient parameters</span>
+                        <span class="t-it">Capisci parametri paziente virtuale</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card h-100 border-warning hover-card" style="cursor: pointer;">
+                <div class="card-body text-center">
+                    <div class="display-4 mb-2">⚗️</div>
+                    <h3 class="h6">
+                        <span class="t-en">Optimization Lab</span>
+                        <span class="t-it">Lab Ottimizzazione</span>
+                    </h3>
+                    <p class="small text-muted mb-2">
+                        <span class="t-en">Find optimal doses automatically</span>
+                        <span class="t-it">Trova dosi ottimali automaticamente</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card h-100 border-primary hover-card" style="cursor: pointer;" onclick="window.location='{% url 'simulator:getting_started' %}'">
+                <div class="card-body text-center">
+                    <div class="display-4 mb-2">🎓</div>
+                    <h3 class="h6">
+                        <span class="t-en">Getting Started</span>
+                        <span class="t-it">Guida Introduttiva</span>
+                    </h3>
+                    <p class="small text-muted mb-2">
+                        <span class="t-en">Beginner-friendly tutorial</span>
+                        <span class="t-it">Tutorial per principianti</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="mb-0">📚 Documentation</h1>
+                <h2 class="h4 mb-0">
+                    � <span class="t-en">All Documentation Files</span>
+                    <span class="t-it">Tutti i File Documentazione</span>
+                </h2>
                 <form action="{% url 'docs_viewer:search' %}" method="get" class="d-flex gap-2">
                     <input 
                         type="search" 
@@ -17,39 +122,47 @@
                         style="width: 300px;"
                     >
                     <button type="submit" class="btn btn-primary">
-                        <span class="t-en">Search</span>
-                        <span class="t-it">Cerca</span>
+                        <span class="t-en">🔍 Search</span>
+                        <span class="t-it">🔍 Cerca</span>
                     </button>
                 </form>
             </div>
 
-            <div class="alert alert-info">
-                <span class="t-en">
-                    <strong>{{ total_docs }}</strong> documentation files available. 
-                    Click any document to view it with syntax highlighting.
-                </span>
-                <span class="t-it">
-                    <strong>{{ total_docs }}</strong> file di documentazione disponibili. 
-                    Clicca su un documento per visualizzarlo con evidenziazione sintassi.
-                </span>
+            <div class="alert alert-info border-info">
+                <div class="d-flex align-items-center gap-2">
+                    <span style="font-size: 1.5rem;">ℹ️</span>
+                    <div>
+                        <span class="t-en">
+                            <strong>{{ total_docs }}</strong> documentation files available. 
+                            Click any document to view it with syntax highlighting and table of contents.
+                        </span>
+                        <span class="t-it">
+                            <strong>{{ total_docs }}</strong> file di documentazione disponibili. 
+                            Clicca su un documento per visualizzarlo con evidenziazione sintassi e indice.
+                        </span>
+                    </div>
+                </div>
             </div>
 
             {% for directory, docs in organized_docs.items %}
-            <div class="card mb-3">
-                <div class="card-header">
-                    <h3 class="mb-0">📁 {{ directory }}</h3>
+            <div class="card mb-3 shadow-sm">
+                <div class="card-header bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="h5 mb-0">📁 {{ directory }}</h3>
+                        <span class="badge bg-secondary">{{ docs|length }} <span class="t-en">file{{ docs|length|pluralize }}</span><span class="t-it">file</span></span>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="list-group">
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
                         {% for doc in docs %}
-                        <a href="{{ doc.url }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <a href="{{ doc.url }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 hover-doc-item">
                             <div>
-                                <i class="bi bi-file-earmark-text"></i>
+                                <i class="bi bi-file-earmark-text text-primary me-2"></i>
                                 <strong>{{ doc.name }}</strong>
                                 <br>
-                                <small class="text-muted">{{ doc.path }}</small>
+                                <small class="text-muted ms-4">📂 {{ doc.path }}</small>
                             </div>
-                            <i class="bi bi-chevron-right"></i>
+                            <i class="bi bi-chevron-right text-muted"></i>
                         </a>
                         {% endfor %}
                     </div>
@@ -59,4 +172,21 @@
         </div>
     </div>
 </div>
+
+<style>
+.hover-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.hover-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2) !important;
+}
+.hover-doc-item {
+    transition: background-color 0.2s, padding-left 0.2s;
+}
+.hover-doc-item:hover {
+    padding-left: 1.5rem !important;
+    background-color: #f8f9fa !important;
+}
+</style>
 {% endblock %}

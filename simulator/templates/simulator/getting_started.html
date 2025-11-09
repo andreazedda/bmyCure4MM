@@ -1,0 +1,694 @@
+{% extends "base.html" %}
+
+{% block title %}Getting Started - bmyCure4MM{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Hero Section -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 mb-3">
+            <span class="t-en">🎓 Welcome to bmyCure4MM</span>
+            <span class="t-it">🎓 Benvenuto in bmyCure4MM</span>
+        </h1>
+        <p class="lead text-muted">
+            <span class="t-en">Learn how to simulate treatments for Multiple Myeloma patients - step by step, no expertise required</span>
+            <span class="t-it">Impara a simulare trattamenti per pazienti con Mieloma Multiplo - passo dopo passo, senza esperienza richiesta</span>
+        </p>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 text-center hover-card">
+                <div class="card-body d-flex flex-column">
+                    <div class="display-4 mb-3">🧪</div>
+                    <h3 class="h5">
+                        <span class="t-en">First Simulation</span>
+                        <span class="t-it">Prima Simulazione</span>
+                    </h3>
+                    <p class="text-muted flex-grow-1">
+                        <span class="t-en">Try your first patient simulation with guided steps</span>
+                        <span class="t-it">Prova la tua prima simulazione paziente con passaggi guidati</span>
+                    </p>
+                    <a href="#tutorial-first" class="btn btn-primary mt-auto">
+                        <span class="t-en">Start Tutorial</span>
+                        <span class="t-it">Inizia Tutorial</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 text-center hover-card">
+                <div class="card-body d-flex flex-column">
+                    <div class="display-4 mb-3">👥</div>
+                    <h3 class="h5">
+                        <span class="t-en">Choose Virtual Patient</span>
+                        <span class="t-it">Scegli Paziente Virtuale</span>
+                    </h3>
+                    <p class="text-muted flex-grow-1">
+                        <span class="t-en">Browse available patients and start simulating</span>
+                        <span class="t-it">Sfoglia pazienti disponibili e inizia a simulare</span>
+                    </p>
+                    <a href="{% url 'simulator:scenario_list' %}" class="btn btn-success mt-auto">
+                        <span class="t-en">👉 View Patients</span>
+                        <span class="t-it">👉 Vedi Pazienti</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 text-center hover-card">
+                <div class="card-body d-flex flex-column">
+                    <div class="display-4 mb-3">💊</div>
+                    <h3 class="h5">
+                        <span class="t-en">Drug Discovery</span>
+                        <span class="t-it">Ricerca Farmaci</span>
+                    </h3>
+                    <p class="text-muted flex-grow-1">
+                        <span class="t-en">Search and analyze potential new treatments</span>
+                        <span class="t-it">Cerca e analizza potenziali nuovi trattamenti</span>
+                    </p>
+                    <a href="{% url 'chemtools:tools_home' %}" class="btn btn-primary mt-auto">
+                        <span class="t-en">Explore Tools</span>
+                        <span class="t-it">Esplora Strumenti</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card h-100 text-center hover-card">
+                <div class="card-body d-flex flex-column">
+                    <div class="display-4 mb-3">📚</div>
+                    <h3 class="h5">
+                        <span class="t-en">Documentation</span>
+                        <span class="t-it">Documentazione</span>
+                    </h3>
+                    <p class="text-muted flex-grow-1">
+                        <span class="t-en">Read detailed guides and references</span>
+                        <span class="t-it">Leggi guide dettagliate e riferimenti</span>
+                    </p>
+                    <a href="{% url 'docs_viewer:index' %}" class="btn btn-primary mt-auto">
+                        <span class="t-en">View Docs</span>
+                        <span class="t-it">Vedi Docs</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Help Banner -->
+    <div class="alert alert-success border-success mb-5">
+        <div class="d-flex align-items-start gap-3">
+            <div style="font-size: 2rem;">🗺️</div>
+            <div class="flex-grow-1">
+                <h4 class="alert-heading">
+                    <span class="t-en">Where Are The Patients Mentioned in This Guide?</span>
+                    <span class="t-it">Dove Sono i Pazienti Citati in Questa Guida?</span>
+                </h4>
+                <p class="mb-2 t-en">
+                    All the practice scenarios and patient cases mentioned below are available in the <strong>"Virtual Patients"</strong> page. 
+                    Click the green button to see the list of all available patients!
+                </p>
+                <p class="mb-2 t-it">
+                    Tutti gli scenari di pratica e casi paziente menzionati sotto sono disponibili nella pagina <strong>"Pazienti Virtuali"</strong>. 
+                    Clicca il bottone verde per vedere la lista di tutti i pazienti disponibili!
+                </p>
+                <a href="{% url 'simulator:scenario_list' %}" class="btn btn-success btn-lg">
+                    <span class="t-en">👥 Go to Virtual Patients Page</span>
+                    <span class="t-it">👥 Vai alla Pagina Pazienti Virtuali</span>
+                </a>
+                <p class="mb-0 mt-2 small text-muted">
+                    <span class="t-en">💡 Tip: Look for the colored risk badges (🟢 Low Risk, 🟡 Intermediate, 🔴 High Risk) on each patient card</span>
+                    <span class="t-it">💡 Consiglio: Cerca i badge colorati di rischio (🟢 Basso Rischio, 🟡 Intermedio, 🔴 Alto Rischio) su ogni card paziente</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tutorial Section -->
+    <div class="card mb-5" id="tutorial-first">
+        <div class="card-header bg-primary text-white">
+            <h2 class="h4 mb-0">
+                <span class="t-en">🚀 Your First Simulation - Step by Step</span>
+                <span class="t-it">🚀 La Tua Prima Simulazione - Passo dopo Passo</span>
+            </h2>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info">
+                <strong class="t-en">What you'll learn:</strong>
+                <strong class="t-it">Cosa imparerai:</strong>
+                <ul class="mb-0 mt-2">
+                    <li class="t-en">How to select a patient scenario</li>
+                    <li class="t-en">Understanding drug dosages and safety limits</li>
+                    <li class="t-en">Interpreting simulation results</li>
+                    <li class="t-en">Making data-driven treatment decisions</li>
+                    <li class="t-it">Come selezionare uno scenario paziente</li>
+                    <li class="t-it">Comprendere dosaggi farmaci e limiti di sicurezza</li>
+                    <li class="t-it">Interpretare i risultati della simulazione</li>
+                    <li class="t-it">Prendere decisioni terapeutiche basate sui dati</li>
+                </ul>
+            </div>
+
+            <!-- Step 1 -->
+            <div class="border-start border-4 border-primary ps-3 mb-4">
+                <h3 class="h5">
+                    <span class="badge bg-primary me-2">1</span>
+                    <span class="t-en">Choose a Patient Scenario</span>
+                    <span class="t-it">Scegli uno Scenario Paziente</span>
+                </h3>
+                <p class="t-en">
+                    A <strong>scenario</strong> represents a specific patient case with their unique characteristics:
+                    age, disease stage, lab results, and medical history.
+                </p>
+                <p class="t-it">
+                    Uno <strong>scenario</strong> rappresenta un caso paziente specifico con le sue caratteristiche uniche:
+                    età, stadio malattia, risultati di laboratorio e storia clinica.
+                </p>
+                
+                <div class="alert alert-light border">
+                    <strong class="t-en">💡 Tip for beginners:</strong>
+                    <strong class="t-it">💡 Consiglio per principianti:</strong>
+                    <p class="mb-0 t-en">Start with "Low Risk - New Diagnosis" scenarios. These are easier to understand and have more forgiving parameters.</p>
+                    <p class="mb-0 t-it">Inizia con scenari "Basso Rischio - Nuova Diagnosi". Sono più facili da capire e hanno parametri più tolleranti.</p>
+                </div>
+
+                <a href="{% url 'simulator:scenario_list' %}" class="btn btn-outline-primary">
+                    <span class="t-en">→ Browse Patient Scenarios</span>
+                    <span class="t-it">→ Sfoglia Scenari Pazienti</span>
+                </a>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="border-start border-4 border-success ps-3 mb-4">
+                <h3 class="h5">
+                    <span class="badge bg-success me-2">2</span>
+                    <span class="t-en">Select Treatment Drugs</span>
+                    <span class="t-it">Seleziona Farmaci Trattamento</span>
+                </h3>
+                <p class="t-en">
+                    For Multiple Myeloma, we typically use a combination of 3 drugs:
+                </p>
+                <p class="t-it">
+                    Per il Mieloma Multiplo, usiamo tipicamente una combinazione di 3 farmaci:
+                </p>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h4 class="h6">💊 Lenalidomide</h4>
+                                <p class="small mb-1 t-en"><strong>What it does:</strong> Boosts immune system to attack cancer cells</p>
+                                <p class="small mb-1 t-it"><strong>Cosa fa:</strong> Stimola il sistema immunitario ad attaccare le cellule tumorali</p>
+                                <p class="small mb-0 t-en"><strong>Typical dose:</strong> 10-25 mg/day</p>
+                                <p class="small mb-0 t-it"><strong>Dose tipica:</strong> 10-25 mg/giorno</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h4 class="h6">💉 Bortezomib</h4>
+                                <p class="small mb-1 t-en"><strong>What it does:</strong> Blocks proteins that help cancer cells survive</p>
+                                <p class="small mb-1 t-it"><strong>Cosa fa:</strong> Blocca proteine che aiutano le cellule tumorali a sopravvivere</p>
+                                <p class="small mb-0 t-en"><strong>Typical dose:</strong> 1.0-1.3 mg/m²</p>
+                                <p class="small mb-0 t-it"><strong>Dose tipica:</strong> 1.0-1.3 mg/m²</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h4 class="h6">🧬 Daratumumab</h4>
+                                <p class="small mb-1 t-en"><strong>What it does:</strong> Antibody that directly targets myeloma cells</p>
+                                <p class="small mb-1 t-it"><strong>Cosa fa:</strong> Anticorpo che colpisce direttamente le cellule mielomatose</p>
+                                <p class="small mb-0 t-en"><strong>Typical dose:</strong> 8-16 mg/kg</p>
+                                <p class="small mb-0 t-it"><strong>Dose tipica:</strong> 8-16 mg/kg</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning mt-3">
+                    <strong class="t-en">⚠️ Safety First:</strong>
+                    <strong class="t-it">⚠️ Sicurezza Prima di Tutto:</strong>
+                    <p class="mb-0 t-en">The system will automatically check if your doses are safe. Green badge = safe, Yellow = borderline, Red = unsafe.</p>
+                    <p class="mb-0 t-it">Il sistema controllerà automaticamente se le tue dosi sono sicure. Badge verde = sicuro, Giallo = limite, Rosso = non sicuro.</p>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="border-start border-4 border-info ps-3 mb-4">
+                <h3 class="h5">
+                    <span class="badge bg-info me-2">3</span>
+                    <span class="t-en">Run the Simulation</span>
+                    <span class="t-it">Esegui la Simulazione</span>
+                </h3>
+                <p class="t-en">
+                    Click <strong>"Run Simulation"</strong> to see how the patient responds to your treatment plan over time.
+                    The simulation uses mathematical models to predict:
+                </p>
+                <p class="t-it">
+                    Clicca <strong>"Esegui Simulazione"</strong> per vedere come il paziente risponde al tuo piano terapeutico nel tempo.
+                    La simulazione usa modelli matematici per predire:
+                </p>
+
+                <ul>
+                    <li class="t-en"><strong>Tumor cell reduction:</strong> How much the cancer shrinks</li>
+                    <li class="t-en"><strong>Healthy cell impact:</strong> Side effects on normal cells</li>
+                    <li class="t-en"><strong>Time to response:</strong> How quickly treatment works</li>
+                    <li class="t-en"><strong>Risk of relapse:</strong> Chance cancer comes back</li>
+                    <li class="t-it"><strong>Riduzione cellule tumorali:</strong> Quanto si riduce il tumore</li>
+                    <li class="t-it"><strong>Impatto cellule sane:</strong> Effetti collaterali su cellule normali</li>
+                    <li class="t-it"><strong>Tempo di risposta:</strong> Quanto velocemente funziona il trattamento</li>
+                    <li class="t-it"><strong>Rischio di recidiva:</strong> Probabilità che il tumore ritorni</li>
+                </ul>
+
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h5 class="h6 t-en">🔬 What happens behind the scenes:</h5>
+                        <h5 class="h6 t-it">🔬 Cosa succede dietro le quinte:</h5>
+                        <ol class="small mb-0">
+                            <li class="t-en">The system calculates drug absorption in the body (pharmacokinetics)</li>
+                            <li class="t-en">It predicts how drugs affect tumor and healthy cells (pharmacodynamics)</li>
+                            <li class="t-en">It simulates cell growth and death over your chosen time period</li>
+                            <li class="t-en">Results are averaged across multiple virtual patients (cohort)</li>
+                            <li class="t-it">Il sistema calcola l'assorbimento dei farmaci nel corpo (farmacocinetica)</li>
+                            <li class="t-it">Predice come i farmaci influenzano cellule tumorali e sane (farmacodinamica)</li>
+                            <li class="t-it">Simula crescita e morte cellulare nel periodo di tempo scelto</li>
+                            <li class="t-it">I risultati sono mediati su più pazienti virtuali (coorte)</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="border-start border-4 border-warning ps-3">
+                <h3 class="h5">
+                    <span class="badge bg-warning text-dark me-2">4</span>
+                    <span class="t-en">Understand Your Results</span>
+                    <span class="t-it">Comprendi i Tuoi Risultati</span>
+                </h3>
+                <p class="t-en">
+                    After simulation, you'll see charts and key metrics. Here's how to read them:
+                </p>
+                <p class="t-it">
+                    Dopo la simulazione, vedrai grafici e metriche chiave. Ecco come leggerli:
+                </p>
+
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th class="t-en">Metric</th>
+                                <th class="t-en">Good Range</th>
+                                <th class="t-en">What It Means</th>
+                                <th class="t-it">Metrica</th>
+                                <th class="t-it">Range Buono</th>
+                                <th class="t-it">Cosa Significa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="t-en">Tumor Reduction</td>
+                                <td class="t-en">&gt;80%</td>
+                                <td class="t-en">Cancer cells decreased significantly</td>
+                                <td class="t-it">Riduzione Tumore</td>
+                                <td class="t-it">&gt;80%</td>
+                                <td class="t-it">Cellule tumorali diminuite significativamente</td>
+                            </tr>
+                            <tr>
+                                <td class="t-en">Healthy Loss</td>
+                                <td class="t-en">&lt;20%</td>
+                                <td class="t-en">Limited damage to normal cells</td>
+                                <td class="t-it">Perdita Sani</td>
+                                <td class="t-it">&lt;20%</td>
+                                <td class="t-it">Danno limitato a cellule normali</td>
+                            </tr>
+                            <tr>
+                                <td class="t-en">Time to Recurrence</td>
+                                <td class="t-en">&gt;180 days</td>
+                                <td class="t-en">Cancer stays away longer</td>
+                                <td class="t-it">Tempo a Recidiva</td>
+                                <td class="t-it">&gt;180 giorni</td>
+                                <td class="t-it">Il tumore resta via più a lungo</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="alert alert-success">
+                    <strong class="t-en">🎯 Good Result Example:</strong>
+                    <strong class="t-it">🎯 Esempio Risultato Buono:</strong>
+                    <p class="mb-0 t-en">Tumor reduction 85%, Healthy loss 15%, No toxicity warnings = Excellent treatment plan!</p>
+                    <p class="mb-0 t-it">Riduzione tumore 85%, Perdita sani 15%, Nessun warning tossicità = Piano terapeutico eccellente!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Practice Scenarios Section -->
+    <div class="card mb-5" id="practice-scenarios">
+        <div class="card-header bg-success text-white">
+            <h2 class="h4 mb-0">
+                <span class="t-en">👥 Practice with Virtual Patients</span>
+                <span class="t-it">👥 Pratica con Pazienti Virtuali</span>
+            </h2>
+        </div>
+        <div class="card-body">
+            <p class="lead t-en">
+                Learn by doing! These guided scenarios help you practice treatment decisions in a safe environment.
+            </p>
+            <p class="lead t-it">
+                Impara facendo! Questi scenari guidati ti aiutano a praticare decisioni terapeutiche in un ambiente sicuro.
+            </p>
+
+            <div class="row g-4 mt-2">
+                <!-- Scenario 1: Easy -->
+                <div class="col-md-6">
+                    <div class="card border-success">
+                        <div class="card-header bg-success bg-opacity-10">
+                            <span class="badge bg-success">BEGINNER</span>
+                            <h3 class="h5 mb-0 mt-2 t-en">Low Risk Patient - First Line Treatment</h3>
+                            <h3 class="h5 mb-0 mt-2 t-it">Paziente Basso Rischio - Prima Linea</h3>
+                        </div>
+                        <div class="card-body">
+                            <p class="t-en"><strong>Patient Profile:</strong> 62-year-old, newly diagnosed, R-ISS I, good kidney function</p>
+                            <p class="t-it"><strong>Profilo Paziente:</strong> 62 anni, nuova diagnosi, R-ISS I, buona funzione renale</p>
+                            
+                            <p class="t-en"><strong>Your Challenge:</strong> Design a safe, effective first-line treatment</p>
+                            <p class="t-it"><strong>La Tua Sfida:</strong> Progetta un trattamento di prima linea sicuro ed efficace</p>
+                            
+                            <p class="t-en"><strong>Learning Goals:</strong></p>
+                            <p class="t-it"><strong>Obiettivi Apprendimento:</strong></p>
+                            <ul class="small">
+                                <li class="t-en">Understanding standard dosing</li>
+                                <li class="t-en">Reading lab safety checks</li>
+                                <li class="t-en">Interpreting basic KPIs</li>
+                                <li class="t-it">Comprendere dosaggio standard</li>
+                                <li class="t-it">Leggere controlli sicurezza laboratorio</li>
+                                <li class="t-it">Interpretare KPI base</li>
+                            </ul>
+                            
+                            <a href="{% url 'simulator:scenario_list' %}" class="btn btn-success">
+                                <span class="t-en">Start This Practice →</span>
+                                <span class="t-it">Inizia Questa Pratica →</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scenario 2: Medium -->
+                <div class="col-md-6">
+                    <div class="card border-warning">
+                        <div class="card-header bg-warning bg-opacity-10">
+                            <span class="badge bg-warning text-dark">INTERMEDIATE</span>
+                            <h3 class="h5 mb-0 mt-2 t-en">High Risk Patient - Dose Optimization</h3>
+                            <h3 class="h5 mb-0 mt-2 t-it">Paziente Alto Rischio - Ottimizzazione Dose</h3>
+                        </div>
+                        <div class="card-body">
+                            <p class="t-en"><strong>Patient Profile:</strong> 58-year-old, R-ISS III, elevated LDH, cytogenetic abnormalities</p>
+                            <p class="t-it"><strong>Profilo Paziente:</strong> 58 anni, R-ISS III, LDH elevato, anomalie citogenetiche</p>
+                            
+                            <p class="t-en"><strong>Your Challenge:</strong> Balance efficacy with toxicity risk</p>
+                            <p class="t-it"><strong>La Tua Sfida:</strong> Bilanciare efficacia con rischio tossicità</p>
+                            
+                            <p class="t-en"><strong>Learning Goals:</strong></p>
+                            <p class="t-it"><strong>Obiettivi Apprendimento:</strong></p>
+                            <ul class="small">
+                                <li class="t-en">Risk-stratified dosing</li>
+                                <li class="t-en">Using optimization tools</li>
+                                <li class="t-en">Understanding patient twin models</li>
+                                <li class="t-it">Dosaggio stratificato per rischio</li>
+                                <li class="t-it">Usare strumenti ottimizzazione</li>
+                                <li class="t-it">Comprendere modelli gemello paziente</li>
+                            </ul>
+                            
+                            <a href="{% url 'simulator:scenario_list' %}" class="btn btn-warning text-dark">
+                                <span class="t-en">Start This Practice →</span>
+                                <span class="t-it">Inizia Questa Pratica →</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scenario 3: Advanced -->
+                <div class="col-md-6">
+                    <div class="card border-danger">
+                        <div class="card-header bg-danger bg-opacity-10">
+                            <span class="badge bg-danger">ADVANCED</span>
+                            <h3 class="h5 mb-0 mt-2 t-en">Relapsed/Refractory - Salvage Therapy</h3>
+                            <h3 class="h5 mb-0 mt-2 t-it">Recidiva/Refrattario - Terapia di Salvataggio</h3>
+                        </div>
+                        <div class="card-body">
+                            <p class="t-en"><strong>Patient Profile:</strong> 67-year-old, 2 prior lines failed, poor kidney function</p>
+                            <p class="t-it"><strong>Profilo Paziente:</strong> 67 anni, 2 linee precedenti fallite, scarsa funzione renale</p>
+                            
+                            <p class="t-en"><strong>Your Challenge:</strong> Find effective treatment despite organ dysfunction</p>
+                            <p class="t-it"><strong>La Tua Sfida:</strong> Trova trattamento efficace nonostante disfunzione organi</p>
+                            
+                            <p class="t-en"><strong>Learning Goals:</strong></p>
+                            <p class="t-it"><strong>Obiettivi Apprendimento:</strong></p>
+                            <ul class="small">
+                                <li class="t-en">Dose adjustment for renal impairment</li>
+                                <li class="t-en">Managing treatment resistance</li>
+                                <li class="t-en">Multi-objective optimization</li>
+                                <li class="t-it">Aggiustamento dose per insufficienza renale</li>
+                                <li class="t-it">Gestire resistenza trattamento</li>
+                                <li class="t-it">Ottimizzazione multi-obiettivo</li>
+                            </ul>
+                            
+                            <a href="{% url 'simulator:scenario_list' %}" class="btn btn-danger">
+                                <span class="t-en">Start This Practice →</span>
+                                <span class="t-it">Inizia Questa Pratica →</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scenario 4: Comparison -->
+                <div class="col-md-6">
+                    <div class="card border-info">
+                        <div class="card-header bg-info bg-opacity-10">
+                            <span class="badge bg-info">COMPARISON</span>
+                            <h3 class="h5 mb-0 mt-2 t-en">Drug Combination Comparison</h3>
+                            <h3 class="h5 mb-0 mt-2 t-it">Confronto Combinazioni Farmaci</h3>
+                        </div>
+                        <div class="card-body">
+                            <p class="t-en"><strong>Patient Profile:</strong> 55-year-old, treatment-naive, eligible for intensive therapy</p>
+                            <p class="t-it"><strong>Profilo Paziente:</strong> 55 anni, mai trattato, eligibile per terapia intensiva</p>
+                            
+                            <p class="t-en"><strong>Your Challenge:</strong> Compare 3-drug vs 2-drug regimens</p>
+                            <p class="t-it"><strong>La Tua Sfida:</strong> Confronta regimi a 3 vs 2 farmaci</p>
+                            
+                            <p class="t-en"><strong>Learning Goals:</strong></p>
+                            <p class="t-it"><strong>Obiettivi Apprendimento:</strong></p>
+                            <ul class="small">
+                                <li class="t-en">Understanding drug synergy</li>
+                                <li class="t-en">Risk-benefit analysis</li>
+                                <li class="t-en">Cost-effectiveness considerations</li>
+                                <li class="t-it">Comprendere sinergia farmaci</li>
+                                <li class="t-it">Analisi rischio-beneficio</li>
+                                <li class="t-it">Considerazioni costo-efficacia</li>
+                            </ul>
+                            
+                            <a href="{% url 'simulator:scenario_list' %}" class="btn btn-info">
+                                <span class="t-en">Start This Practice →</span>
+                                <span class="t-it">Inizia Questa Pratica →</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="h4 mb-0">
+                <span class="t-en">❓ Frequently Asked Questions</span>
+                <span class="t-it">❓ Domande Frequenti</span>
+            </h2>
+        </div>
+        <div class="card-body">
+            <div class="accordion" id="faqAccordion">
+                <div class="accordion-item">
+                    <h3 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                            <span class="t-en">What is a mathematical model and how does it work?</span>
+                            <span class="t-it">Cos'è un modello matematico e come funziona?</span>
+                        </button>
+                    </h3>
+                    <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            <p class="t-en">
+                                Think of a mathematical model like a weather forecast, but for cancer treatment. Just as meteorologists use equations to predict rain,
+                                we use equations to predict how tumor cells and healthy cells respond to drugs over time.
+                            </p>
+                            <p class="t-it">
+                                Pensa a un modello matematico come a una previsione meteo, ma per il trattamento del cancro. Come i meteorologi usano equazioni per predire la pioggia,
+                                noi usiamo equazioni per predire come le cellule tumorali e sane rispondono ai farmaci nel tempo.
+                            </p>
+                            <p class="t-en">
+                                Our model includes:
+                            </p>
+                            <p class="t-it">
+                                Il nostro modello include:
+                            </p>
+                            <ul>
+                                <li class="t-en"><strong>Cell growth equations:</strong> How fast cells divide</li>
+                                <li class="t-en"><strong>Drug effects:</strong> How medicines kill cancer cells</li>
+                                <li class="t-en"><strong>Side effects:</strong> Impact on healthy cells</li>
+                                <li class="t-en"><strong>Competition:</strong> Tumor cells vs healthy cells</li>
+                                <li class="t-it"><strong>Equazioni crescita cellulare:</strong> Quanto velocemente si dividono le cellule</li>
+                                <li class="t-it"><strong>Effetti farmaci:</strong> Come le medicine uccidono le cellule tumorali</li>
+                                <li class="t-it"><strong>Effetti collaterali:</strong> Impatto su cellule sane</li>
+                                <li class="t-it"><strong>Competizione:</strong> Cellule tumorali vs cellule sane</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h3 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                            <span class="t-en">How accurate are these simulations?</span>
+                            <span class="t-it">Quanto sono accurate queste simulazioni?</span>
+                        </button>
+                    </h3>
+                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            <p class="t-en">
+                                Simulations are predictions based on clinical data and scientific studies. They're useful for:
+                            </p>
+                            <p class="t-it">
+                                Le simulazioni sono predizioni basate su dati clinici e studi scientifici. Sono utili per:
+                            </p>
+                            <ul>
+                                <li class="t-en">Comparing different treatment options</li>
+                                <li class="t-en">Understanding general trends</li>
+                                <li class="t-en">Learning about drug interactions</li>
+                                <li class="t-en">Training and education</li>
+                                <li class="t-it">Confrontare diverse opzioni terapeutiche</li>
+                                <li class="t-it">Comprendere tendenze generali</li>
+                                <li class="t-it">Imparare interazioni farmaci</li>
+                                <li class="t-it">Formazione ed educazione</li>
+                            </ul>
+                            <div class="alert alert-warning mt-2">
+                                <strong class="t-en">⚠️ Important:</strong>
+                                <strong class="t-it">⚠️ Importante:</strong>
+                                <p class="mb-0 t-en">These simulations are for research and education only. Always consult qualified healthcare professionals for real patient care decisions.</p>
+                                <p class="mb-0 t-it">Queste simulazioni sono solo per ricerca ed educazione. Consulta sempre professionisti sanitari qualificati per decisioni reali di cura paziente.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h3 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                            <span class="t-en">What do all these medical terms mean?</span>
+                            <span class="t-it">Cosa significano tutti questi termini medici?</span>
+                        </button>
+                    </h3>
+                    <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th class="t-en">Term</th>
+                                            <th class="t-en">Simple Explanation</th>
+                                            <th class="t-it">Termine</th>
+                                            <th class="t-it">Spiegazione Semplice</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="t-en"><strong>ANC</strong> (Absolute Neutrophil Count)</td>
+                                            <td class="t-en">White blood cells that fight infection</td>
+                                            <td class="t-it"><strong>ANC</strong> (Conta Assoluta Neutrofili)</td>
+                                            <td class="t-it">Globuli bianchi che combattono infezioni</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="t-en"><strong>Platelets</strong></td>
+                                            <td class="t-en">Blood cells that help clotting</td>
+                                            <td class="t-it"><strong>Piastrine</strong></td>
+                                            <td class="t-it">Cellule sangue che aiutano coagulazione</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="t-en"><strong>R-ISS</strong></td>
+                                            <td class="t-en">Risk score (I=low, II=medium, III=high)</td>
+                                            <td class="t-it"><strong>R-ISS</strong></td>
+                                            <td class="t-it">Punteggio rischio (I=basso, II=medio, III=alto)</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="t-en"><strong>LDH</strong></td>
+                                            <td class="t-en">Enzyme that increases when cells are damaged</td>
+                                            <td class="t-it"><strong>LDH</strong></td>
+                                            <td class="t-it">Enzima che aumenta quando cellule sono danneggiate</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="t-en"><strong>Creatinine Clearance</strong></td>
+                                            <td class="t-en">How well kidneys filter waste</td>
+                                            <td class="t-it"><strong>Clearance Creatinina</strong></td>
+                                            <td class="t-it">Quanto bene i reni filtrano scorie</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <a href="{% url 'docs_viewer:index' %}" class="btn btn-sm btn-outline-primary">
+                                <span class="t-en">→ See Full Glossary</span>
+                                <span class="t-it">→ Vedi Glossario Completo</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h3 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                            <span class="t-en">Can I save my simulations and come back later?</span>
+                            <span class="t-it">Posso salvare le mie simulazioni e tornare dopo?</span>
+                        </button>
+                    </h3>
+                    <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            <p class="t-en">
+                                Yes! All your simulations are automatically saved and linked to your account. You can:
+                            </p>
+                            <p class="t-it">
+                                Sì! Tutte le tue simulazioni sono salvate automaticamente e collegate al tuo account. Puoi:
+                            </p>
+                            <ul>
+                                <li class="t-en">View previous simulation results anytime</li>
+                                <li class="t-en">Download CSV data and plots</li>
+                                <li class="t-en">Compare different treatment approaches</li>
+                                <li class="t-en">Share results with colleagues (JSON export)</li>
+                                <li class="t-it">Vedere risultati simulazioni precedenti in qualsiasi momento</li>
+                                <li class="t-it">Scaricare dati CSV e grafici</li>
+                                <li class="t-it">Confrontare diversi approcci terapeutici</li>
+                                <li class="t-it">Condividere risultati con colleghi (export JSON)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.hover-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+</style>
+{% endblock %}

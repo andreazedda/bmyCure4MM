@@ -1,20 +1,151 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-2">
-    <div>
-        <h1 class="h3 mb-0">Cheminformatics Jobs</h1>
-        <small class="text-muted">Track queued and completed analyses.</small>
-    </div>
-    <div class="btn-group" role="group" aria-label="Chem tool shortcuts">
-        <a class="btn btn-outline-primary" href="{% url 'chemtools:drug_params' %}">Drug Parameters</a>
-        <a class="btn btn-outline-primary" href="{% url 'chemtools:binding_viz' %}">Binding Visualizer</a>
-        <a class="btn btn-outline-primary" href="{% url 'chemtools:similarity' %}">Similarity Search</a>
+<!-- Main Explanation Banner -->
+<div class="alert alert-primary border-primary mb-4">
+    <div class="d-flex align-items-start gap-3">
+        <div style="font-size: 3rem;">💊</div>
+        <div class="flex-grow-1">
+            <h1 class="h3 alert-heading mb-2">
+                <span class="t-en">Drug Discovery & Cheminformatics Tools</span>
+                <span class="t-it">Strumenti Ricerca Farmaci & Cheminformatica</span>
+            </h1>
+            <div class="t-en">
+                <p class="mb-2"><strong>What is this page?</strong> This is your hub for analyzing chemical compounds and searching for new drug candidates.</p>
+                <p class="mb-2"><strong>Available Tools:</strong></p>
+                <ul class="mb-2">
+                    <li><strong>💊 Drug Parameters:</strong> Calculate molecular properties (weight, LogP, drug-likeness)</li>
+                    <li><strong>🔬 Binding Visualizer:</strong> View 3D structures and protein-ligand interactions</li>
+                    <li><strong>🔍 Similarity Search:</strong> Find molecules similar to known drugs (e.g., like Bortezomib/Velcade)</li>
+                </ul>
+                <p class="mb-0"><strong>💡 How it works:</strong> Submit a job using the buttons above → System processes it → Results appear in the table below</p>
+            </div>
+            <div class="t-it">
+                <p class="mb-2"><strong>Cos'è questa pagina?</strong> Questo è il tuo hub per analizzare composti chimici e cercare nuovi candidati farmaci.</p>
+                <p class="mb-2"><strong>Strumenti Disponibili:</strong></p>
+                <ul class="mb-2">
+                    <li><strong>💊 Parametri Farmaci:</strong> Calcola proprietà molecolari (peso, LogP, drug-likeness)</li>
+                    <li><strong>🔬 Visualizzatore Binding:</strong> Vedi strutture 3D e interazioni proteina-ligando</li>
+                    <li><strong>🔍 Ricerca Similarità:</strong> Trova molecole simili a farmaci noti (es. come Bortezomib/Velcade)</li>
+                </ul>
+                <p class="mb-0"><strong>💡 Come funziona:</strong> Invia un job usando i bottoni sopra → Il sistema lo processa → I risultati appaiono nella tabella sotto</p>
+            </div>
+        </div>
     </div>
 </div>
 
-<div class="alert alert-info" role="alert">
-    Results are provided for clinical decision support only and must be reviewed alongside institutional guidelines before use.
+<!-- Tool Buttons with Descriptions -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card h-100 border-primary hover-card">
+            <div class="card-body">
+                <h3 class="h5">
+                    💊 <span class="t-en">Drug Parameters</span>
+                    <span class="t-it">Parametri Farmaci</span>
+                </h3>
+                <p class="small text-muted mb-2">
+                    <span class="t-en">Calculate molecular properties like weight, LogP, number of H-bond donors/acceptors</span>
+                    <span class="t-it">Calcola proprietà molecolari come peso, LogP, numero donatori/accettori legami H</span>
+                </p>
+                <p class="small mb-3">
+                    <strong class="t-en">Use when:</strong><strong class="t-it">Usa quando:</strong>
+                    <span class="t-en">You have a molecule's SMILES and want to check if it follows drug-likeness rules</span>
+                    <span class="t-it">Hai lo SMILES di una molecola e vuoi verificare se segue regole drug-likeness</span>
+                </p>
+                <a class="btn btn-primary w-100" href="{% url 'chemtools:drug_params' %}">
+                    <span class="t-en">Open Tool</span>
+                    <span class="t-it">Apri Strumento</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card h-100 border-success hover-card">
+            <div class="card-body">
+                <h3 class="h5">
+                    🔬 <span class="t-en">Binding Visualizer</span>
+                    <span class="t-it">Visualizzatore Binding</span>
+                </h3>
+                <p class="small text-muted mb-2">
+                    <span class="t-en">View 3D protein-ligand structures and analyze binding interactions</span>
+                    <span class="t-it">Visualizza strutture 3D proteina-ligando e analizza interazioni binding</span>
+                </p>
+                <p class="small mb-3">
+                    <strong class="t-en">Use when:</strong><strong class="t-it">Usa quando:</strong>
+                    <span class="t-en">You have a PDB file and want to see how a drug binds to its target protein</span>
+                    <span class="t-it">Hai un file PDB e vuoi vedere come un farmaco si lega alla proteina target</span>
+                </p>
+                <a class="btn btn-success w-100" href="{% url 'chemtools:binding_viz' %}">
+                    <span class="t-en">Open Tool</span>
+                    <span class="t-it">Apri Strumento</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card h-100 border-info hover-card">
+            <div class="card-body">
+                <h3 class="h5">
+                    🔍 <span class="t-en">Similarity Search</span>
+                    <span class="t-it">Ricerca Similarità</span>
+                </h3>
+                <p class="small text-muted mb-2">
+                    <span class="t-en">Find molecules similar to known drugs (e.g., Bortezomib, Lenalidomide)</span>
+                    <span class="t-it">Trova molecole simili a farmaci noti (es. Bortezomib, Lenalidomide)</span>
+                </p>
+                <p class="small mb-3">
+                    <strong class="t-en">Use when:</strong><strong class="t-it">Usa quando:</strong>
+                    <span class="t-en">You want to discover new drug candidates with similar structure to effective treatments</span>
+                    <span class="t-it">Vuoi scoprire nuovi candidati farmaci con struttura simile a trattamenti efficaci</span>
+                </p>
+                <a class="btn btn-info w-100" href="{% url 'chemtools:similarity' %}">
+                    <span class="t-en">Open Tool</span>
+                    <span class="t-it">Apri Strumento</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-2">
+    <div>
+        <h2 class="h4 mb-0">
+            <span class="t-en">📊 Your Analysis Jobs</span>
+            <span class="t-it">📊 I Tuoi Job di Analisi</span>
+        </h2>
+        <small class="text-muted">
+            <span class="t-en">Track queued and completed analyses</span>
+            <span class="t-it">Traccia analisi in coda e completate</span>
+        </small>
+    </div>
+</div>
+
+<div class="alert alert-info border-info mb-4" role="alert">
+    <div class="d-flex align-items-start gap-2">
+        <span style="font-size: 1.5rem;">ℹ️</span>
+        <div>
+            <strong class="t-en">How to Read This Table:</strong>
+            <strong class="t-it">Come Leggere Questa Tabella:</strong>
+            <ul class="small mb-0 mt-2">
+                <li class="t-en"><strong>Status badges:</strong> 🟢 Success (green) = Job completed, 🟡 Queued (yellow) = Processing, 🔴 Failed (red) = Error occurred</li>
+                <li class="t-en"><strong>Outputs:</strong> Click "View HTML" for interactive results or "Download CSV" for data</li>
+                <li class="t-en"><strong>Thumbnail:</strong> Preview of molecular structure (if available)</li>
+                <li class="t-en"><strong>View log:</strong> See technical details and any error messages</li>
+                <li class="t-it"><strong>Badge Status:</strong> 🟢 Success (verde) = Job completato, 🟡 Queued (giallo) = In elaborazione, 🔴 Failed (rosso) = Errore</li>
+                <li class="t-it"><strong>Outputs:</strong> Clicca "View HTML" per risultati interattivi o "Download CSV" per dati</li>
+                <li class="t-it"><strong>Thumbnail:</strong> Anteprima struttura molecolare (se disponibile)</li>
+                <li class="t-it"><strong>View log:</strong> Vedi dettagli tecnici e messaggi errore</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-warning border-warning" role="alert">
+    <strong>⚠️ <span class="t-en">Clinical Decision Support Notice:</span><span class="t-it">Avviso Supporto Decisioni Cliniche:</span></strong>
+    <span class="t-en">Results are provided for research and educational purposes only and must be reviewed alongside institutional guidelines before any clinical use.</span>
+    <span class="t-it">I risultati sono forniti solo per scopi di ricerca ed educativi e devono essere revisionati secondo linee guida istituzionali prima di qualsiasi uso clinico.</span>
 </div>
 
 {% if jobs %}
@@ -24,14 +155,32 @@
                 <table class="table table-striped table-hover table-sm align-middle mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th scope="col">Created</th>
-                            <th scope="col">Type</th>
+                            <th scope="col">
+                                <span class="t-en">Created</span>
+                                <span class="t-it">Creato</span>
+                            </th>
+                            <th scope="col">
+                                <span class="t-en">Type</span>
+                                <span class="t-it">Tipo</span>
+                            </th>
                             <th scope="col">Status</th>
-                            <th scope="col">Requested By</th>
-                            <th scope="col">Inputs</th>
-                            <th scope="col">Outputs</th>
+                            <th scope="col">
+                                <span class="t-en">Requested By</span>
+                                <span class="t-it">Richiesto Da</span>
+                            </th>
+                            <th scope="col">
+                                <span class="t-en">Inputs</span>
+                                <span class="t-it">Input</span>
+                            </th>
+                            <th scope="col">
+                                <span class="t-en">Outputs</span>
+                                <span class="t-it">Output</span>
+                            </th>
                             <th scope="col">Thumbnail</th>
-                            <th scope="col" class="text-end">Actions</th>
+                            <th scope="col" class="text-end">
+                                <span class="t-en">Actions</span>
+                                <span class="t-it">Azioni</span>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -109,9 +258,40 @@
     {% endfor %}
 {% else %}
     <div class="alert alert-secondary" role="alert">
-        No jobs have been submitted yet.
+        <div class="text-center py-4">
+            <div style="font-size: 3rem;" class="mb-3">📭</div>
+            <h3 class="h5">
+                <span class="t-en">No Jobs Yet</span>
+                <span class="t-it">Nessun Job Ancora</span>
+            </h3>
+            <p class="text-muted mb-3">
+                <span class="t-en">You haven't submitted any analysis jobs yet. Get started by choosing a tool above!</span>
+                <span class="t-it">Non hai ancora inviato job di analisi. Inizia scegliendo uno strumento sopra!</span>
+            </p>
+            <div class="d-flex gap-2 justify-content-center">
+                <a href="{% url 'chemtools:drug_params' %}" class="btn btn-primary">
+                    <span class="t-en">Try Drug Parameters</span>
+                    <span class="t-it">Prova Parametri Farmaci</span>
+                </a>
+                <a href="{% url 'chemtools:similarity' %}" class="btn btn-info">
+                    <span class="t-en">Try Similarity Search</span>
+                    <span class="t-it">Prova Ricerca Similarità</span>
+                </a>
+            </div>
+        </div>
     </div>
 {% endif %}
+
+<style>
+.hover-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+.hover-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2) !important;
+}
+</style>
 
 {% block extra_js %}
 {{ block.super }}

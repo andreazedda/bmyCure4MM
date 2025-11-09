@@ -197,3 +197,6 @@
 2025-10-10 09:38:18,162 - INFO - Fetching PDB data for ID: 5LF3
 2025-10-10 09:38:19,748 - INFO - PDB data fetched successfully.
 2025-10-10 09:38:19,872 - INFO - Initializing 3Dmol viewer.
+2025-11-09 11:02:18,795 - INFO - Fetching PDB data for ID: 224
+2025-11-09 11:02:19,930 - ERROR - Error fetching PDB data: 404 Client Error: Not Found for url: https://files.rcsb.org/download/224.pdb
+2025-11-09 11:02:19,931 - ERROR - An error occurred in the main function: 404 Client Error: Not Found for url: https://files.rcsb.org/download/224.pdb

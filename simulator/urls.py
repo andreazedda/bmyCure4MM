@@ -4,6 +4,7 @@ from . import views, views_cohort, views_manage
 
 urlpatterns = [
     path("", views.scenario_list, name="scenario_list"),
+    path("getting-started/", views.getting_started, name="getting_started"),
     path("manage/", views_manage.ScenarioManageListView.as_view(), name="scenario_manage_list"),
     path("scenarios/new/", views_manage.ScenarioCreateView.as_view(), name="scenario_create"),
     path("scenarios/<int:pk>/edit/", views_manage.ScenarioUpdateView.as_view(), name="scenario_edit"),
