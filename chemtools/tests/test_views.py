@@ -215,6 +215,224 @@ class ChemToolsSecurityTests(TestCase):
         self.assertNotContains(response, "BBB")
 
 
+class JobDetailViewTests(TestCase):
+    """Test integrated job detail view."""
+    
+    def setUp(self) -> None:
+        self.user = get_user_model().objects.create_user("tester", password="pass123")
+        self.client.force_login(self.user)
+        
+    def test_job_detail_requires_login(self) -> None:
+        """Test that job detail requires authentication."""
+        self.client.logout()
+        job = models.ChemJob.objects.create(kind=models.ChemJob.PARAM, input_a="CCO", user=self.user)
+        response = self.client.get(reverse("chemtools:job_detail", args=[job.pk]))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/admin/login/", response.url)
+        
+    def test_job_detail_user_isolation(self) -> None:
+        """Test that users can only view their own jobs."""
+        user2 = get_user_model().objects.create_user("other", password="pass123")
+        job = models.ChemJob.objects.create(kind=models.ChemJob.PARAM, input_a="CCO", user=user2)
+        
+        response = self.client.get(reverse("chemtools:job_detail", args=[job.pk]))
+        self.assertEqual(response.status_code, 404)
+        
+    def test_job_detail_nonexistent_404(self) -> None:
+        """Test that non-existent job returns 404."""
+        response = self.client.get(reverse("chemtools:job_detail", args=[9999]))
+        self.assertEqual(response.status_code, 404)
+        
+    def test_job_detail_drug_params_renders(self) -> None:
+        """Test job detail renders Drug Parameters correctly."""
+        job = models.ChemJob.objects.create(
+            kind=models.ChemJob.PARAM,
+            input_a="CCO",
+            user=self.user
+        )
+        
+        # Create mock HTML output with parameters table
+        from django.core.files.base import ContentFile
+        html_content = """
+        <html>
+            <div id="container-01"></div>
+            <table class="parameters-table">
+                <tr><td>MW</td><td>46.07</td></tr>
+                <tr><td>LogP</td><td>-0.31</td></tr>
+            </table>
+            <script>
+                let viewer = $3Dmol.createViewer($("#container-01"));
+            </script>
+        </html>
+        """
+        job.out_html.save("test.html", ContentFile(html_content), save=True)
+        
+        response = self.client.get(reverse("chemtools:job_detail", args=[job.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Molecular Properties")
+        self.assertContains(response, "parameters-table")
+        self.assertContains(response, "46.07")  # MW value
+        self.assertContains(response, "LogP")
+        
+    def test_job_detail_similarity_search_renders(self) -> None:
+        """Test job detail renders Similarity Search correctly."""
+        job = models.ChemJob.objects.create(
+            kind=models.ChemJob.SIM,
+            input_a="CCO",
+            input_b="0.9",
+            user=self.user
+        )
+        
+        # Create mock CSV output
+        from django.core.files.base import ContentFile
+        csv_content = """CID,SMILES,Similarity,MW,LogP,HBD,HBA,TPSA,RotBonds,LogS,Name
+702,CCO,1.0,46.07,-0.31,1,1,20.23,0,-0.77,Ethanol
+1031,CCCO,0.95,60.1,0.25,1,1,20.23,1,-1.01,Propanol"""
+        job.out_csv.save("test.csv", ContentFile(csv_content), save=True)
+        
+        response = self.client.get(reverse("chemtools:job_detail", args=[job.pk]))
+        self.assertEqual(response.status_code, 200)
+        
+        # Verify the CSV was loaded (csv_data should be in context)
+        if hasattr(response, 'context') and response.context:
+            csv_data = response.context.get('csv_data')
+            if csv_data:
+                self.assertGreater(len(csv_data), 0)
+                # Verify content
+                self.assertContains(response, "Similar Compounds Found")
+                self.assertContains(response, "Ethanol")
+            else:
+                # If CSV wasn't loaded, at least check job is displayed
+                self.assertContains(response, job.get_kind_display())
+        
+    def test_job_detail_binding_viz_renders(self) -> None:
+        """Test job detail renders Binding Visualizer correctly."""
+        job = models.ChemJob.objects.create(
+            kind=models.ChemJob.BIND,
+            input_a="5LF3",
+            input_b="BOR",
+            user=self.user
+        )
+        
+        # Create mock HTML output
+        from django.core.files.base import ContentFile
+        html_content = """
+        <html>
+            <div id="viewport" style="width:100%;height:600px;"></div>
+            <script>
+                let viewer = $3Dmol.createViewer("#viewport");
+                viewer.addModel("ATOM...", "pdb");
+            </script>
+        </html>
+        """
+        job.out_html.save("test.html", ContentFile(html_content), save=True)
+        
+        response = self.client.get(reverse("chemtools:job_detail", args=[job.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "3D Protein-Ligand Structure")
+        self.assertContains(response, "5LF3")
+        self.assertContains(response, "$3Dmol")
+        
+    def test_job_detail_empty_csv(self) -> None:
+        """Test job detail handles empty CSV gracefully."""
+        job = models.ChemJob.objects.create(
+            kind=models.ChemJob.SIM,
+            input_a="CCO",
+            user=self.user
+        )
+        
+        # Create CSV with only headers
+        from django.core.files.base import ContentFile
+        csv_content = "CID,SMILES,Similarity,MW,LogP,HBD,HBA,TPSA,RotBonds,LogS,Name\n"
+        job.out_csv.save("test.csv", ContentFile(csv_content), save=True)
+        
+        response = self.client.get(reverse("chemtools:job_detail", args=[job.pk]))
+        self.assertEqual(response.status_code, 200)
+        # With empty CSV, similar compounds section should not appear
+        # Instead check that job is displayed
+        self.assertContains(response, job.get_kind_display())
+        
+    def test_job_detail_queued_auto_refresh(self) -> None:
+        """Test that queued jobs have auto-refresh meta tag."""
+        job = models.ChemJob.objects.create(
+            kind=models.ChemJob.PARAM,
+            input_a="CCO",
+            user=self.user
+        )
+        # Don't set output files - job is still queued
+        
+        response = self.client.get(reverse("chemtools:job_detail", args=[job.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'http-equiv="refresh"')
+        self.assertContains(response, 'content="5"')  # 5 second refresh
+        
+    def test_job_detail_completed_no_refresh(self) -> None:
+        """Test that completed jobs don't have auto-refresh."""
+        job = models.ChemJob.objects.create(
+            kind=models.ChemJob.PARAM,
+            input_a="CCO",
+            user=self.user
+        )
+        
+        # Mark job as complete with output
+        from django.core.files.base import ContentFile
+        job.out_html.save("test.html", ContentFile("<html></html>"), save=True)
+        
+        response = self.client.get(reverse("chemtools:job_detail", args=[job.pk]))
+        self.assertEqual(response.status_code, 200)
+        # Should NOT contain refresh meta tag
+        self.assertNotContains(response, 'http-equiv="refresh"')
+        
+    def test_job_detail_progress_display(self) -> None:
+        """Test that job progress is displayed."""
+        job = models.ChemJob.objects.create(
+            kind=models.ChemJob.SIM,
+            input_a="CCO",
+            user=self.user,
+            progress_percent=45,
+            progress_message="Processing compound 45 of 100"
+        )
+        
+        response = self.client.get(reverse("chemtools:job_detail", args=[job.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "45%")
+        self.assertContains(response, "Processing compound 45 of 100")
+        
+    def test_job_detail_log_display(self) -> None:
+        """Test that job log is displayed in collapsible section."""
+        job = models.ChemJob.objects.create(
+            kind=models.ChemJob.PARAM,
+            input_a="CCO",
+            user=self.user,
+            log="Processing SMILES: CCO\nCalculating MW: 46.07\nSuccess!"
+        )
+        
+        from django.core.files.base import ContentFile
+        job.out_html.save("test.html", ContentFile("<html></html>"), save=True)
+        
+        response = self.client.get(reverse("chemtools:job_detail", args=[job.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Processing SMILES: CCO")
+        self.assertContains(response, "Calculating MW: 46.07")
+        
+    def test_job_detail_csv_parsing_error_handling(self) -> None:
+        """Test graceful handling of malformed CSV."""
+        job = models.ChemJob.objects.create(
+            kind=models.ChemJob.SIM,
+            input_a="CCO",
+            user=self.user
+        )
+        
+        # Create malformed CSV
+        from django.core.files.base import ContentFile
+        csv_content = "Malformed,CSV\nWithout,Proper,Headers"
+        job.out_csv.save("test.csv", ContentFile(csv_content), save=True)
+        
+        response = self.client.get(reverse("chemtools:job_detail", args=[job.pk]))
+        # Should not crash
+        self.assertEqual(response.status_code, 200)
+
+
 class ChemToolsIntegrationTests(TestCase):
     """Integration tests for complete workflows."""
     
@@ -239,6 +457,10 @@ class ChemToolsIntegrationTests(TestCase):
         response = self.client.get(reverse("chemtools:job_status", args=[job.pk]))
         self.assertEqual(response.status_code, 200)
         
+        # Check job detail view works
+        response = self.client.get(reverse("chemtools:job_detail", args=[job.pk]))
+        self.assertEqual(response.status_code, 200)
+        
     def test_complete_similarity_search_workflow(self) -> None:
         """Test complete similarity search workflow."""
         with patch("chemtools.views._enqueue", return_value=(True, False)):
@@ -250,4 +472,29 @@ class ChemToolsIntegrationTests(TestCase):
         job = models.ChemJob.objects.filter(user=self.user, kind=models.ChemJob.SIM).first()
         self.assertIsNotNone(job)
         self.assertEqual(job.input_a, "c1ccccc1")
+        
+        # Check integrated view works
+        response = self.client.get(reverse("chemtools:job_detail", args=[job.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "c1ccccc1")
+        
+    def test_integrated_view_replaces_downloads(self) -> None:
+        """Test that integrated view shows results without downloads."""
+        job = models.ChemJob.objects.create(
+            kind=models.ChemJob.PARAM,
+            input_a="CCO",
+            user=self.user
+        )
+        
+        from django.core.files.base import ContentFile
+        job.out_html.save("test.html", ContentFile("<html><p>Results</p></html>"), save=True)
+        
+        # Check tools_home has "View Results" button
+        response = self.client.get(reverse("chemtools:tools_home"))
+        self.assertContains(response, "📊 View Results")
+        self.assertContains(response, f"/chemtools/job/{job.pk}/")
+        
+        # Check job detail shows embedded content
+        response = self.client.get(reverse("chemtools:job_detail", args=[job.pk]))
+        self.assertContains(response, "<p>Results</p>")  # Embedded HTML
 

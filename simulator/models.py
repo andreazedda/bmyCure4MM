@@ -33,7 +33,17 @@ DEFAULT_PD_PARAMS = {
 
 
 class Scenario(models.Model):
-    """Clinical scenarios used to practice MM treatment decision making."""
+    """
+    Clinical scenarios used to practice MM treatment decision making.
+    
+    Enhanced with comprehensive clinical parameters for realistic case scenarios:
+    - Cytogenetics: del(17p), t(4;14), t(14;16), 1q21 gain, hyperdiploid, t(11;14)
+    - Tumor biology: cell count, growth rate, carrying capacity
+    - Patient characteristics: age, ECOG, Charlson comorbidity index
+    - Laboratory values: renal function, albumin, β2M, LDH, hemoglobin, calcium
+    - Risk stratification: R-ISS stage, patient archetype
+    - Difficulty scoring: auto-calculated from clinical parameters
+    """
 
     STAGE_CHOICES = [
         ("newly_diagnosed", "Newly Diagnosed"),
@@ -42,6 +52,42 @@ class Scenario(models.Model):
         ("supportive", "Supportive Care"),
     ]
 
+    RISS_CHOICES = [
+        ("", "Not specified"),
+        ("I", "R-ISS I (Low risk)"),
+        ("II", "R-ISS II (Intermediate risk)"),
+        ("III", "R-ISS III (High risk)"),
+    ]
+
+    ECOG_CHOICES = [
+        (0, "0 - Fully active"),
+        (1, "1 - Restricted in strenuous activity"),
+        (2, "2 - Ambulatory, self-care"),
+        (3, "3 - Limited self-care"),
+        (4, "4 - Completely disabled"),
+    ]
+
+    ARCHETYPE_CHOICES = [
+        ("", "Custom/Mixed"),
+        ("nd_standard", "Newly Diagnosed - Standard Risk"),
+        ("nd_high_risk", "Newly Diagnosed - High Risk"),
+        ("frail_elderly", "Frail Elderly (Age >75)"),
+        ("renal_impaired", "Renal Impairment (CrCl <60)"),
+        ("rr_early", "Relapsed/Refractory - Early (1-2 lines)"),
+        ("rr_late", "Relapsed/Refractory - Late (≥3 lines)"),
+        ("aggressive", "Aggressive/Plasma Cell Leukemia"),
+    ]
+
+    DIFFICULTY_CHOICES = [
+        ("", "Not calculated"),
+        ("easy", "Easy (0-30)"),
+        ("moderate", "Moderate (30-50)"),
+        ("hard", "Hard (50-70)"),
+        ("very_hard", "Very Hard (70-85)"),
+        ("expert", "Expert (85-100)"),
+    ]
+
+    # Basic scenario fields
     title = models.CharField(max_length=200)
     clinical_stage = models.CharField(
         max_length=32,
@@ -76,6 +122,140 @@ class Scenario(models.Model):
         blank=True,
         help_text="Target IMWG response. Optional; used for feedback.",
     )
+
+    # Patient characteristics
+    patient_age = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text="Patient age in years. Range: 18-120"
+    )
+    ecog_performance_status = models.IntegerField(
+        null=True,
+        blank=True,
+        choices=ECOG_CHOICES,
+        help_text="ECOG Performance Status (0-4)"
+    )
+    charlson_comorbidity_index = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text="Charlson Comorbidity Index. Range: 0-10. Low: 0-1, Moderate: 2-3, High: ≥4"
+    )
+    patient_archetype = models.CharField(
+        max_length=32,
+        blank=True,
+        default="",
+        choices=ARCHETYPE_CHOICES,
+        help_text="Patient archetype from virtual patient generator"
+    )
+
+    # Cytogenetics
+    del17p = models.BooleanField(
+        default=False,
+        help_text="TP53 deletion - high risk",
+        verbose_name="del(17p)"
+    )
+    t_4_14 = models.BooleanField(
+        default=False,
+        help_text="Translocation (4;14) - high risk",
+        verbose_name="t(4;14)"
+    )
+    t_14_16 = models.BooleanField(
+        default=False,
+        help_text="Translocation (14;16) - very high risk",
+        verbose_name="t(14;16)"
+    )
+    gain_1q21 = models.BooleanField(
+        default=False,
+        help_text="1q21 gain/amplification - proliferation advantage",
+        verbose_name="1q21 gain"
+    )
+    hyperdiploid = models.BooleanField(
+        default=False,
+        help_text="Hyperdiploid karyotype - standard risk",
+        verbose_name="Hyperdiploid"
+    )
+    t_11_14 = models.BooleanField(
+        default=False,
+        help_text="Translocation (11;14) - standard risk, better prognosis",
+        verbose_name="t(11;14)"
+    )
+
+    # Tumor biology
+    tumor_cell_count = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="Tumor cell count (cells). Range: 1e6-1e12. Typical newly diagnosed: 1e10"
+    )
+    tumor_growth_rate = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="Tumor growth rate (per day). Range: 0.001-0.1. Typical: 0.01"
+    )
+    carrying_capacity = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="Maximum tumor burden (cells). Range: 1e11-1e13. Default: 1e12"
+    )
+
+    # Laboratory values
+    creatinine_clearance = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="Creatinine clearance (mL/min). Normal: >60, Moderate renal impairment: 30-60, Severe: <30"
+    )
+    albumin = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="Serum albumin (g/dL). Normal: 3.5-5.0"
+    )
+    beta2_microglobulin = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="β2-microglobulin (mg/L). Normal: <2, Elevated: 2-5.5, Very high: >5.5",
+        verbose_name="β2-microglobulin"
+    )
+    ldh = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="Lactate dehydrogenase (U/L). Normal: 140-280, Elevated: >280",
+        verbose_name="LDH"
+    )
+    hemoglobin = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="Hemoglobin (g/dL). Normal: M 13-17, F 12-15. Anemia: <10"
+    )
+    calcium = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="Serum calcium (mg/dL). Normal: 8.5-10.2, Hypercalcemia: >10.5, Severe: >14"
+    )
+
+    # Risk stratification
+    riss_stage = models.CharField(
+        max_length=16,
+        blank=True,
+        default="",
+        choices=RISS_CHOICES,
+        help_text="Revised International Staging System stage",
+        verbose_name="R-ISS Stage"
+    )
+
+    # Calculated fields
+    difficulty_score = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="Calculated difficulty score (0-100). Auto-populated from difficulty scoring system."
+    )
+    difficulty_level = models.CharField(
+        max_length=16,
+        blank=True,
+        default="",
+        choices=DIFFICULTY_CHOICES,
+        help_text="Difficulty level category"
+    )
+
+    # Metadata
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     active = models.BooleanField(default=True)

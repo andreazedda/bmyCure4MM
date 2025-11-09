@@ -7,6 +7,7 @@ urlpatterns = [
     path("params/", views.drug_params, name="drug_params"),
     path("binding/", views.binding_viz, name="binding_viz"),
     path("similarity/", views.similarity, name="similarity"),
+    path("job/<int:pk>/", views.job_detail, name="job_detail"),
     path("job/<int:pk>/retry/", views.retry_job, name="job_retry"),
     path("job/<int:pk>/status.json", views.job_status, name="job_status"),
 ]

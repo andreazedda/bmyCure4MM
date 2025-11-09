@@ -218,17 +218,17 @@
                                     {% if job.input_b %}<div class="small text-muted">{{ job.input_b }}</div>{% endif %}
                                 </td>
                                 <td data-cell="outputs">
-                                    <div class="btn-group btn-group-sm" role="group">
-                                        {% if job.out_html %}
-                                            <a class="btn btn-outline-primary" href="{{ job.out_html.url }}" target="_blank">View HTML</a>
-                                        {% endif %}
-                                        {% if job.out_csv %}
-                                            <a class="btn btn-outline-secondary" href="{{ job.out_csv.url }}">Download CSV</a>
-                                        {% endif %}
-                                        {% if not job.out_html and not job.out_csv %}
-                                            <span class="text-muted small">–</span>
-                                        {% endif %}
-                                    </div>
+                                    {% if job.out_html or job.out_csv %}
+                                        <a href="{% url 'chemtools:job_detail' job.pk %}" class="btn btn-primary btn-sm">
+                                            <span class="t-en">📊 View Results</span>
+                                            <span class="t-it">📊 Vedi Risultati</span>
+                                        </a>
+                                    {% else %}
+                                        <span class="text-muted small">
+                                            <span class="t-en">No output yet</span>
+                                            <span class="t-it">Nessun output</span>
+                                        </span>
+                                    {% endif %}
                                 </td>
                                 <td data-cell="thumbnail">
                                     {% if job.thumbnail_url %}
@@ -312,19 +312,11 @@
 {{ block.super }}
 <script>
 (() => {
-    const buildOutputs = (data) => {
+    const buildOutputs = (data, jobId) => {
         if (!data.has_html && !data.has_csv) {
-            return '<span class="text-muted small">–</span>';
+            return '<span class="text-muted small"><span class="t-en">No output yet</span><span class="t-it">Nessun output</span></span>';
         }
-        let html = '<div class="btn-group btn-group-sm" role="group">';
-        if (data.html_url) {
-            html += `<a class="btn btn-outline-primary" href="${data.html_url}" target="_blank">View HTML</a>`;
-        }
-        if (data.csv_url) {
-            html += `<a class="btn btn-outline-secondary" href="${data.csv_url}">Download CSV</a>`;
-        }
-        html += '</div>';
-        return html;
+        return `<a href="/chemtools/job/${jobId}/" class="btn btn-primary btn-sm"><span class="t-en">📊 View Results</span><span class="t-it">📊 Vedi Risultati</span></a>`;
     };
 
     document.body.addEventListener('htmx:afterRequest', (event) => {
@@ -374,7 +366,8 @@
         
         const outputsCell = row.querySelector('[data-cell="outputs"]');
         if (outputsCell) {
-            outputsCell.innerHTML = buildOutputs(data);
+            const jobId = row.dataset.jobId;
+            outputsCell.innerHTML = buildOutputs(data, jobId);
         }
         const thumbCell = row.querySelector('[data-cell="thumbnail"]');
         if (thumbCell) {

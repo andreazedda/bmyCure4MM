@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import shutil
 import tempfile
 import traceback
@@ -10,6 +11,9 @@ from celery import shared_task
 from django.conf import settings
 
 from . import models, utils
+
+# Configure logging
+logger = logging.getLogger(__name__)
 
 
 def _job_media_dir(job_id: int) -> Path:
@@ -164,37 +168,57 @@ def run_binding_viz_job(job_id: int, pdb_id: str, ligand: str) -> None:
 
 @shared_task
 def run_similarity_job(job_id: int, smiles: str) -> None:
+    logger.info(f"[Job {job_id}] Starting similarity search for SMILES: {smiles}")
     job = models.ChemJob.objects.get(pk=job_id)
     tmpdir = Path(tempfile.mkdtemp(prefix="chem_sim_"))
     previous_log = job.log or ""
     logs: list[str] = []
+    
     try:
+        logger.info(f"[Job {job_id}] Step 1: Initializing (10%)")
         job.update_progress(10, "Initializing similarity search...")
         _run_setup(logs)
         
+        logger.info(f"[Job {job_id}] Step 2: Generating fingerprint (30%)")
         job.update_progress(30, "Generating molecular fingerprint...")
+        
+        logger.info(f"[Job {job_id}] Calling utils.run_similarity_search...")
         output_path, stdout, stderr = utils.run_similarity_search(
             smiles=smiles,
             out_csv=tmpdir,
         )
+        logger.info(f"[Job {job_id}] utils.run_similarity_search completed. Output: {output_path}")
         
+        logger.info(f"[Job {job_id}] Step 3: Searching database (60%)")
         job.update_progress(60, "Searching database for similar compounds...")
         logs.append(utils._compose_logs(stdout, stderr) or "(no output captured)")
         
         if output_path and output_path.is_file():
+            logger.info(f"[Job {job_id}] Step 4: Saving results (90%)")
             job.update_progress(90, "Saving results...")
             job_dir = _job_media_dir(job.pk)
             dest = _next_versioned_path(job_dir, f"sim_{job.pk}", ".csv")
             job.out_csv.name = _store_file(output_path, dest)
+            logger.info(f"[Job {job_id}] Results saved to: {dest}")
+        else:
+            logger.warning(f"[Job {job_id}] No output file generated!")
         
+        logger.info(f"[Job {job_id}] Step 5: Completed (100%)")
         job.update_progress(100, "Completed!")
+        logger.info(f"[Job {job_id}] Similarity search completed successfully")
+        
     except Exception as exc:  # pragma: no cover - defensive
+        logger.error(f"[Job {job_id}] ERROR: {exc}")
+        logger.error(f"[Job {job_id}] Traceback: {traceback.format_exc()}")
         detail = ""
         if isinstance(exc, utils.ToolRunError):
             detail = utils._compose_logs(exc.stdout, exc.stderr)
+            logger.error(f"[Job {job_id}] Tool error details: {detail}")
         logs.append(_error_entry(exc, detail))
         job.update_progress(0, "Failed")
     finally:
         _append_log(job, previous_log, logs)
         job.save()
+        logger.info(f"[Job {job_id}] Cleaning up temp dir: {tmpdir}")
         shutil.rmtree(tmpdir, ignore_errors=True)
+        logger.info(f"[Job {job_id}] Task finished")

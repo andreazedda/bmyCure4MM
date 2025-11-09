@@ -158,3 +158,39 @@ def job_status(request: HttpRequest, pk: int) -> JsonResponse:
         "progress_message": job.progress_message,
     }
     return JsonResponse(data)
+
+
+@login_required
+def job_detail(request: HttpRequest, pk: int) -> HttpResponse:
+    """Integrated results viewer for all job types."""
+    job = get_object_or_404(models.ChemJob, pk=pk, user=request.user)
+    
+    # Load content based on job type
+    html_content = None
+    csv_data = None
+    
+    if job.out_html:
+        try:
+            with job.out_html.open('r') as f:
+                html_content = f.read()
+        except Exception:
+            html_content = None
+    
+    if job.out_csv:
+        try:
+            import csv as csv_module
+            with job.out_csv.open('r') as f:
+                reader = csv_module.DictReader(f)
+                csv_data = list(reader)
+        except Exception:
+            csv_data = None
+    
+    return render(
+        request,
+        "chemtools/job_detail.html",
+        {
+            "job": job,
+            "html_content": html_content,
+            "csv_data": csv_data,
+        },
+    )

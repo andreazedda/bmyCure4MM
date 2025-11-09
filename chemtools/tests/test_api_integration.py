@@ -239,6 +239,72 @@ class SimilaritySearchAPITests(TestCase):
         
         mock_run.assert_called_once()
         
+    def test_pubchem_fastsimilarity_2d_endpoint(self) -> None:
+        """Test that correct PubChem API endpoint is used."""
+        job = models.ChemJob.objects.create(
+            kind=models.ChemJob.SIM,
+            input_a="CCO",
+            input_b="0.9",
+            user=self.user
+        )
+        
+        # Mock the requests.get call to verify correct endpoint
+        with patch("LigandSimilaritySearcher.sources.lib.similarity.requests.get") as mock_get:
+            mock_response = Mock()
+            mock_response.status_code = 200
+            mock_response.json.return_value = {
+                "IdentifierList": {"CID": [702, 1031]}
+            }
+            mock_get.return_value = mock_response
+            
+            # Import and call the actual function
+            from LigandSimilaritySearcher.sources.lib.similarity import search_similar_compounds
+            result = search_similar_compounds("CCO", threshold=90, max_records=100)
+            
+            # Verify correct endpoint was called
+            called_url = mock_get.call_args[0][0]
+            self.assertIn("fastsimilarity_2d", called_url)
+            self.assertIn("CCO", called_url)
+            self.assertIn("Threshold=90", called_url)
+            
+    def test_smiles_property_fetching(self) -> None:
+        """Test SMILES property fetching from PubChem."""
+        job = models.ChemJob.objects.create(
+            kind=models.ChemJob.SIM,
+            input_a="CCO",
+            user=self.user
+        )
+        
+        with patch("LigandSimilaritySearcher.sources.lib.similarity.requests.get") as mock_get:
+            # Mock similarity search response
+            sim_response = Mock()
+            sim_response.status_code = 200
+            sim_response.json.return_value = {
+                "IdentifierList": {"CID": [702]}
+            }
+            
+            # Mock properties response
+            props_response = Mock()
+            props_response.status_code = 200
+            props_response.json.return_value = {
+                "PropertyTable": {
+                    "Properties": [
+                        {"CID": 702, "IsomericSMILES": "CCO"}
+                    ]
+                }
+            }
+            
+            mock_get.side_effect = [sim_response, props_response]
+            
+            from LigandSimilaritySearcher.sources.lib.similarity import search_similar_compounds
+            result = search_similar_compounds("CCO", threshold=90, max_records=1)
+            
+            # Verify properties endpoint was called
+            self.assertEqual(mock_get.call_count, 2)
+            second_call_url = mock_get.call_args_list[1][0][0]
+            self.assertIn("property", second_call_url)
+            self.assertIn("IsomericSMILES", second_call_url)
+            
     def test_similarity_database_query(self) -> None:
         """Test similarity search against database."""
         job = models.ChemJob.objects.create(
@@ -291,6 +357,170 @@ class SimilaritySearchAPITests(TestCase):
                     tasks.run_similarity_job(job.pk, "CCO")
         
         mock_store.assert_called_once()
+        
+    def test_empty_results_handling(self) -> None:
+        """Test handling of empty similarity search results."""
+        job = models.ChemJob.objects.create(
+            kind=models.ChemJob.SIM,
+            input_a="CCCCCCCCCCCCCCCC",  # Long chain unlikely to match
+            input_b="0.99",  # Very high threshold
+            user=self.user
+        )
+        
+        with patch("LigandSimilaritySearcher.sources.lib.similarity.requests.get") as mock_get:
+            # Mock empty response
+            mock_response = Mock()
+            mock_response.status_code = 200
+            mock_response.json.return_value = {
+                "IdentifierList": {"CID": []}
+            }
+            mock_get.return_value = mock_response
+            
+            from LigandSimilaritySearcher.sources.lib.similarity import search_similar_compounds
+            result = search_similar_compounds("CCCCCCCCCCCCCCCC", threshold=99, max_records=100)
+            
+            # Should return empty list, not crash
+            self.assertEqual(len(result), 0)
+            
+    def test_api_error_retry_mechanism(self) -> None:
+        """Test retry mechanism for API errors."""
+        with patch("LigandSimilaritySearcher.sources.lib.similarity.requests.get") as mock_get:
+            # First call fails, second succeeds
+            fail_response = Mock()
+            fail_response.status_code = 500
+            fail_response.raise_for_status.side_effect = Exception("Server Error")
+            
+            success_response = Mock()
+            success_response.status_code = 200
+            success_response.json.return_value = {
+                "IdentifierList": {"CID": [702]}
+            }
+            
+            mock_get.side_effect = [fail_response, success_response]
+            
+            from LigandSimilaritySearcher.sources.lib.similarity import search_similar_compounds
+            # Should retry and succeed
+            result = search_similar_compounds("CCO", threshold=90, max_records=1)
+            
+            # Verify retry happened
+            self.assertEqual(mock_get.call_count, 2)
+
+
+class DrugParametersEnhancedTests(TestCase):
+    """Test enhanced drug parameters with molecular properties table."""
+    
+    def setUp(self) -> None:
+        self.user = get_user_model().objects.create_user("tester", password="pass123")
+        
+    def test_parameters_table_generation(self) -> None:
+        """Test that parameters table is generated in HTML output."""
+        job = models.ChemJob.objects.create(
+            kind=models.ChemJob.PARAM,
+            input_a="CCO",
+            user=self.user
+        )
+        
+        with patch("pipelines.processes.drug_parameter_evaluator.rdMolDescriptors") as mock_desc:
+            # Mock RDKit descriptor calculations
+            mock_mol = Mock()
+            mock_desc.CalcExactMolWt.return_value = 46.07
+            mock_desc.CalcNumHBD.return_value = 1
+            mock_desc.CalcNumHBA.return_value = 1
+            mock_desc.CalcTPSA.return_value = 20.23
+            mock_desc.CalcNumRotatableBonds.return_value = 0
+            
+            with patch("pipelines.processes.drug_parameter_evaluator.Descriptors") as mock_crippen:
+                mock_crippen.MolLogP.return_value = -0.31
+                
+                # Call the actual function
+                from pipelines.processes.drug_parameter_evaluator import visualize_drug_structure
+                
+                parameters = {
+                    "MW": 46.07,
+                    "LogP": -0.31,
+                    "HBD": 1,
+                    "HBA": 1,
+                    "TPSA": 20.23,
+                    "RotBonds": 0,
+                    "LogS": -0.77
+                }
+                
+                html_output = visualize_drug_structure(parameters)
+                
+                # Verify table is in output
+                self.assertIn("parameters-table", html_output)
+                self.assertIn("Molecular Weight", html_output)
+                self.assertIn("46.07", html_output)
+                self.assertIn("LogP", html_output)
+                self.assertIn("-0.31", html_output)
+                self.assertIn("Lipinski", html_output)
+                
+    def test_drug_likeness_indicators(self) -> None:
+        """Test drug-likeness indicators in parameters table."""
+        from pipelines.processes.drug_parameter_evaluator import visualize_drug_structure
+        
+        # Good drug-like parameters
+        good_params = {
+            "MW": 350,      # < 500
+            "LogP": 2.5,    # 0-5
+            "HBD": 2,       # ≤ 5
+            "HBA": 4,       # ≤ 10
+            "TPSA": 75,     # < 140
+            "RotBonds": 3,  # < 10
+            "LogS": -3.0    # > -4
+        }
+        
+        html_output = visualize_drug_structure(good_params)
+        
+        # Should have green checkmarks for optimal values
+        self.assertIn("✓", html_output)
+        self.assertIn("#28a745", html_output)  # Green color
+        
+    def test_parameters_warning_indicators(self) -> None:
+        """Test warning indicators for non-optimal parameters."""
+        from pipelines.processes.drug_parameter_evaluator import visualize_drug_structure
+        
+        # Poor drug-like parameters
+        poor_params = {
+            "MW": 600,      # > 500 (warning)
+            "LogP": 6.5,    # > 5 (warning)
+            "HBD": 8,       # > 5 (warning)
+            "HBA": 12,      # > 10 (warning)
+            "TPSA": 160,    # > 140 (warning)
+            "RotBonds": 15, # > 10 (warning)
+            "LogS": -5.5    # < -4 (warning)
+        }
+        
+        html_output = visualize_drug_structure(poor_params)
+        
+        # Should have warning symbols
+        self.assertIn("⚠", html_output)
+        self.assertIn("#ffc107", html_output)  # Warning color
+        
+    def test_3d_structure_and_table_both_present(self) -> None:
+        """Test that both 3D structure and parameters table are generated."""
+        from pipelines.processes.drug_parameter_evaluator import visualize_drug_structure
+        
+        params = {
+            "MW": 46.07,
+            "LogP": -0.31,
+            "HBD": 1,
+            "HBA": 1,
+            "TPSA": 20.23,
+            "RotBonds": 0,
+            "LogS": -0.77
+        }
+        
+        html_output = visualize_drug_structure(params)
+        
+        # Verify 3D viewer is present
+        self.assertIn("$3Dmol", html_output)
+        self.assertIn("container-01", html_output)
+        
+        # Verify parameters table is present
+        self.assertIn("parameters-table", html_output)
+        self.assertIn("MW", html_output)
+        self.assertIn("46.07", html_output)
 
 
 class JobLifecycleTests(TransactionTestCase):

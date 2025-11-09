@@ -200,3 +200,9 @@
 2025-11-09 11:02:18,795 - INFO - Fetching PDB data for ID: 224
 2025-11-09 11:02:19,930 - ERROR - Error fetching PDB data: 404 Client Error: Not Found for url: https://files.rcsb.org/download/224.pdb
 2025-11-09 11:02:19,931 - ERROR - An error occurred in the main function: 404 Client Error: Not Found for url: https://files.rcsb.org/download/224.pdb
+2025-11-09 12:26:38,693 - INFO - Fetching PDB data for ID: 4KW5
+2025-11-09 12:26:39,657 - INFO - PDB data fetched successfully.
+2025-11-09 12:26:39,685 - INFO - Initializing 3Dmol viewer.
+2025-11-09 14:10:46,631 - INFO - Fetching PDB data for ID: 4KW5
+2025-11-09 14:10:47,621 - INFO - PDB data fetched successfully.
+2025-11-09 14:10:47,637 - INFO - Initializing 3Dmol viewer.

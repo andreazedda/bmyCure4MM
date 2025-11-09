@@ -1,0 +1,351 @@
+{% extends "base.html" %}
+{% load math_filters %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'chemtools:tools_home' %}">
+            <span class="t-en">Drug Discovery Tools</span>
+            <span class="t-it">Strumenti Drug Discovery</span>
+        </a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ job.get_kind_display }} #{{ job.pk }}</li>
+    </ol>
+</nav>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-primary text-white">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="h4 mb-0">
+                {% if job.kind == 'PARAM' %}💊{% elif job.kind == 'BIND' %}🔬{% else %}🔍{% endif %}
+                {{ job.get_kind_display }}
+                <span class="badge bg-{{ job.status_label.1 }} ms-2">{{ job.status_label.0 }}</span>
+            </h1>
+            <div class="btn-group">
+                <a href="{% url 'chemtools:job_retry' job.pk %}" class="btn btn-sm btn-light">
+                    🔄 <span class="t-en">Retry</span><span class="t-it">Riprova</span>
+                </a>
+                {% if job.out_csv %}
+                    <a href="{{ job.out_csv.url }}" class="btn btn-sm btn-light" download>
+                        📥 <span class="t-en">Download CSV</span><span class="t-it">Scarica CSV</span>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">
+                <span class="t-en">Created</span>
+                <span class="t-it">Creato</span>
+            </dt>
+            <dd class="col-sm-9">{{ job.created|date:"Y-m-d H:i:s" }}</dd>
+
+            <dt class="col-sm-3">
+                <span class="t-en">Input A</span>
+                <span class="t-it">Input A</span>
+            </dt>
+            <dd class="col-sm-9"><code>{{ job.input_a|default:"—" }}</code></dd>
+
+            {% if job.input_b %}
+                <dt class="col-sm-3">
+                    <span class="t-en">Input B</span>
+                    <span class="t-it">Input B</span>
+                </dt>
+                <dd class="col-sm-9"><code>{{ job.input_b }}</code></dd>
+            {% endif %}
+
+            {% if job.progress_percent > 0 and job.progress_percent < 100 %}
+                <dt class="col-sm-3">
+                    <span class="t-en">Progress</span>
+                    <span class="t-it">Progresso</span>
+                </dt>
+                <dd class="col-sm-9">
+                    <div class="progress" style="height: 25px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                             role="progressbar" 
+                             style="width: {{ job.progress_percent }}%" 
+                             aria-valuenow="{{ job.progress_percent }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                            {{ job.progress_percent }}%
+                        </div>
+                    </div>
+                    <small class="text-muted">{{ job.progress_message }}</small>
+                </dd>
+            {% endif %}
+        </dl>
+    </div>
+</div>
+
+{% if job.status_label.0 == "Queued" %}
+    <div class="alert alert-info" role="alert">
+        <div class="d-flex align-items-center">
+            <div class="spinner-border text-primary me-3" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <div>
+                <strong>
+                    <span class="t-en">Job is processing...</span>
+                    <span class="t-it">Job in elaborazione...</span>
+                </strong>
+                <p class="mb-0">
+                    <span class="t-en">This page will auto-refresh. Results will appear below when ready.</span>
+                    <span class="t-it">Questa pagina si aggiornerà automaticamente. I risultati appariranno sotto quando pronti.</span>
+                </p>
+            </div>
+        </div>
+    </div>
+    <meta http-equiv="refresh" content="5">
+{% elif job.status_label.0 == "Failed" %}
+    <div class="alert alert-danger" role="alert">
+        <h4 class="alert-heading">
+            ❌ <span class="t-en">Job Failed</span>
+            <span class="t-it">Job Fallito</span>
+        </h4>
+        <hr>
+        <pre class="mb-0 small">{{ job.log|default:"No log available" }}</pre>
+    </div>
+{% else %}
+    <!-- SUCCESS: Show integrated results -->
+    
+    {% if job.kind == 'PARAM' and html_content %}
+        <!-- Drug Parameters: Integrated View -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-success text-white">
+                <h2 class="h5 mb-0">
+                    📊 <span class="t-en">Molecular Properties & Structure</span>
+                    <span class="t-it">Proprietà Molecolari & Struttura</span>
+                </h2>
+            </div>
+            <div class="card-body">
+                {{ html_content|safe }}
+            </div>
+        </div>
+    {% endif %}
+
+    {% if job.kind == 'BIND' and html_content %}
+        <!-- Binding Visualizer: Integrated 3D View -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-success text-white">
+                <h2 class="h5 mb-0">
+                    🧬 <span class="t-en">3D Protein-Ligand Structure</span>
+                    <span class="t-it">Struttura 3D Proteina-Ligando</span>
+                </h2>
+            </div>
+            <div class="card-body p-0">
+                <div style="width: 100%; min-height: 600px;">
+                    {{ html_content|safe }}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if job.kind == 'SIM' and csv_data %}
+        <!-- Similarity Search: Interactive Table with Molecule Previews -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-success text-white">
+                <h2 class="h5 mb-0">
+                    🔍 <span class="t-en">Similar Compounds Found</span>
+                    <span class="t-it">Composti Simili Trovati</span>
+                    <span class="badge bg-light text-dark ms-2">{{ csv_data|length }} results</span>
+                </h2>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info mb-3">
+                    <strong>📊 <span class="t-en">Results Summary:</span><span class="t-it">Riepilogo Risultati:</span></strong>
+                    <ul class="mb-0 mt-2">
+                        <li><span class="t-en">Found {{ csv_data|length }} compounds with >90% structural similarity</span>
+                            <span class="t-it">Trovati {{ csv_data|length }} composti con >90% similarità strutturale</span></li>
+                        <li><span class="t-en">Results sorted by Tanimoto similarity score (1.0 = identical)</span>
+                            <span class="t-it">Risultati ordinati per punteggio similarità Tanimoto (1.0 = identico)</span></li>
+                        <li><span class="t-en">Click CID to view full PubChem entry with biological activity data</span>
+                            <span class="t-it">Clicca CID per vedere entry completa PubChem con dati attività biologica</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm mb-0" id="similarityTable">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th style="width: 80px;">
+                                    <span class="t-en">PubChem ID</span>
+                                    <span class="t-it">ID PubChem</span>
+                                </th>
+                                <th style="width: 200px;">SMILES</th>
+                                <th style="width: 150px;">
+                                    <span class="t-en">Similarity</span>
+                                    <span class="t-it">Similarità</span>
+                                </th>
+                                <th>MW</th>
+                                <th>LogP</th>
+                                <th>TPSA</th>
+                                <th>
+                                    <span class="t-en">H Donors</span>
+                                    <span class="t-it">Donatori H</span>
+                                </th>
+                                <th>
+                                    <span class="t-en">H Acceptors</span>
+                                    <span class="t-it">Accettori H</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in csv_data %}
+                                <tr>
+                                    <td>
+                                        <a href="https://pubchem.ncbi.nlm.nih.gov/compound/{{ row.CID }}" 
+                                           target="_blank" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            {{ row.CID }} 🔗
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <code class="small" style="font-size: 0.75rem;">{{ row.SMILES|truncatechars:30 }}</code>
+                                    </td>
+                                    <td>
+                                        {% with sim_val=row.Similarity|floatformat:3 %}
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="progress flex-grow-1" style="height: 24px; min-width: 80px;">
+                                                {% if sim_val|add:"0" == 1.0 %}
+                                                    <div class="progress-bar bg-success" style="width: 100%">
+                                                        {{ sim_val }}
+                                                    </div>
+                                                {% elif sim_val|add:"0" >= 0.95 %}
+                                                    <div class="progress-bar bg-info" style="width: {{ sim_val|add:'0'|multiply:100 }}%">
+                                                        {{ sim_val }}
+                                                    </div>
+                                                {% else %}
+                                                    <div class="progress-bar bg-warning" style="width: {{ sim_val|add:'0'|multiply:100 }}%">
+                                                        {{ sim_val }}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            {% if sim_val|add:"0" == 1.0 %}
+                                                <span class="badge bg-success">Perfect</span>
+                                            {% elif sim_val|add:"0" >= 0.95 %}
+                                                <span class="badge bg-info">High</span>
+                                            {% endif %}
+                                        </div>
+                                        {% endwith %}
+                                    </td>
+                                    <td><span class="badge bg-light text-dark">{{ row.MW|floatformat:1 }}</span></td>
+                                    <td>
+                                        {% with logp=row.LogP|floatformat:2 %}
+                                            {% if logp|add:"0" >= 0 and logp|add:"0" <= 5 %}
+                                                <span class="text-success">{{ logp }}</span>
+                                            {% else %}
+                                                <span class="text-warning">{{ logp }}</span>
+                                            {% endif %}
+                                        {% endwith %}
+                                    </td>
+                                    <td>{{ row.TPSA|floatformat:1 }}</td>
+                                    <td class="text-center">{{ row.HBD }}</td>
+                                    <td class="text-center">{{ row.HBA }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-light">
+                <div class="row">
+                    <div class="col-md-6">
+                        <small class="text-muted">
+                            <strong>💡 <span class="t-en">Color coding:</span><span class="t-it">Codice colori:</span></strong><br>
+                            <span class="badge bg-success">Green</span> = Perfect match (1.0)<br>
+                            <span class="badge bg-info">Blue</span> = Very similar (≥0.95)<br>
+                            <span class="badge bg-warning">Yellow</span> = Similar (0.90-0.95)
+                        </small>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <small class="text-muted">
+                            <strong>� <span class="t-en">Drug-likeness indicators:</span><span class="t-it">Indicatori drug-likeness:</span></strong><br>
+                            <span class="text-success">●</span> LogP in optimal range (0-5)<br>
+                            <span class="text-warning">●</span> LogP outside optimal range
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if not html_content and not csv_data %}
+        <div class="alert alert-warning" role="alert">
+            <span class="t-en">⚠️ No output files generated for this job.</span>
+            <span class="t-it">⚠️ Nessun file di output generato per questo job.</span>
+        </div>
+    {% endif %}
+
+    <!-- Log Section (Collapsible) -->
+    {% if job.log %}
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <button class="btn btn-link text-decoration-none p-0 w-100 text-start" 
+                        type="button" 
+                        data-bs-toggle="collapse" 
+                        data-bs-target="#logCollapse">
+                    <strong>
+                        📝 <span class="t-en">Execution Log</span>
+                        <span class="t-it">Log Esecuzione</span>
+                    </strong>
+                    <small class="text-muted ms-2">
+                        (<span class="t-en">click to expand</span><span class="t-it">clicca per espandere</span>)
+                    </small>
+                </button>
+            </div>
+            <div id="logCollapse" class="collapse">
+                <div class="card-body">
+                    <pre class="small mb-0" style="max-height: 400px; overflow-y: auto;">{{ job.log }}</pre>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+// Add DataTables for similarity results if present
+{% if job.kind == 'SIM' and csv_data %}
+document.addEventListener('DOMContentLoaded', function() {
+    // Simple sorting for the table
+    const table = document.getElementById('similarityTable');
+    if (table) {
+        const headers = table.querySelectorAll('th');
+        headers.forEach((header, index) => {
+            header.style.cursor = 'pointer';
+            header.addEventListener('click', () => {
+                sortTable(table, index);
+            });
+        });
+    }
+});
+
+function sortTable(table, column) {
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    const isAscending = table.dataset.sortOrder !== 'asc';
+    
+    rows.sort((a, b) => {
+        const aValue = a.querySelectorAll('td')[column].textContent.trim();
+        const bValue = b.querySelectorAll('td')[column].textContent.trim();
+        
+        const aNum = parseFloat(aValue);
+        const bNum = parseFloat(bValue);
+        
+        if (!isNaN(aNum) && !isNaN(bNum)) {
+            return isAscending ? aNum - bNum : bNum - aNum;
+        }
+        
+        return isAscending ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+    });
+    
+    rows.forEach(row => tbody.appendChild(row));
+    table.dataset.sortOrder = isAscending ? 'asc' : 'desc';
+}
+{% endif %}
+</script>
+{% endblock %}
