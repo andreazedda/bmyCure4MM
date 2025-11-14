@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.9.15)  3 JUL 2025 23:28
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.9.15)  14 NOV 2025 22:03
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1011,10 +1011,10 @@ l.159 ...ed) is the primary target of Bortezomib.}
 You may provide a definition with
 \DeclareUnicodeCharacter 
 
-</Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure.png, id=28, 570.2103pt x 426.393pt>
-File: /Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure.png Graphic file (type png)
-<use /Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure.png>
-Package pdftex.def Info: /Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure.png  used on input line 166.
+<5LF3_structure.png, id=28, 570.2103pt x 426.393pt>
+File: 5LF3_structure.png Graphic file (type png)
+<use 5LF3_structure.png>
+Package pdftex.def Info: 5LF3_structure.png  used on input line 166.
 (pdftex.def)             Requested size: 386.95897pt x 289.37085pt.
 
 /Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:167: LaTeX Error: Unicode character α (U+03B1)
@@ -1259,7 +1259,7 @@ Package fancyhdr Warning: \headheight is too small (12.0pt):
 (fancyhdr)                You might also make \topmargin smaller to compensate:
 (fancyhdr)                \addtolength{\topmargin}{-1.60925pt}.
 
-[4 </Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure.png>]
+[4 <./5LF3_structure.png>]
 /Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure_report.tex:204: Missing $ inserted.
 <inserted text> 
                 $
@@ -1954,14 +1954,14 @@ Package rerunfilecheck Info: Checksums for `5LF3_structure_report.out':
  ) 
 Here is how much of TeX's memory you used:
  16069 strings out of 474116
- 253894 string characters out of 5743682
+ 253425 string characters out of 5743682
  1942187 words of memory out of 5000000
  38048 multiletter control sequences out of 15000+600000
  570293 words of font info for 82 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  83i,15n,131p,1091b,553s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sfbx0800.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sfrm1095.pfb>
-Output written on 5LF3_structure_report.pdf (16 pages, 270221 bytes).
+Output written on 5LF3_structure_report.pdf (16 pages, 270857 bytes).
 PDF statistics:
  323 PDF objects out of 1000 (max. 8388607)
  276 compressed objects within 3 object streams

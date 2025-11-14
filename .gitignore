@@ -1,108 +1,7 @@
-venv
-.vscode
-BBBP.csv
-cifar-10-batches-py/batches.meta
-cifar-10-batches-py/data_batch_1
-cifar-10-batches-py/data_batch_2
-cifar-10-batches-py/data_batch_3
-cifar-10-batches-py/data_batch_4
-cifar-10-batches-py/data_batch_5
-cifar-10-batches-py/readme.html
-cifar-10-batches-py/test_batch
-cifar-10-python.tar.gz
-media
-__pycache__
-.ipynb_checkpoints
-PytorchGeometricTutorial-main
-pipelines/data/outputs/5LF3_structure_viewer.html
-outputs/
-data/
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
-
-# C extensions
-*.so
-
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
-*.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-.hypothesis/
-.pytest_cache/
-
-# Translations
-*.mo
-*.pot
-
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-
-# Flask stuff:
-instance/
-.webassets-cache
-
-# Scrapy stuff:
-.scrapy
-
-# Sphinx documentation
-docs/_build/
-
-# PyBuilder
-target/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# pyenv
-.python-version
-
-# celery beat schedule file
-celerybeat-schedule
-
-# SageMath parsed files
-*.sage.py
-
-# Environments
+# Environment files
 .env
+.env.*
+!.env.example
 .venv
 env/
 venv/
@@ -110,23 +9,53 @@ ENV/
 env.bak/
 venv.bak/
 
-# Spyder project settings
-.spyderproject
-.spyproject
+# Secrets and credentials
+secrets.json
+*.pem
+*.key
+*.cert
+*.p12
 
-# Rope project settings
-.ropeproject
+# Database files
+*.sqlite3
+*.db
+db.sqlite3
+db.sqlite3-journal
+db.*
 
-# mkdocs documentation
-/site
+# Logs
+*.log
+logs/
+*.log.*
 
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
+# Media and uploads
+media/
+media/*
+uploads/
 
-# Pyre type checker
-.pyre/
+# Static files
+staticfiles/
+static/collected/
+
+# Cache
+__pycache__/
+*.py[cod]
+*$py.class
+.cache/
+.pytest_cache/
+.ruff_cache/
+
+# LaTeX generated files
+*.aux
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.out
+*.toc
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints/
 
 # IDEs
 .vscode/
@@ -144,17 +73,71 @@ dmypy.json
 ehthumbs.db
 Thumbs.db
 
-# Static and media files
-staticfiles/
-media/
+# Python distribution
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
-# Database
-*.sqlite3
-*.db
+# Testing
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
 
-# Secrets
-secrets.json
-db.sqlite3
-*.sqlite3
-db.*
-*.log
+# Documentation builds
+docs/_build/
+/site
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Data files (keep out of repo)
+data/
+outputs/
+pipelines/data/outputs/
+pipelines/data/logs/
+*.csv
+*.pkl
+*.pickle
+
+# Specific files to ignore
+BBBP.csv
+binding_visualizer.log
+output.html
+5LF3_structure_viewer.html
+
+# Generated reports
+*.pdf
+!docs/**/*.pdf
+
+# Compiled extensions
+*.so
+
+# Other
+cifar-10-batches-py/
+cifar-10-python.tar.gz
+PytorchGeometricTutorial-main/

@@ -234,11 +234,11 @@ INPUT /usr/local/texlive/2024/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm1
 INPUT /usr/local/texlive/2024/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm7.tfm
 INPUT /usr/local/texlive/2024/texmf-dist/fonts/tfm/public/amsfonts/symbols/msbm5.tfm
 INPUT /usr/local/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmti10.tfm
-INPUT /Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure.png
-INPUT /Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure.png
-INPUT /Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure.png
-INPUT /Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure.png
-INPUT /Volumes/nvme/Github/bmyCure4MM/modules/binding_visualizer/sources/5LF3_structure.png
+INPUT ./5LF3_structure.png
+INPUT ./5LF3_structure.png
+INPUT ./5LF3_structure.png
+INPUT ./5LF3_structure.png
+INPUT ./5LF3_structure.png
 INPUT /usr/local/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmbx8.tfm
 INPUT /usr/local/texlive/2024/texmf-dist/fonts/tfm/jknappen/ec/tcbx0800.tfm
 INPUT /usr/local/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmtt10.tfm
