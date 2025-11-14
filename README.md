@@ -19,6 +19,7 @@
 - **🧪 Computational Biology** - Integration with PDB, molecular visualization, and cheminformatics
 
 Perfect for researchers, clinicians, and students working on multiple myeloma treatment optimization and drug discovery.
+<img width="1438" height="771" alt="image" src="https://github.com/user-attachments/assets/5b17abc2-8697-445f-9667-73ff2642b58e" />
 
 ---
 
