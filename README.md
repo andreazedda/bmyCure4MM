@@ -315,7 +315,7 @@ SOFTWARE.
 
 **Andrea Zedda**
 - GitHub: [@andreazedda](https://github.com/andreazedda)
-- Email: andreazedda@example.com
+- Email: andreazedda@outlook.it
 
 ---
 
@@ -334,7 +334,7 @@ SOFTWARE.
 - **Issues**: Report bugs or request features via [GitHub Issues](https://github.com/andreazedda/bmyCure4MM/issues)
 - **Discussions**: Join conversations in [GitHub Discussions](https://github.com/andreazedda/bmyCure4MM/discussions)
 - **Documentation**: Check the [docs/](docs/) folder for detailed guides
-- **Email**: For private inquiries, contact andreazedda@example.com
+- **Email**: For private inquiries, contact andreazedda@outlook.it
 
 ---
 
