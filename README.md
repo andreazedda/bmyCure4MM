@@ -6,6 +6,8 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Django 4.2+](https://img.shields.io/badge/django-4.2+-green.svg)](https://www.djangoproject.com/)
 
+<img width="1438" height="771" alt="image" src="https://github.com/user-attachments/assets/5b17abc2-8697-445f-9667-73ff2642b58e" />
+
 ---
 
 ## 🎯 Overview
@@ -19,7 +21,6 @@
 - **🧪 Computational Biology** - Integration with PDB, molecular visualization, and cheminformatics
 
 Perfect for researchers, clinicians, and students working on multiple myeloma treatment optimization and drug discovery.
-<img width="1438" height="771" alt="image" src="https://github.com/user-attachments/assets/5b17abc2-8697-445f-9667-73ff2642b58e" />
 
 ---
 
