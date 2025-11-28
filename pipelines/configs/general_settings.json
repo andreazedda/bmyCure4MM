@@ -1,8 +1,8 @@
 {
-    "root_path": "./pipelines",
-    "data_path": "./pipelines/data",
-    "logs_path": "./pipelines/data/logs",
-    "outputs_path": "./pipelines/data/outputs",
-    "pickles_path": "./pipelines/data/outputs/pickles",
-    "configs_path": "./pipelines/configs"
+    "root_path": "/home/runner/work/bmyCure4MM/bmyCure4MM/pipelines",
+    "data_path": "/home/runner/work/bmyCure4MM/bmyCure4MM/pipelines/data",
+    "logs_path": "/home/runner/work/bmyCure4MM/bmyCure4MM/pipelines/data/logs",
+    "outputs_path": "/home/runner/work/bmyCure4MM/bmyCure4MM/pipelines/data/outputs",
+    "pickles_path": "/home/runner/work/bmyCure4MM/bmyCure4MM/pipelines/data/outputs/pickles",
+    "configs_path": "/home/runner/work/bmyCure4MM/bmyCure4MM/pipelines/configs"
 }
