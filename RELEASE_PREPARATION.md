@@ -99,7 +99,7 @@ Created `.env.example` (150+ lines) with:
 - Production security recommendations
 
 **Key Variables Documented**:
-- `DJANGO_SECRET_KEY` (with generation command)
+- `DJANGO_SECRET_KEY` (REQUIRED - with generation command and security validation)
 - `DJANGO_DEBUG`
 - `ALLOWED_HOSTS`
 - `CSRF_TRUSTED_ORIGINS`
@@ -109,7 +109,13 @@ Created `.env.example` (150+ lines) with:
 - Security settings (HTTPS, HSTS, cookies)
 - Static/media file paths
 
-**Impact**: Users can quickly configure the application without hunting for required settings.
+**Security Enhancement (Dec 2025)**:
+- Application now **requires** `DJANGO_SECRET_KEY` to be set (no default)
+- Validates that key is not insecure or using default values
+- Fails fast with clear error message if SECRET_KEY is missing or weak
+- See Issue #7 for implementation details
+
+**Impact**: Users can quickly configure the application without hunting for required settings. Security is enforced at startup.
 
 ### 5. Enhanced .gitignore
 **Status**: Complete

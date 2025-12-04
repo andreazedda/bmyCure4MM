@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import os
+import sys
 from pathlib import Path
+from django.core.exceptions import ImproperlyConfigured
 from django.contrib.messages import constants as django_messages
 
 # Build paths inside the project like this: BASE_DIR / "subdir".
@@ -11,15 +13,39 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 LOGS_DIR = BASE_DIR / "logs"
 LOGS_DIR.mkdir(exist_ok=True)
 
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get(
-    "DJANGO_SECRET_KEY",
-    "django-insecure-please-change-me",
-)
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
+
+# SECURITY WARNING: keep the secret key used in production secret!
+# In production (DEBUG=False), SECRET_KEY MUST be set via DJANGO_SECRET_KEY environment variable
+# In development (DEBUG=True), a default key is provided for convenience
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
+
+if not DEBUG:  # Production mode - strict validation
+    if not SECRET_KEY:
+        raise ImproperlyConfigured(
+            "DJANGO_SECRET_KEY environment variable is required in production. "
+            "Generate a secure key with: "
+            "python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'"
+        )
+    
+    if "insecure" in SECRET_KEY.lower() or SECRET_KEY in (
+        "your-secret-key-here-change-me-in-production",
+        "django-insecure-please-change-me",
+        "change-me",
+        "changeme",
+        "dev-key-not-for-production",
+    ):
+        raise ImproperlyConfigured(
+            "DJANGO_SECRET_KEY contains an insecure or default value. "
+            "Please set a strong, random secret key in your environment. "
+            "Generate one with: "
+            "python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'"
+        )
+else:  # Development mode - allow default for convenience
+    if not SECRET_KEY:
+        SECRET_KEY = "dev-key-not-for-production"
+        print("⚠️  Using default SECRET_KEY for development. Set DJANGO_SECRET_KEY in production!")
 
 _hosts = os.environ.get("ALLOWED_HOSTS")
 ALLOWED_HOSTS: list[str] = [host.strip() for host in _hosts.split(",") if host.strip()] if _hosts else []

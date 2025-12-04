@@ -78,7 +78,12 @@ pip install -r requirements.txt
 
 # Set up environment variables
 cp .env.example .env
-# Edit .env with your configuration
+
+# IMPORTANT: Generate and set DJANGO_SECRET_KEY
+# Generate a secure key:
+python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
+# Copy the output and add to .env file:
+# DJANGO_SECRET_KEY=<paste-generated-key-here>
 
 # Run database migrations
 python manage.py migrate

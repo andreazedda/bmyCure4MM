@@ -169,10 +169,19 @@ User ─┬─ Patient ─── Assessment
 ## Configuration
 
 ### Environment Variables
+
+**Required Variables:**
+```bash
+# Django - REQUIRED
+DJANGO_SECRET_KEY          # Secret key (REQUIRED - no default)
+                          # Generate: python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
+                          # Must be strong and random - app will not start without it
+```
+
+**Optional Variables:**
 ```bash
 # Django
-DJANGO_SECRET_KEY          # Secret key (required in production)
-DJANGO_DEBUG               # Debug mode (0 or 1)
+DJANGO_DEBUG               # Debug mode (0 or 1, default: 1)
 ALLOWED_HOSTS              # Comma-separated hostnames
 CSRF_TRUSTED_ORIGINS       # Comma-separated origins
 
@@ -184,6 +193,13 @@ CELERY_TASK_ALWAYS_EAGER   # Run tasks synchronously (dev)
 # Features
 PREDLAB_V2                 # Enable experimental features (0 or 1)
 ```
+
+**Security Note:** The application will refuse to start if `DJANGO_SECRET_KEY` is:
+- Not set in environment
+- Contains "insecure" 
+- Uses a known default value
+
+See `.env.example` for complete configuration template.
 
 ### File Structure
 ```
@@ -292,20 +308,43 @@ LOGGING = {
 ## Deployment
 
 ### Development
+
+**First-time setup:**
+```bash
+# 1. Generate a secure SECRET_KEY
+python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
+
+# 2. Create .env file from template
+cp .env.example .env
+
+# 3. Edit .env and set DJANGO_SECRET_KEY to the generated value
+# DJANGO_SECRET_KEY=<paste-generated-key-here>
+
+# 4. Start development server
+./start_dev.sh  # Redis + Celery + Django
+```
+
+**Quick start (after initial setup):**
 ```bash
 ./start_dev.sh  # Redis + Celery + Django
 ```
 
 ### Production Checklist
 - [ ] Set `DJANGO_DEBUG=0`
-- [ ] Configure strong `DJANGO_SECRET_KEY`
-- [ ] Set `ALLOWED_HOSTS`
+- [ ] Generate and set strong `DJANGO_SECRET_KEY` (REQUIRED - see above)
+- [ ] Set `ALLOWED_HOSTS` to your domain(s)
 - [ ] Use PostgreSQL instead of SQLite
 - [ ] Enable HTTPS
 - [ ] Configure static file serving (WhiteNoise/CDN)
 - [ ] Set up proper logging/monitoring
 - [ ] Configure backup strategy
 - [ ] Enable error tracking (Sentry)
+
+**Security Validation:**
+The application will automatically refuse to start if:
+- `DJANGO_SECRET_KEY` is not set
+- `DJANGO_SECRET_KEY` contains "insecure"
+- `DJANGO_SECRET_KEY` matches known default values
 
 ## Future Architecture Considerations
 
