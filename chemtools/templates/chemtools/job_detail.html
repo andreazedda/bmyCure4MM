@@ -1576,7 +1576,12 @@ div[style*="font-family:Arial"] {
                 
                 buttons.forEach((btn, idx) => {
                     const wasDisabled = btn.disabled;
-                    const hadOnclick = btn.hasAttribute('onclick') || btn.onclick;
+                    let hadOnclick = btn.hasAttribute('onclick');
+                    try {
+                        hadOnclick = hadOnclick || btn.onclick;
+                    } catch (e) {
+                        // onclick property may throw SyntaxError with certain inline handlers
+                    }
                     const buttonText = btn.textContent.trim();
                     const onclickAttr = btn.getAttribute('onclick');
                     
@@ -1615,8 +1620,7 @@ div[style*="font-family:Arial"] {
                 // Add click event listeners for debugging
                 console.group('🔌 Adding Debug Click Listeners');
                 buttons.forEach((btn, idx) => {
-                    // Store original onclick if it exists
-                    const originalOnclick = btn.onclick;
+                    // Use getAttribute instead of .onclick to avoid SyntaxError with complex inline handlers
                     const onclickAttr = btn.getAttribute('onclick');
                     
                     // Wrap with debug logging
@@ -1625,7 +1629,6 @@ div[style*="font-family:Arial"] {
                         console.log('  Button:', btn.textContent.trim());
                         console.log('  Disabled:', btn.disabled);
                         console.log('  Has onclick attr:', !!onclickAttr);
-                        console.log('  Has onclick handler:', !!btn.onclick);
                         console.log('  window.viewer exists:', !!window.viewer);
                         console.log('  window.viewer.setStyle exists:', !!(window.viewer && typeof window.viewer.setStyle === 'function'));
                         
