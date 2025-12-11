@@ -37,7 +37,25 @@ import matplotlib.image as mpimg
 from io import BytesIO
 import base64
 
-print(Fore.CYAN + '[binding_visualizer] Starting script...' + Style.RESET_ALL)
+# ============================================================
+# DEBUG MODE: Comprehensive Python logging enabled
+# ============================================================
+print(Fore.MAGENTA + '═' * 70 + Style.RESET_ALL)
+print(Fore.MAGENTA + Style.BRIGHT + '  bmyCure4MM - BINDING VISUALIZER - DEBUG MODE ACTIVE' + Style.RESET_ALL)
+print(Fore.MAGENTA + '═' * 70 + Style.RESET_ALL)
+print(Fore.CYAN + '🔍 [DEBUG] All operations will be logged in detail' + Style.RESET_ALL)
+print(Fore.CYAN + '📊 [DEBUG] API calls and data processing tracked' + Style.RESET_ALL)
+print(Fore.CYAN + '⏱️  [DEBUG] Performance timings enabled' + Style.RESET_ALL)
+print(Fore.CYAN + '🔬 [DEBUG] Data extraction and validation logged' + Style.RESET_ALL)
+print(Fore.MAGENTA + '═' * 70 + Style.RESET_ALL)
+print()
+
+print(Fore.CYAN + '[DEBUG] 🚀 Starting script...' + Style.RESET_ALL)
+print(Fore.CYAN + f'[DEBUG] 📅 Timestamp: {datetime.datetime.now().isoformat()}' + Style.RESET_ALL)
+print(Fore.CYAN + f'[DEBUG] 🐍 Python version: {sys.version}' + Style.RESET_ALL)
+print(Fore.CYAN + f'[DEBUG] 💻 Platform: {platform.platform()}' + Style.RESET_ALL)
+print(Fore.CYAN + f'[DEBUG] 👤 User: {getpass.getuser()}' + Style.RESET_ALL)
+print()
 
 # Load general settings
 # general_settings = pu.load_general_settings()
@@ -47,7 +65,12 @@ print(Fore.CYAN + '[binding_visualizer] Starting script...' + Style.RESET_ALL)
 module_name = os.path.splitext(os.path.basename(__file__))[0]
 this_script_folder_path = os.path.dirname(os.path.realpath(__file__))
 config_path = os.path.join(this_script_folder_path, module_name + ".yaml")
-print(Fore.CYAN + f"[INFO] Loading configuration from {config_path}" + Style.RESET_ALL)
+print(Fore.CYAN + f"[DEBUG] 📁 Script folder: {this_script_folder_path}" + Style.RESET_ALL)
+print(Fore.CYAN + f"[DEBUG] 📝 Loading configuration from {config_path}" + Style.RESET_ALL)
+if os.path.exists(config_path):
+    print(Fore.GREEN + f"[DEBUG] ✅ Config file exists (size: {os.path.getsize(config_path)} bytes)" + Style.RESET_ALL)
+else:
+    print(Fore.RED + f"[DEBUG] ❌ Config file not found!" + Style.RESET_ALL)
 if not os.path.exists(config_path):
     print(Fore.RED + f"Configuration file {config_path} not found." + Style.RESET_ALL)
     exit(1)
@@ -852,16 +875,39 @@ with open(debug_sidebar_path, 'w') as debug_file:
 print(Fore.YELLOW + f"[DEBUG] Sidebar HTML saved to {debug_sidebar_path}. Inspect for troubleshooting." + Style.RESET_ALL)
 
 def main():
-    print(Fore.CYAN + '[DEBUG] Entered main()' + Style.RESET_ALL)
+    import time
+    start_time = time.time()
+    
+    print()
+    print(Fore.MAGENTA + '═' * 70 + Style.RESET_ALL)
+    print(Fore.MAGENTA + Style.BRIGHT + '  STARTING MAIN WORKFLOW' + Style.RESET_ALL)
+    print(Fore.MAGENTA + '═' * 70 + Style.RESET_ALL)
+    print(Fore.CYAN + '[DEBUG] 🎯 Entered main()' + Style.RESET_ALL)
+    
     # Initialize logging configuration
+    log_file = os.path.join(this_script_folder_path, "binding_visualizer.log")
     logging.basicConfig(
-        filename=os.path.join(this_script_folder_path, "binding_visualizer.log"),
-        level=logging.INFO,
-        format="%(asctime)s - %(levelname)s - %(message)s"
+        filename=log_file,
+        level=logging.DEBUG,  # Changed to DEBUG for more verbose logging
+        format="%(asctime)s - %(levelname)s - %(funcName)s - %(message)s"
     )
+    print(Fore.CYAN + f"[DEBUG] 📋 Log file: {log_file}" + Style.RESET_ALL)
+    
     try:
-        print(Fore.CYAN + f"[DEBUG] About to fetch PDB data for {config['pdb_id']}..." + Style.RESET_ALL)
+        # Log configuration details
+        print(Fore.CYAN + f"[DEBUG] 📊 Configuration keys: {list(config.keys())}" + Style.RESET_ALL)
+        print(Fore.CYAN + f"[DEBUG] 🔬 PDB ID: {config.get('pdb_id', 'NOT SET')}" + Style.RESET_ALL)
+        print(Fore.CYAN + f"[DEBUG] 📐 Viewer dimensions: {config.get('viewer', {}).get('width', 'N/A')}x{config.get('viewer', {}).get('height', 'N/A')}" + Style.RESET_ALL)
+        print()
+        
+        print(Fore.YELLOW + f"[DEBUG] 🌐 Fetching PDB data for {config['pdb_id']}..." + Style.RESET_ALL)
+        fetch_start = time.time()
         pdb_data = fetch_pdb_data(config['pdb_id'])
+        fetch_time = time.time() - fetch_start
+        print(Fore.GREEN + f"[DEBUG] ✅ PDB data fetched in {fetch_time:.2f}s" + Style.RESET_ALL)
+        print(Fore.CYAN + f"[DEBUG] 📏 PDB data size: {len(pdb_data)} bytes" + Style.RESET_ALL)
+        print(Fore.CYAN + f"[DEBUG] 📄 PDB data lines: {pdb_data.count(chr(10))} lines" + Style.RESET_ALL)
+        logging.info(f"Fetched PDB data for {config['pdb_id']}: {len(pdb_data)} bytes in {fetch_time:.2f}s")
         
         # Parse PDB metadata for report generation
         print(Fore.CYAN + f"[DEBUG] Parsing PDB metadata for {config['pdb_id']}..." + Style.RESET_ALL)

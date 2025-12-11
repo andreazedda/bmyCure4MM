@@ -1,6 +1,250 @@
 {% extends "base.html" %}
 {% load math_filters %}
 
+{% block extra_head %}
+<style>
+/* Py3Dmol Binding Visualizer Integration Styles */
+
+/* Hide the sidebar from binding_visualizer.py */
+#bv-sidebar {
+    display: none !important;
+}
+
+/* Adjust content that has margin-left for sidebar */
+div[style*="margin-left:260px"],
+div[style*="margin-left: 260px"] {
+    margin-left: 0 !important;
+}
+
+/* Viewer container adjustments */
+#viewerContainer {
+    position: relative;
+    min-height: 600px;
+    overflow: visible;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 0.375rem;
+}
+
+/* 3Dmol viewer divs (generated dynamically by py3Dmol) */
+div[id^="3dmolviewer_"] {
+    display: block !important;
+    visibility: visible !important;
+    min-height: 600px !important;
+    width: 100% !important;
+    border-radius: 0.375rem;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* 3Dmol canvas elements - Styled to match Bootstrap cards */
+div[id^="3dmolviewer_"] canvas {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    border-radius: 0.375rem !important;
+    box-shadow: 0 0 15px rgba(102, 126, 234, 0.1) !important;
+    transition: box-shadow 0.3s ease !important;
+}
+
+/* Add hover effect for interactivity feedback */
+div[id^="3dmolviewer_"]:hover canvas {
+    box-shadow: 0 0 25px rgba(102, 126, 234, 0.2) !important;
+}
+
+/* Style any control panels within the viewer */
+div[id^="3dmolviewer_"] > div[style*="position: absolute"] {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px);
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    padding: 0.75rem;
+}
+
+/* Style buttons within the viewer controls */
+div[id^="3dmolviewer_"] button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 0.375rem !important;
+    padding: 0.5rem 1rem !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+div[id^="3dmolviewer_"] button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3) !important;
+}
+
+/* Loading/placeholder background */
+#viewerContainer:empty::before {
+    content: "Loading 3D Viewer...";
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 600px;
+    font-size: 1.25rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+/* Professional border accent for the entire viewer card */
+.card:has(#viewerContainer) {
+    border: 2px solid transparent;
+    background: linear-gradient(white, white) padding-box,
+                linear-gradient(135deg, #667eea 0%, #764ba2 100%) border-box;
+    border-radius: 0.5rem;
+}
+
+/* Enhance the info overlay to match Bootstrap styling */
+#infoOverlay {
+    background: rgba(255, 255, 255, 0.98) !important;
+    border: 1px solid rgba(102, 126, 234, 0.2) !important;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
+    color: #212529 !important;
+    backdrop-filter: blur(10px);
+}
+
+#infoOverlay #atomInfo {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+/* Style any labels or text within the viewer */
+div[id^="3dmolviewer_"] .label,
+div[id^="3dmolviewer_"] span[style*="position: absolute"] {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #viewerContainer {
+        min-height: 400px;
+    }
+    
+    div[id^="3dmolviewer_"] {
+        min-height: 400px !important;
+    }
+}
+
+/* Interactive controls panel from binding_visualizer.py */
+#bv-controls {
+    margin-top: 0 !important;
+    margin-bottom: 1rem;
+    margin-left: 0 !important;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 2px solid #667eea;
+    position: relative;
+    overflow: hidden;
+}
+
+#bv-controls::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+}
+
+#bv-controls > div {
+    margin-bottom: 1rem;
+}
+
+#bv-controls > div:last-child {
+    margin-bottom: 0;
+}
+
+#bv-controls > b:first-child {
+    display: block;
+    font-size: 1.1rem;
+    color: #667eea;
+    margin-bottom: 1rem;
+    padding-left: 0.5rem;
+    border-left: 4px solid #667eea;
+}
+
+#bv-controls > div > b {
+    display: inline-block;
+    font-weight: 600;
+    color: #495057;
+    margin-right: 0.75rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+#bv-controls button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 0.375rem !important;
+    padding: 0.5rem 1rem !important;
+    margin: 0.25rem !important;
+    font-weight: 500 !important;
+    font-size: 0.9rem !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3) !important;
+    cursor: pointer !important;
+}
+
+#bv-controls button:hover:not(:disabled) {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4) !important;
+}
+
+#bv-controls button:active:not(:disabled) {
+    transform: translateY(0) !important;
+}
+
+#bv-controls button:disabled {
+    opacity: 0.6 !important;
+    cursor: not-allowed !important;
+}
+
+#bv-controls select,
+#bv-controls input {
+    border-radius: 0.375rem !important;
+    border: 1px solid #ced4da !important;
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.95rem !important;
+    transition: all 0.2s ease !important;
+}
+
+#bv-controls select:focus,
+#bv-controls input:focus {
+    border-color: #667eea !important;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25) !important;
+    outline: none !important;
+}
+
+#bv-controls label {
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+/* Info panels and metadata from binding_visualizer */
+div[style*="font-family:Arial"] {
+    max-width: 100%;
+    overflow-x: auto;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+    background: white;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <nav aria-label="breadcrumb" class="mb-4">
     <ol class="breadcrumb">
@@ -108,6 +352,90 @@
 {% else %}
     <!-- SUCCESS: Show integrated results -->
     
+    <!-- API Data Sources Banner for BIND jobs -->
+    {% if job.kind == 'BIND' and pdb_metadata %}
+    <div class="alert alert-primary shadow-sm mb-4">
+        <div class="row">
+            <div class="col-md-8">
+                <h4 class="alert-heading h6 mb-2">
+                    🌐 <span class="t-en">Comprehensive API Data Integration</span>
+                    <span class="t-it">Integrazione Dati API Completa</span>
+                </h4>
+                <p class="mb-2 small">
+                    <span class="t-en">This analysis integrates data from multiple authoritative sources to provide comprehensive insights:</span>
+                    <span class="t-it">Questa analisi integra dati da più fonti autorevoli per fornire approfondimenti completi:</span>
+                </p>
+                <div class="row small">
+                    <div class="col-md-6">
+                        <strong>🔬 Structural Data:</strong>
+                        <ul class="mb-1">
+                            <li>RCSB PDB - Structure metadata</li>
+                            <li>PDBe - Validation & interactions</li>
+                            {% if pdb_metadata.validation_metrics %}<li class="text-success">✅ Quality metrics available</li>{% endif %}
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>💊 Drug Information:</strong>
+                        <ul class="mb-1">
+                            <li>ChEMBL - Drug properties</li>
+                            <li>PubChem - Chemical data</li>
+                            {% if pdb_metadata.clinical_trials %}<li class="text-success">✅ Clinical trials data</li>{% endif %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="row small mt-2">
+                    <div class="col-md-6">
+                        <strong>📚 Literature:</strong>
+                        <ul class="mb-0">
+                            <li>PubMed/NCBI - Publications</li>
+                            {% if pdb_metadata.pubmed_literature %}<li class="text-success">✅ {{ pdb_metadata.pubmed_literature|length }} articles found</li>{% endif %}
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>🕸️ Networks:</strong>
+                        <ul class="mb-0">
+                            <li>STRING - Protein interactions</li>
+                            <li>Reactome - Pathways</li>
+                            {% if pdb_metadata.protein_network %}<li class="text-success">✅ Interaction network available</li>{% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="bg-light p-3 rounded">
+                    <h6 class="small mb-2">📊 <span class="t-en">Data Status</span><span class="t-it">Stato Dati</span></h6>
+                    <ul class="list-unstyled small mb-0">
+                        {% if pdb_metadata.validation_metrics %}
+                        <li class="text-success">✅ Validation metrics</li>
+                        {% endif %}
+                        {% if pdb_metadata.interaction_details %}
+                        <li class="text-success">✅ Binding site details</li>
+                        {% endif %}
+                        {% if pdb_metadata.chembl_drug_details %}
+                        <li class="text-success">✅ ChEMBL drug data</li>
+                        {% endif %}
+                        {% if pdb_metadata.clinical_trials %}
+                        <li class="text-success">✅ {{ pdb_metadata.clinical_trials|length }} clinical trials</li>
+                        {% endif %}
+                        {% if pdb_metadata.pubmed_literature %}
+                        <li class="text-success">✅ Recent publications</li>
+                        {% endif %}
+                        {% if pdb_metadata.protein_network %}
+                        <li class="text-success">✅ Protein network</li>
+                        {% endif %}
+                        {% if pdb_metadata.similar_structures %}
+                        <li class="text-success">✅ Similar structures</li>
+                        {% endif %}
+                        {% if not pdb_metadata.validation_metrics and not pdb_metadata.chembl_drug_details and not pdb_metadata.clinical_trials %}
+                        <li class="text-muted">⏳ Additional data loading...</li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
     {% if job.kind == 'PARAM' and html_content %}
         <!-- Drug Parameters: Integrated View -->
         <div class="card shadow-sm mb-4">
@@ -124,20 +452,1511 @@
     {% endif %}
 
     {% if job.kind == 'BIND' and html_content %}
-        <!-- Binding Visualizer: Integrated 3D View -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-header bg-success text-white">
-                <h2 class="h5 mb-0">
-                    🧬 <span class="t-en">3D Protein-Ligand Structure</span>
-                    <span class="t-it">Struttura 3D Proteina-Ligando</span>
-                </h2>
-            </div>
-            <div class="card-body p-0">
-                <div style="width: 100%; min-height: 600px;">
-                    {{ html_content|safe }}
+        <!-- Clinical Context Panel (if available) -->
+        {% if binding_analysis %}
+        <div class="alert alert-info border-info shadow-sm mb-4">
+            <div class="row">
+                <div class="col-md-8">
+                    <h3 class="h6 text-info mb-3">
+                        <span class="t-en">🎯 Clinical Context: {{ binding_analysis.name }}</span>
+                        <span class="t-it">🎯 Contesto Clinico: {{ binding_analysis.name }}</span>
+                    </h3>
+                    <dl class="row mb-0 small">
+                        <dt class="col-sm-4">
+                            <span class="t-en">Mechanism:</span>
+                            <span class="t-it">Meccanismo:</span>
+                        </dt>
+                        <dd class="col-sm-8">{{ binding_analysis.mechanism }}</dd>
+                        
+                        <dt class="col-sm-4">
+                            <span class="t-en">Clinical Use:</span>
+                            <span class="t-it">Uso Clinico:</span>
+                        </dt>
+                        <dd class="col-sm-8"><strong>{{ binding_analysis.clinical }}</strong></dd>
+                        
+                        <dt class="col-sm-4">
+                            <span class="t-en">Key Residues:</span>
+                            <span class="t-it">Residui Chiave:</span>
+                        </dt>
+                        <dd class="col-sm-8"><code>{{ binding_analysis.key_residues }}</code></dd>
+                        
+                        <dt class="col-sm-4">
+                            <span class="t-en">Binding Type:</span>
+                            <span class="t-it">Tipo Binding:</span>
+                        </dt>
+                        <dd class="col-sm-8 mb-0">
+                            <span class="badge bg-primary">{{ binding_analysis.binding_type }}</span>
+                        </dd>
+                    </dl>
+                </div>
+                <div class="col-md-4">
+                    <h6 class="small text-info mb-2">
+                        <span class="t-en">💡 Analysis Tips:</span>
+                        <span class="t-it">💡 Suggerimenti Analisi:</span>
+                    </h6>
+                    <ul class="small mb-0 ps-3">
+                        <li class="t-en">Focus on binding pocket interactions</li>
+                        <li class="t-en">Check H-bonds with key residues</li>
+                        <li class="t-en">Compare with similar structures</li>
+                        <li class="t-en">Evaluate druggability metrics</li>
+                        <li class="t-it">Focalizza su interazioni tasca binding</li>
+                        <li class="t-it">Controlla legami H con residui chiave</li>
+                        <li class="t-it">Confronta con strutture simili</li>
+                        <li class="t-it">Valuta metriche druggability</li>
+                    </ul>
                 </div>
             </div>
         </div>
+        {% endif %}
+
+        <!-- Educational Context Panel (only for BIND jobs) -->
+        {% if job.kind == 'BIND' %}
+        <div class="card shadow-sm mb-4 border-warning">
+            <div class="card-header bg-warning bg-opacity-10 border-warning">
+                <h3 class="h6 mb-0 text-warning">
+                    📚 <span class="t-en">Educational Resources & Metabolic Pathways</span>
+                    <span class="t-it">Risorse Educative & Percorsi Metabolici</span>
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Metabolic Pathways -->
+                    <div class="col-md-6 mb-3">
+                        <h6 class="text-primary">
+                            <span class="t-en">🔄 Metabolic Pathways Involved</span>
+                            <span class="t-it">🔄 Percorsi Metabolici Coinvolti</span>
+                        </h6>
+                        <div class="small">
+                            {% if binding_analysis %}
+                                {% if 'Lenalidomide' in binding_analysis.name or 'IMiD' in binding_analysis.mechanism %}
+                                <div class="alert alert-light border-start border-primary border-3 mb-2">
+                                    <strong>🧬 Ubiquitin-Proteasome System (UPS)</strong><br>
+                                    <span class="t-en">Lenalidomide modulates CRBN E3 ubiquitin ligase → targets IKZF1/3 for degradation → inhibits MM cell proliferation</span>
+                                    <span class="t-it">Lenalidomide modula CRBN E3 ubiquitina ligasi → degrada IKZF1/3 → inibisce proliferazione cellule MM</span>
+                                    <div class="mt-2">
+                                        <a href="https://www.kegg.jp/pathway/hsa04120" target="_blank" class="btn btn-sm btn-outline-primary me-1">
+                                            📊 KEGG: Ubiquitin Pathway
+                                        </a>
+                                        <a href="https://reactome.org/content/detail/R-HSA-8866652" target="_blank" class="btn btn-sm btn-outline-info me-1">
+                                            🔬 Reactome: IMiD Pathway
+                                        </a>
+                                        <a href="https://go.drugbank.com/drugs/DB00480" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                            📖 DrugBank
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="alert alert-light border-start border-success border-3 mb-2">
+                                    <strong>🔥 NF-κB Signaling Pathway</strong><br>
+                                    <span class="t-en">IKZF1/3 degradation → downregulation of IRF4 → reduced NF-κB activity → decreased MM survival signals</span>
+                                    <span class="t-it">Degradazione IKZF1/3 → riduzione IRF4 → attività NF-κB ridotta → segnali sopravvivenza MM diminuiti</span>
+                                    <div class="mt-2">
+                                        <a href="https://www.kegg.jp/pathway/hsa04064" target="_blank" class="btn btn-sm btn-outline-success">
+                                            📊 KEGG: NF-κB Pathway
+                                        </a>
+                                    </div>
+                                </div>
+                                {% elif 'Bortezomib' in binding_analysis.name or 'Proteasome' in binding_analysis.mechanism %}
+                                <div class="alert alert-light border-start border-danger border-3 mb-2">
+                                    <strong>⚙️ 26S Proteasome Inhibition Mechanism</strong><br>
+                                    <span class="t-en">Bortezomib (boronic acid dipeptide) inhibits the β5 catalytic subunit of 20S proteasome → blocks protein degradation → accumulation of pro-apoptotic proteins (p53, Bax, p27) → MM cell apoptosis</span>
+                                    <span class="t-it">Bortezomib (dipeptide boronico) inibisce la subunità catalitica β5 del proteasoma 20S → blocca degradazione proteica → accumulo proteine pro-apoptotiche (p53, Bax, p27) → apoptosi cellule MM</span>
+                                    
+                                    {% if binding_analysis.resistance %}
+                                    <div class="mt-2 p-2 bg-warning bg-opacity-10 rounded">
+                                        <small><strong>⚠️ <span class="t-en">Resistance Mutations:</span><span class="t-it">Mutazioni Resistenza:</span></strong> {{ binding_analysis.resistance }}</small>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <div class="mt-2 d-flex gap-1 flex-wrap">
+                                        <a href="https://www.kegg.jp/pathway/hsa03050" target="_blank" class="btn btn-sm btn-outline-danger">
+                                            📊 KEGG: Proteasome
+                                        </a>
+                                        <a href="https://reactome.org/content/detail/R-HSA-5679002" target="_blank" class="btn btn-sm btn-outline-info">
+                                            🔬 Reactome: Bortezomib MOA
+                                        </a>
+                                        <a href="https://go.drugbank.com/drugs/DB00188" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                            📖 DrugBank: Bortezomib
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="alert alert-light border-start border-warning border-3 mb-2">
+                                    <strong>💀 ER Stress & Unfolded Protein Response (UPR)</strong><br>
+                                    <span class="t-en">Proteasome inhibition → accumulation of misfolded proteins in ER → ER stress → UPR activation (IRE1α, PERK, ATF6) → if persistent → apoptosis via CHOP</span>
+                                    <span class="t-it">Inibizione proteasoma → accumulo proteine mal foldate in ER → stress ER → attivazione UPR (IRE1α, PERK, ATF6) → se persistente → apoptosi via CHOP</span>
+                                    <div class="mt-2 d-flex gap-1 flex-wrap">
+                                        <a href="https://www.kegg.jp/pathway/hsa04141" target="_blank" class="btn btn-sm btn-outline-warning">
+                                            📊 KEGG: ER Processing
+                                        </a>
+                                        <a href="https://reactome.org/content/detail/R-HSA-381119" target="_blank" class="btn btn-sm btn-outline-info">
+                                            🔬 Reactome: Unfolded Protein Response
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="alert alert-light border-start border-success border-3 mb-2">
+                                    <strong>🎯 Clinical Impact & Resistance</strong><br>
+                                    <div class="small mt-2">
+                                        <strong class="t-en">✅ Clinical Use:</strong><strong class="t-it">✅ Uso Clinico:</strong><br>
+                                        <span class="t-en">• VRd regimen (Bortezomib + Lenalidomide + Dex) - Standard induction<br>
+                                        • VCD (Bortezomib + Cyclophosphamide + Dex) - Alternative<br>
+                                        • Weekly vs twice-weekly dosing to reduce neuropathy</span>
+                                        <span class="t-it">• Regime VRd (Bortezomib + Lenalidomide + Dex) - Induzione standard<br>
+                                        • VCD (Bortezomib + Ciclofosfamide + Dex) - Alternativa<br>
+                                        • Dosaggio settimanale vs bi-settimanale per ridurre neuropatia</span>
+                                        
+                                        <div class="mt-2">
+                                            <strong class="t-en">⚠️ Toxicity:</strong><strong class="t-it">⚠️ Tossicità:</strong><br>
+                                            <span class="t-en">Peripheral neuropathy (main dose-limiting), thrombocytopenia, GI symptoms</span>
+                                            <span class="t-it">Neuropatia periferica (principale dose-limitante), trombocitopenia, sintomi GI</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% else %}
+                                <div class="alert alert-info border-start border-info border-3 mb-2">
+                                    <strong>🧬 PDB: {{ pdb_metadata.pdb_id }}</strong><br>
+                                    <span class="t-en">This structure contains important protein-ligand interactions relevant to MM therapy.</span>
+                                    <span class="t-it">Questa struttura contiene interazioni proteina-ligando importanti per la terapia MM.</span>
+                                    
+                                    <div class="mt-3">
+                                        <strong class="t-en">🔬 Key Biological Pathways:</strong>
+                                        <strong class="t-it">🔬 Principali Vie Biologiche:</strong>
+                                    </div>
+                                    <ul class="mb-2 mt-2 small">
+                                        <li><span class="t-en"><strong>Ubiquitin-Proteasome System (UPS)</strong> - Protein degradation</span><span class="t-it"><strong>Sistema Ubiquitina-Proteasoma (UPS)</strong> - Degradazione proteica</span></li>
+                                        <li><span class="t-en"><strong>Apoptosis Regulation</strong> - Programmed cell death</span><span class="t-it"><strong>Regolazione Apoptosi</strong> - Morte cellulare programmata</span></li>
+                                        <li><span class="t-en"><strong>Cell Cycle Control</strong> - G1/S and G2/M checkpoints</span><span class="t-it"><strong>Controllo Ciclo Cellulare</strong> - Checkpoint G1/S e G2/M</span></li>
+                                        <li><span class="t-en"><strong>NF-κB Signaling</strong> - Inflammation and survival</span><span class="t-it"><strong>Segnalazione NF-κB</strong> - Infiammazione e sopravvivenza</span></li>
+                                    </ul>
+                                    <div class="d-flex gap-2 flex-wrap mt-3">
+                                        <a href="https://www.kegg.jp/pathway/hsa03050" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            📊 KEGG: Proteasome
+                                        </a>
+                                        <a href="https://reactome.org/PathwayBrowser/#/R-HSA-597592" target="_blank" class="btn btn-sm btn-outline-info">
+                                            🔬 Reactome: Post-translational protein modification
+                                        </a>
+                                        <a href="https://www.kegg.jp/kegg/pathway.html" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                            🌐 Browse All Pathways
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Learning Resources -->
+                    <div class="col-md-6 mb-3">
+                        <h6 class="text-success">
+                            <span class="t-en">🎓 Learning Resources</span>
+                            <span class="t-it">🎓 Risorse Didattiche</span>
+                        </h6>
+                        <div class="accordion accordion-flush" id="learningAccordion">
+                            <!-- Drug Discovery Basics -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed small" type="button" data-bs-toggle="collapse" data-bs-target="#learnBasics">
+                                        <span class="t-en">💊 Drug Discovery Basics</span>
+                                        <span class="t-it">💊 Basi Drug Discovery</span>
+                                    </button>
+                                </h2>
+                                <div id="learnBasics" class="accordion-collapse collapse" data-bs-parent="#learningAccordion">
+                                    <div class="accordion-body small">
+                                        <div class="d-grid gap-2">
+                                            <a href="https://www.nature.com/subjects/drug-discovery" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                📰 Nature: Drug Discovery
+                                            </a>
+                                            <a href="https://www.youtube.com/results?search_query=drug+discovery+process" target="_blank" class="btn btn-sm btn-outline-danger">
+                                                🎥 YouTube Tutorials
+                                            </a>
+                                            <a href="https://www.coursera.org/search?query=drug%20discovery" target="_blank" class="btn btn-sm btn-outline-info">
+                                                🎓 Coursera Courses
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Protein Structure -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed small" type="button" data-bs-toggle="collapse" data-bs-target="#learnProtein">
+                                        <span class="t-en">🧬 Protein Structure Analysis</span>
+                                        <span class="t-it">🧬 Analisi Struttura Proteica</span>
+                                    </button>
+                                </h2>
+                                <div id="learnProtein" class="accordion-collapse collapse" data-bs-parent="#learningAccordion">
+                                    <div class="accordion-body small">
+                                        <div class="d-grid gap-2">
+                                            <a href="https://pdb101.rcsb.org/" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                📚 PDB-101 Education
+                                            </a>
+                                            <a href="https://proteopedia.org/" target="_blank" class="btn btn-sm btn-outline-success">
+                                                📖 Proteopedia
+                                            </a>
+                                            <a href="https://www.ebi.ac.uk/training/online/courses/protein-classification-intro-interpro/" target="_blank" class="btn btn-sm btn-outline-info">
+                                                🎓 EMBL-EBI Training
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Multiple Myeloma Specific -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed small" type="button" data-bs-toggle="collapse" data-bs-target="#learnMM">
+                                        <span class="t-en">🔬 Multiple Myeloma Research</span>
+                                        <span class="t-it">🔬 Ricerca Mieloma Multiplo</span>
+                                    </button>
+                                </h2>
+                                <div id="learnMM" class="accordion-collapse collapse" data-bs-parent="#learningAccordion">
+                                    <div class="accordion-body small">
+                                        <div class="d-grid gap-2">
+                                            <a href="https://www.myeloma.org/" target="_blank" class="btn btn-sm btn-outline-danger">
+                                                🏥 IMF - Myeloma Foundation
+                                            </a>
+                                            <a href="https://www.nccn.org/guidelines/category_1" target="_blank" class="btn btn-sm btn-outline-warning">
+                                                📋 NCCN Guidelines
+                                            </a>
+                                            <a href="https://pubmed.ncbi.nlm.nih.gov/?term=multiple+myeloma+treatment" target="_blank" class="btn btn-sm btn-outline-info">
+                                                📄 PubMed Research
+                                            </a>
+                                            <a href="https://clinicaltrials.gov/search?cond=Multiple%20Myeloma" target="_blank" class="btn btn-sm btn-outline-success">
+                                                🧪 Clinical Trials
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Molecular Modeling -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed small" type="button" data-bs-toggle="collapse" data-bs-target="#learnModeling">
+                                        <span class="t-en">⚗️ Molecular Modeling Tools</span>
+                                        <span class="t-it">⚗️ Strumenti Modellazione Molecolare</span>
+                                    </button>
+                                </h2>
+                                <div id="learnModeling" class="accordion-collapse collapse" data-bs-parent="#learningAccordion">
+                                    <div class="accordion-body small">
+                                        <div class="d-grid gap-2">
+                                            <a href="https://www.pymol.org/" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                🔷 PyMOL
+                                            </a>
+                                            <a href="https://www.cgl.ucsf.edu/chimera/" target="_blank" class="btn btn-sm btn-outline-success">
+                                                🔶 UCSF ChimeraX
+                                            </a>
+                                            <a href="https://3dmol.csb.pitt.edu/" target="_blank" class="btn btn-sm btn-outline-info">
+                                                🧪 3Dmol.js Docs
+                                            </a>
+                                            <a href="https://swissmodel.expasy.org/" target="_blank" class="btn btn-sm btn-outline-warning">
+                                                🏔️ SWISS-MODEL
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Reference Cards -->
+                <div class="row mt-3 pt-3 border-top">
+                    <div class="col-md-4">
+                        <div class="card bg-light h-100">
+                            <div class="card-body p-2">
+                                <h6 class="small text-primary mb-2">
+                                    <span class="t-en">🎯 Key Databases</span>
+                                    <span class="t-it">🎯 Database Principali</span>
+                                </h6>
+                                <div class="small">
+                                    • <a href="https://www.rcsb.org/" target="_blank">RCSB PDB</a> - Protein structures<br>
+                                    • <a href="https://www.uniprot.org/" target="_blank">UniProt</a> - Protein sequences<br>
+                                    • <a href="https://www.ebi.ac.uk/chembl/" target="_blank">ChEMBL</a> - Bioactive molecules<br>
+                                    • <a href="https://pubchem.ncbi.nlm.nih.gov/" target="_blank">PubChem</a> - Chemical compounds<br>
+                                    • <a href="https://zinc.docking.org/" target="_blank">ZINC</a> - Drug-like compounds
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-light h-100">
+                            <div class="card-body p-2">
+                                <h6 class="small text-success mb-2">
+                                    <span class="t-en">📊 Analysis Tools</span>
+                                    <span class="t-it">📊 Strumenti Analisi</span>
+                                </h6>
+                                <div class="small">
+                                    • <a href="https://www.rcsb.org/docs/tools/ligand-explorer" target="_blank">Ligand Explorer</a> - Binding analysis<br>
+                                    {% if pdb_metadata %}
+                                    • <a href="https://www.ebi.ac.uk/thornton-srv/databases/cgi-bin/pdbsum/GetPage.pl?pdbcode={{ pdb_metadata.pdb_id }}" target="_blank">PDBsum</a> - Structure summaries<br>
+                                    {% endif %}
+                                    • <a href="https://plip-tool.biotec.tu-dresden.de/plip-web/plip/index" target="_blank">PLIP</a> - Interaction profiler<br>
+                                    • <a href="https://www.swissdock.ch/" target="_blank">SwissDock</a> - Docking server<br>
+                                    • <a href="http://www.scfbio-iitd.res.in/software/drugdesign/lipinski.jsp" target="_blank">Lipinski Calculator</a> - Drug-likeness
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-light h-100">
+                            <div class="card-body p-2">
+                                <h6 class="small text-warning mb-2">
+                                    <span class="t-en">📖 Literature Search</span>
+                                    <span class="t-it">📖 Ricerca Letteratura</span>
+                                </h6>
+                                <div class="small">
+                                    {% if pdb_metadata %}
+                                    • <a href="https://pubmed.ncbi.nlm.nih.gov/?term={{ pdb_metadata.pdb_id }}" target="_blank">PubMed: {{ pdb_metadata.pdb_id }}</a><br>
+                                    • <a href="https://scholar.google.com/scholar?q={{ pdb_metadata.pdb_id }}+protein+structure" target="_blank">Google Scholar</a><br>
+                                    {% else %}
+                                    • <a href="https://pubmed.ncbi.nlm.nih.gov/" target="_blank">PubMed</a><br>
+                                    • <a href="https://scholar.google.com/" target="_blank">Google Scholar</a><br>
+                                    {% endif %}
+                                    • <a href="https://www.biorxiv.org/" target="_blank">bioRxiv Preprints</a><br>
+                                    • <a href="https://europepmc.org/" target="_blank">Europe PMC</a><br>
+                                    • <a href="https://www.semanticscholar.org/" target="_blank">Semantic Scholar</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- NEW: Comprehensive API Data Sections -->
+        {% if job.kind == 'BIND' and pdb_metadata %}
+        
+        <!-- Structure Validation Metrics -->
+        {% if pdb_metadata.validation_metrics %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-success text-white">
+                <h2 class="h5 mb-0">
+                    ✅ <span class="t-en">Structure Quality & Validation</span>
+                    <span class="t-it">Qualità e Validazione Struttura</span>
+                </h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-primary">Quality Percentiles (vs. all PDB structures)</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <tbody>
+                                    {% if pdb_metadata.validation_metrics.overall_quality %}
+                                    <tr>
+                                        <td><strong>Overall Quality</strong></td>
+                                        <td>
+                                            <div class="progress" style="height: 20px;">
+                                                {% if pdb_metadata.validation_metrics.overall_quality > 50 %}
+                                                <div class="progress-bar bg-success" 
+                                                     role="progressbar" 
+                                                     style="width: {{ pdb_metadata.validation_metrics.overall_quality }}%">
+                                                    {{ pdb_metadata.validation_metrics.overall_quality|floatformat:1 }}%
+                                                </div>
+                                                {% else %}
+                                                <div class="progress-bar bg-warning" 
+                                                     role="progressbar" 
+                                                     style="width: {{ pdb_metadata.validation_metrics.overall_quality }}%">
+                                                    {{ pdb_metadata.validation_metrics.overall_quality|floatformat:1 }}%
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                    {% if pdb_metadata.validation_metrics.clashscore %}
+                                    <tr>
+                                        <td><strong>Clashscore</strong></td>
+                                        <td>
+                                            <div class="progress" style="height: 20px;">
+                                                <div class="progress-bar bg-info" 
+                                                     role="progressbar" 
+                                                     style="width: {{ pdb_metadata.validation_metrics.clashscore }}%">
+                                                    {{ pdb_metadata.validation_metrics.clashscore|floatformat:1 }}%
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                    {% if pdb_metadata.validation_metrics.ramachandran_outliers %}
+                                    <tr>
+                                        <td><strong>Ramachandran</strong></td>
+                                        <td>
+                                            <div class="progress" style="height: 20px;">
+                                                <div class="progress-bar bg-primary" 
+                                                     role="progressbar" 
+                                                     style="width: {{ pdb_metadata.validation_metrics.ramachandran_outliers }}%">
+                                                    {{ pdb_metadata.validation_metrics.ramachandran_outliers|floatformat:1 }}%
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="alert alert-info">
+                            <h6><strong>💡 Understanding Quality Metrics</strong></h6>
+                            <p class="small mb-0">
+                                Higher percentiles indicate better quality compared to all PDB structures.
+                                <strong>>50%</strong> means above average quality.
+                                These metrics help assess the reliability of the structural model.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Ligand Interaction Details -->
+        {% if pdb_metadata.interaction_details %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-info text-white">
+                <h2 class="h5 mb-0">
+                    🔗 <span class="t-en">Ligand Binding Site Details</span>
+                    <span class="t-it">Dettagli Sito di Legame Ligando</span>
+                </h2>
+            </div>
+            <div class="card-body">
+                {% for site in pdb_metadata.interaction_details %}
+                <div class="mb-3 p-3 border rounded">
+                    <h6 class="text-primary">
+                        <strong>Site {{ forloop.counter }}: Ligand {{ site.ligand_id }}</strong>
+                        {% if site.site_id %}<small class="text-muted">({{ site.site_id }})</small>{% endif %}
+                    </h6>
+                    {% if site.residues %}
+                    <p class="mb-1"><strong>Interacting Residues:</strong></p>
+                    <div class="mb-2">
+                        {% for residue in site.residues %}
+                        <span class="badge bg-secondary me-1">{{ residue }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    {% if site.details %}
+                    <p class="small text-muted mb-0">{{ site.details }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Clinical Trials Information -->
+        {% if pdb_metadata.clinical_trials %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h2 class="h5 mb-0">
+                    🏥 <span class="t-en">Active Clinical Trials</span>
+                    <span class="t-it">Studi Clinici Attivi</span>
+                </h2>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>NCT ID</th>
+                                <th>Title</th>
+                                <th>Phase</th>
+                                <th>Status</th>
+                                <th>Link</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for trial in pdb_metadata.clinical_trials %}
+                            <tr>
+                                <td><code>{{ trial.nct_id }}</code></td>
+                                <td>{{ trial.title|truncatewords:10 }}</td>
+                                <td><span class="badge bg-primary">{{ trial.phase }}</span></td>
+                                <td><span class="badge bg-success">{{ trial.status }}</span></td>
+                                <td><a href="{{ trial.url }}" target="_blank" class="btn btn-sm btn-outline-primary">View</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ChEMBL Drug Details -->
+        {% if pdb_metadata.chembl_drug_details %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h2 class="h5 mb-0">
+                    💊 <span class="t-en">Comprehensive Drug Information (ChEMBL)</span>
+                    <span class="t-it">Informazioni Complete sul Farmaco (ChEMBL)</span>
+                </h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-5">ChEMBL ID:</dt>
+                            <dd class="col-sm-7"><code>{{ pdb_metadata.chembl_drug_details.chembl_id }}</code></dd>
+                            
+                            <dt class="col-sm-5">Drug Name:</dt>
+                            <dd class="col-sm-7"><strong>{{ pdb_metadata.chembl_drug_details.name }}</strong></dd>
+                            
+                            <dt class="col-sm-5">Molecule Type:</dt>
+                            <dd class="col-sm-7">{{ pdb_metadata.chembl_drug_details.type }}</dd>
+                            
+                            <dt class="col-sm-5">Max Phase:</dt>
+                            <dd class="col-sm-7">
+                                <span class="badge bg-{% if pdb_metadata.chembl_drug_details.max_phase == 4 %}success{% elif pdb_metadata.chembl_drug_details.max_phase >= 2 %}warning{% else %}secondary{% endif %}">
+                                    Phase {{ pdb_metadata.chembl_drug_details.max_phase }}
+                                </span>
+                            </dd>
+                            
+                            {% if pdb_metadata.chembl_drug_details.first_approval %}
+                            <dt class="col-sm-5">First Approval:</dt>
+                            <dd class="col-sm-7">{{ pdb_metadata.chembl_drug_details.first_approval }}</dd>
+                            {% endif %}
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-primary">Administration Routes</h6>
+                        <ul class="list-unstyled">
+                            {% if pdb_metadata.chembl_drug_details.oral %}<li>✅ Oral</li>{% endif %}
+                            {% if pdb_metadata.chembl_drug_details.parenteral %}<li>✅ Parenteral (injection)</li>{% endif %}
+                            {% if pdb_metadata.chembl_drug_details.topical %}<li>✅ Topical</li>{% endif %}
+                        </ul>
+                        
+                        {% if pdb_metadata.chembl_drug_details.black_box_warning %}
+                        <div class="alert alert-danger mt-3">
+                            <strong>⚠️ Black Box Warning</strong><br>
+                            This drug has serious safety warnings.
+                        </div>
+                        {% endif %}
+                        
+                        {% if pdb_metadata.chembl_drug_details.therapeutic_flag %}
+                        <div class="alert alert-success mt-3">
+                            <strong>✅ Therapeutic Flag: Active</strong>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- PubMed Literature -->
+        {% if pdb_metadata.pubmed_literature %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-secondary text-white">
+                <h2 class="h5 mb-0">
+                    📚 <span class="t-en">Recent Publications (PubMed)</span>
+                    <span class="t-it">Pubblicazioni Recenti (PubMed)</span>
+                </h2>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    {% for article in pdb_metadata.pubmed_literature %}
+                    <a href="{{ article.url }}" target="_blank" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ article.title }}</h6>
+                            <small class="text-muted">{{ article.year }}</small>
+                        </div>
+                        <p class="mb-1 small">
+                            <strong>{{ article.authors }}</strong> - <em>{{ article.journal }}</em>
+                        </p>
+                        <small class="text-muted">PMID: {{ article.pmid }}</small>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Protein Interaction Network -->
+        {% if pdb_metadata.protein_network %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-danger text-white">
+                <h2 class="h5 mb-0">
+                    🕸️ <span class="t-en">Protein Interaction Network</span>
+                    <span class="t-it">Rete di Interazioni Proteiche</span>
+                </h2>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                    Showing <strong>{{ pdb_metadata.protein_network.count }}</strong> protein-protein interactions
+                    (Source: STRING database)
+                </p>
+                <div class="table-responsive">
+                    <table class="table table-sm table-striped">
+                        <thead>
+                            <tr>
+                                <th>Protein A</th>
+                                <th>Protein B</th>
+                                <th>Confidence Score</th>
+                                <th>Evidence</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for interaction in pdb_metadata.protein_network.interactions %}
+                            <tr>
+                                <td><code>{{ interaction.protein_a }}</code></td>
+                                <td><code>{{ interaction.protein_b }}</code></td>
+                                <td>
+                                    <div class="progress" style="height: 20px; width: 100px;">
+                                        <div class="progress-bar" 
+                                             role="progressbar" 
+                                             style="width: {{ interaction.score|floatformat:0 }}%">
+                                            {{ interaction.score }}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><small>{{ interaction.evidence }}</small></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Similar Structures -->
+        {% if pdb_metadata.similar_structures %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-dark text-white">
+                <h2 class="h5 mb-0">
+                    🔍 <span class="t-en">Similar Structures</span>
+                    <span class="t-it">Strutture Simili</span>
+                </h2>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>PDB ID</th>
+                                <th>Title</th>
+                                <th>Similarity</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for structure in pdb_metadata.similar_structures %}
+                            <tr>
+                                <td><strong><code>{{ structure.pdb_id }}</code></strong></td>
+                                <td>{{ structure.title|truncatewords:15 }}</td>
+                                <td>
+                                    <span class="badge bg-success">{{ structure.similarity }}%</span>
+                                </td>
+                                <td>
+                                    <a href="https://www.rcsb.org/structure/{{ structure.pdb_id }}" 
+                                       target="_blank" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        View
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% endif %}
+        <!-- END: Comprehensive API Data Sections -->
+
+        <!-- Binding Visualizer: Professional 3D View (only for BIND jobs with html_content) -->
+        {% if job.kind == 'BIND' and html_content %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="h5 mb-0">
+                        🧬 <span class="t-en">3D Protein-Ligand Complex Viewer</span>
+                        <span class="t-it">Visualizzatore 3D Complesso Proteina-Ligando</span>
+                    </h2>
+                    <div class="text-muted small">
+                        <span class="t-en">Interactive controls provided by py3Dmol</span>
+                        <span class="t-it">Controlli interattivi forniti da py3Dmol</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Note: Interactive controls are provided by the binding_visualizer.py generated HTML -->
+            <!-- The controls panel, sidebar, and viewer are all managed by py3Dmol -->
+            
+            <!-- 3D Viewer Container: Direct insertion of py3Dmol generated HTML -->
+            <div class="card-body p-3" id="viewerContainer" style="min-height: 600px; position: relative;">
+                {% if '3dmolviewer' in html_content and 'viewer_' in html_content %}
+                    <!-- Py3Dmol generated HTML with sidebar, viewer div, and initialization scripts -->
+                    <div style="background: white; border-radius: 0.5rem; padding: 1rem; box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);">
+                        {{ html_content|safe }}
+                    </div>
+                {% else %}
+                    <!-- Fallback: No valid 3Dmol viewer detected -->
+                    <div class="alert alert-warning m-4">
+                        <h5>⚠️ <span class="t-en">3D Viewer Not Available</span><span class="t-it">Visualizzatore 3D Non Disponibile</span></h5>
+                        <p class="mb-0">
+                            <span class="t-en">The 3D visualization could not be loaded. The HTML content may be invalid or incomplete.</span>
+                            <span class="t-it">La visualizzazione 3D non può essere caricata. Il contenuto HTML potrebbe essere invalido o incompleto.</span>
+                        </p>
+                    </div>
+                {% endif %}
+                
+                <!-- Info Overlay (preserved for potential future use) -->
+                <div id="infoOverlay" style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.8); color: white; padding: 10px 15px; border-radius: 8px; font-size: 0.85rem; display: none; max-width: 300px; z-index: 100;">
+                        <div id="atomInfo"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Organized Content Containers (populated by JavaScript) -->
+        <div id="organizedContent"></div>
+        {% endif %}
+
+        <script>
+        // ============================================================
+        // DEBUG MODE: Comprehensive logging enabled for all operations
+        // ============================================================
+        console.log('%c════════════════════════════════════════════════════════════', 'color: #667eea; font-weight: bold');
+        console.log('%c bmyCure4MM - DEBUG MODE ACTIVE', 'color: #667eea; font-size: 16px; font-weight: bold');
+        console.log('%c════════════════════════════════════════════════════════════', 'color: #667eea; font-weight: bold');
+        console.log('🔍 All operations will be logged in detail');
+        console.log('🖱️ Click any button to see detailed interaction logs');
+        console.log('⏱️ Performance timings will be tracked');
+        console.log('📊 Data extraction and processing will be logged');
+        console.log('%c════════════════════════════════════════════════════════════', 'color: #667eea; font-weight: bold');
+        
+        // Reorganize binding visualizer content into clean sections
+        function reorganizeBindingContent() {
+            console.group('[DEBUG] 🔄 Starting Content Reorganization');
+            console.time('reorganizeBindingContent');
+            
+            const container = document.querySelector('#viewerContainer > div');
+            console.log('Container found:', !!container, container);
+            if (!container) {
+                console.warn('❌ No container found at #viewerContainer > div');
+                console.groupEnd();
+                return;
+            }
+            
+            // Find the info panel generated by binding_visualizer.py
+            const infoDiv = container.querySelector('div[style*="font-family:Arial"]');
+            console.log('Info div found:', !!infoDiv, infoDiv);
+            if (!infoDiv) {
+                console.warn('❌ No info div found with font-family:Arial');
+                console.groupEnd();
+                return;
+            }
+            
+            // Create organized sections
+            const organized = document.getElementById('organizedContent');
+            console.log('Organized container found:', !!organized, organized);
+            if (!organized) {
+                console.warn('❌ No #organizedContent element found');
+                console.groupEnd();
+                return;
+            }
+            
+            console.log('📊 Info div has', infoDiv.querySelectorAll('div').length, 'div children');
+            console.log('📊 Info div has', infoDiv.querySelectorAll('table').length, 'tables');
+            
+            // Helper function to extract text content
+            function extractField(parent, label) {
+                const divs = Array.from(parent.querySelectorAll('div'));
+                const field = divs.find(d => d.textContent.includes(label + ':'));
+                if (field) {
+                    const spans = field.querySelectorAll('span');
+                    const value = spans[spans.length - 1]?.textContent.trim() || '';
+                    console.log(`    extractField("${label}"):`, value ? `"${value}"` : '(empty)');
+                    return value;
+                }
+                console.log(`    extractField("${label}"): (not found)`);
+                return '';
+            }
+            
+            // Extract PDB information with escaping
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+            
+            console.group('📝 Extracting PDB Information');
+            const pdbId = extractField(infoDiv, 'PDB ID') || 'Unknown';
+            console.log('  PDB ID:', pdbId);
+            const title = extractField(infoDiv, 'Title') || 'No title available';
+            console.log('  Title:', title.substring(0, 50) + (title.length > 50 ? '...' : ''));
+            const method = extractField(infoDiv, 'Experimental Method') || 'N/A';
+            console.log('  Method:', method);
+            const resolution = extractField(infoDiv, 'Resolution') || 'N/A';
+            console.log('  Resolution:', resolution);
+            const ligands = extractField(infoDiv, 'Ligands') || 'None';
+            console.log('  Ligands:', ligands);
+            const chains = extractField(infoDiv, 'Chains') || 'N/A';
+            console.log('  Chains:', chains);
+            console.groupEnd();
+            
+            // Extract tables - mutation table (has Chain, ResNum, Mutation, Effect columns)
+            console.group('📋 Extracting Tables');
+            const tables = Array.from(infoDiv.querySelectorAll('table'));
+            console.log('  Total tables found:', tables.length);
+            
+            tables.forEach((table, idx) => {
+                const headers = Array.from(table.querySelectorAll('th, td')).map(h => h.textContent.trim()).slice(0, 5);
+                console.log(`  Table ${idx} headers:`, headers);
+            });
+            
+            const mutationTable = tables.find(t => {
+                const headers = Array.from(t.querySelectorAll('th, td'));
+                return headers.some(h => h.textContent.includes('Mutation') || h.textContent.includes('Effect'));
+            });
+            const mutationHtml = mutationTable ? mutationTable.outerHTML : '';
+            console.log('  Mutation table found:', !!mutationTable);
+            if (mutationTable) {
+                console.log('    Rows:', mutationTable.querySelectorAll('tr').length);
+            }
+            
+            // Extract therapies table (has Name, Ligand, Phase, MM Relevance columns)
+            const therapyTable = tables.find(t => {
+                const headers = Array.from(t.querySelectorAll('th, td'));
+                return headers.some(h => h.textContent.includes('MM Relevance') || h.textContent.includes('Phase'));
+            });
+            const therapiesHtml = therapyTable ? therapyTable.outerHTML : '';
+            console.log('  Therapy table found:', !!therapyTable);
+            if (therapyTable) {
+                console.log('    Rows:', therapyTable.querySelectorAll('tr').length);
+            }
+            console.groupEnd();
+            
+            // Extract citation
+            console.group('📚 Extracting Citation & Literature');
+            const citationDiv = Array.from(infoDiv.querySelectorAll('div')).find(d => {
+                const text = d.textContent || '';
+                return text.includes('Citation:') && !d.querySelector('div');
+            });
+            let citationHtml = '';
+            if (citationDiv) {
+                citationHtml = citationDiv.innerHTML.replace(/<b>Citation:<\/b>\s*/i, '').trim();
+                console.log('  Citation found:', citationHtml.substring(0, 100) + '...');
+            } else {
+                console.log('  Citation: Not found');
+            }
+            
+            // Extract pathways - look for text containing pathway keywords
+            console.log('🧬 Extracting Pathways');
+            let pathwaysText = '';
+            const pathwayDivs = Array.from(infoDiv.querySelectorAll('div')).filter(d => {
+                const text = d.textContent || '';
+                return text.match(/hsa\d+|R-HSA-\d+|pathway/i) && !d.querySelector('table');
+            });
+            console.log('  Pathway divs found:', pathwayDivs.length);
+            if (pathwayDivs.length > 0) {
+                pathwaysText = pathwayDivs.map(d => d.textContent.trim()).join('<br>');
+                console.log('  Pathways text:', pathwaysText);
+            }
+            
+            // Extract literature - look for ul elements
+            const literatureUl = infoDiv.querySelector('ul');
+            const literatureHtml = literatureUl ? literatureUl.outerHTML : '';
+            console.log('  Literature list found:', !!literatureUl);
+            if (literatureUl) {
+                console.log('    List items:', literatureUl.querySelectorAll('li').length);
+            }
+            console.groupEnd();
+            
+            // Build organized HTML
+            organized.innerHTML = `
+                <!-- PDB Structure Information -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h2 class="h5 mb-0">
+                            🔬 <span class="t-en">Structure Information</span>
+                            <span class="t-it">Informazioni Struttura</span>
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <table class="table table-sm table-borderless">
+                                    <tr>
+                                        <td class="fw-bold text-primary">PDB ID:</td>
+                                        <td><a href="https://www.rcsb.org/structure/${pdbId}" target="_blank" class="text-decoration-none">${pdbId}</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold text-primary">Method:</td>
+                                        <td>${method}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold text-primary">Resolution:</td>
+                                        <td><span class="badge bg-success">${resolution}</span></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <table class="table table-sm table-borderless">
+                                    <tr>
+                                        <td class="fw-bold text-primary">Ligands:</td>
+                                        <td><span class="badge bg-warning text-dark">${ligands}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold text-primary">Chains:</td>
+                                        <td><span class="badge bg-secondary">${chains}</span></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="alert alert-light border mt-3 mb-0">
+                            <strong>Title:</strong> ${escapeHtml(title)}
+                        </div>
+                    </div>
+                </div>
+                
+                ${mutationHtml ? `
+                <!-- Drug Resistance Mutations -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-danger text-white">
+                        <h2 class="h5 mb-0">
+                            ⚠️ <span class="t-en">Drug Resistance Mutations</span>
+                            <span class="t-it">Mutazioni di Resistenza</span>
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            ${mutationHtml}
+                        </div>
+                        <div class="alert alert-warning mt-3 mb-0">
+                            <small>
+                                <strong>Note:</strong> These mutations may affect drug efficacy. 
+                                Consult clinical guidelines for treatment adaptation.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+                
+                ${therapiesHtml ? `
+                <!-- MM Therapies & Clinical Relevance -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                        <h2 class="h5 mb-0">
+                            💊 <span class="t-en">Multiple Myeloma Therapies</span>
+                            <span class="t-it">Terapie Mieloma Multiplo</span>
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            ${therapiesHtml}
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+                
+                ${pathwaysText ? `
+                <!-- Biological Pathways -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h2 class="h5 mb-0">
+                            🧬 <span class="t-en">Biological Pathways</span>
+                            <span class="t-it">Pathway Biologiche</span>
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-0">${pathwaysText}</p>
+                    </div>
+                </div>
+                ` : ''}
+                
+                ${citationHtml ? `
+                <!-- Primary Citation -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-secondary text-white">
+                        <h2 class="h5 mb-0">
+                            📚 <span class="t-en">Primary Citation</span>
+                            <span class="t-it">Citazione Primaria</span>
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        ${citationHtml}
+                    </div>
+                </div>
+                ` : ''}
+                
+                ${literatureHtml ? `
+                <!-- Related Literature -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-dark text-white">
+                        <h2 class="h5 mb-0">
+                            📖 <span class="t-en">Related Publications</span>
+                            <span class="t-it">Pubblicazioni Correlate</span>
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        ${literatureHtml}
+                    </div>
+                </div>
+                ` : ''}
+            `;
+            
+            console.log('✅ Organized HTML built successfully');
+            console.log('  Total characters:', organized.innerHTML.length);
+            console.log('  Card sections:', {
+                pdbInfo: !!pdbId,
+                mutations: !!mutationHtml,
+                therapies: !!therapiesHtml,
+                pathways: !!pathwaysText,
+                citation: !!citationHtml,
+                literature: !!literatureHtml
+            });
+            
+            // Hide the original info panel
+            infoDiv.style.display = 'none';
+            console.log('🙈 Original info panel hidden');
+            
+            // Style tables with Bootstrap classes
+            console.group('🎨 Styling Tables');
+            const organizedTables = organized.querySelectorAll('table');
+            console.log('  Tables to style:', organizedTables.length);
+            organizedTables.forEach(table => {
+                // Only add classes if not already present
+                if (!table.classList.contains('table')) {
+                    table.classList.add('table', 'table-hover', 'table-sm');
+                }
+                // Style table headers
+                const thead = table.querySelector('thead');
+                if (thead) {
+                    const ths = thead.querySelectorAll('th');
+                    ths.forEach(th => {
+                        if (!th.classList.contains('text-primary')) {
+                            th.classList.add('text-primary', 'fw-semibold');
+                        }
+                    });
+                }
+                // Add striped rows
+                const tbody = table.querySelector('tbody');
+                if (tbody && !table.classList.contains('table-striped')) {
+                    table.classList.add('table-striped');
+                }
+            });
+            console.groupEnd();
+            
+            console.timeEnd('reorganizeBindingContent');
+            console.log('✅ Content reorganization complete');
+            console.groupEnd();
+        }
+        
+        // Move controls panel to better position
+        function reorganizeControls() {
+            console.group('[DEBUG] 🎮 Reorganizing Controls');
+            const controls = document.getElementById('bv-controls');
+            const viewerContainer = document.getElementById('viewerContainer');
+            
+            console.log('  Controls panel found:', !!controls);
+            console.log('  Viewer container found:', !!viewerContainer);
+            
+            if (controls && viewerContainer) {
+                // Move controls right after the viewer
+                console.log('  Moving controls after viewer...');
+                viewerContainer.parentNode.insertBefore(
+                    controls,
+                    viewerContainer.nextSibling
+                );
+                console.log('  ✅ Controls moved successfully');
+                
+                // Re-enable buttons (they may have been disabled)
+                console.group('[DEBUG] 🔘 Processing Control Buttons');
+                const buttons = controls.querySelectorAll('button');
+                console.log('  Total buttons:', buttons.length);
+                
+                let enabledCount = 0;
+                let hasOnclickCount = 0;
+                const buttonDetails = [];
+                
+                buttons.forEach((btn, idx) => {
+                    const wasDisabled = btn.disabled;
+                    const hadOnclick = btn.hasAttribute('onclick') || btn.onclick;
+                    const buttonText = btn.textContent.trim();
+                    const onclickAttr = btn.getAttribute('onclick');
+                    
+                    btn.disabled = false;
+                    
+                    if (wasDisabled) enabledCount++;
+                    if (hadOnclick) hasOnclickCount++;
+                    
+                    const detail = {
+                        index: idx,
+                        text: buttonText,
+                        wasDisabled,
+                        hadOnclick,
+                        onclickLength: onclickAttr ? onclickAttr.length : 0,
+                        onclickPreview: onclickAttr ? onclickAttr.substring(0, 50) + '...' : 'none'
+                    };
+                    buttonDetails.push(detail);
+                    
+                    console.log(`  [${idx}] "${buttonText}":`, {
+                        wasDisabled,
+                        hadOnclick,
+                        nowDisabled: btn.disabled,
+                        onclickChars: detail.onclickLength
+                    });
+                });
+                
+                console.log('📊 Summary:', {
+                    totalButtons: buttons.length,
+                    wereDisabled: enabledCount,
+                    hadOnclick: hasOnclickCount,
+                    nowAllEnabled: Array.from(buttons).every(b => !b.disabled)
+                });
+                
+                console.table(buttonDetails);
+                
+                // Add click event listeners for debugging
+                console.group('🔌 Adding Debug Click Listeners');
+                buttons.forEach((btn, idx) => {
+                    // Store original onclick if it exists
+                    const originalOnclick = btn.onclick;
+                    const onclickAttr = btn.getAttribute('onclick');
+                    
+                    // Wrap with debug logging
+                    btn.addEventListener('click', (e) => {
+                        console.group(`[DEBUG] 🖱️ Button Click #${idx}`);
+                        console.log('  Button:', btn.textContent.trim());
+                        console.log('  Disabled:', btn.disabled);
+                        console.log('  Has onclick attr:', !!onclickAttr);
+                        console.log('  Has onclick handler:', !!btn.onclick);
+                        console.log('  window.viewer exists:', !!window.viewer);
+                        console.log('  window.viewer.setStyle exists:', !!(window.viewer && typeof window.viewer.setStyle === 'function'));
+                        
+                        if (btn.disabled) {
+                            console.warn('  ⚠️ Button is disabled, click blocked!');
+                            e.preventDefault();
+                            e.stopPropagation();
+                        } else {
+                            console.log('  ✅ Button enabled, onclick should fire');
+                        }
+                        console.groupEnd();
+                    }, { capture: true }); // Use capture phase to log before onclick fires
+                    
+                    console.log(`  Listener added for button ${idx}: "${btn.textContent.trim()}"`);
+                });
+                console.log(`✅ Added debug listeners to ${buttons.length} buttons`);
+                console.groupEnd();
+                
+                console.groupEnd(); // Close "Processing Control Buttons"
+                
+                // Add instructions panel
+                const instructions = document.createElement('div');
+                instructions.className = 'alert alert-info mb-4';
+                instructions.innerHTML = `
+                    <h6 class="alert-heading">
+                        <i class="bi bi-info-circle"></i> 
+                        <span class="t-en">Viewer Instructions</span>
+                        <span class="t-it">Istruzioni Visualizzatore</span>
+                    </h6>
+                    <ul class="mb-0 small">
+                        <li><strong>Rotate:</strong> Click and drag</li>
+                        <li><strong>Zoom:</strong> Scroll wheel or pinch</li>
+                        <li><strong>Pan:</strong> Right-click and drag (or Ctrl + drag)</li>
+                        <li><strong>Center:</strong> Double-click on structure</li>
+                        <li><strong>Inspect:</strong> Hover over atoms for details</li>
+                    </ul>
+                `;
+                viewerContainer.parentNode.insertBefore(
+                    instructions,
+                    viewerContainer.nextSibling
+                );
+            }
+        }
+        
+        // Ensure viewer object is available globally for button onclick handlers
+        function ensureViewerAvailable() {
+            console.group('[DEBUG] 🔍 Checking Viewer Availability');
+            
+            // Check if window.viewer is already set
+            if (window.viewer) {
+                console.log('✅ window.viewer already available');
+                console.log('  Type:', typeof window.viewer);
+                console.log('  Has setStyle:', typeof window.viewer.setStyle === 'function');
+                console.log('  Has render:', typeof window.viewer.render === 'function');
+                console.groupEnd();
+                return true;
+            }
+            
+            console.log('⏳ window.viewer not set, searching...');
+            
+            // Look for viewer objects in the global scope
+            const viewerKeys = Object.keys(window).filter(k => /^viewer_\d+$/.test(k));
+            console.log('  Found potential viewer keys:', viewerKeys);
+            
+            for (const key of viewerKeys) {
+                console.log(`  Checking ${key}:`, {
+                    exists: !!window[key],
+                    type: typeof window[key],
+                    hasSetStyle: window[key] && typeof window[key].setStyle === 'function',
+                    hasRender: window[key] && typeof window[key].render === 'function'
+                });
+                
+                if (window[key] && typeof window[key].setStyle === 'function') {
+                    window.viewer = window[key];
+                    console.log('✅ Found and assigned window.viewer from', key);
+                    console.groupEnd();
+                    return true;
+                }
+            }
+            
+            // Try $3Dmol.viewers if available
+            console.log('  Checking $3Dmol:', {
+                exists: !!window.$3Dmol,
+                hasViewers: !!(window.$3Dmol && window.$3Dmol.viewers)
+            });
+            
+            if (window.$3Dmol && window.$3Dmol.viewers) {
+                const viewerIds = Object.keys(window.$3Dmol.viewers);
+                console.log('  $3Dmol viewer IDs:', viewerIds);
+                
+                for (const id of viewerIds) {
+                    if (window.$3Dmol.viewers[id]) {
+                        window.viewer = window.$3Dmol.viewers[id];
+                        console.log('✅ Found and assigned window.viewer from $3Dmol.viewers', id);
+                        console.groupEnd();
+                        return true;
+                    }
+                }
+            }
+            
+            console.warn('❌ window.viewer not found');
+            console.groupEnd();
+            return false;
+        }
+        
+        // Run after page loads with multiple attempts to ensure viewer is ready
+        function initializeViewerUI() {
+            console.group('[DEBUG] 🚀 Starting Viewer UI Initialization');
+            console.log('⏰ Time:', new Date().toISOString());
+            console.log('📍 Document state:', document.readyState);
+            console.log('🌐 Window loaded:', document.readyState === 'complete');
+            
+            let attempts = 0;
+            const maxAttempts = 10;
+            const startTime = performance.now();
+            
+            function tryInit() {
+                attempts++;
+                const attemptTime = performance.now();
+                
+                console.group(`[DEBUG] 🔄 Attempt ${attempts}/${maxAttempts}`);
+                console.log('  Elapsed time:', Math.round(attemptTime - startTime), 'ms');
+                
+                // Check DOM elements
+                console.log('  DOM Check:', {
+                    viewerContainer: !!document.getElementById('viewerContainer'),
+                    organizedContent: !!document.getElementById('organizedContent'),
+                    bvControls: !!document.getElementById('bv-controls'),
+                    infoDiv: !!document.querySelector('div[style*="font-family:Arial"]')
+                });
+                
+                // First ensure viewer is available
+                const viewerReady = ensureViewerAvailable();
+                console.log('  Viewer ready:', viewerReady);
+                
+                // Then reorganize content
+                try {
+                    reorganizeBindingContent();
+                    console.log('  ✅ Content reorganization completed');
+                } catch (e) {
+                    console.error('  ❌ Content reorganization failed:', e);
+                }
+                
+                try {
+                    reorganizeControls();
+                    console.log('  ✅ Controls reorganization completed');
+                } catch (e) {
+                    console.error('  ❌ Controls reorganization failed:', e);
+                }
+                
+                console.groupEnd();
+                
+                // If viewer isn't ready yet and we haven't exceeded max attempts, try again
+                if (!viewerReady && attempts < maxAttempts) {
+                    console.log(`⏳ Viewer not ready, will retry in 300ms (attempt ${attempts + 1}/${maxAttempts})`);
+                    setTimeout(tryInit, 300);
+                } else {
+                    const totalTime = Math.round(performance.now() - startTime);
+                    console.log('🏁 Initialization complete:', {
+                        attempts,
+                        viewerReady,
+                        totalTime: totalTime + 'ms',
+                        success: viewerReady
+                    });
+                    
+                    // Final comprehensive state check
+                    console.group('[DEBUG] 📊 Final State Summary');
+                    const finalButtons = document.querySelectorAll('#bv-controls button');
+                    console.log('Control Buttons:', {
+                        total: finalButtons.length,
+                        enabled: Array.from(finalButtons).filter(b => !b.disabled).length,
+                        disabled: Array.from(finalButtons).filter(b => b.disabled).length,
+                        withOnclick: Array.from(finalButtons).filter(b => b.hasAttribute('onclick') || b.onclick).length
+                    });
+                    
+                    console.log('Viewer State:', {
+                        exists: !!window.viewer,
+                        type: typeof window.viewer,
+                        hasSetStyle: !!(window.viewer && typeof window.viewer.setStyle === 'function'),
+                        hasRender: !!(window.viewer && typeof window.viewer.render === 'function'),
+                        hasZoomTo: !!(window.viewer && typeof window.viewer.zoomTo === 'function')
+                    });
+                    
+                    console.log('DOM Elements:', {
+                        viewerContainer: !!document.getElementById('viewerContainer'),
+                        organizedContent: !!document.getElementById('organizedContent'),
+                        bvControls: !!document.getElementById('bv-controls'),
+                        canvas: !!document.querySelector('#viewerContainer canvas')
+                    });
+                    
+                    const cards = document.querySelectorAll('#organizedContent .card');
+                    console.log('Content Cards:', {
+                        total: cards.length,
+                        titles: Array.from(cards).map(c => c.querySelector('.card-header')?.textContent.trim().substring(0, 30))
+                    });
+                    
+                    console.log('📚 All debugging enabled. Click any button to see detailed logs.');
+                    console.groupEnd();
+                    
+                    console.groupEnd();
+                }
+            }
+            
+            tryInit();
+        }
+        
+        // Run after page loads
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                setTimeout(initializeViewerUI, 500);
+            });
+        } else {
+            setTimeout(initializeViewerUI, 500);
+        }
+        
+        // Enhanced 3D viewer controls
+        let darkBackground = true;
+        
+        // Fallback for highlightMutations if not defined by binding_visualizer
+        if (typeof window.highlightMutations === 'undefined') {
+            window.highlightMutations = function() {
+                console.warn('[bmyCure4MM] highlightMutations not yet defined by binding_visualizer.py');
+                // Try to find it in the next tick
+                setTimeout(() => {
+                    if (typeof window.highlightMutations === 'function') {
+                        window.highlightMutations();
+                    } else {
+                        alert('Mutation highlighting is not available. Please refresh the page.');
+                    }
+                }, 100);
+            };
+        }
+        
+        function resetView() {
+            if (typeof viewer !== 'undefined') {
+                viewer.zoomTo();
+                viewer.center();
+            }
+        }
+        
+        function toggleFullscreen() {
+            const container = document.getElementById('viewerContainer');
+            if (!document.fullscreenElement) {
+                container.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+        
+        function toggleBackground() {
+            const viewer3d = document.getElementById('mol3dviewer');
+            darkBackground = !darkBackground;
+            if (darkBackground) {
+                viewer3d.style.background = 'linear-gradient(to bottom, #1a1a2e 0%, #16213e 100%)';
+            } else {
+                viewer3d.style.background = 'linear-gradient(to bottom, #f0f0f0 0%, #ffffff 100%)';
+            }
+        }
+        
+        function captureSnapshot() {
+            if (typeof viewer !== 'undefined') {
+                const imgData = viewer.pngURI();
+                const link = document.createElement('a');
+                link.href = imgData;
+                link.download = 'protein_ligand_{{ job.input_a }}_snapshot.png';
+                link.click();
+            }
+        }
+        
+        function showLoading(show) {
+            document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+        }
+        
+        function showAtomInfo(info) {
+            const overlay = document.getElementById('infoOverlay');
+            const atomInfo = document.getElementById('atomInfo');
+            if (info) {
+                atomInfo.innerHTML = info;
+                overlay.style.display = 'block';
+            } else {
+                overlay.style.display = 'none';
+            }
+        }
+        
+        // Event listeners for controls
+        document.addEventListener('DOMContentLoaded', function() {
+            // Display options
+            ['showProtein', 'showLigand', 'showWater', 'showHBonds', 'showPocket'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('change', function() {
+                        showLoading(true);
+                        setTimeout(() => {
+                            console.log(id, 'changed to', this.checked);
+                            showLoading(false);
+                        }, 500);
+                    });
+                }
+            });
+            
+            // Style selectors
+            ['proteinStyle', 'ligandStyle', 'colorScheme'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('change', function() {
+                        showLoading(true);
+                        setTimeout(() => {
+                            console.log(id, 'changed to', this.value);
+                            showLoading(false);
+                        }, 500);
+                    });
+                }
+            });
+            
+            // Atom click handler (if 3Dmol.js viewer is available)
+            if (typeof viewer !== 'undefined') {
+                viewer.setClickable({}, true, function(atom, viewer, event, container) {
+                    if (atom) {
+                        const info = `
+                            <strong>Atom Details:</strong><br>
+                            Element: ${atom.elem}<br>
+                            Residue: ${atom.resn} ${atom.resi}<br>
+                            Chain: ${atom.chain}<br>
+                            ${atom.b ? 'B-factor: ' + atom.b.toFixed(2) + '<br>' : ''}
+                        `;
+                        showAtomInfo(info);
+                    }
+                });
+            }
+        });
+        </script>
     {% endif %}
 
     {% if job.kind == 'SIM' and csv_data %}
@@ -276,9 +2095,10 @@
             <span class="t-it">⚠️ Nessun file di output generato per questo job.</span>
         </div>
     {% endif %}
+{% endif %}
 
-    <!-- Log Section (Collapsible) -->
-    {% if job.log %}
+<!-- Log Section (Collapsible) -->
+{% if job.log %}
         <div class="card shadow-sm">
             <div class="card-header">
                 <button class="btn btn-link text-decoration-none p-0 w-100 text-start" 
@@ -301,7 +2121,6 @@
             </div>
         </div>
     {% endif %}
-{% endif %}
 
 {% endblock %}
 

@@ -2,40 +2,263 @@
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-lg-6">
+    <div class="col-lg-10">
         <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h1 class="h4 mb-0">🔬 Binding Visualizer - Multiple Myeloma Drug Analysis</h1>
+            </div>
             <div class="card-body">
-                <h1 class="h4 mb-3">Binding Visualizer</h1>
-                <p class="text-muted">Generate an interactive py3Dmol viewer and PDF-ready assets for a PDB structure.</p>
-                <form method="post" novalidate>
+                <p class="text-muted mb-4">Generate comprehensive drug-target analysis with multi-source API data integration for Multiple Myeloma research.</p>
+                
+                <form method="post" novalidate id="bindingVizForm">
                     {% csrf_token %}
                     {% if form.non_field_errors %}
                         <div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>
                     {% endif %}
-                    {% for field in form %}
-                        <div class="mb-3">
-                            <label class="form-label" for="id_{{ field.name }}">{{ field.label }}{% if field.field.required %}<span class="text-danger"> *</span>{% endif %}</label>
-                            {{ field }}
-                            {% if field.help_text %}
-                                <div class="form-text">{{ field.help_text }}</div>
-                            {% endif %}
-                            {% if field.errors %}
-                                <div class="invalid-feedback d-block">{{ field.errors|striptags }}</div>
-                            {% endif %}
+                    
+                    <!-- Quick Select Section -->
+                    <div class="card mb-4 border-info">
+                        <div class="card-header bg-info bg-opacity-10">
+                            <h5 class="mb-0">🎯 Quick Select MM Drug</h5>
                         </div>
-                    {% endfor %}
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">
-                            <span class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
-                            Run Visualization
-                        </button>
-                        <a href="{% url 'chemtools:tools_home' %}" class="btn btn-outline-secondary">Cancel</a>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label" for="id_mm_drug_preset">{{ form.mm_drug_preset.label }}</label>
+                                {{ form.mm_drug_preset }}
+                                {% if form.mm_drug_preset.help_text %}
+                                    <div class="form-text">{{ form.mm_drug_preset.help_text }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Structure Input Section -->
+                    <div class="card mb-4 border-primary">
+                        <div class="card-header bg-primary bg-opacity-10">
+                            <h5 class="mb-0">🧬 Structure Identification</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="id_pdb_id">{{ form.pdb_id.label }}<span class="text-danger"> *</span></label>
+                                        {{ form.pdb_id }}
+                                        {% if form.pdb_id.help_text %}
+                                            <div class="form-text">{{ form.pdb_id.help_text }}</div>
+                                        {% endif %}
+                                        {% if form.pdb_id.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.pdb_id.errors|striptags }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="id_ligand">{{ form.ligand.label }}</label>
+                                        {{ form.ligand }}
+                                        {% if form.ligand.help_text %}
+                                            <div class="form-text">{{ form.ligand.help_text }}</div>
+                                        {% endif %}
+                                        {% if form.ligand.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.ligand.errors|striptags }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- API Data Sources Section -->
+                    <div class="card mb-4 border-success">
+                        <div class="card-header bg-success bg-opacity-10">
+                            <h5 class="mb-0">📊 Select API Data Sources</h5>
+                            <small class="text-muted">Choose which information to fetch from external databases</small>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="text-primary mb-3">Structural & Molecular Data</h6>
+                                    <div class="form-check mb-2">
+                                        {{ form.fetch_validation }}
+                                        <label class="form-check-label" for="id_fetch_validation">
+                                            <strong>{{ form.fetch_validation.label }}</strong>
+                                            <br><small class="text-muted">{{ form.fetch_validation.help_text }}</small>
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        {{ form.fetch_interactions }}
+                                        <label class="form-check-label" for="id_fetch_interactions">
+                                            <strong>{{ form.fetch_interactions.label }}</strong>
+                                            <br><small class="text-muted">{{ form.fetch_interactions.help_text }}</small>
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        {{ form.fetch_protein_network }}
+                                        <label class="form-check-label" for="id_fetch_protein_network">
+                                            <strong>{{ form.fetch_protein_network.label }}</strong>
+                                            <br><small class="text-muted">{{ form.fetch_protein_network.help_text }}</small>
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        {{ form.fetch_pathways }}
+                                        <label class="form-check-label" for="id_fetch_pathways">
+                                            <strong>{{ form.fetch_pathways.label }}</strong>
+                                            <br><small class="text-muted">{{ form.fetch_pathways.help_text }}</small>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="text-success mb-3">Clinical & Research Data</h6>
+                                    <div class="form-check mb-2">
+                                        {{ form.fetch_drug_info }}
+                                        <label class="form-check-label" for="id_fetch_drug_info">
+                                            <strong>{{ form.fetch_drug_info.label }}</strong>
+                                            <br><small class="text-muted">{{ form.fetch_drug_info.help_text }}</small>
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        {{ form.fetch_clinical_trials }}
+                                        <label class="form-check-label" for="id_fetch_clinical_trials">
+                                            <strong>{{ form.fetch_clinical_trials.label }}</strong>
+                                            <br><small class="text-muted">{{ form.fetch_clinical_trials.help_text }}</small>
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        {{ form.fetch_publications }}
+                                        <label class="form-check-label" for="id_fetch_publications">
+                                            <strong>{{ form.fetch_publications.label }}</strong>
+                                            <br><small class="text-muted">{{ form.fetch_publications.help_text }}</small>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="my-3">
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-sm btn-outline-success" onclick="selectAllAPI()">✓ Select All</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="deselectAllAPI()">✗ Deselect All</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- MM-Specific Focus Section -->
+                    <div class="card mb-4 border-warning">
+                        <div class="card-header bg-warning bg-opacity-10">
+                            <h5 class="mb-0">🎯 Multiple Myeloma Focus Areas</h5>
+                            <small class="text-muted">Emphasize specific clinical aspects for MM research</small>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-check mb-2">
+                                        {{ form.mm_focus_resistance }}
+                                        <label class="form-check-label" for="id_mm_focus_resistance">
+                                            <strong>{{ form.mm_focus_resistance.label }}</strong>
+                                            <br><small class="text-muted">{{ form.mm_focus_resistance.help_text }}</small>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check mb-2">
+                                        {{ form.mm_focus_combinations }}
+                                        <label class="form-check-label" for="id_mm_focus_combinations">
+                                            <strong>{{ form.mm_focus_combinations.label }}</strong>
+                                            <br><small class="text-muted">{{ form.mm_focus_combinations.help_text }}</small>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check mb-2">
+                                        {{ form.mm_focus_toxicity }}
+                                        <label class="form-check-label" for="id_mm_focus_toxicity">
+                                            <strong>{{ form.mm_focus_toxicity.label }}</strong>
+                                            <br><small class="text-muted">{{ form.mm_focus_toxicity.help_text }}</small>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Submit Section -->
+                    <div class="d-flex gap-2 justify-content-between align-items-center">
+                        <div>
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <span class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
+                                🚀 Run Comprehensive Analysis
+                            </button>
+                            <a href="{% url 'chemtools:tools_home' %}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                        <div class="text-muted small">
+                            <em>Selected data sources will be queried from 10+ APIs</em>
+                        </div>
                     </div>
                 </form>
-                <hr>
-                <p class="mb-0 small text-muted">PDB IDs are four characters starting with a digit (e.g., <code>5LF3</code>). Ligand codes are 1–3 characters (e.g., <code>BOR</code>).</p>
+                
+                <hr class="my-4">
+                <div class="alert alert-info mb-0">
+                    <h6 class="alert-heading">💡 Quick Tips</h6>
+                    <ul class="mb-0 small">
+                        <li>Use <strong>Quick Select</strong> for common MM drugs to auto-fill structure info</li>
+                        <li>All API data sources are selected by default - uncheck to skip specific data types</li>
+                        <li>Enable MM Focus options for disease-specific insights and resistance mechanisms</li>
+                        <li>Results will show interactive 3D viewer + comprehensive multi-source data analysis</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+// MM Drug Preset Auto-fill
+const mmPresets = {
+    '5LF3_BOR': { pdb: '5LF3', ligand: 'BOR', name: 'Bortezomib (Velcade)' },
+    '4KW5_LEN': { pdb: '4KW5', ligand: 'LEN', name: 'Lenalidomide (Revlimid)' },
+    '5MX5_CFZ': { pdb: '5MX5', ligand: 'CFZ', name: 'Carfilzomib (Kyprolis)' },
+    '5T3H_POM': { pdb: '5T3H', ligand: 'POM', name: 'Pomalidomide (Pomalyst)' },
+    '5M2B_IXA': { pdb: '5M2B', ligand: 'IXA', name: 'Ixazomib (Ninlaro)' }
+};
+
+function fillMMPreset(value) {
+    if (value === 'custom' || !value) {
+        document.getElementById('id_pdb_id').value = '';
+        document.getElementById('id_ligand').value = '';
+        document.getElementById('id_pdb_id').focus();
+        return;
+    }
+    
+    const preset = mmPresets[value];
+    if (preset) {
+        document.getElementById('id_pdb_id').value = preset.pdb;
+        document.getElementById('id_ligand').value = preset.ligand;
+        
+        // Show confirmation
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-success alert-dismissible fade show mt-2';
+        alert.innerHTML = `
+            <strong>✓ Loaded ${preset.name}</strong> - PDB: ${preset.pdb}, Ligand: ${preset.ligand}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.getElementById('bindingVizForm').insertBefore(alert, document.getElementById('bindingVizForm').firstChild);
+        setTimeout(() => alert.remove(), 3000);
+    }
+}
+
+// API Selection helpers
+function selectAllAPI() {
+    document.querySelectorAll('[id^="id_fetch_"]').forEach(cb => cb.checked = true);
+}
+
+function deselectAllAPI() {
+    document.querySelectorAll('[id^="id_fetch_"]').forEach(cb => cb.checked = false);
+}
+
+// Form submission spinner
+document.getElementById('bindingVizForm').addEventListener('submit', function() {
+    const spinner = this.querySelector('.spinner-border');
+    const btn = this.querySelector('button[type="submit"]');
+    spinner.classList.remove('d-none');
+    btn.disabled = true;
+});
+</script>
+
 {% endblock %}

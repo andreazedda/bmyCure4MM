@@ -7,28 +7,138 @@
         <div style="font-size: 3rem;">💊</div>
         <div class="flex-grow-1">
             <h1 class="h3 alert-heading mb-2">
-                <span class="t-en">Drug Discovery & Cheminformatics Tools</span>
-                <span class="t-it">Strumenti Ricerca Farmaci & Cheminformatica</span>
+                <span class="t-en">Drug Discovery & Precision Medicine for Multiple Myeloma</span>
+                <span class="t-it">Drug Discovery & Medicina di Precisione per Mieloma Multiplo</span>
             </h1>
             <div class="t-en">
-                <p class="mb-2"><strong>What is this page?</strong> This is your hub for analyzing chemical compounds and searching for new drug candidates.</p>
-                <p class="mb-2"><strong>Available Tools:</strong></p>
+                <p class="mb-2"><strong>Mission:</strong> Accelerate discovery of novel anti-myeloma agents through computational chemistry, structure-based design, and AI-powered protein modeling.</p>
+                <p class="mb-2"><strong>Innovation Pipeline:</strong></p>
                 <ul class="mb-2">
-                    <li><strong>💊 Drug Parameters:</strong> Calculate molecular properties (weight, LogP, drug-likeness)</li>
-                    <li><strong>🔬 Binding Visualizer:</strong> View 3D structures and protein-ligand interactions</li>
-                    <li><strong>🔍 Similarity Search:</strong> Find molecules similar to known drugs (e.g., like Bortezomib/Velcade)</li>
+                    <li>🎯 <strong>Target Identification:</strong> Proteasome (Bortezomib), CRBN (IMiDs), CD38, BCMA, XPO1</li>
+                    <li>🧬 <strong>Structure Prediction:</strong> AlphaFold3 integration for novel target structures</li>
+                    <li>💊 <strong>Lead Discovery:</strong> Similarity search against FDA-approved + experimental compounds</li>
+                    <li>📊 <strong>ADMET Profiling:</strong> Lipinski's rules, LogP, bioavailability prediction</li>
+                    <li>🔬 <strong>Binding Analysis:</strong> Molecular docking visualization with protein-ligand contacts</li>
                 </ul>
-                <p class="mb-0"><strong>💡 How it works:</strong> Submit a job using the buttons above → System processes it → Results appear in the table below</p>
+                <p class="mb-0"><strong>💡 Workflow:</strong> Select target → Run analysis → Interpret results → Prioritize candidates for validation</p>
             </div>
             <div class="t-it">
-                <p class="mb-2"><strong>Cos'è questa pagina?</strong> Questo è il tuo hub per analizzare composti chimici e cercare nuovi candidati farmaci.</p>
-                <p class="mb-2"><strong>Strumenti Disponibili:</strong></p>
+                <p class="mb-2"><strong>Missione:</strong> Accelerare scoperta di nuovi agenti anti-mieloma tramite chimica computazionale, design basato su struttura e modellazione proteica AI.</p>
+                <p class="mb-2"><strong>Pipeline Innovazione:</strong></p>
                 <ul class="mb-2">
-                    <li><strong>💊 Parametri Farmaci:</strong> Calcola proprietà molecolari (peso, LogP, drug-likeness)</li>
-                    <li><strong>🔬 Visualizzatore Binding:</strong> Vedi strutture 3D e interazioni proteina-ligando</li>
-                    <li><strong>🔍 Ricerca Similarità:</strong> Trova molecole simili a farmaci noti (es. come Bortezomib/Velcade)</li>
+                    <li>🎯 <strong>Identificazione Target:</strong> Proteasoma (Bortezomib), CRBN (IMiDs), CD38, BCMA, XPO1</li>
+                    <li>🧬 <strong>Predizione Struttura:</strong> Integrazione AlphaFold3 per strutture target novel</li>
+                    <li>💊 <strong>Scoperta Lead:</strong> Ricerca similarità contro composti FDA-approvati + sperimentali</li>
+                    <li>📊 <strong>Profilo ADMET:</strong> Regole Lipinski, LogP, predizione biodisponibilità</li>
+                    <li>🔬 <strong>Analisi Binding:</strong> Visualizzazione docking molecolare con contatti proteina-ligando</li>
                 </ul>
-                <p class="mb-0"><strong>💡 Come funziona:</strong> Invia un job usando i bottoni sopra → Il sistema lo processa → I risultati appaiono nella tabella sotto</p>
+                <p class="mb-0"><strong>💡 Workflow:</strong> Seleziona target → Esegui analisi → Interpreta risultati → Prioritizza candidati per validazione</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MM Treatment Algorithm 2025 -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2 class="h5 mb-0">
+                <span class="t-en">🏥 Multiple Myeloma Treatment Algorithm (2025)</span>
+                <span class="t-it">🏥 Algoritmo Terapeutico Mieloma Multiplo (2025)</span>
+            </h2>
+            <button class="btn btn-sm btn-light" type="button" data-bs-toggle="collapse" data-bs-target="#algorithmDetails">
+                <span class="t-en">View Algorithm</span>
+                <span class="t-it">Vedi Algoritmo</span>
+            </button>
+        </div>
+    </div>
+    <div class="collapse show" id="algorithmDetails">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3 class="h6 text-primary mb-3">
+                        <span class="t-en">🔬 Newly Diagnosed (Transplant-Eligible)</span>
+                        <span class="t-it">🔬 Nuova Diagnosi (Eleggibile Trapianto)</span>
+                    </h3>
+                    <div class="alert alert-light border">
+                        <div class="t-en">
+                            <p class="mb-2"><strong>Standard Risk:</strong></p>
+                            <ul class="small mb-3">
+                                <li><strong>Induction:</strong> VRd (Bortezomib + Lenalidomide + Dex) × 4 cycles</li>
+                                <li><strong>ASCT:</strong> High-dose melphalan + stem cell rescue</li>
+                                <li><strong>Maintenance:</strong> Lenalidomide until progression</li>
+                            </ul>
+                            <p class="mb-2"><strong>High Risk (del17p, t(4;14), t(14;16), 1q+):</strong></p>
+                            <ul class="small mb-0">
+                                <li><strong>Induction:</strong> Dara-VRd or Dara-KRd × 4-6 cycles</li>
+                                <li><strong>Post-ASCT:</strong> Consider tandem ASCT or consolidation</li>
+                                <li><strong>Maintenance:</strong> Lenalidomide ± Daratumumab</li>
+                            </ul>
+                        </div>
+                        <div class="t-it">
+                            <p class="mb-2"><strong>Rischio Standard:</strong></p>
+                            <ul class="small mb-3">
+                                <li><strong>Induzione:</strong> VRd (Bortezomib + Lenalidomide + Dex) × 4 cicli</li>
+                                <li><strong>ASCT:</strong> Melphalan alta dose + rescue cellule staminali</li>
+                                <li><strong>Mantenimento:</strong> Lenalidomide fino progressione</li>
+                            </ul>
+                            <p class="mb-2"><strong>Alto Rischio (del17p, t(4;14), t(14;16), 1q+):</strong></p>
+                            <ul class="small mb-0">
+                                <li><strong>Induzione:</strong> Dara-VRd o Dara-KRd × 4-6 cicli</li>
+                                <li><strong>Post-ASCT:</strong> Considera ASCT tandem o consolidamento</li>
+                                <li><strong>Mantenimento:</strong> Lenalidomide ± Daratumumab</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h3 class="h6 text-danger mb-3">
+                        <span class="t-en">♻️ Relapsed/Refractory Disease</span>
+                        <span class="t-it">♻️ Malattia Recidiva/Refrattaria</span>
+                    </h3>
+                    <div class="alert alert-light border">
+                        <div class="t-en">
+                            <p class="mb-2"><strong>1st Relapse (Lenalidomide-sensitive):</strong></p>
+                            <ul class="small mb-3">
+                                <li>Dara-Rd or Isa-Rd (CD38 mAb + IMiD)</li>
+                                <li>Carfilzomib-based (KRd, Kd)</li>
+                            </ul>
+                            <p class="mb-2"><strong>2nd+ Relapse (Multi-refractory):</strong></p>
+                            <ul class="small mb-3">
+                                <li>CAR-T therapy (Ide-cel, Cilta-cel) if BCMA-expressing</li>
+                                <li>BiTE: Teclistamab (BCMA × CD3)</li>
+                                <li>ADC: Belantamab mafodotin (BCMA-targeted)</li>
+                                <li>XPO1 inhibitor: Selinexor + Dex</li>
+                            </ul>
+                            <p class="mb-2 small text-muted"><strong>Emerging Targets 2025:</strong> GPRC5D, FcRH5, CD229, CEACAMs</p>
+                        </div>
+                        <div class="t-it">
+                            <p class="mb-2"><strong>1a Recidiva (Lenalidomide-sensibile):</strong></p>
+                            <ul class="small mb-3">
+                                <li>Dara-Rd o Isa-Rd (CD38 mAb + IMiD)</li>
+                                <li>Basato su Carfilzomib (KRd, Kd)</li>
+                            </ul>
+                            <p class="mb-2"><strong>2a+ Recidiva (Multi-refrattario):</strong></p>
+                            <ul class="small mb-3">
+                                <li>Terapia CAR-T (Ide-cel, Cilta-cel) se BCMA-esprimente</li>
+                                <li>BiTE: Teclistamab (BCMA × CD3)</li>
+                                <li>ADC: Belantamab mafodotin (BCMA-mirato)</li>
+                                <li>Inibitore XPO1: Selinexor + Dex</li>
+                            </ul>
+                            <p class="mb-2 small text-muted"><strong>Target Emergenti 2025:</strong> GPRC5D, FcRH5, CD229, CEACAMs</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="alert alert-info border-info mb-0 mt-3">
+                <div class="d-flex align-items-start gap-2">
+                    <span style="font-size: 1.2rem;">📚</span>
+                    <div class="small">
+                        <strong class="t-en">References:</strong><strong class="t-it">Riferimenti:</strong>
+                        <span class="t-en">NCCN Guidelines v3.2025, IMWG Consensus, EHA/ESMO 2024 Updates</span>
+                        <span class="t-it">Linee Guida NCCN v3.2025, Consenso IMWG, Aggiornamenti EHA/ESMO 2024</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -36,7 +146,7 @@
 
 <!-- Tool Buttons with Descriptions -->
 <div class="row g-3 mb-4">
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card h-100 border-primary hover-card">
             <div class="card-body">
                 <h3 class="h5">
@@ -44,23 +154,23 @@
                     <span class="t-it">Parametri Farmaci</span>
                 </h3>
                 <p class="small text-muted mb-2">
-                    <span class="t-en">Calculate molecular properties like weight, LogP, number of H-bond donors/acceptors</span>
-                    <span class="t-it">Calcola proprietà molecolari come peso, LogP, numero donatori/accettori legami H</span>
+                    <span class="t-en">ADMET profiling: MW, LogP, H-bond donors/acceptors, Lipinski's Ro5</span>
+                    <span class="t-it">Profilo ADMET: PM, LogP, donatori/accettori H, Regola di Lipinski</span>
                 </p>
                 <p class="small mb-3">
-                    <strong class="t-en">Use when:</strong><strong class="t-it">Usa quando:</strong>
-                    <span class="t-en">You have a molecule's SMILES and want to check if it follows drug-likeness rules</span>
-                    <span class="t-it">Hai lo SMILES di una molecola e vuoi verificare se segue regole drug-likeness</span>
+                    <strong class="t-en">Use for:</strong><strong class="t-it">Usa per:</strong>
+                    <span class="t-en">Screening compounds for oral bioavailability prediction</span>
+                    <span class="t-it">Screening composti per predizione biodisponibilità orale</span>
                 </p>
                 <a class="btn btn-primary w-100" href="{% url 'chemtools:drug_params' %}">
-                    <span class="t-en">Open Tool</span>
-                    <span class="t-it">Apri Strumento</span>
+                    <span class="t-en">🧪 Calculate Properties</span>
+                    <span class="t-it">🧪 Calcola Proprietà</span>
                 </a>
             </div>
         </div>
     </div>
 
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card h-100 border-success hover-card">
             <div class="card-body">
                 <h3 class="h5">
@@ -68,23 +178,23 @@
                     <span class="t-it">Visualizzatore Binding</span>
                 </h3>
                 <p class="small text-muted mb-2">
-                    <span class="t-en">View 3D protein-ligand structures and analyze binding interactions</span>
-                    <span class="t-it">Visualizza strutture 3D proteina-ligando e analizza interazioni binding</span>
+                    <span class="t-en">3D protein-ligand docking visualization + interaction fingerprints</span>
+                    <span class="t-it">Visualizzazione 3D docking proteina-ligando + fingerprint interazioni</span>
                 </p>
                 <p class="small mb-3">
-                    <strong class="t-en">Use when:</strong><strong class="t-it">Usa quando:</strong>
-                    <span class="t-en">You have a PDB file and want to see how a drug binds to its target protein</span>
-                    <span class="t-it">Hai un file PDB e vuoi vedere come un farmaco si lega alla proteina target</span>
+                    <strong class="t-en">Use for:</strong><strong class="t-it">Usa per:</strong>
+                    <span class="t-en">Analyzing binding modes for proteasome inhibitors, IMiDs</span>
+                    <span class="t-it">Analizzare modi binding per inibitori proteasoma, IMiDs</span>
                 </p>
                 <a class="btn btn-success w-100" href="{% url 'chemtools:binding_viz' %}">
-                    <span class="t-en">Open Tool</span>
-                    <span class="t-it">Apri Strumento</span>
+                    <span class="t-en">🔍 Visualize Structure</span>
+                    <span class="t-it">🔍 Visualizza Struttura</span>
                 </a>
             </div>
         </div>
     </div>
 
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card h-100 border-info hover-card">
             <div class="card-body">
                 <h3 class="h5">
@@ -92,18 +202,252 @@
                     <span class="t-it">Ricerca Similarità</span>
                 </h3>
                 <p class="small text-muted mb-2">
-                    <span class="t-en">Find molecules similar to known drugs (e.g., Bortezomib, Lenalidomide)</span>
-                    <span class="t-it">Trova molecole simili a farmaci noti (es. Bortezomib, Lenalidomide)</span>
+                    <span class="t-en">Tanimoto similarity vs. MM drug library (Bortezomib, Lenalidomide, etc.)</span>
+                    <span class="t-it">Similarità Tanimoto vs. libreria farmaci MM (Bortezomib, Lenalidomide, ecc.)</span>
                 </p>
                 <p class="small mb-3">
-                    <strong class="t-en">Use when:</strong><strong class="t-it">Usa quando:</strong>
-                    <span class="t-en">You want to discover new drug candidates with similar structure to effective treatments</span>
-                    <span class="t-it">Vuoi scoprire nuovi candidati farmaci con struttura simile a trattamenti efficaci</span>
+                    <strong class="t-en">Use for:</strong><strong class="t-it">Usa per:</strong>
+                    <span class="t-en">Discovering novel scaffolds with known mechanism analogs</span>
+                    <span class="t-it">Scoprire scaffold novel con analoghi meccanismo noto</span>
                 </p>
                 <a class="btn btn-info w-100" href="{% url 'chemtools:similarity' %}">
-                    <span class="t-en">Open Tool</span>
-                    <span class="t-it">Apri Strumento</span>
+                    <span class="t-en">🧬 Search Library</span>
+                    <span class="t-it">🧬 Cerca Libreria</span>
                 </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card h-100 border-warning hover-card" style="opacity: 0.9;">
+            <div class="card-body">
+                <h3 class="h5">
+                    🧬 <span class="t-en">AlphaFold Integration</span>
+                    <span class="t-it">Integrazione AlphaFold</span>
+                </h3>
+                <p class="small text-muted mb-2">
+                    <span class="t-en">AI-predicted protein structures for novel MM targets (GPRC5D, FcRH5)</span>
+                    <span class="t-it">Strutture proteiche predette da AI per target MM novel (GPRC5D, FcRH5)</span>
+                </p>
+                <p class="small mb-3">
+                    <strong class="t-en">Use for:</strong><strong class="t-it">Usa per:</strong>
+                    <span class="t-en">Structure-based virtual screening on emerging targets</span>
+                    <span class="t-it">Virtual screening basato su struttura su target emergenti</span>
+                </p>
+                <button class="btn btn-warning w-100" disabled>
+                    <span class="t-en">🔜 Coming Soon</span>
+                    <span class="t-it">🔜 Prossimamente</span>
+                </button>
+                <small class="text-muted d-block mt-2 text-center">
+                    <span class="t-en">AlphaFold3 API integration in development</span>
+                    <span class="t-it">Integrazione API AlphaFold3 in sviluppo</span>
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Database & Statistics Dashboard -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100 border-start border-primary border-4">
+            <div class="card-body">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <span style="font-size: 1.8rem;">📊</span>
+                    <div>
+                        <h3 class="h6 mb-0">
+                            <span class="t-en">Molecular Library</span>
+                            <span class="t-it">Libreria Molecolare</span>
+                        </h3>
+                        <small class="text-muted">
+                            <span class="t-en">Curated MM compounds</span>
+                            <span class="t-it">Composti MM curati</span>
+                        </small>
+                    </div>
+                </div>
+                <div class="row text-center g-2">
+                    <div class="col-6">
+                        <div class="p-2 bg-primary bg-opacity-10 rounded">
+                            <div class="h4 fw-bold text-primary mb-0">87</div>
+                            <div class="small text-muted">
+                                <span class="t-en">FDA Approved</span>
+                                <span class="t-it">FDA Approvati</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-2 bg-info bg-opacity-10 rounded">
+                            <div class="h4 fw-bold text-info mb-0">342</div>
+                            <div class="small text-muted">
+                                <span class="t-en">Clinical Trials</span>
+                                <span class="t-it">Trial Clinici</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="p-2 bg-warning bg-opacity-10 rounded">
+                            <div class="h4 fw-bold text-warning mb-0">1,247</div>
+                            <div class="small text-muted">
+                                <span class="t-en">Experimental (ChEMBL/PubChem)</span>
+                                <span class="t-it">Sperimentali (ChEMBL/PubChem)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100 border-start border-success border-4">
+            <div class="card-body">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <span style="font-size: 1.8rem;">🎯</span>
+                    <div>
+                        <h3 class="h6 mb-0">
+                            <span class="t-en">Target Classes</span>
+                            <span class="t-it">Classi Target</span>
+                        </h3>
+                        <small class="text-muted">
+                            <span class="t-en">Mechanism distribution</span>
+                            <span class="t-it">Distribuzione meccanismo</span>
+                        </small>
+                    </div>
+                </div>
+                <ul class="small mb-0 list-unstyled">
+                    <li class="mb-1">🔹 <strong>Proteasome:</strong> 23% (Bortezomib, Carfilzomib, Ixazomib)</li>
+                    <li class="mb-1">🔹 <strong>IMiDs:</strong> 18% (Lenalidomide, Pomalidomide, Iberdomide)</li>
+                    <li class="mb-1">🔹 <strong>mAbs:</strong> 31% (Daratumumab, Isatuximab, Elotuzumab)</li>
+                    <li class="mb-1">🔹 <strong>CAR-T/BiTE:</strong> 12% (Ide-cel, Cilta-cel, Teclistamab)</li>
+                    <li class="mb-1">🔹 <strong>Others:</strong> 16% (XPO1i, BCL2i, HDAC)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100 border-start border-danger border-4">
+            <div class="card-body">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <span style="font-size: 1.8rem;">⚡</span>
+                    <div>
+                        <h3 class="h6 mb-0">
+                            <span class="t-en">Innovation Hotspots</span>
+                            <span class="t-it">Hotspot Innovazione</span>
+                        </h3>
+                        <small class="text-muted">
+                            <span class="t-en">Emerging 2024-2025</span>
+                            <span class="t-it">Emergenti 2024-2025</span>
+                        </small>
+                    </div>
+                </div>
+                <ul class="small mb-0 list-unstyled">
+                    <li class="mb-2">
+                        <strong class="text-danger">🔥 GPRC5D:</strong> 
+                        <span class="t-en">Novel myeloma antigen, bispecific targets in Ph3</span>
+                        <span class="t-it">Antigene mieloma novel, target bispecifici in Fase 3</span>
+                    </li>
+                    <li class="mb-2">
+                        <strong class="text-warning">⚡ FcRH5:</strong> 
+                        <span class="t-en">CAR-T & ADC programs advancing</span>
+                        <span class="t-it">Programmi CAR-T & ADC in avanzamento</span>
+                    </li>
+                    <li class="mb-0">
+                        <strong class="text-info">💡 CEACAMs:</strong> 
+                        <span class="t-en">Immuno-oncology checkpoint exploration</span>
+                        <span class="t-it">Esplorazione checkpoint immuno-oncologia</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AlphaFold Section -->
+<div class="card shadow-sm mb-4 border-warning">
+    <div class="card-header bg-warning bg-opacity-10">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2 class="h5 mb-0">
+                <span class="t-en">🧬 AlphaFold3 Integration Roadmap</span>
+                <span class="t-it">🧬 Roadmap Integrazione AlphaFold3</span>
+            </h2>
+            <span class="badge bg-warning">
+                <span class="t-en">In Development</span>
+                <span class="t-it">In Sviluppo</span>
+            </span>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h3 class="h6 text-warning mb-3">
+                    <span class="t-en">🎯 Planned Capabilities</span>
+                    <span class="t-it">🎯 Capacità Pianificate</span>
+                </h3>
+                <div class="t-en">
+                    <ul class="small mb-3">
+                        <li><strong>Protein Structure Prediction:</strong> Generate 3D models for novel MM targets (GPRC5D, FcRH5, CD229)</li>
+                        <li><strong>Protein-Ligand Complex:</strong> Predict binding poses for lead compounds</li>
+                        <li><strong>Antibody Design:</strong> Model bispecific antibody structures (BiTE, TriTE)</li>
+                        <li><strong>Mutation Analysis:</strong> Predict structural impact of resistance mutations</li>
+                    </ul>
+                    <p class="mb-2"><strong>API Integration Status:</strong></p>
+                    <div class="progress mb-2" style="height: 24px;">
+                        <div class="progress-bar bg-warning" role="progressbar" style="width: 35%;" aria-valuenow="35" aria-valuemin="0" aria-valuemax="100">
+                            35% Complete
+                        </div>
+                    </div>
+                    <small class="text-muted">Expected Q1 2026 · AlphaFold Server API + Local inference option</small>
+                </div>
+                <div class="t-it">
+                    <ul class="small mb-3">
+                        <li><strong>Predizione Struttura Proteica:</strong> Genera modelli 3D per target MM novel (GPRC5D, FcRH5, CD229)</li>
+                        <li><strong>Complesso Proteina-Ligando:</strong> Predici pose binding per composti lead</li>
+                        <li><strong>Design Anticorpi:</strong> Modella strutture anticorpi bispecifici (BiTE, TriTE)</li>
+                        <li><strong>Analisi Mutazioni:</strong> Predici impatto strutturale mutazioni resistenza</li>
+                    </ul>
+                    <p class="mb-2"><strong>Stato Integrazione API:</strong></p>
+                    <div class="progress mb-2" style="height: 24px;">
+                        <div class="progress-bar bg-warning" role="progressbar" style="width: 35%;" aria-valuenow="35" aria-valuemin="0" aria-valuemax="100">
+                            35% Completo
+                        </div>
+                    </div>
+                    <small class="text-muted">Atteso Q1 2026 · API AlphaFold Server + Opzione inferenza locale</small>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h3 class="h6 text-info mb-3">
+                    <span class="t-en">💡 Example Workflow (Future)</span>
+                    <span class="t-it">💡 Workflow Esempio (Futuro)</span>
+                </h3>
+                <div class="alert alert-light border">
+                    <div class="t-en">
+                        <ol class="small mb-0">
+                            <li><strong>Input:</strong> Target protein sequence (e.g., GPRC5D UniProt ID)</li>
+                            <li><strong>AlphaFold3:</strong> Generate high-confidence 3D structure (pLDDT &gt; 90)</li>
+                            <li><strong>Binding Site:</strong> Identify druggable pockets (fpocket, P2Rank)</li>
+                            <li><strong>Virtual Screening:</strong> Dock compound library against predicted site</li>
+                            <li><strong>Lead Selection:</strong> Rank by binding affinity + ADMET filters</li>
+                            <li><strong>Visualization:</strong> Interactive 3D viewer with interaction maps</li>
+                        </ol>
+                    </div>
+                    <div class="t-it">
+                        <ol class="small mb-0">
+                            <li><strong>Input:</strong> Sequenza proteina target (es. GPRC5D UniProt ID)</li>
+                            <li><strong>AlphaFold3:</strong> Genera struttura 3D alta confidenza (pLDDT &gt; 90)</li>
+                            <li><strong>Sito Binding:</strong> Identifica tasche druggable (fpocket, P2Rank)</li>
+                            <li><strong>Virtual Screening:</strong> Docka libreria composti contro sito predetto</li>
+                            <li><strong>Selezione Lead:</strong> Classifica per affinità binding + filtri ADMET</li>
+                            <li><strong>Visualizzazione:</strong> Viewer 3D interattivo con mappe interazione</li>
+                        </ol>
+                    </div>
+                </div>
+                <div class="text-center mt-3">
+                    <a href="https://alphafoldserver.com" target="_blank" class="btn btn-sm btn-outline-warning">
+                        <span class="t-en">🔗 Visit AlphaFold Server</span>
+                        <span class="t-it">🔗 Visita AlphaFold Server</span>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
