@@ -246,49 +246,25 @@ def job_detail(request: HttpRequest, pk: int) -> HttpResponse:
             logger.error(f"[DEBUG] ❌ Failed to load CSV: {e}")
             csv_data = None
     
-    # Enhanced metadata for binding jobs - NOW WITH API INTEGRATION
+    # Enhanced metadata for binding jobs - FAST LOAD (basic data only)
     if job.kind == models.ChemJob.BIND and job.input_a:
         pdb_id = job.input_a.upper()
         logger.info(f"[DEBUG] 🔬 Processing binding job metadata for PDB: {pdb_id}")
         
-        # Basic PDB metadata URLs
+        # Basic PDB metadata URLs (FAST - no API calls)
         pdb_metadata = {
             'pdb_id': pdb_id,
             'rcsb_url': f'https://www.rcsb.org/structure/{pdb_id}',
             'pdbe_url': f'https://www.ebi.ac.uk/pdbe/entry/pdb/{pdb_id}',
             'pdb_redo_url': f'https://pdb-redo.eu/db/{pdb_id}',
             'alphafold_similar': f'https://alphafold.ebi.ac.uk/search/text/{pdb_id}',
+            'ligand_id': job.input_b,
         }
         logger.debug(f"[DEBUG]   Basic URLs configured: {list(pdb_metadata.keys())}")
+        logger.info(f"[DEBUG] ⚡ Fast load mode - enriched data will load asynchronously")
         
-        # Get API preferences from job (use defaults if not set)
-        api_prefs = job.api_preferences if hasattr(job, 'api_preferences') and job.api_preferences else None
-        if api_prefs:
-            enabled_count = sum(1 for v in api_prefs.values() if v)
-            logger.info(f"[DEBUG] 🔧 API preferences loaded: {enabled_count} sources enabled")
-            logger.debug(f"[DEBUG]   Preferences: {api_prefs}")
-        else:
-            logger.warning(f"[DEBUG] ⚠️ No API preferences found, using defaults")
-        
-        # Enrich with API data (includes PDB summary, ligands, validation, etc.)
-        logger.info(f"[DEBUG] 🌐 Enriching metadata with API data...")
-        enrich_start = time.time()
-        api_enriched_data = enrich_pdb_metadata_for_view(pdb_id, ligand_id=job.input_b, api_prefs=api_prefs)
-        enrich_time = time.time() - enrich_start
-        logger.info(f"[DEBUG] ✅ Metadata enrichment completed in {enrich_time:.2f}s")
-        if api_enriched_data:
-            logger.debug(f"[DEBUG]   Enriched data keys: {list(api_enriched_data.keys())}")
-        else:
-            logger.warning(f"[DEBUG] ⚠️ No enriched data returned")
-        
-        # Merge API data into pdb_metadata
-        if api_enriched_data:
-            pdb_metadata.update(api_enriched_data)
-            
-            # Extract binding_analysis from API data for template compatibility
-            if 'binding_analysis' in api_enriched_data:
-                binding_analysis = api_enriched_data['binding_analysis']
-                logger.debug(f"[DEBUG]   Binding analysis extracted: {list(binding_analysis.keys()) if binding_analysis else 'empty'}")
+        # Extract binding_analysis if available (will be loaded async)
+        binding_analysis = None
     
     elapsed = time.time() - start_time
     logger.info(f"[DEBUG] ⏱️ job_detail view completed in {elapsed:.2f}s")
@@ -305,3 +281,52 @@ def job_detail(request: HttpRequest, pk: int) -> HttpResponse:
             "binding_analysis": binding_analysis,
         },
     )
+
+
+def job_enriched_data(request: HttpRequest, pk: int) -> HttpResponse:
+    """AJAX endpoint to load enriched API data asynchronously."""
+    import logging
+    import time
+    from django.http import JsonResponse
+    logger = logging.getLogger(__name__)
+    
+    start_time = time.time()
+    logger.info(f"[DEBUG] 🌐 AJAX enriched_data endpoint called - Job ID: {pk}")
+    
+    job = get_object_or_404(models.ChemJob, pk=pk, user=request.user)
+    
+    # Only process binding jobs
+    if job.kind != models.ChemJob.BIND or not job.input_a:
+        return JsonResponse({'error': 'Not a binding job'}, status=400)
+    
+    pdb_id = job.input_a.upper()
+    ligand_id = job.input_b
+    
+    # Get API preferences
+    api_prefs = job.api_preferences if hasattr(job, 'api_preferences') and job.api_preferences else None
+    
+    logger.info(f"[DEBUG] 🔬 Enriching PDB: {pdb_id}, Ligand: {ligand_id}")
+    
+    # Fetch enriched data (this is the slow part)
+    enriched_data = enrich_pdb_metadata_for_view(pdb_id, ligand_id=ligand_id, api_prefs=api_prefs)
+    
+    elapsed = time.time() - start_time
+    logger.info(f"[DEBUG] ✅ Enriched data loaded in {elapsed:.2f}s")
+    
+    # Return only the data needed for dynamic sections
+    response_data = {
+        'mm_efficacy_profile': enriched_data.get('mm_efficacy_profile'),
+        'survival_impact': enriched_data.get('survival_impact'),
+        'toxicity_profile': enriched_data.get('toxicity_profile'),
+        'binding_analysis': enriched_data.get('binding_analysis'),
+        'validation_metrics': enriched_data.get('validation_metrics'),
+        'interaction_details': enriched_data.get('interaction_details'),
+        'similar_structures': enriched_data.get('similar_structures'),
+        'pubmed_literature': enriched_data.get('pubmed_literature'),
+        'chembl_drug_details': enriched_data.get('chembl_drug_details'),
+        'clinical_trials': enriched_data.get('clinical_trials'),
+        'protein_network': enriched_data.get('protein_network'),
+        'reactome_pathways': enriched_data.get('reactome_pathways'),
+    }
+    
+    return JsonResponse(response_data)

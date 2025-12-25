@@ -614,30 +614,406 @@ div[style*="font-family:Arial"] {
                             {% else %}
                                 <div class="alert alert-info border-start border-info border-3 mb-2">
                                     <strong>🧬 PDB: {{ pdb_metadata.pdb_id }}</strong><br>
-                                    <span class="t-en">This structure contains important protein-ligand interactions relevant to MM therapy.</span>
-                                    <span class="t-it">Questa struttura contiene interazioni proteina-ligando importanti per la terapia MM.</span>
+                                    <span class="t-en">This structure contains important protein-ligand interactions.</span>
+                                    <span class="t-it">Questa struttura contiene interazioni proteina-ligando importanti.</span>
                                     
-                                    <div class="mt-3">
-                                        <strong class="t-en">🔬 Key Biological Pathways:</strong>
-                                        <strong class="t-it">🔬 Principali Vie Biologiche:</strong>
+                                    <!-- Dynamic MM Efficacy Section (loads via AJAX) -->
+                                    <div id="mm-efficacy-section" class="mt-4">
+                                        <div class="text-center p-4">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                            <p class="mt-2 text-muted">
+                                                <span class="t-en">Loading MM efficacy analysis...</span>
+                                                <span class="t-it">Caricamento analisi efficacia MM...</span>
+                                            </p>
+                                        </div>
                                     </div>
-                                    <ul class="mb-2 mt-2 small">
-                                        <li><span class="t-en"><strong>Ubiquitin-Proteasome System (UPS)</strong> - Protein degradation</span><span class="t-it"><strong>Sistema Ubiquitina-Proteasoma (UPS)</strong> - Degradazione proteica</span></li>
-                                        <li><span class="t-en"><strong>Apoptosis Regulation</strong> - Programmed cell death</span><span class="t-it"><strong>Regolazione Apoptosi</strong> - Morte cellulare programmata</span></li>
-                                        <li><span class="t-en"><strong>Cell Cycle Control</strong> - G1/S and G2/M checkpoints</span><span class="t-it"><strong>Controllo Ciclo Cellulare</strong> - Checkpoint G1/S e G2/M</span></li>
-                                        <li><span class="t-en"><strong>NF-κB Signaling</strong> - Inflammation and survival</span><span class="t-it"><strong>Segnalazione NF-κB</strong> - Infiammazione e sopravvivenza</span></li>
-                                    </ul>
-                                    <div class="d-flex gap-2 flex-wrap mt-3">
-                                        <a href="https://www.kegg.jp/pathway/hsa03050" target="_blank" class="btn btn-sm btn-outline-primary">
-                                            📊 KEGG: Proteasome
-                                        </a>
-                                        <a href="https://reactome.org/PathwayBrowser/#/R-HSA-597592" target="_blank" class="btn btn-sm btn-outline-info">
-                                            🔬 Reactome: Post-translational protein modification
-                                        </a>
-                                        <a href="https://www.kegg.jp/kegg/pathway.html" target="_blank" class="btn btn-sm btn-outline-secondary">
-                                            🌐 Browse All Pathways
-                                        </a>
+                                    
+                                    <!-- Dynamic Survival Impact Section (loads via AJAX) -->
+                                    <div id="survival-impact-section" class="mt-4">
+                                        <div class="text-center p-4">
+                                            <div class="spinner-border text-success" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                            <p class="mt-2 text-muted">
+                                                <span class="t-en">Loading survival impact estimation...</span>
+                                                <span class="t-it">Caricamento stima impatto sopravvivenza...</span>
+                                            </p>
+                                        </div>
                                     </div>
+                                    
+                                    <!-- Dynamic Toxicity Profile Section (loads via AJAX) -->
+                                    <div id="toxicity-profile-section" class="mt-4">
+                                        <div class="text-center p-4">
+                                            <div class="spinner-border text-warning" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                            <p class="mt-2 text-muted">
+                                                <span class="t-en">Loading toxicity profile...</span>
+                                                <span class="t-it">Caricamento profilo tossicità...</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                        <div class="mt-4 p-3 border rounded" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+                                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                                <h6 class="mb-0">
+                                                    <i class="bi bi-activity text-danger"></i>
+                                                    <strong class="t-en">Multiple Myeloma Efficacy Estimation</strong>
+                                                    <strong class="t-it">Stima dell'Efficacia nel Mieloma Multiplo</strong>
+                                                </h6>
+                                                <span class="badge 
+                                                    {% if pdb_metadata.mm_efficacy_profile.overall_score >= 70 %}bg-success
+                                                    {% elif pdb_metadata.mm_efficacy_profile.overall_score >= 50 %}bg-warning
+                                                    {% elif pdb_metadata.mm_efficacy_profile.overall_score >= 30 %}bg-info
+                                                    {% else %}bg-secondary{% endif %} fs-6">
+                                                    {{ pdb_metadata.mm_efficacy_profile.overall_score }}/100
+                                                </span>
+                                            </div>
+                                            
+                                            <div class="progress mb-3" style="height: 25px;">
+                                                <div class="progress-bar 
+                                                    {% if pdb_metadata.mm_efficacy_profile.overall_score >= 70 %}bg-success
+                                                    {% elif pdb_metadata.mm_efficacy_profile.overall_score >= 50 %}bg-warning
+                                                    {% elif pdb_metadata.mm_efficacy_profile.overall_score >= 30 %}bg-info
+                                                    {% else %}bg-secondary{% endif %}"
+                                                    role="progressbar" 
+                                                    style="width: {{ pdb_metadata.mm_efficacy_profile.overall_score }}%"
+                                                    aria-valuenow="{{ pdb_metadata.mm_efficacy_profile.overall_score }}" 
+                                                    aria-valuemin="0" 
+                                                    aria-valuemax="100">
+                                                    <strong>{{ pdb_metadata.mm_efficacy_profile.interpretation }}</strong>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="row g-2 mb-3">
+                                                <div class="col-md-6">
+                                                    <small class="text-muted t-en">Confidence Level:</small>
+                                                    <small class="text-muted t-it">Livello di Confidenza:</small><br>
+                                                    <span class="badge 
+                                                        {% if pdb_metadata.mm_efficacy_profile.confidence == 'High' %}bg-success
+                                                        {% elif pdb_metadata.mm_efficacy_profile.confidence == 'Medium' %}bg-warning
+                                                        {% else %}bg-secondary{% endif %}">
+                                                        {{ pdb_metadata.mm_efficacy_profile.confidence }}
+                                                    </span>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <small class="text-muted t-en">Evidence Sources:</small>
+                                                    <small class="text-muted t-it">Fonti di Evidenza:</small><br>
+                                                    <small>{{ pdb_metadata.mm_efficacy_profile.evidence_sources|join:", "|default:"Limited data" }}</small>
+                                                </div>
+                                            </div>
+                                            
+                                            {% if pdb_metadata.mm_efficacy_profile.clinical_status %}
+                                            <div class="alert alert-light border-start border-primary border-3 mb-2 py-2">
+                                                <small>
+                                                    <i class="bi bi-clipboard-pulse text-primary"></i>
+                                                    <strong class="t-en">Clinical Status:</strong>
+                                                    <strong class="t-it">Stato Clinico:</strong>
+                                                    {{ pdb_metadata.mm_efficacy_profile.clinical_status }}
+                                                </small>
+                                            </div>
+                                            {% endif %}
+                                            
+                                            {% if pdb_metadata.mm_efficacy_profile.key_findings %}
+                                            <div class="mt-2">
+                                                <small class="text-muted">
+                                                    <strong class="t-en">Key Findings:</strong>
+                                                    <strong class="t-it">Risultati Chiave:</strong>
+                                                </small>
+                                                <ul class="small mb-0 mt-1">
+                                                    {% for finding in pdb_metadata.mm_efficacy_profile.key_findings %}
+                                                    <li>{{ finding }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                            {% endif %}
+                                            
+                                            {% if pdb_metadata.mm_efficacy_profile.limitations %}
+                                            <div class="mt-2">
+                                                <small class="text-muted">
+                                                    <i class="bi bi-exclamation-triangle text-warning"></i>
+                                                    <strong class="t-en">Limitations:</strong>
+                                                    <strong class="t-it">Limitazioni:</strong>
+                                                    {{ pdb_metadata.mm_efficacy_profile.limitations|join:", " }}
+                                                </small>
+                                            </div>
+                                            {% endif %}
+                                            
+                                            <div class="mt-3 pt-2 border-top">
+                                                <small class="text-muted">
+                                                    <i class="bi bi-info-circle"></i>
+                                                    <span class="t-en">
+                                                        <strong>Note:</strong> This estimation is based on target relevance, mechanism of action, clinical trials, and published literature. 
+                                                        It does not replace clinical judgment or regulatory approval status.
+                                                    </span>
+                                                    <span class="t-it">
+                                                        <strong>Nota:</strong> Questa stima si basa sulla rilevanza del target, meccanismo d'azione, trial clinici e letteratura pubblicata. 
+                                                        Non sostituisce il giudizio clinico o lo stato di approvazione regolatoria.
+                                                    </span>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    {% if pdb_metadata.survival_impact %}
+                                        <div class="mt-4 p-3 border rounded bg-light">
+                                            <h6 class="mb-3">
+                                                <i class="bi bi-graph-up-arrow text-success"></i>
+                                                <strong class="t-en">Estimated Survival Impact for Generic MM Patient</strong>
+                                                <strong class="t-it">Impatto Stimato sulla Sopravvivenza per Paziente MM Generico</strong>
+                                            </h6>
+                                            
+                                            <div class="row g-3 mb-3">
+                                                {% if pdb_metadata.survival_impact.median_pfs_months %}
+                                                <div class="col-md-6">
+                                                    <div class="card border-primary">
+                                                        <div class="card-body p-2">
+                                                            <small class="text-muted t-en">Median Progression-Free Survival</small>
+                                                            <small class="text-muted t-it">Sopravvivenza Mediana Libera da Progressione</small>
+                                                            <h4 class="text-primary mb-0">{{ pdb_metadata.survival_impact.median_pfs_months|floatformat:1 }} months</h4>
+                                                            {% if pdb_metadata.survival_impact.pfs_interpretation %}
+                                                            <small class="text-muted">{{ pdb_metadata.survival_impact.pfs_interpretation }}</small>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {% endif %}
+                                                
+                                                {% if pdb_metadata.survival_impact.median_os_months %}
+                                                <div class="col-md-6">
+                                                    <div class="card border-success">
+                                                        <div class="card-body p-2">
+                                                            <small class="text-muted t-en">Median Overall Survival</small>
+                                                            <small class="text-muted t-it">Sopravvivenza Globale Mediana</small>
+                                                            <h4 class="text-success mb-0">{{ pdb_metadata.survival_impact.median_os_months|floatformat:1 }} months</h4>
+                                                            {% if pdb_metadata.survival_impact.os_interpretation %}
+                                                            <small class="text-muted">{{ pdb_metadata.survival_impact.os_interpretation }}</small>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            
+                                            <div class="row g-3 mb-3">
+                                                {% if pdb_metadata.survival_impact.response_rate_percent %}
+                                                <div class="col-md-6">
+                                                    <small class="text-muted t-en">Overall Response Rate:</small>
+                                                    <small class="text-muted t-it">Tasso di Risposta Globale:</small>
+                                                    <h5 class="text-info mb-0">{{ pdb_metadata.survival_impact.response_rate_percent }}%</h5>
+                                                </div>
+                                                {% endif %}
+                                                
+                                                <div class="col-md-6">
+                                                    <small class="text-muted t-en">Confidence:</small>
+                                                    <small class="text-muted t-it">Confidenza:</small>
+                                                    <h5 class="mb-0">
+                                                        <span class="badge 
+                                                            {% if pdb_metadata.survival_impact.confidence == 'High' %}bg-success
+                                                            {% elif pdb_metadata.survival_impact.confidence == 'Medium-High' %}bg-info
+                                                            {% elif pdb_metadata.survival_impact.confidence == 'Medium' %}bg-warning
+                                                            {% else %}bg-secondary{% endif %}">
+                                                            {{ pdb_metadata.survival_impact.confidence }}
+                                                        </span>
+                                                    </h5>
+                                                </div>
+                                            </div>
+                                            
+                                            {% if pdb_metadata.survival_impact.survival_benefit %}
+                                            <div class="alert alert-success border-start border-success border-3 mb-2 py-2">
+                                                <small>
+                                                    <i class="bi bi-check-circle text-success"></i>
+                                                    <strong>{{ pdb_metadata.survival_impact.survival_benefit }}</strong>
+                                                </small>
+                                            </div>
+                                            {% endif %}
+                                            
+                                            {% if pdb_metadata.survival_impact.pfs_formula or pdb_metadata.survival_impact.os_formula %}
+                                            <div class="mt-3 p-2 bg-white border rounded">
+                                                <small class="text-muted">
+                                                    <strong class="t-en">Mathematical Model:</strong>
+                                                    <strong class="t-it">Modello Matematico:</strong>
+                                                </small>
+                                                {% if pdb_metadata.survival_impact.pfs_formula %}
+                                                <div class="font-monospace small">PFS: {{ pdb_metadata.survival_impact.pfs_formula }}</div>
+                                                {% endif %}
+                                                {% if pdb_metadata.survival_impact.os_formula %}
+                                                <div class="font-monospace small">OS: {{ pdb_metadata.survival_impact.os_formula }}</div>
+                                                {% endif %}
+                                            </div>
+                                            {% endif %}
+                                            
+                                            {% if pdb_metadata.survival_impact.model_basis %}
+                                            <div class="mt-2">
+                                                <small class="text-muted">
+                                                    <i class="bi bi-info-circle"></i>
+                                                    <span class="t-en">Model basis:</span>
+                                                    <span class="t-it">Base del modello:</span>
+                                                    {{ pdb_metadata.survival_impact.model_basis|join:", " }}
+                                                </small>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                    
+                                    {% if pdb_metadata.toxicity_profile %}
+                                        <div class="mt-4 p-3 border rounded" style="background: linear-gradient(135deg, #fff5f5 0%, #ffe5e5 100%);">
+                                            <h6 class="mb-3">
+                                                <i class="bi bi-exclamation-triangle-fill text-warning"></i>
+                                                <strong class="t-en">Estimated Toxicity & Side Effects Profile</strong>
+                                                <strong class="t-it">Profilo Stimato di Tossicità ed Effetti Collaterali</strong>
+                                            </h6>
+                                            
+                                            <div class="row g-2 mb-3">
+                                                <div class="col-md-6">
+                                                    <small class="text-muted t-en">Overall Risk Level:</small>
+                                                    <small class="text-muted t-it">Livello di Rischio Globale:</small><br>
+                                                    <span class="badge 
+                                                        {% if pdb_metadata.toxicity_profile.overall_risk == 'High' %}bg-danger
+                                                        {% elif pdb_metadata.toxicity_profile.overall_risk == 'Moderate' %}bg-warning
+                                                        {% elif pdb_metadata.toxicity_profile.overall_risk == 'Low-Moderate' %}bg-info
+                                                        {% else %}bg-success{% endif %} fs-6">
+                                                        {{ pdb_metadata.toxicity_profile.overall_risk }}
+                                                    </span>
+                                                    <small class="text-muted">(Risk Score: {{ pdb_metadata.toxicity_profile.risk_score }}/100)</small>
+                                                </div>
+                                                
+                                                {% if pdb_metadata.toxicity_profile.risk_benefit_ratio %}
+                                                <div class="col-md-6">
+                                                    <small class="text-muted t-en">Risk-Benefit Ratio:</small>
+                                                    <small class="text-muted t-it">Rapporto Rischio-Beneficio:</small><br>
+                                                    <small><strong>{{ pdb_metadata.toxicity_profile.risk_benefit_ratio }}</strong></small>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            
+                                            {% if pdb_metadata.toxicity_profile.black_box_warnings %}
+                                            <div class="alert alert-danger border-start border-danger border-3 mb-2 py-2">
+                                                <small>
+                                                    <i class="bi bi-exclamation-octagon-fill text-danger"></i>
+                                                    <strong class="t-en">Black Box Warnings:</strong>
+                                                    <strong class="t-it">Avvertenze Gravi (Black Box):</strong>
+                                                </small>
+                                                <ul class="mb-0 mt-1 small">
+                                                    {% for warning in pdb_metadata.toxicity_profile.black_box_warnings %}
+                                                    <li><strong>{{ warning }}</strong></li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                            {% endif %}
+                                            
+                                            {% if pdb_metadata.toxicity_profile.common_adverse_events %}
+                                            <div class="mb-2">
+                                                <small class="text-muted">
+                                                    <strong class="t-en">Common Adverse Events:</strong>
+                                                    <strong class="t-it">Eventi Avversi Comuni:</strong>
+                                                </small>
+                                                <ul class="small mb-0 mt-1">
+                                                    {% for event in pdb_metadata.toxicity_profile.common_adverse_events|slice:":6" %}
+                                                    <li>{{ event }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                            {% endif %}
+                                            
+                                            {% if pdb_metadata.toxicity_profile.serious_adverse_events %}
+                                            <div class="mb-2">
+                                                <small class="text-muted">
+                                                    <strong class="t-en">Serious Adverse Events:</strong>
+                                                    <strong class="t-it">Eventi Avversi Gravi:</strong>
+                                                </small>
+                                                <ul class="small mb-0 mt-1">
+                                                    {% for event in pdb_metadata.toxicity_profile.serious_adverse_events|slice:":4" %}
+                                                    <li class="text-danger"><strong>{{ event }}</strong></li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                            {% endif %}
+                                            
+                                            {% if pdb_metadata.toxicity_profile.management_strategies %}
+                                            <div class="alert alert-info border-start border-info border-3 mb-2 py-2">
+                                                <small>
+                                                    <i class="bi bi-shield-check text-info"></i>
+                                                    <strong class="t-en">Management Strategies:</strong>
+                                                    <strong class="t-it">Strategie di Gestione:</strong>
+                                                </small>
+                                                <ul class="mb-0 mt-1 small">
+                                                    {% for strategy in pdb_metadata.toxicity_profile.management_strategies|slice:":5" %}
+                                                    <li>{{ strategy }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                            {% endif %}
+                                            
+                                            {% if pdb_metadata.toxicity_profile.mechanism_related_toxicities %}
+                                            <div class="mt-2">
+                                                <small class="text-muted">
+                                                    <i class="bi bi-info-circle"></i>
+                                                    <strong class="t-en">Mechanism-Related:</strong>
+                                                    <strong class="t-it">Correlato al Meccanismo:</strong>
+                                                    {{ pdb_metadata.toxicity_profile.mechanism_related_toxicities|first }}
+                                                </small>
+                                            </div>
+                                            {% endif %}
+                                            
+                                            <div class="mt-3 pt-2 border-top">
+                                                <small class="text-muted">
+                                                    <i class="bi bi-exclamation-triangle"></i>
+                                                    <span class="t-en">
+                                                        <strong>Disclaimer:</strong> This toxicity profile is estimated based on mechanism of action and drug class. 
+                                                        Actual adverse event rates may vary. Consult package insert for complete safety information.
+                                                    </span>
+                                                    <span class="t-it">
+                                                        <strong>Disclaimer:</strong> Questo profilo di tossicità è stimato in base al meccanismo d'azione e alla classe di farmaco. 
+                                                        I tassi effettivi di eventi avversi possono variare. Consultare il foglietto illustrativo per informazioni complete sulla sicurezza.
+                                                    </span>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    {% if pdb_metadata.reactome_pathways %}
+                                        <div class="mt-3">
+                                            <strong class="t-en">🔬 Biological Pathways (Reactome):</strong>
+                                            <strong class="t-it">🔬 Vie Biologiche (Reactome):</strong>
+                                        </div>
+                                        <ul class="mb-2 mt-2 small">
+                                            {% for pathway in pdb_metadata.reactome_pathways|slice:":5" %}
+                                            <li>
+                                                <strong>{{ pathway.displayName }}</strong>
+                                                {% if pathway.species %}
+                                                <span class="text-muted">({{ pathway.species }})</span>
+                                                {% endif %}
+                                                {% if pathway.url %}
+                                                <a href="{{ pathway.url }}" target="_blank" class="ms-1">
+                                                    <i class="bi bi-box-arrow-up-right"></i>
+                                                </a>
+                                                {% endif %}
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                        <div class="d-flex gap-2 flex-wrap mt-3">
+                                            {% for pathway in pdb_metadata.reactome_pathways|slice:":3" %}
+                                            <a href="{{ pathway.url }}" target="_blank" class="btn btn-sm btn-outline-info">
+                                                🔬 {{ pathway.displayName|truncatechars:30 }}
+                                            </a>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        <div class="mt-3">
+                                            <strong class="t-en">🔬 General Resources:</strong>
+                                            <strong class="t-it">🔬 Risorse Generali:</strong>
+                                        </div>
+                                        <div class="d-flex gap-2 flex-wrap mt-3">
+                                            <a href="https://www.kegg.jp/kegg/pathway.html" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                                🌐 KEGG Pathways
+                                            </a>
+                                            <a href="https://reactome.org/" target="_blank" class="btn btn-sm btn-outline-info">
+                                                🔬 Reactome Database
+                                            </a>
+                                        </div>
+                                    {% endif %}
                                 </div>
                             {% endif %}
                         </div>
@@ -2098,7 +2474,6 @@ div[style*="font-family:Arial"] {
             <span class="t-it">⚠️ Nessun file di output generato per questo job.</span>
         </div>
     {% endif %}
-{% endif %}
 
 <!-- Log Section (Collapsible) -->
 {% if job.log %}
@@ -2130,6 +2505,203 @@ div[style*="font-family:Arial"] {
 {% block extra_js %}
 {{ block.super }}
 <script>
+// Load enriched MM data asynchronously for binding jobs
+{% if job.kind == 'BIND' and pdb_metadata.pdb_id %}
+document.addEventListener('DOMContentLoaded', function() {
+    const jobId = {{ job.pk }};
+    const enrichedDataUrl = `/chem/job/${jobId}/enriched-data.json`;
+    
+    console.log('[MM Efficacy] Loading enriched data from:', enrichedDataUrl);
+    
+    fetch(enrichedDataUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('[MM Efficacy] Data loaded:', data);
+            
+            // Render MM Efficacy section
+            if (data.mm_efficacy_profile) {
+                renderMMEfficacy(data.mm_efficacy_profile);
+            } else {
+                document.getElementById('mm-efficacy-section').innerHTML = '<p class="text-muted"><em>No MM efficacy data available</em></p>';
+            }
+            
+            // Render Survival Impact section
+            if (data.survival_impact) {
+                renderSurvivalImpact(data.survival_impact);
+            } else {
+                document.getElementById('survival-impact-section').innerHTML = '<p class="text-muted"><em>No survival impact data available</em></p>';
+            }
+            
+            // Render Toxicity Profile section
+            if (data.toxicity_profile) {
+                renderToxicityProfile(data.toxicity_profile);
+            } else {
+                document.getElementById('toxicity-profile-section').innerHTML = '<p class="text-muted"><em>No toxicity profile data available</em></p>';
+            }
+        })
+        .catch(error => {
+            console.error('[MM Efficacy] Error loading data:', error);
+            document.getElementById('mm-efficacy-section').innerHTML = `
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <span class="t-en">Failed to load MM efficacy data. Please refresh the page.</span>
+                    <span class="t-it">Impossibile caricare i dati di efficacia MM. Ricarica la pagina.</span>
+                </div>
+            `;
+        });
+});
+
+function renderMMEfficacy(profile) {
+    const scoreClass = profile.overall_score >= 70 ? 'bg-success' : 
+                      profile.overall_score >= 50 ? 'bg-warning' : 
+                      profile.overall_score >= 30 ? 'bg-info' : 'bg-secondary';
+    
+    const html = `
+        <div class="p-3 border rounded" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h6 class="mb-0">
+                    <i class="bi bi-activity text-danger"></i>
+                    <strong class="t-en">Multiple Myeloma Efficacy Estimation</strong>
+                    <strong class="t-it">Stima dell'Efficacia nel Mieloma Multiplo</strong>
+                </h6>
+                <span class="badge ${scoreClass} fs-6">${profile.overall_score}/100</span>
+            </div>
+            
+            <div class="progress mb-3" style="height: 25px;">
+                <div class="progress-bar ${scoreClass}" role="progressbar" 
+                    style="width: ${profile.overall_score}%"
+                    aria-valuenow="${profile.overall_score}" aria-valuemin="0" aria-valuemax="100">
+                    <strong>${profile.interpretation}</strong>
+                </div>
+            </div>
+            
+            <div class="row g-2 mb-3">
+                <div class="col-6 col-md-3">
+                    <div class="small"><strong class="t-en">Target Relevance:</strong><strong class="t-it">Rilevanza Target:</strong> ${profile.target_relevance_score}/40</div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="small"><strong class="t-en">Mechanism:</strong><strong class="t-it">Meccanismo:</strong> ${profile.mechanism_relevance_score}/30</div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="small"><strong class="t-en">Clinical Evidence:</strong><strong class="t-it">Evidenza Clinica:</strong> ${profile.clinical_evidence_score}/20</div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="small"><strong class="t-en">Literature:</strong><strong class="t-it">Letteratura:</strong> ${profile.literature_evidence_score}/10</div>
+                </div>
+            </div>
+            
+            <div class="small text-muted">
+                <strong class="t-en">Confidence:</strong><strong class="t-it">Confidenza:</strong> 
+                <span class="badge ${profile.confidence === 'High' ? 'bg-success' : profile.confidence === 'Medium' ? 'bg-warning' : 'bg-secondary'}">${profile.confidence}</span>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('mm-efficacy-section').innerHTML = html;
+}
+
+function renderSurvivalImpact(impact) {
+    const confidenceClass = impact.confidence_level === 'High' ? 'bg-success' : 
+                           impact.confidence_level === 'Medium-High' ? 'bg-info' : 
+                           impact.confidence_level === 'Medium' ? 'bg-warning' : 'bg-secondary';
+    
+    const html = `
+        <div class="p-3 border rounded bg-light">
+            <h6><i class="bi bi-heart-pulse text-success"></i>
+                <strong class="t-en">Estimated Survival Impact for Generic MM Patient</strong>
+                <strong class="t-it">Stima Impatto Sopravvivenza per Paziente MM Generico</strong>
+            </h6>
+            
+            <div class="row g-3 mt-2">
+                <div class="col-md-4">
+                    <div class="card border-primary">
+                        <div class="card-body text-center">
+                            <small class="text-muted"><strong class="t-en">Median PFS</strong><strong class="t-it">PFS Mediana</strong></small>
+                            <h4 class="text-primary mb-0">${impact.median_pfs_months} <small>months</small></h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-success">
+                        <div class="card-body text-center">
+                            <small class="text-muted"><strong class="t-en">Median OS</strong><strong class="t-it">OS Mediana</strong></small>
+                            <h4 class="text-success mb-0">${impact.median_os_months} <small>months</small></h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-info">
+                        <div class="card-body text-center">
+                            <small class="text-muted"><strong class="t-en">Response Rate</strong><strong class="t-it">Tasso Risposta</strong></small>
+                            <h4 class="text-info mb-0">${impact.response_rate_percent}%</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-3 small">
+                <span class="badge ${confidenceClass}"><strong class="t-en">Confidence:</strong><strong class="t-it">Confidenza:</strong> ${impact.confidence_level}</span>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('survival-impact-section').innerHTML = html;
+}
+
+function renderToxicityProfile(toxicity) {
+    const riskClass = toxicity.overall_risk === 'High' ? 'bg-danger' : 
+                     toxicity.overall_risk === 'Moderate' ? 'bg-warning' : 'bg-info';
+    
+    let html = `
+        <div class="p-3 border rounded" style="background: #fff5f5">
+            <h6><i class="bi bi-exclamation-triangle text-warning"></i>
+                <strong class="t-en">Estimated Toxicity & Side Effects Profile</strong>
+                <strong class="t-it">Profilo Tossicità ed Effetti Collaterali Stimati</strong>
+            </h6>
+            
+            <div class="mt-2">
+                <span class="badge ${riskClass}"><strong class="t-en">Risk Level:</strong><strong class="t-it">Livello Rischio:</strong> ${toxicity.overall_risk}</span>
+                <small class="text-muted">(<strong class="t-en">Risk Score:</strong><strong class="t-it">Punteggio:</strong> ${toxicity.risk_score}/100)</small>
+            </div>
+            
+            <div class="mt-2">
+                <strong class="t-en">Risk-Benefit Ratio:</strong><strong class="t-it">Rapporto Rischio-Beneficio:</strong> 
+                <span class="badge bg-${toxicity.risk_benefit_ratio === 'Favorable' ? 'success' : toxicity.risk_benefit_ratio === 'Acceptable' ? 'info' : 'warning'}">${toxicity.risk_benefit_ratio}</span>
+            </div>
+    `;
+    
+    if (toxicity.black_box_warnings && toxicity.black_box_warnings.length > 0) {
+        html += `
+            <div class="alert alert-danger mt-3 mb-2">
+                <strong><i class="bi bi-exclamation-octagon"></i> <span class="t-en">Black Box Warnings:</span><span class="t-it">Avvertenze Black Box:</span></strong>
+                <ul class="mb-0 mt-1">
+                    ${toxicity.black_box_warnings.map(w => `<li><strong>${w}</strong></li>`).join('')}
+                </ul>
+            </div>
+        `;
+    }
+    
+    if (toxicity.common_adverse_events && toxicity.common_adverse_events.length > 0) {
+        html += `
+            <div class="mt-2">
+                <strong class="t-en">Common Adverse Events:</strong><strong class="t-it">Eventi Avversi Comuni:</strong>
+                <ul class="small mb-1">
+                    ${toxicity.common_adverse_events.slice(0, 6).map(e => `<li>${e}</li>`).join('')}
+                </ul>
+            </div>
+        `;
+    }
+    
+    html += '</div>';
+    document.getElementById('toxicity-profile-section').innerHTML = html;
+}
+{% endif %}
+
 // Add DataTables for similarity results if present
 {% if job.kind == 'SIM' and csv_data %}
 document.addEventListener('DOMContentLoaded', function() {
