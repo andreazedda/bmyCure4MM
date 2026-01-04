@@ -7,9 +7,9 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.http import JsonResponse
 from django.urls import include, path
-from django.http import JsonResponse
 
 from simulator.api import drugs, glossary
+from simulator.api_design import design_report
 from simulator.api_help import help_item, help_search
 from simulator.api_ux import audit as ux_audit
 
@@ -25,6 +25,7 @@ urlpatterns = [
     path("api/help/search/", help_search, name="api_help_search"),
     path("api/help/<slug:slug>/", help_item, name="api_help_item"),
     path("api/ux/audit/", ux_audit, name="api_ux_audit"),
+    path("api/design-report/", design_report, name="api_design_report"),
     path("api/chem/", include("chemtools.api")),
     path("healthz/", lambda request: JsonResponse({"ok": True})),
 ]

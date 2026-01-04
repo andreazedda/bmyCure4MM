@@ -2509,7 +2509,7 @@ div[style*="font-family:Arial"] {
 {% if job.kind == 'BIND' and pdb_metadata.pdb_id %}
 document.addEventListener('DOMContentLoaded', function() {
     const jobId = {{ job.pk }};
-    const enrichedDataUrl = `/chem/job/${jobId}/enriched-data.json`;
+    const enrichedDataUrl = "{% url 'chemtools:job_enriched_data' job.pk %}";
     
     console.log('[MM Efficacy] Loading enriched data from:', enrichedDataUrl);
     

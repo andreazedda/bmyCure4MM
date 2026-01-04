@@ -4,7 +4,6 @@ from django.db.models import Q
 from django.http import Http404, HttpResponse, JsonResponse
 from django.utils.crypto import salted_hmac
 from django.utils.http import http_date
-from django.utils.text import slugify
 from django.views.decorators.http import require_GET
 
 from .models_help import HelpArticle
@@ -42,8 +41,55 @@ def infer_type(slug: str) -> str:
     return "article"
 
 
+def _preset_payload(slug: str, lang: str) -> dict[str, str]:
+    preset = PRESETS[slug]
+    title = str(preset.get("label") or slug)
+    description = str(preset.get(f"description_{lang}") or preset.get("description_en") or "")
+    story = preset.get(f"story_{lang}") or preset.get("story_en") or {}
+
+    body_parts: list[str] = []
+    if description:
+        body_parts.append(f"<p>{description}</p>")
+
+    if isinstance(story, dict) and story:
+        story_title = story.get("title")
+        if story_title:
+            body_parts.append(f"<h5>{story_title}</h5>")
+
+        for key, heading_en, heading_it in (
+            ("background", "Background", "Contesto"),
+            ("challenge", "Challenge", "Sfida"),
+            ("why_these_drugs", "Why these drugs", "Perché questi farmaci"),
+            ("expected_outcome", "Expected outcome", "Risultato atteso"),
+        ):
+            value = story.get(key)
+            if not value:
+                continue
+            heading = heading_it if lang == "it" else heading_en
+            body_parts.append(f"<h6>{heading}</h6><p>{value}</p>")
+
+        learning_points = story.get("learning_points")
+        if isinstance(learning_points, list) and learning_points:
+            heading = "Learning points" if lang != "it" else "Punti chiave"
+            items = "".join(f"<li>{point}</li>" for point in learning_points if point)
+            if items:
+                body_parts.append(f"<h6>{heading}</h6><ul>{items}</ul>")
+
+    body = "\n".join(body_parts) if body_parts else "<p>(no details)</p>"
+    return {"title": title, "body": body}
+
+
 def help_item(request, slug: str):
     lang = request.GET.get("lang", "en")
+
+    if slug in PRESETS:
+        payload = _preset_payload(slug, lang)
+        payload["type"] = "preset"
+        payload["slug"] = slug
+        resp = JsonResponse(payload)
+        resp["Cache-Control"] = "max-age=600, public"
+        return resp
+
     try:
         article = HelpArticle.objects.get(slug=slug)
     except HelpArticle.DoesNotExist as exc:  # pragma: no cover - 404 path
@@ -95,7 +141,7 @@ def help_search(request):
                 items.insert(
                     0,
                     {
-                        "slug": slugify(slug),
+                        "slug": slug,
                         "title": label,
                         "type": "preset",
                     },

@@ -175,6 +175,14 @@ LOGGING = {
         "activity": {
             "format": "%(asctime)s [%(levelname)s] %(message)s",
         },
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {message}",
+            "style": "{",
+        },
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{",
+        },
     },
     "handlers": {
         "activity_file": {
@@ -182,6 +190,20 @@ LOGGING = {
             "class": "logging.FileHandler",
             "filename": str(LOGS_DIR / "activity.log"),
             "formatter": "activity",
+        },
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+        "file": {
+            "class": "logging.FileHandler",
+            "filename": os.path.join(BASE_DIR, "logs", "django.log"),
+            "formatter": "verbose",
+        },
+        "celery_file": {
+            "class": "logging.FileHandler",
+            "filename": os.path.join(BASE_DIR, "logs", "celery_tasks.log"),
+            "formatter": "verbose",
         },
     },
     "loggers": {
@@ -192,6 +214,20 @@ LOGGING = {
         },
         "ux.education": {
             "handlers": ["activity_file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "django": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
+        },
+        "chemtools.tasks": {
+            "handlers": ["console", "celery_file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "celery": {
+            "handlers": ["console", "celery_file"],
             "level": "INFO",
             "propagate": False,
         },
@@ -221,50 +257,4 @@ CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", CELERY_BROKER_UR
 # CELERY_TASK_ALWAYS_EAGER = True
 # CELERY_TASK_EAGER_PROPAGATES = True
 
-# Logging configuration
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {message}',
-            'style': '{',
-        },
-        'simple': {
-            'format': '{levelname} {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
-        },
-        'file': {
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs', 'django.log'),
-            'formatter': 'verbose',
-        },
-        'celery_file': {
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs', 'celery_tasks.log'),
-            'formatter': 'verbose',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-        },
-        'chemtools.tasks': {
-            'handlers': ['console', 'celery_file'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'celery': {
-            'handlers': ['console', 'celery_file'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-    },
-}
+

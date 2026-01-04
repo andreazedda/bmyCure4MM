@@ -5,7 +5,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
-from clinic.models import Regimen
+from django.apps import apps
+
+Regimen = apps.get_model("clinic", "Regimen")
 
 from . import explain, forms, models
 from .presets import PRESETS

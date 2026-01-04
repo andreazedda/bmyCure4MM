@@ -1,0 +1,1067 @@
+{
+  "inputs": {
+    "seed": 7,
+    "steps": 18,
+    "dt_days": 7.0,
+    "scenario": "demo_mm_bulk_reservoir"
+  },
+  "tradeoff_points": [
+    {
+      "therapy": "ADC-BCMA",
+      "tp": 0.6666666666666666,
+      "fp": 0.0,
+      "toxicity": {
+        "marrow_reserve_depletion": 0.22761363636363635,
+        "on_target_off_tumor": 0.31111111111111106,
+        "immune_mediated": 0.0,
+        "payload_mediated": 0.31875,
+        "off_target_polypharmacology": 0.0
+      }
+    },
+    {
+      "therapy": "ADC-(BCMA AND GPRC5D)",
+      "tp": 0.3333333333333333,
+      "fp": 0.0,
+      "toxicity": {
+        "marrow_reserve_depletion": 0.17010125709769783,
+        "on_target_off_tumor": 0.0004263592930460209,
+        "immune_mediated": 0.0,
+        "payload_mediated": 0.28350000000000003,
+        "off_target_polypharmacology": 0.0
+      }
+    },
+    {
+      "therapy": "CAR-T BCMA",
+      "tp": 0.6666666666666666,
+      "fp": 0.0,
+      "toxicity": {
+        "marrow_reserve_depletion": 0.0,
+        "on_target_off_tumor": 0.6222222222222221,
+        "immune_mediated": 0.39,
+        "payload_mediated": 0.0,
+        "off_target_polypharmacology": 0.0
+      }
+    }
+  ],
+  "pareto_front": [
+    {
+      "therapy": "ADC-BCMA",
+      "tp": 0.6666666666666666,
+      "fp": 0.0
+    },
+    {
+      "therapy": "CAR-T BCMA",
+      "tp": 0.6666666666666666,
+      "fp": 0.0
+    },
+    {
+      "therapy": "ADC-(BCMA AND GPRC5D)",
+      "tp": 0.3333333333333333,
+      "fp": 0.0
+    }
+  ],
+  "dynamics": [
+    {
+      "time_days": 7.0,
+      "tumor_load_bulk": 0.7605707527766351,
+      "tumor_load_reservoir": 0.32360062956345126,
+      "clone_fractions_bulk": {
+        "C0": 0.532496428956758,
+        "C1": 0.35405654914350554,
+        "C2": 0.11344702189973652
+      },
+      "clone_fractions_reservoir": {
+        "C0": 0.2286579834335893,
+        "C1": 0.3431757670511229,
+        "C2": 0.42816624951528764
+      },
+      "toxicity": {
+        "on_target_off_tumor": 0.31111111111111106,
+        "off_target_polypharmacology": 0.0,
+        "payload_mediated": 0.31875,
+        "immune_mediated": 0.0,
+        "marrow_reserve_depletion": 0.22761363636363635
+      },
+      "toxicity_explanation": {
+        "on_target_off_tumor": [
+          "Marrow progenitors expresses BCMA: binding\u22480.09, vulnerability=0.90.",
+          "Plasma cells (normal) expresses BCMA: binding\u22480.44, vulnerability=0.70."
+        ],
+        "off_target_polypharmacology": [],
+        "payload_mediated": [
+          "Bystander diffusion=0.40 enables payload spillover to nearby non-target cells.",
+          "Systemic leakage=0.60 models FcR uptake/catabolism \u2192 circulating payload exposure.",
+          "Linker cleavage=0.70 controls payload release kinetics.",
+          "Payload potency=0.75 amplifies exposure-to-damage mapping."
+        ],
+        "immune_mediated": [],
+        "marrow_reserve_depletion": [
+          "Neutropenia mechanism chain:",
+          "ADC \u2192 (binding/internalization + systemic leakage/bystander) \u2192 payload exposure in marrow \u2192 damage to myeloid precursors \u2192 neutropenia.",
+          "Computed marrow binding proxy=0.09; payload-mediated score=0.32."
+        ]
+      },
+      "relapse_risk": 0.33491347521340925
+    },
+    {
+      "time_days": 14.0,
+      "tumor_load_bulk": 0.5850234970273679,
+      "tumor_load_reservoir": 0.3028252949475896,
+      "clone_fractions_bulk": {
+        "C0": 0.5174944902056208,
+        "C1": 0.35675166600942265,
+        "C2": 0.12575384378495646
+      },
+      "clone_fractions_reservoir": {
+        "C0": 0.21078814766914666,
+        "C1": 0.3382348763070991,
+        "C2": 0.45097697602375436
+      },
+      "toxicity": {
+        "on_target_off_tumor": 0.31111111111111106,
+        "off_target_polypharmacology": 0.0,
+        "payload_mediated": 0.31875,
+        "immune_mediated": 0.0,
+        "marrow_reserve_depletion": 0.22761363636363635
+      },
+      "toxicity_explanation": {
+        "on_target_off_tumor": [
+          "Marrow progenitors expresses BCMA: binding\u22480.09, vulnerability=0.90.",
+          "Plasma cells (normal) expresses BCMA: binding\u22480.44, vulnerability=0.70."
+        ],
+        "off_target_polypharmacology": [],
+        "payload_mediated": [
+          "Bystander diffusion=0.40 enables payload spillover to nearby non-target cells.",
+          "Systemic leakage=0.60 models FcR uptake/catabolism \u2192 circulating payload exposure.",
+          "Linker cleavage=0.70 controls payload release kinetics.",
+          "Payload potency=0.75 amplifies exposure-to-damage mapping."
+        ],
+        "immune_mediated": [],
+        "marrow_reserve_depletion": [
+          "Neutropenia mechanism chain:",
+          "ADC \u2192 (binding/internalization + systemic leakage/bystander) \u2192 payload exposure in marrow \u2192 damage to myeloid precursors \u2192 neutropenia.",
+          "Computed marrow binding proxy=0.09; payload-mediated score=0.32."
+        ]
+      },
+      "relapse_risk": 0.3612383120215682
+    },
+    {
+      "time_days": 21.0,
+      "tumor_load_bulk": 0.4521902683787099,
+      "tumor_load_reservoir": 0.28419866102984176,
+      "clone_fractions_bulk": {
+        "C0": 0.49859253744387394,
+        "C1": 0.3590522614628304,
+        "C2": 0.1423552010932955
+      },
+      "clone_fractions_reservoir": {
+        "C0": 0.19072925496368603,
+        "C1": 0.3326664647851711,
+        "C2": 0.4766042802511428
+      },
+      "toxicity": {
+        "on_target_off_tumor": 0.31111111111111106,
+        "off_target_polypharmacology": 0.0,
+        "payload_mediated": 0.31875,
+        "immune_mediated": 0.0,
+        "marrow_reserve_depletion": 0.22761363636363635
+      },
+      "toxicity_explanation": {
+        "on_target_off_tumor": [
+          "Marrow progenitors expresses BCMA: binding\u22480.09, vulnerability=0.90.",
+          "Plasma cells (normal) expresses BCMA: binding\u22480.44, vulnerability=0.70."
+        ],
+        "off_target_polypharmacology": [],
+        "payload_mediated": [
+          "Bystander diffusion=0.40 enables payload spillover to nearby non-target cells.",
+          "Systemic leakage=0.60 models FcR uptake/catabolism \u2192 circulating payload exposure.",
+          "Linker cleavage=0.70 controls payload release kinetics.",
+          "Payload potency=0.75 amplifies exposure-to-damage mapping."
+        ],
+        "immune_mediated": [],
+        "marrow_reserve_depletion": [
+          "Neutropenia mechanism chain:",
+          "ADC \u2192 (binding/internalization + systemic leakage/bystander) \u2192 payload exposure in marrow \u2192 damage to myeloid precursors \u2192 neutropenia.",
+          "Computed marrow binding proxy=0.09; payload-mediated score=0.32."
+        ]
+      },
+      "relapse_risk": 0.38853550521250846
+    },
+    {
+      "time_days": 28.0,
+      "tumor_load_bulk": 0.35174795212858445,
+      "tumor_load_reservoir": 0.2675767438926059,
+      "clone_fractions_bulk": {
+        "C0": 0.4840667731940595,
+        "C1": 0.35757354346884274,
+        "C2": 0.15835968333709768
+      },
+      "clone_fractions_reservoir": {
+        "C0": 0.17558575685268965,
+        "C1": 0.31881567951537365,
+        "C2": 0.5055985636319367
+      },
+      "toxicity": {
+        "on_target_off_tumor": 0.31111111111111106,
+        "off_target_polypharmacology": 0.0,
+        "payload_mediated": 0.31875,
+        "immune_mediated": 0.0,
+        "marrow_reserve_depletion": 0.22761363636363635
+      },
+      "toxicity_explanation": {
+        "on_target_off_tumor": [
+          "Marrow progenitors expresses BCMA: binding\u22480.09, vulnerability=0.90.",
+          "Plasma cells (normal) expresses BCMA: binding\u22480.44, vulnerability=0.70."
+        ],
+        "off_target_polypharmacology": [],
+        "payload_mediated": [
+          "Bystander diffusion=0.40 enables payload spillover to nearby non-target cells.",
+          "Systemic leakage=0.60 models FcR uptake/catabolism \u2192 circulating payload exposure.",
+          "Linker cleavage=0.70 controls payload release kinetics.",
+          "Payload potency=0.75 amplifies exposure-to-damage mapping."
+        ],
+        "immune_mediated": [],
+        "marrow_reserve_depletion": [
+          "Neutropenia mechanism chain:",
+          "ADC \u2192 (binding/internalization + systemic leakage/bystander) \u2192 payload exposure in marrow \u2192 damage to myeloid precursors \u2192 neutropenia.",
+          "Computed marrow binding proxy=0.09; payload-mediated score=0.32."
+        ]
+      },
+      "relapse_risk": 0.41644492281379786
+    },
+    {
+      "time_days": 35.0,
+      "tumor_load_bulk": 0.2751609101817231,
+      "tumor_load_reservoir": 0.25275258103227893,
+      "clone_fractions_bulk": {
+        "C0": 0.4667946434609969,
+        "C1": 0.35916268335456747,
+        "C2": 0.17404267318443556
+      },
+      "clone_fractions_reservoir": {
+        "C0": 0.16148206379030744,
+        "C1": 0.30687700862302963,
+        "C2": 0.5316409275866629
+      },
+      "toxicity": {
+        "on_target_off_tumor": 0.31111111111111106,
+        "off_target_polypharmacology": 0.0,
+        "payload_mediated": 0.31875,
+        "immune_mediated": 0.0,
+        "marrow_reserve_depletion": 0.22761363636363635
+      },
+      "toxicity_explanation": {
+        "on_target_off_tumor": [
+          "Marrow progenitors expresses BCMA: binding\u22480.09, vulnerability=0.90.",
+          "Plasma cells (normal) expresses BCMA: binding\u22480.44, vulnerability=0.70."
+        ],
+        "off_target_polypharmacology": [],
+        "payload_mediated": [
+          "Bystander diffusion=0.40 enables payload spillover to nearby non-target cells.",
+          "Systemic leakage=0.60 models FcR uptake/catabolism \u2192 circulating payload exposure.",
+          "Linker cleavage=0.70 controls payload release kinetics.",
+          "Payload potency=0.75 amplifies exposure-to-damage mapping."
+        ],
+        "immune_mediated": [],
+        "marrow_reserve_depletion": [
+          "Neutropenia mechanism chain:",
+          "ADC \u2192 (binding/internalization + systemic leakage/bystander) \u2192 payload exposure in marrow \u2192 damage to myeloid precursors \u2192 neutropenia.",
+          "Computed marrow binding proxy=0.09; payload-mediated score=0.32."
+        ]
+      },
+      "relapse_risk": 0.4446308071661679
+    },
+    {
+      "time_days": 42.0,
+      "tumor_load_bulk": 0.21651563981687758,
+      "tumor_load_reservoir": 0.23945576838640267,
+      "clone_fractions_bulk": {
+        "C0": 0.44556250224408406,
+        "C1": 0.3600045949681818,
+        "C2": 0.19443290278773406
+      },
+      "clone_fractions_reservoir": {
+        "C0": 0.14684402010225756,
+        "C1": 0.288480559412551,
+        "C2": 0.5646754204851915
+      },
+      "toxicity": {
+        "on_target_off_tumor": 0.31111111111111106,
+        "off_target_polypharmacology": 0.0,
+        "payload_mediated": 0.31875,
+        "immune_mediated": 0.0,
+        "marrow_reserve_depletion": 0.22761363636363635
+      },
+      "toxicity_explanation": {
+        "on_target_off_tumor": [
+          "Marrow progenitors expresses BCMA: binding\u22480.09, vulnerability=0.90.",
+          "Plasma cells (normal) expresses BCMA: binding\u22480.44, vulnerability=0.70."
+        ],
+        "off_target_polypharmacology": [],
+        "payload_mediated": [
+          "Bystander diffusion=0.40 enables payload spillover to nearby non-target cells.",
+          "Systemic leakage=0.60 models FcR uptake/catabolism \u2192 circulating payload exposure.",
+          "Linker cleavage=0.70 controls payload release kinetics.",
+          "Payload potency=0.75 amplifies exposure-to-damage mapping."
+        ],
+        "immune_mediated": [],
+        "marrow_reserve_depletion": [
+          "Neutropenia mechanism chain:",
+          "ADC \u2192 (binding/internalization + systemic leakage/bystander) \u2192 payload exposure in marrow \u2192 damage to myeloid precursors \u2192 neutropenia.",
+          "Computed marrow binding proxy=0.09; payload-mediated score=0.32."
+        ]
+      },
+      "relapse_risk": 0.47179652077593665
+    },
+    {
+      "time_days": 49.0,
+      "tumor_load_bulk": 0.17163886216285554,
+      "tumor_load_reservoir": 0.22767252653628162,
+      "clone_fractions_bulk": {
+        "C0": 0.42298969039381534,
+        "C1": 0.364513041624818,
+        "C2": 0.21249726798136662
+      },
+      "clone_fractions_reservoir": {
+        "C0": 0.13323690484367767,
+        "C1": 0.27645970934265524,
+        "C2": 0.590303385813667
+      },
+      "toxicity": {
+        "on_target_off_tumor": 0.31111111111111106,
+        "off_target_polypharmacology": 0.0,
+        "payload_mediated": 0.31875,
+        "immune_mediated": 0.0,
+        "marrow_reserve_depletion": 0.22761363636363635
+      },
+      "toxicity_explanation": {
+        "on_target_off_tumor": [
+          "Marrow progenitors expresses BCMA: binding\u22480.09, vulnerability=0.90.",
+          "Plasma cells (normal) expresses BCMA: binding\u22480.44, vulnerability=0.70."
+        ],
+        "off_target_polypharmacology": [],
+        "payload_mediated": [
+          "Bystander diffusion=0.40 enables payload spillover to nearby non-target cells.",
+          "Systemic leakage=0.60 models FcR uptake/catabolism \u2192 circulating payload exposure.",
+          "Linker cleavage=0.70 controls payload release kinetics.",
+          "Payload potency=0.75 amplifies exposure-to-damage mapping."
+        ],
+        "immune_mediated": [],
+        "marrow_reserve_depletion": [
+          "Neutropenia mechanism chain:",
+          "ADC \u2192 (binding/internalization + systemic leakage/bystander) \u2192 payload exposure in marrow \u2192 damage to myeloid precursors \u2192 neutropenia.",
+          "Computed marrow binding proxy=0.09; payload-mediated score=0.32."
+        ]
+      },
+      "relapse_risk": 0.49826363962911757
+    },
+    {
+      "time_days": 56.0,
+      "tumor_load_bulk": 0.13701862310998889,
+      "tumor_load_reservoir": 0.21709226365289247,
+      "clone_fractions_bulk": {
+        "C0": 0.4025773302094909,
+        "C1": 0.36481237069871775,
+        "C2": 0.23261029909179123
+      },
+      "clone_fractions_reservoir": {
+        "C0": 0.1213269395674427,
+        "C1": 0.26597636007960607,
+        "C2": 0.6126967003529512
+      },
+      "toxicity": {
+        "on_target_off_tumor": 0.31111111111111106,
+        "off_target_polypharmacology": 0.0,
+        "payload_mediated": 0.31875,
+        "immune_mediated": 0.0,
+        "marrow_reserve_depletion": 0.22761363636363635
+      },
+      "toxicity_explanation": {
+        "on_target_off_tumor": [
+          "Marrow progenitors expresses BCMA: binding\u22480.09, vulnerability=0.90.",
+          "Plasma cells (normal) expresses BCMA: binding\u22480.44, vulnerability=0.70."
+        ],
+        "off_target_polypharmacology": [],
+        "payload_mediated": [
+          "Bystander diffusion=0.40 enables payload spillover to nearby non-target cells.",
+          "Systemic leakage=0.60 models FcR uptake/catabolism \u2192 circulating payload exposure.",
+          "Linker cleavage=0.70 controls payload release kinetics.",
+          "Payload potency=0.75 amplifies exposure-to-damage mapping."
+        ],
+        "immune_mediated": [],
+        "marrow_reserve_depletion": [
+          "Neutropenia mechanism chain:",
+          "ADC \u2192 (binding/internalization + systemic leakage/bystander) \u2192 payload exposure in marrow \u2192 damage to myeloid precursors \u2192 neutropenia.",
+          "Computed marrow binding proxy=0.09; payload-mediated score=0.32."
+        ]
+      },
+      "relapse_risk": 0.5234636736529141
+    },
+    {
+      "time_days": 63.0,
+      "tumor_load_bulk": 0.11016665109689044,
+      "tumor_load_reservoir": 0.20752306558930034,
+      "clone_fractions_bulk": {
+        "C0": 0.37886313689570783,
+        "C1": 0.36620502163558905,
+        "C2": 0.254931841468703
+      },
+      "clone_fractions_reservoir": {
+        "C0": 0.10814413624935784,
+        "C1": 0.25046435230844505,
+        "C2": 0.6413915114421972
+      },
+      "toxicity": {
+        "on_target_off_tumor": 0.31111111111111106,
+        "off_target_polypharmacology": 0.0,
+        "payload_mediated": 0.31875,
+        "immune_mediated": 0.0,
+        "marrow_reserve_depletion": 0.22761363636363635
+      },
+      "toxicity_explanation": {
+        "on_target_off_tumor": [
+          "Marrow progenitors expresses BCMA: binding\u22480.09, vulnerability=0.90.",
+          "Plasma cells (normal) expresses BCMA: binding\u22480.44, vulnerability=0.70."
+        ],
+        "off_target_polypharmacology": [],
+        "payload_mediated": [
+          "Bystander diffusion=0.40 enables payload spillover to nearby non-target cells.",
+          "Systemic leakage=0.60 models FcR uptake/catabolism \u2192 circulating payload exposure.",
+          "Linker cleavage=0.70 controls payload release kinetics.",
+          "Payload potency=0.75 amplifies exposure-to-damage mapping."
+        ],
+        "immune_mediated": [],
+        "marrow_reserve_depletion": [
+          "Neutropenia mechanism chain:",
+          "ADC \u2192 (binding/internalization + systemic leakage/bystander) \u2192 payload exposure in marrow \u2192 damage to myeloid precursors \u2192 neutropenia.",
+          "Computed marrow binding proxy=0.09; payload-mediated score=0.32."
+        ]
+      },
+      "relapse_risk": 0.5459535285417
+    },
+    {
+      "time_days": 70.0,
+      "tumor_load_bulk": 0.09600767548115997,
+      "tumor_load_reservoir": 0.20061842534878013,
+      "clone_fractions_bulk": {
+        "C0": 0.3554405870268996,
+        "C1": 0.36063639193606695,
+        "C2": 0.28392302103703354
+      },
+      "clone_fractions_reservoir": {
+        "C0": 0.09633328365579312,
+        "C1": 0.23587798598906948,
+        "C2": 0.6677887303551375
+      },
+      "toxicity": {
+        "on_target_off_tumor": 0.31111111111111106,
+        "off_target_polypharmacology": 0.0,
+        "payload_mediated": 0.31875,
+        "immune_mediated": 0.0,
+        "marrow_reserve_depletion": 0.22761363636363635
+      },
+      "toxicity_explanation": {
+        "on_target_off_tumor": [
+          "Marrow progenitors expresses BCMA: binding\u22480.09, vulnerability=0.90.",
+          "Plasma cells (normal) expresses BCMA: binding\u22480.44, vulnerability=0.70."
+        ],
+        "off_target_polypharmacology": [],
+        "payload_mediated": [
+          "Bystander diffusion=0.40 enables payload spillover to nearby non-target cells.",
+          "Systemic leakage=0.60 models FcR uptake/catabolism \u2192 circulating payload exposure.",
+          "Linker cleavage=0.70 controls payload release kinetics.",
+          "Payload potency=0.75 amplifies exposure-to-damage mapping."
+        ],
+        "immune_mediated": [],
+        "marrow_reserve_depletion": [
+          "Neutropenia mechanism chain:",
+          "ADC \u2192 (binding/internalization + systemic leakage/bystander) \u2192 payload exposure in marrow \u2192 damage to myeloid precursors \u2192 neutropenia.",
+          "Computed marrow binding proxy=0.09; payload-mediated score=0.32."
+        ]
+      },
+      "relapse_risk": 0.5573361826601411
+    },
+    {
+      "time_days": 77.0,
+      "tumor_load_bulk": 0.08404288306520488,
+      "tumor_load_reservoir": 0.19431787851156332,
+      "clone_fractions_bulk": {
+        "C0": 0.33161356001629044,
+        "C1": 0.3587350737334062,
+        "C2": 0.3096513662503033
+      },
+      "clone_fractions_reservoir": {
+        "C0": 0.08778013932283521,
+        "C1": 0.2209281178947382,
+        "C2": 0.6912917427824267
+      },
+      "toxicity": {
+        "on_target_off_tumor": 0.31111111111111106,
+        "off_target_polypharmacology": 0.0,
+        "payload_mediated": 0.31875,
+        "immune_mediated": 0.0,
+        "marrow_reserve_depletion": 0.22761363636363635
+      },
+      "toxicity_explanation": {
+        "on_target_off_tumor": [
+          "Marrow progenitors expresses BCMA: binding\u22480.09, vulnerability=0.90.",
+          "Plasma cells (normal) expresses BCMA: binding\u22480.44, vulnerability=0.70."
+        ],
+        "off_target_polypharmacology": [],
+        "payload_mediated": [
+          "Bystander diffusion=0.40 enables payload spillover to nearby non-target cells.",
+          "Systemic leakage=0.60 models FcR uptake/catabolism \u2192 circulating payload exposure.",
+          "Linker cleavage=0.70 controls payload release kinetics.",
+          "Payload potency=0.75 amplifies exposure-to-damage mapping."
+        ],
+        "immune_mediated": [],
+        "marrow_reserve_depletion": [
+          "Neutropenia mechanism chain:",
+          "ADC \u2192 (binding/internalization + systemic leakage/bystander) \u2192 payload exposure in marrow \u2192 damage to myeloid precursors \u2192 neutropenia.",
+          "Computed marrow binding proxy=0.09; payload-mediated score=0.32."
+        ]
+      },
+      "relapse_risk": 0.5681301421678366
+    },
+    {
+      "time_days": 84.0,
+      "tumor_load_bulk": 0.07384405888854036,
+      "tumor_load_reservoir": 0.18854880040665467,
+      "clone_fractions_bulk": {
+        "C0": 0.3102821633266375,
+        "C1": 0.35353412860576394,
+        "C2": 0.3361837080675985
+      },
+      "clone_fractions_reservoir": {
+        "C0": 0.0774352241986701,
+        "C1": 0.20714613005383514,
+        "C2": 0.7154186457474947
+      },
+      "toxicity": {
+        "on_target_off_tumor": 0.31111111111111106,
+        "off_target_polypharmacology": 0.0,
+        "payload_mediated": 0.31875,
+        "immune_mediated": 0.0,
+        "marrow_reserve_depletion": 0.22761363636363635
+      },
+      "toxicity_explanation": {
+        "on_target_off_tumor": [
+          "Marrow progenitors expresses BCMA: binding\u22480.09, vulnerability=0.90.",
+          "Plasma cells (normal) expresses BCMA: binding\u22480.44, vulnerability=0.70."
+        ],
+        "off_target_polypharmacology": [],
+        "payload_mediated": [
+          "Bystander diffusion=0.40 enables payload spillover to nearby non-target cells.",
+          "Systemic leakage=0.60 models FcR uptake/catabolism \u2192 circulating payload exposure.",
+          "Linker cleavage=0.70 controls payload release kinetics.",
+          "Payload potency=0.75 amplifies exposure-to-damage mapping."
+        ],
+        "immune_mediated": [],
+        "marrow_reserve_depletion": [
+          "Neutropenia mechanism chain:",
+          "ADC \u2192 (binding/internalization + systemic leakage/bystander) \u2192 payload exposure in marrow \u2192 damage to myeloid precursors \u2192 neutropenia.",
+          "Computed marrow binding proxy=0.09; payload-mediated score=0.32."
+        ]
+      },
+      "relapse_risk": 0.5775959070472922
+    },
+    {
+      "time_days": 91.0,
+      "tumor_load_bulk": 0.06850593300028851,
+      "tumor_load_reservoir": 0.1855363643319374,
+      "clone_fractions_bulk": {
+        "C0": 0.2864651608763171,
+        "C1": 0.3461481962151729,
+        "C2": 0.3673866429085101
+      },
+      "clone_fractions_reservoir": {
+        "C0": 0.06920795166089447,
+        "C1": 0.19344350399697738,
+        "C2": 0.7373485443421282
+      },
+      "toxicity": {
+        "on_target_off_tumor": 0.31111111111111106,
+        "off_target_polypharmacology": 0.0,
+        "payload_mediated": 0.31875,
+        "immune_mediated": 0.0,
+        "marrow_reserve_depletion": 0.22761363636363635
+      },
+      "toxicity_explanation": {
+        "on_target_off_tumor": [
+          "Marrow progenitors expresses BCMA: binding\u22480.09, vulnerability=0.90.",
+          "Plasma cells (normal) expresses BCMA: binding\u22480.44, vulnerability=0.70."
+        ],
+        "off_target_polypharmacology": [],
+        "payload_mediated": [
+          "Bystander diffusion=0.40 enables payload spillover to nearby non-target cells.",
+          "Systemic leakage=0.60 models FcR uptake/catabolism \u2192 circulating payload exposure.",
+          "Linker cleavage=0.70 controls payload release kinetics.",
+          "Payload potency=0.75 amplifies exposure-to-damage mapping."
+        ],
+        "immune_mediated": [],
+        "marrow_reserve_depletion": [
+          "Neutropenia mechanism chain:",
+          "ADC \u2192 (binding/internalization + systemic leakage/bystander) \u2192 payload exposure in marrow \u2192 damage to myeloid precursors \u2192 neutropenia.",
+          "Computed marrow binding proxy=0.09; payload-mediated score=0.32."
+        ]
+      },
+      "relapse_risk": 0.581588649116378
+    },
+    {
+      "time_days": 98.0,
+      "tumor_load_bulk": 0.06378211848633324,
+      "tumor_load_reservoir": 0.182720769709626,
+      "clone_fractions_bulk": {
+        "C0": 0.26592833832059737,
+        "C1": 0.3393622920011528,
+        "C2": 0.39470936967824977
+      },
+      "clone_fractions_reservoir": {
+        "C0": 0.062033045589345054,
+        "C1": 0.18248363419037714,
+        "C2": 0.7554833202202779
+      },
+      "toxicity": {
+        "on_target_off_tumor": 0.31111111111111106,
+        "off_target_polypharmacology": 0.0,
+        "payload_mediated": 0.31875,
+        "immune_mediated": 0.0,
+        "marrow_reserve_depletion": 0.22761363636363635
+      },
+      "toxicity_explanation": {
+        "on_target_off_tumor": [
+          "Marrow progenitors expresses BCMA: binding\u22480.09, vulnerability=0.90.",
+          "Plasma cells (normal) expresses BCMA: binding\u22480.44, vulnerability=0.70."
+        ],
+        "off_target_polypharmacology": [],
+        "payload_mediated": [
+          "Bystander diffusion=0.40 enables payload spillover to nearby non-target cells.",
+          "Systemic leakage=0.60 models FcR uptake/catabolism \u2192 circulating payload exposure.",
+          "Linker cleavage=0.70 controls payload release kinetics.",
+          "Payload potency=0.75 amplifies exposure-to-damage mapping."
+        ],
+        "immune_mediated": [],
+        "marrow_reserve_depletion": [
+          "Neutropenia mechanism chain:",
+          "ADC \u2192 (binding/internalization + systemic leakage/bystander) \u2192 payload exposure in marrow \u2192 damage to myeloid precursors \u2192 neutropenia.",
+          "Computed marrow binding proxy=0.09; payload-mediated score=0.32."
+        ]
+      },
+      "relapse_risk": 0.5854273718137847
+    },
+    {
+      "time_days": 105.0,
+      "tumor_load_bulk": 0.059568917314539255,
+      "tumor_load_reservoir": 0.1800710303975443,
+      "clone_fractions_bulk": {
+        "C0": 0.2459474161041947,
+        "C1": 0.3296183523635283,
+        "C2": 0.42443423153227694
+      },
+      "clone_fractions_reservoir": {
+        "C0": 0.05485411709888316,
+        "C1": 0.16942236477862516,
+        "C2": 0.7757235181224915
+      },
+      "toxicity": {
+        "on_target_off_tumor": 0.31111111111111106,
+        "off_target_polypharmacology": 0.0,
+        "payload_mediated": 0.31875,
+        "immune_mediated": 0.0,
+        "marrow_reserve_depletion": 0.22761363636363635
+      },
+      "toxicity_explanation": {
+        "on_target_off_tumor": [
+          "Marrow progenitors expresses BCMA: binding\u22480.09, vulnerability=0.90.",
+          "Plasma cells (normal) expresses BCMA: binding\u22480.44, vulnerability=0.70."
+        ],
+        "off_target_polypharmacology": [],
+        "payload_mediated": [
+          "Bystander diffusion=0.40 enables payload spillover to nearby non-target cells.",
+          "Systemic leakage=0.60 models FcR uptake/catabolism \u2192 circulating payload exposure.",
+          "Linker cleavage=0.70 controls payload release kinetics.",
+          "Payload potency=0.75 amplifies exposure-to-damage mapping."
+        ],
+        "immune_mediated": [],
+        "marrow_reserve_depletion": [
+          "Neutropenia mechanism chain:",
+          "ADC \u2192 (binding/internalization + systemic leakage/bystander) \u2192 payload exposure in marrow \u2192 damage to myeloid precursors \u2192 neutropenia.",
+          "Computed marrow binding proxy=0.09; payload-mediated score=0.32."
+        ]
+      },
+      "relapse_risk": 0.5882705245861772
+    },
+    {
+      "time_days": 112.0,
+      "tumor_load_bulk": 0.056098948316000756,
+      "tumor_load_reservoir": 0.17830266476719348,
+      "clone_fractions_bulk": {
+        "C0": 0.2307127364077475,
+        "C1": 0.3219961497342977,
+        "C2": 0.44729111385795467
+      },
+      "clone_fractions_reservoir": {
+        "C0": 0.04832969749080073,
+        "C1": 0.1576627388084588,
+        "C2": 0.7940075637007405
+      },
+      "toxicity": {
+        "on_target_off_tumor": 0.31111111111111106,
+        "off_target_polypharmacology": 0.0,
+        "payload_mediated": 0.31875,
+        "immune_mediated": 0.0,
+        "marrow_reserve_depletion": 0.22761363636363635
+      },
+      "toxicity_explanation": {
+        "on_target_off_tumor": [
+          "Marrow progenitors expresses BCMA: binding\u22480.09, vulnerability=0.90.",
+          "Plasma cells (normal) expresses BCMA: binding\u22480.44, vulnerability=0.70."
+        ],
+        "off_target_polypharmacology": [],
+        "payload_mediated": [
+          "Bystander diffusion=0.40 enables payload spillover to nearby non-target cells.",
+          "Systemic leakage=0.60 models FcR uptake/catabolism \u2192 circulating payload exposure.",
+          "Linker cleavage=0.70 controls payload release kinetics.",
+          "Payload potency=0.75 amplifies exposure-to-damage mapping."
+        ],
+        "immune_mediated": [],
+        "marrow_reserve_depletion": [
+          "Neutropenia mechanism chain:",
+          "ADC \u2192 (binding/internalization + systemic leakage/bystander) \u2192 payload exposure in marrow \u2192 damage to myeloid precursors \u2192 neutropenia.",
+          "Computed marrow binding proxy=0.09; payload-mediated score=0.32."
+        ]
+      },
+      "relapse_risk": 0.5906608707360838
+    },
+    {
+      "time_days": 119.0,
+      "tumor_load_bulk": 0.05297445726973053,
+      "tumor_load_reservoir": 0.1766856598716164,
+      "clone_fractions_bulk": {
+        "C0": 0.2137858415535379,
+        "C1": 0.31416361985822566,
+        "C2": 0.47205053858823637
+      },
+      "clone_fractions_reservoir": {
+        "C0": 0.042387236006482164,
+        "C1": 0.1469134524660969,
+        "C2": 0.8106993115274209
+      },
+      "toxicity": {
+        "on_target_off_tumor": 0.31111111111111106,
+        "off_target_polypharmacology": 0.0,
+        "payload_mediated": 0.31875,
+        "immune_mediated": 0.0,
+        "marrow_reserve_depletion": 0.22761363636363635
+      },
+      "toxicity_explanation": {
+        "on_target_off_tumor": [
+          "Marrow progenitors expresses BCMA: binding\u22480.09, vulnerability=0.90.",
+          "Plasma cells (normal) expresses BCMA: binding\u22480.44, vulnerability=0.70."
+        ],
+        "off_target_polypharmacology": [],
+        "payload_mediated": [
+          "Bystander diffusion=0.40 enables payload spillover to nearby non-target cells.",
+          "Systemic leakage=0.60 models FcR uptake/catabolism \u2192 circulating payload exposure.",
+          "Linker cleavage=0.70 controls payload release kinetics.",
+          "Payload potency=0.75 amplifies exposure-to-damage mapping."
+        ],
+        "immune_mediated": [],
+        "marrow_reserve_depletion": [
+          "Neutropenia mechanism chain:",
+          "ADC \u2192 (binding/internalization + systemic leakage/bystander) \u2192 payload exposure in marrow \u2192 damage to myeloid precursors \u2192 neutropenia.",
+          "Computed marrow binding proxy=0.09; payload-mediated score=0.32."
+        ]
+      },
+      "relapse_risk": 0.5927981558438996
+    },
+    {
+      "time_days": 126.0,
+      "tumor_load_bulk": 0.050232005073679406,
+      "tumor_load_reservoir": 0.17535886720234525,
+      "clone_fractions_bulk": {
+        "C0": 0.20026166323089004,
+        "C1": 0.3045007097770882,
+        "C2": 0.4952376269920219
+      },
+      "clone_fractions_reservoir": {
+        "C0": 0.037484046451129065,
+        "C1": 0.13388018504484694,
+        "C2": 0.8286357685040239
+      },
+      "toxicity": {
+        "on_target_off_tumor": 0.31111111111111106,
+        "off_target_polypharmacology": 0.0,
+        "payload_mediated": 0.31875,
+        "immune_mediated": 0.0,
+        "marrow_reserve_depletion": 0.22761363636363635
+      },
+      "toxicity_explanation": {
+        "on_target_off_tumor": [
+          "Marrow progenitors expresses BCMA: binding\u22480.09, vulnerability=0.90.",
+          "Plasma cells (normal) expresses BCMA: binding\u22480.44, vulnerability=0.70."
+        ],
+        "off_target_polypharmacology": [],
+        "payload_mediated": [
+          "Bystander diffusion=0.40 enables payload spillover to nearby non-target cells.",
+          "Systemic leakage=0.60 models FcR uptake/catabolism \u2192 circulating payload exposure.",
+          "Linker cleavage=0.70 controls payload release kinetics.",
+          "Payload potency=0.75 amplifies exposure-to-damage mapping."
+        ],
+        "immune_mediated": [],
+        "marrow_reserve_depletion": [
+          "Neutropenia mechanism chain:",
+          "ADC \u2192 (binding/internalization + systemic leakage/bystander) \u2192 payload exposure in marrow \u2192 damage to myeloid precursors \u2192 neutropenia.",
+          "Computed marrow binding proxy=0.09; payload-mediated score=0.32."
+        ]
+      },
+      "relapse_risk": 0.5942136201626025
+    }
+  ],
+  "relapse_forecast": {
+    "samples_days": [
+      119.0,
+      0.0,
+      126.0,
+      7.0,
+      105.0,
+      63.0,
+      0.0,
+      98.0,
+      70.0,
+      14.0,
+      63.0,
+      126.0,
+      49.0,
+      7.0,
+      7.0,
+      126.0,
+      28.0,
+      14.0,
+      21.0,
+      35.0,
+      77.0,
+      0.0,
+      14.0,
+      21.0,
+      7.0,
+      63.0,
+      7.0,
+      56.0,
+      7.0,
+      35.0,
+      98.0,
+      7.0,
+      21.0,
+      119.0,
+      35.0,
+      7.0,
+      7.0,
+      0.0,
+      98.0,
+      112.0,
+      63.0,
+      35.0,
+      14.0,
+      84.0,
+      35.0,
+      0.0,
+      56.0,
+      28.0,
+      84.0,
+      49.0,
+      0.0,
+      49.0,
+      98.0,
+      119.0,
+      35.0,
+      126.0,
+      35.0,
+      84.0,
+      98.0,
+      0.0,
+      28.0,
+      42.0,
+      63.0,
+      63.0,
+      0.0,
+      35.0,
+      77.0,
+      49.0,
+      126.0,
+      63.0,
+      0.0,
+      70.0,
+      35.0,
+      70.0,
+      42.0,
+      21.0,
+      0.0,
+      0.0,
+      84.0,
+      28.0,
+      126.0,
+      7.0,
+      21.0,
+      0.0,
+      42.0,
+      77.0,
+      126.0,
+      42.0,
+      84.0,
+      70.0,
+      49.0,
+      28.0,
+      112.0,
+      49.0,
+      21.0,
+      49.0,
+      56.0,
+      112.0,
+      21.0,
+      14.0,
+      84.0,
+      56.0,
+      14.0,
+      14.0,
+      7.0,
+      21.0,
+      112.0,
+      91.0,
+      49.0,
+      49.0,
+      84.0,
+      49.0,
+      0.0,
+      56.0,
+      0.0,
+      63.0,
+      21.0,
+      35.0,
+      63.0,
+      21.0,
+      7.0,
+      77.0,
+      21.0,
+      42.0,
+      7.0,
+      105.0,
+      126.0,
+      42.0,
+      14.0,
+      28.0,
+      0.0,
+      28.0,
+      35.0,
+      35.0,
+      0.0,
+      42.0,
+      35.0,
+      63.0,
+      56.0,
+      14.0,
+      21.0,
+      91.0,
+      7.0,
+      56.0,
+      7.0,
+      126.0,
+      126.0,
+      28.0,
+      63.0,
+      14.0,
+      126.0,
+      56.0,
+      119.0,
+      35.0,
+      91.0,
+      14.0,
+      14.0,
+      91.0,
+      98.0,
+      56.0,
+      77.0,
+      42.0,
+      0.0,
+      21.0,
+      126.0,
+      56.0,
+      42.0,
+      56.0,
+      14.0,
+      56.0,
+      126.0,
+      70.0,
+      21.0,
+      7.0,
+      112.0,
+      7.0,
+      98.0,
+      7.0,
+      35.0,
+      42.0,
+      21.0,
+      0.0,
+      21.0,
+      14.0,
+      28.0,
+      28.0,
+      49.0,
+      0.0,
+      14.0,
+      35.0,
+      112.0,
+      119.0,
+      35.0,
+      70.0,
+      98.0,
+      126.0,
+      0.0,
+      63.0,
+      0.0,
+      84.0
+    ],
+    "mean_days": 49.0,
+    "p50_days": 42.0,
+    "p90_days": 112.0
+  },
+  "toxicity_decomposition": {
+    "therapy": "ADC-BCMA",
+    "scores": {
+      "on_target_off_tumor": 0.31111111111111106,
+      "off_target_polypharmacology": 0.0,
+      "payload_mediated": 0.31875,
+      "immune_mediated": 0.0,
+      "marrow_reserve_depletion": 0.22761363636363635
+    },
+    "explanations": {
+      "on_target_off_tumor": [
+        "Marrow progenitors expresses BCMA: binding\u22480.09, vulnerability=0.90.",
+        "Plasma cells (normal) expresses BCMA: binding\u22480.44, vulnerability=0.70."
+      ],
+      "off_target_polypharmacology": [],
+      "payload_mediated": [
+        "Bystander diffusion=0.40 enables payload spillover to nearby non-target cells.",
+        "Systemic leakage=0.60 models FcR uptake/catabolism \u2192 circulating payload exposure.",
+        "Linker cleavage=0.70 controls payload release kinetics.",
+        "Payload potency=0.75 amplifies exposure-to-damage mapping."
+      ],
+      "immune_mediated": [],
+      "marrow_reserve_depletion": [
+        "Neutropenia mechanism chain:",
+        "ADC \u2192 (binding/internalization + systemic leakage/bystander) \u2192 payload exposure in marrow \u2192 damage to myeloid precursors \u2192 neutropenia.",
+        "Computed marrow binding proxy=0.09; payload-mediated score=0.32."
+      ]
+    }
+  },
+  "rationale": {
+    "summary": "Pareto-optimal TP/FP selection with mechanistic toxicity + reservoir persistence considerations.",
+    "selected_therapy": "ADC-BCMA",
+    "end_state": {
+      "time_days": 126.0,
+      "tumor_load_bulk": 0.050232005073679406,
+      "tumor_load_reservoir": 0.17535886720234525,
+      "relapse_risk": 0.5942136201626025
+    }
+  }
+}
