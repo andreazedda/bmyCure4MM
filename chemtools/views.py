@@ -13,6 +13,7 @@ from .tasks import (
     run_drug_params_job,
     run_similarity_job,
 )
+from .pdb_api_client import enrich_pdb_metadata_for_view
 
 
 def _enqueue(task, job: models.ChemJob, *params) -> tuple[bool, bool]:
@@ -70,24 +71,65 @@ def drug_params(request: HttpRequest) -> HttpResponse:
 
 @login_required
 def binding_viz(request: HttpRequest) -> HttpResponse:
+    import logging
+    logger = logging.getLogger(__name__)
+    
+    logger.info(f"[DEBUG] 🌐 binding_viz view called - Method: {request.method}, User: {request.user}")
+    
     form = forms.BindingVizForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         pdb_id = form.cleaned_data["pdb_id"]
         ligand = form.cleaned_data.get("ligand", "")
+        
+        logger.info(f"[DEBUG] 📝 Form validated - PDB ID: {pdb_id}, Ligand: {ligand or '(none)'}")
+        
+        # Capture API preferences
+        # BooleanField with required=False returns False when unchecked
+        # Use the cleaned_data directly as it reflects user's actual choices
+        api_prefs = {
+            'fetch_validation': form.cleaned_data.get('fetch_validation', True),
+            'fetch_interactions': form.cleaned_data.get('fetch_interactions', True),
+            'fetch_drug_info': form.cleaned_data.get('fetch_drug_info', True),
+            'fetch_clinical_trials': form.cleaned_data.get('fetch_clinical_trials', True),
+            'fetch_publications': form.cleaned_data.get('fetch_publications', True),
+            'fetch_protein_network': form.cleaned_data.get('fetch_protein_network', True),
+            'fetch_pathways': form.cleaned_data.get('fetch_pathways', True),
+            'mm_focus_resistance': form.cleaned_data.get('mm_focus_resistance', False),
+            'mm_focus_combinations': form.cleaned_data.get('mm_focus_combinations', False),
+            'mm_focus_toxicity': form.cleaned_data.get('mm_focus_toxicity', False),
+        }
+        
+        logger.debug(f"[DEBUG] 📊 API Preferences captured: {api_prefs}")
+        enabled_apis = [k for k, v in api_prefs.items() if v]
+        logger.info(f"[DEBUG] ✅ Enabled APIs ({len(enabled_apis)}): {', '.join(enabled_apis)}")
+        
         job = models.ChemJob.objects.create(
             kind=models.ChemJob.BIND,
             input_a=pdb_id,
             input_b=ligand,
+            api_preferences=api_prefs,
             user=request.user if request.user.is_authenticated else None,
         )
+        
+        logger.info(f"[DEBUG] 💾 Job created - ID: {job.pk}, Kind: BIND")
+        logger.debug(f"[DEBUG] 🔗 Job redirect URL: {reverse('chemtools:job_detail', args=[job.pk])}")
+        
+        logger.info(f"[DEBUG] 🚀 Attempting to enqueue job {job.pk}...")
         queued, failed = _enqueue(run_binding_viz_job, job, pdb_id, ligand)
+        
         if queued:
+            logger.info(f"[DEBUG] ✅ Job {job.pk} queued successfully (Celery)")
             messages.info(request, "Binding visualization queued. Refresh shortly for results.")
         elif failed:
+            logger.error(f"[DEBUG] ❌ Job {job.pk} failed during synchronous execution")
             messages.error(request, "Binding visualization failed. Check the job log for details.")
         else:
+            logger.info(f"[DEBUG] ✅ Job {job.pk} completed synchronously")
             messages.success(request, "Binding visualization completed.")
+        
         return redirect(reverse("chemtools:tools_home"))
+    
+    logger.debug(f"[DEBUG] 📄 Rendering binding_viz form (GET or invalid POST)")
     return render(request, "chemtools/binding_viz.html", {"form": form})
 
 
@@ -162,28 +204,71 @@ def job_status(request: HttpRequest, pk: int) -> JsonResponse:
 
 @login_required
 def job_detail(request: HttpRequest, pk: int) -> HttpResponse:
-    """Integrated results viewer for all job types."""
+    """Integrated results viewer for all job types with enhanced analytics."""
+    import logging
+    import time
+    logger = logging.getLogger(__name__)
+    
+    start_time = time.time()
+    logger.info(f"[DEBUG] 📋 job_detail view called - Job ID: {pk}, User: {request.user}")
+    
     job = get_object_or_404(models.ChemJob, pk=pk, user=request.user)
+    logger.info(f"[DEBUG] 💼 Job loaded - Kind: {job.kind}, Created: {job.created}")
+    logger.debug(f"[DEBUG]   Input A: {job.input_a}, Input B: {job.input_b}")
+    logger.debug(f"[DEBUG]   Has HTML: {bool(job.out_html)}, Has CSV: {bool(job.out_csv)}")
+    logger.debug(f"[DEBUG]   API Preferences: {job.api_preferences if hasattr(job, 'api_preferences') else 'N/A'}")
     
     # Load content based on job type
     html_content = None
     csv_data = None
+    pdb_metadata = None
+    binding_analysis = None
     
     if job.out_html:
+        logger.debug(f"[DEBUG] 📄 Loading HTML output...")
         try:
             with job.out_html.open('r') as f:
                 html_content = f.read()
-        except Exception:
+            logger.info(f"[DEBUG] ✅ HTML loaded - Size: {len(html_content)} chars, Lines: {html_content.count(chr(10))}")
+        except Exception as e:
+            logger.error(f"[DEBUG] ❌ Failed to load HTML: {e}")
             html_content = None
     
     if job.out_csv:
+        logger.debug(f"[DEBUG] 📊 Loading CSV output...")
         try:
             import csv as csv_module
             with job.out_csv.open('r') as f:
                 reader = csv_module.DictReader(f)
                 csv_data = list(reader)
-        except Exception:
+            logger.info(f"[DEBUG] ✅ CSV loaded - Rows: {len(csv_data)}, Columns: {list(csv_data[0].keys()) if csv_data else []}")
+        except Exception as e:
+            logger.error(f"[DEBUG] ❌ Failed to load CSV: {e}")
             csv_data = None
+    
+    # Enhanced metadata for binding jobs - FAST LOAD (basic data only)
+    if job.kind == models.ChemJob.BIND and job.input_a:
+        pdb_id = job.input_a.upper()
+        logger.info(f"[DEBUG] 🔬 Processing binding job metadata for PDB: {pdb_id}")
+        
+        # Basic PDB metadata URLs (FAST - no API calls)
+        pdb_metadata = {
+            'pdb_id': pdb_id,
+            'rcsb_url': f'https://www.rcsb.org/structure/{pdb_id}',
+            'pdbe_url': f'https://www.ebi.ac.uk/pdbe/entry/pdb/{pdb_id}',
+            'pdb_redo_url': f'https://pdb-redo.eu/db/{pdb_id}',
+            'alphafold_similar': f'https://alphafold.ebi.ac.uk/search/text/{pdb_id}',
+            'ligand_id': job.input_b,
+        }
+        logger.debug(f"[DEBUG]   Basic URLs configured: {list(pdb_metadata.keys())}")
+        logger.info(f"[DEBUG] ⚡ Fast load mode - enriched data will load asynchronously")
+        
+        # Extract binding_analysis if available (will be loaded async)
+        binding_analysis = None
+    
+    elapsed = time.time() - start_time
+    logger.info(f"[DEBUG] ⏱️ job_detail view completed in {elapsed:.2f}s")
+    logger.info(f"[DEBUG] 📦 Context prepared with: html_content={bool(html_content)}, csv_data={bool(csv_data)}, pdb_metadata={bool(pdb_metadata)}, binding_analysis={bool(binding_analysis)}")
     
     return render(
         request,
@@ -192,5 +277,56 @@ def job_detail(request: HttpRequest, pk: int) -> HttpResponse:
             "job": job,
             "html_content": html_content,
             "csv_data": csv_data,
+            "pdb_metadata": pdb_metadata,
+            "binding_analysis": binding_analysis,
         },
     )
+
+
+def job_enriched_data(request: HttpRequest, pk: int) -> HttpResponse:
+    """AJAX endpoint to load enriched API data asynchronously."""
+    import logging
+    import time
+    from django.http import JsonResponse
+    logger = logging.getLogger(__name__)
+    
+    start_time = time.time()
+    logger.info(f"[DEBUG] 🌐 AJAX enriched_data endpoint called - Job ID: {pk}")
+    
+    job = get_object_or_404(models.ChemJob, pk=pk, user=request.user)
+    
+    # Only process binding jobs
+    if job.kind != models.ChemJob.BIND or not job.input_a:
+        return JsonResponse({'error': 'Not a binding job'}, status=400)
+    
+    pdb_id = job.input_a.upper()
+    ligand_id = job.input_b
+    
+    # Get API preferences
+    api_prefs = job.api_preferences if hasattr(job, 'api_preferences') and job.api_preferences else None
+    
+    logger.info(f"[DEBUG] 🔬 Enriching PDB: {pdb_id}, Ligand: {ligand_id}")
+    
+    # Fetch enriched data (this is the slow part)
+    enriched_data = enrich_pdb_metadata_for_view(pdb_id, ligand_id=ligand_id, api_prefs=api_prefs)
+    
+    elapsed = time.time() - start_time
+    logger.info(f"[DEBUG] ✅ Enriched data loaded in {elapsed:.2f}s")
+    
+    # Return only the data needed for dynamic sections
+    response_data = {
+        'mm_efficacy_profile': enriched_data.get('mm_efficacy_profile'),
+        'survival_impact': enriched_data.get('survival_impact'),
+        'toxicity_profile': enriched_data.get('toxicity_profile'),
+        'binding_analysis': enriched_data.get('binding_analysis'),
+        'validation_metrics': enriched_data.get('validation_metrics'),
+        'interaction_details': enriched_data.get('interaction_details'),
+        'similar_structures': enriched_data.get('similar_structures'),
+        'pubmed_literature': enriched_data.get('pubmed_literature'),
+        'chembl_drug_details': enriched_data.get('chembl_drug_details'),
+        'clinical_trials': enriched_data.get('clinical_trials'),
+        'protein_network': enriched_data.get('protein_network'),
+        'reactome_pathways': enriched_data.get('reactome_pathways'),
+    }
+    
+    return JsonResponse(response_data)

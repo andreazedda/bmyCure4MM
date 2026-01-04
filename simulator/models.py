@@ -13,7 +13,14 @@ from plotly import io as pio
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 
-from clinic.models import Assessment, Regimen
+IMWG_RESPONSE_CHOICES = [
+    ("sCR", "Stringent CR"),
+    ("CR", "Complete Response"),
+    ("VGPR", "Very Good Partial Response"),
+    ("PR", "Partial Response"),
+    ("SD", "Stable Disease"),
+    ("PD", "Progressive Disease"),
+]
 
 from .models_simulation import MathematicalModel
 from .pharmaco import registry as pharmaco_registry
@@ -108,7 +115,7 @@ class Scenario(models.Model):
         help_text="Dictionary of key laboratory values shown to the learner.",
     )
     recommended_regimens = models.ManyToManyField(
-        Regimen,
+        "clinic.Regimen",
         related_name="training_scenarios",
         blank=True,
     )
@@ -118,7 +125,7 @@ class Scenario(models.Model):
     )
     expected_response = models.CharField(
         max_length=4,
-        choices=Assessment.RESPONSE_CHOICES,
+        choices=IMWG_RESPONSE_CHOICES,
         blank=True,
         help_text="Target IMWG response. Optional; used for feedback.",
     )
@@ -286,14 +293,14 @@ class SimulationAttempt(models.Model):
         blank=True,
     )
     selected_regimen = models.ForeignKey(
-        Regimen,
+        "clinic.Regimen",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
     )
     predicted_response = models.CharField(
         max_length=4,
-        choices=Assessment.RESPONSE_CHOICES,
+        choices=IMWG_RESPONSE_CHOICES,
         blank=True,
     )
     confidence = models.PositiveSmallIntegerField(
@@ -329,8 +336,10 @@ class SimulationAttempt(models.Model):
             assessment_id = resolved_params.get("twin_assessment_id") or resolved_params.get("assessment_id")
             if assessment_id:
                 try:
+                    from clinic.models import Assessment
+
                     twin_assessment = Assessment.objects.get(pk=assessment_id)
-                except Assessment.DoesNotExist:
+                except Exception:
                     twin_assessment = None
             if twin_assessment:
                 twin_payload = build_patient_twin(twin_assessment)

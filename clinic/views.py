@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.db.models import Count, Prefetch
+from django.db.models import Count, Prefetch, F
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -15,15 +15,70 @@ is_staff = user_passes_test(lambda u: u.is_staff)
 
 @login_required
 def dashboard(request: HttpRequest) -> HttpResponse:
+    from django.db.models import Q, Max, OuterRef, Subquery
+    from django.utils import timezone
+    from datetime import timedelta
+    
     patient_count = models.Patient.objects.count()
-    recent_assessments = (
+    
+    # Create queryset for response counting (don't slice yet)
+    recent_assessments_qs = (
         models.Assessment.objects.select_related("patient")
         .all()
-        .order_by("-date")[:10]
+        .order_by("-date")
     )
+    
+    # Response distribution from recent assessments (count before slicing)
+    response_counts = {}
+    for code, label in models.Assessment.RESPONSE_CHOICES:
+        response_counts[code] = recent_assessments_qs.filter(response=code).count()
+    
+    # Now slice for display (latest 10)
+    recent_assessments = recent_assessments_qs[:10]
+    
+    # R-ISS distribution from latest assessments (SQLite-compatible approach)
+    # Get the latest assessment date for each patient
+    latest_assessment_dates = models.Assessment.objects.filter(
+        patient=OuterRef('patient')
+    ).order_by('-date').values('date')[:1]
+    
+    # Get assessments that match the latest date for each patient
+    latest_assessments = models.Assessment.objects.annotate(
+        latest_date=Subquery(latest_assessment_dates)
+    ).filter(date=F('latest_date'))
+    
+    riss_counts = {
+        "I": latest_assessments.filter(r_iss="I").count(),
+        "II": latest_assessments.filter(r_iss="II").count(),
+        "III": latest_assessments.filter(r_iss="III").count(),
+    }
+    
+    # Active therapies (no end date)
+    active_therapies = models.PatientTherapy.objects.filter(
+        end_date__isnull=True
+    ).select_related('patient', 'regimen').count()
+    
+    # Patients needing attention (progressive disease or high FLC ratio)
+    thirty_days_ago = timezone.now().date() - timedelta(days=30)
+    patients_needing_attention = models.Patient.objects.filter(
+        Q(assessments__response="PD", assessments__date__gte=thirty_days_ago) |
+        Q(assessments__flc_ratio__gt=10, assessments__date__gte=thirty_days_ago)
+    ).distinct().count()
+    
+    # High-risk cytogenetics count
+    high_risk_codes = {"del(17p)", "t(4;14)", "t(14;16)", "1q+"}
+    high_risk_patients = models.Patient.objects.filter(
+        cytogenetics__abnormality__code__in=high_risk_codes
+    ).distinct().count()
+    
     context = {
         "patient_count": patient_count,
         "recent_assessments": recent_assessments,
+        "riss_counts": riss_counts,
+        "response_counts": response_counts,
+        "active_therapies": active_therapies,
+        "patients_needing_attention": patients_needing_attention,
+        "high_risk_patients": high_risk_patients,
     }
     return render(request, "clinic/dashboard.html", context)
 

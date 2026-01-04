@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Iterable
+from typing import Iterable, Any
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -20,9 +20,11 @@ from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.generic import TemplateView
 
+from django.apps import apps
+
 from django.core.exceptions import PermissionDenied
 
-from clinic.models import Regimen
+Regimen = apps.get_model("clinic", "Regimen")
 
 from . import explain, forms, models, optim
 from .pharmaco import registry as pharmaco_registry
@@ -279,7 +281,7 @@ def _render_guideline_update(request: HttpRequest, scenario: models.Scenario) ->
     return HttpResponse(html)
 
 
-def _distinct_values(queryset: Iterable[Regimen], field: str) -> list[str]:
+def _distinct_values(queryset: Iterable[Any], field: str) -> list[str]:
     values = (
         queryset.order_by(field)
         .values_list(field, flat=True)

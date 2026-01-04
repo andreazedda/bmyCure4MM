@@ -38,6 +38,9 @@ class ChemJob(models.Model):
     # Progress tracking fields
     progress_percent = models.IntegerField(default=0)
     progress_message = models.CharField(max_length=255, blank=True)
+    
+    # API preferences (stored as JSON)
+    api_preferences = models.JSONField(default=dict, blank=True)
 
     class Meta:
         ordering = ["-created"]

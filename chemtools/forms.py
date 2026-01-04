@@ -67,6 +67,28 @@ class DrugParamForm(BootstrapValidationMixin, forms.Form):
 
 
 class BindingVizForm(BootstrapValidationMixin, forms.Form):
+    # MM Drug Preset Options
+    MM_DRUG_PRESETS = [
+        ('', '-- Select a Multiple Myeloma Drug --'),
+        ('5LF3_BOR', '🔴 Bortezomib (Velcade) - Proteasome Inhibitor'),
+        ('4KW5_LEN', '🔵 Lenalidomide (Revlimid) - IMiD'),
+        ('5MX5_CFZ', '🟣 Carfilzomib (Kyprolis) - Proteasome Inhibitor'),
+        ('5T3H_POM', '🟢 Pomalidomide (Pomalyst) - IMiD'),
+        ('5M2B_IXA', '🟠 Ixazomib (Ninlaro) - Proteasome Inhibitor'),
+        ('custom', '⚙️ Custom Entry'),
+    ]
+    
+    mm_drug_preset = forms.ChoiceField(
+        label="Quick Select MM Drug",
+        choices=MM_DRUG_PRESETS,
+        required=False,
+        help_text="Select a common Multiple Myeloma drug to auto-fill PDB and ligand",
+        widget=forms.Select(attrs={
+            "class": "form-select",
+            "onchange": "fillMMPreset(this.value)"
+        })
+    )
+    
     pdb_id = forms.RegexField(
         label="PDB ID",
         max_length=4,
@@ -103,6 +125,88 @@ class BindingVizForm(BootstrapValidationMixin, forms.Form):
                 "class": "form-control",
             }
         ),
+    )
+    
+    # API Data Source Options
+    fetch_validation = forms.BooleanField(
+        label="Structure Validation Metrics",
+        required=False,
+        initial=True,
+        help_text="Quality metrics from PDBe (clashscore, Ramachandran, overall quality)",
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
+    )
+    
+    fetch_interactions = forms.BooleanField(
+        label="Binding Site Interactions",
+        required=False,
+        initial=True,
+        help_text="Detailed ligand-protein interactions and key residues",
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
+    )
+    
+    fetch_drug_info = forms.BooleanField(
+        label="Drug Development Data",
+        required=False,
+        initial=True,
+        help_text="ChEMBL drug information (phases, routes, warnings)",
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
+    )
+    
+    fetch_clinical_trials = forms.BooleanField(
+        label="Clinical Trials (MM-specific)",
+        required=False,
+        initial=True,
+        help_text="Active clinical trials for Multiple Myeloma from ClinicalTrials.gov",
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
+    )
+    
+    fetch_publications = forms.BooleanField(
+        label="Scientific Publications",
+        required=False,
+        initial=True,
+        help_text="Recent PubMed articles about the structure and drug",
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
+    )
+    
+    fetch_protein_network = forms.BooleanField(
+        label="Protein Interaction Network",
+        required=False,
+        initial=True,
+        help_text="Protein-protein interactions from STRING database",
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
+    )
+    
+    fetch_pathways = forms.BooleanField(
+        label="Biological Pathways",
+        required=False,
+        initial=True,
+        help_text="Metabolic and signaling pathways (Reactome, KEGG)",
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
+    )
+    
+    # MM-Specific Focus Options
+    mm_focus_resistance = forms.BooleanField(
+        label="Focus on Drug Resistance",
+        required=False,
+        initial=False,
+        help_text="Highlight resistance mutations and mechanisms specific to MM",
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
+    )
+    
+    mm_focus_combinations = forms.BooleanField(
+        label="Show Combination Therapies",
+        required=False,
+        initial=False,
+        help_text="Include information about combination regimens (VRd, KRd, etc.)",
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
+    )
+    
+    mm_focus_toxicity = forms.BooleanField(
+        label="Toxicity & Side Effects",
+        required=False,
+        initial=False,
+        help_text="Emphasize safety data, adverse events, and dose-limiting toxicities",
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"})
     )
 
     def clean_pdb_id(self):

@@ -78,7 +78,12 @@ pip install -r requirements.txt
 
 # Set up environment variables
 cp .env.example .env
-# Edit .env with your configuration
+
+# IMPORTANT: Generate and set DJANGO_SECRET_KEY
+# Generate a secure key:
+python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
+# Copy the output and add to .env file:
+# DJANGO_SECRET_KEY=<paste-generated-key-here>
 
 # Run database migrations
 python manage.py migrate
@@ -203,6 +208,31 @@ coverage report
 
 # Run with verbose output
 python manage.py test -v 2
+```
+
+---
+
+## 🧬 Design / Simulation Report (MVP)
+
+An early design/simulation engine prototype can generate a JSON report with:
+- TP/FP tradeoffs + Pareto front
+- Bulk vs reservoir dynamics (with subclone evolution)
+- Relapse forecast proxy
+- Mechanistic toxicity decomposition + rationale
+
+### Generate report (CLI)
+
+```bash
+python manage.py generate_design_report --out artifacts/design_report.json
+```
+
+### Fetch report (HTTP)
+
+- `GET /api/design-report/`
+- Optional query params: `seed`, `steps`, `dt_days`
+
+```bash
+curl 'http://127.0.0.1:8001/api/design-report/?seed=123&steps=12&dt_days=7'
 ```
 
 **Current Test Coverage**: 94% (30/32 tests passing)

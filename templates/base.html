@@ -252,6 +252,10 @@
     const HELP_CACHE = new Map();
     let helpDrawerLang = getCurrentLang();
     let currentHelpSlug = null;
+
+    const API_UX_AUDIT_URL = "{% url 'api_ux_audit' %}";
+    const API_HELP_ITEM_URL_TEMPLATE = "{% url 'api_help_item' '__slug__' %}";
+    const API_HELP_SEARCH_URL = "{% url 'api_help_search' %}";
     const helpDrawerEl = document.getElementById('helpDrawer');
     const helpDrawerLabel = document.getElementById('helpDrawerLabel');
     const helpDrawerContent = document.getElementById('helpDrawerContent');
@@ -392,7 +396,7 @@
 
     const audit = (event, detail) => {
         const token = getCsrfToken();
-        fetch('/api/ux/audit/', {
+        fetch(API_UX_AUDIT_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -408,7 +412,8 @@
         if (HELP_CACHE.has(key)) {
             return HELP_CACHE.get(key);
         }
-        const res = await fetch(`/api/help/${slug}/?lang=${lang}`);
+        const url = `${API_HELP_ITEM_URL_TEMPLATE.replace('__slug__', slug)}/?lang=${lang}`;
+        const res = await fetch(url);
         if (!res.ok) {
             throw new Error('help-not-found');
         }
@@ -600,7 +605,7 @@
             return;
         }
         const lang = getCurrentLang() || 'en';
-        const res = await fetch(`/api/help/search/?q=${encodeURIComponent(query)}&lang=${lang}`);
+        const res = await fetch(`${API_HELP_SEARCH_URL}?q=${encodeURIComponent(query)}&lang=${lang}`);
         const data = await res.json();
         cmdResults.innerHTML = data.results
             .map((item) => {
@@ -723,8 +728,10 @@
         });
 
         const initTooltips = () => {
-            const tooltipTriggerList = Array.prototype.slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            tooltipTriggerList.forEach((el) => new bootstrap.Tooltip(el));
+            if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+                const tooltipTriggerList = Array.prototype.slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                tooltipTriggerList.forEach((el) => new bootstrap.Tooltip(el));
+            }
         };
         initTooltips();
         applyGlossaryTooltips();

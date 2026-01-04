@@ -118,26 +118,238 @@
 </div>
 
 <!-- Statistics -->
-<div class="row g-3 mb-3">
-    <div class="col-md-4">
-        <div class="card shadow-sm h-100">
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100 border-start border-primary border-4">
             <div class="card-body">
                 <div class="d-flex align-items-center gap-2 mb-2">
                     <span style="font-size: 1.5rem;">👥</span>
-                    <h2 class="h5 text-muted mb-0">
+                    <h2 class="h6 text-muted mb-0">
                         <span class="t-en">Total Patients</span>
                         <span class="t-it">Pazienti Totali</span>
                     </h2>
                 </div>
-                <p class="display-5 fw-semibold mb-2">{{ patient_count }}</p>
+                <p class="display-6 fw-bold mb-2 text-primary">{{ patient_count }}</p>
                 <p class="small text-muted mb-0">
-                    <span class="t-en">Patients tracked in the system</span>
-                    <span class="t-it">Pazienti tracciati nel sistema</span>
+                    <span class="t-en">Tracked in system</span>
+                    <span class="t-it">Tracciati nel sistema</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100 border-start border-success border-4">
+            <div class="card-body">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span style="font-size: 1.5rem;">💊</span>
+                    <h2 class="h6 text-muted mb-0">
+                        <span class="t-en">Active Therapies</span>
+                        <span class="t-it">Terapie Attive</span>
+                    </h2>
+                </div>
+                <p class="display-6 fw-bold mb-2 text-success">{{ active_therapies }}</p>
+                <p class="small text-muted mb-0">
+                    <span class="t-en">Ongoing treatments</span>
+                    <span class="t-it">Trattamenti in corso</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100 border-start border-warning border-4">
+            <div class="card-body">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span style="font-size: 1.5rem;">⚠️</span>
+                    <h2 class="h6 text-muted mb-0">
+                        <span class="t-en">Need Attention</span>
+                        <span class="t-it">Richiedono Attenzione</span>
+                    </h2>
+                </div>
+                <p class="display-6 fw-bold mb-2 text-warning">{{ patients_needing_attention }}</p>
+                <p class="small text-muted mb-0">
+                    <span class="t-en">PD or high FLC (30d)</span>
+                    <span class="t-it">PD o FLC alto (30g)</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100 border-start border-danger border-4">
+            <div class="card-body">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span style="font-size: 1.5rem;">🧬</span>
+                    <h2 class="h6 text-muted mb-0">
+                        <span class="t-en">High-Risk</span>
+                        <span class="t-it">Alto Rischio</span>
+                    </h2>
+                </div>
+                <p class="display-6 fw-bold mb-2 text-danger">{{ high_risk_patients }}</p>
+                <p class="small text-muted mb-0">
+                    <span class="t-en">Adverse cytogenetics</span>
+                    <span class="t-it">Citogenetica avversa</span>
                 </p>
             </div>
         </div>
     </div>
 </div>
+
+<!-- R-ISS Distribution & Response Summary -->
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h2 class="h6 mb-0">
+                    <span class="t-en">📊 R-ISS Stage Distribution</span>
+                    <span class="t-it">📊 Distribuzione Stadio R-ISS</span>
+                </h2>
+                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#rissHelp">
+                    <span class="t-en">?</span>
+                    <span class="t-it">?</span>
+                </button>
+            </div>
+            <div class="collapse" id="rissHelp">
+                <div class="card-body bg-light border-bottom small">
+                    <div class="t-en">
+                        <strong>R-ISS Staging System:</strong> Risk stratification for Multiple Myeloma patients based on lab values and genetics.
+                        <ul class="mb-0 mt-2">
+                            <li><strong>Stage I:</strong> Best prognosis, longest survival</li>
+                            <li><strong>Stage II:</strong> Intermediate risk</li>
+                            <li><strong>Stage III:</strong> Highest risk, requires aggressive treatment</li>
+                        </ul>
+                    </div>
+                    <div class="t-it">
+                        <strong>Sistema di Stadiazione R-ISS:</strong> Stratificazione rischio per pazienti Mieloma Multiplo basata su valori laboratorio e genetica.
+                        <ul class="mb-0 mt-2">
+                            <li><strong>Stadio I:</strong> Migliore prognosi, sopravvivenza più lunga</li>
+                            <li><strong>Stadio II:</strong> Rischio intermedio</li>
+                            <li><strong>Stadio III:</strong> Rischio più alto, richiede trattamento aggressivo</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <div class="p-3 bg-success bg-opacity-10 rounded">
+                            <div class="h2 fw-bold text-success">{{ riss_counts.I }}</div>
+                            <div class="small text-muted">Stage I</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-3 bg-warning bg-opacity-10 rounded">
+                            <div class="h2 fw-bold text-warning">{{ riss_counts.II }}</div>
+                            <div class="small text-muted">Stage II</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="p-3 bg-danger bg-opacity-10 rounded">
+                            <div class="h2 fw-bold text-danger">{{ riss_counts.III }}</div>
+                            <div class="small text-muted">Stage III</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h2 class="h6 mb-0">
+                    <span class="t-en">🎯 Treatment Response Summary</span>
+                    <span class="t-it">🎯 Riepilogo Risposta al Trattamento</span>
+                </h2>
+                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#responseHelp">
+                    <span class="t-en">?</span>
+                    <span class="t-it">?</span>
+                </button>
+            </div>
+            <div class="collapse" id="responseHelp">
+                <div class="card-body bg-light border-bottom small">
+                    <div class="t-en">
+                        <strong>Response Categories:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li><strong>sCR/CR:</strong> Complete response - no detectable disease</li>
+                            <li><strong>VGPR:</strong> Very good partial response - minimal disease</li>
+                            <li><strong>PR:</strong> Partial response - significant improvement</li>
+                            <li><strong>SD:</strong> Stable disease - no change</li>
+                            <li><strong>PD:</strong> Progressive disease - worsening (requires action)</li>
+                        </ul>
+                    </div>
+                    <div class="t-it">
+                        <strong>Categorie di Risposta:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li><strong>sCR/CR:</strong> Risposta completa - malattia non rilevabile</li>
+                            <li><strong>VGPR:</strong> Risposta parziale molto buona - malattia minima</li>
+                            <li><strong>PR:</strong> Risposta parziale - miglioramento significativo</li>
+                            <li><strong>SD:</strong> Malattia stabile - nessun cambiamento</li>
+                            <li><strong>PD:</strong> Malattia progressiva - peggioramento (richiede azione)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-2 justify-content-around">
+                    {% for code, label in response_counts.items %}
+                        {% if code == "sCR" or code == "CR" %}
+                            <div class="text-center p-2 bg-success bg-opacity-10 rounded flex-fill">
+                                <div class="h4 fw-bold text-success mb-0">{{ label }}</div>
+                                <div class="small text-muted">{{ code }}</div>
+                            </div>
+                        {% elif code == "VGPR" or code == "PR" %}
+                            <div class="text-center p-2 bg-info bg-opacity-10 rounded flex-fill">
+                                <div class="h4 fw-bold text-info mb-0">{{ label }}</div>
+                                <div class="small text-muted">{{ code }}</div>
+                            </div>
+                        {% elif code == "SD" %}
+                            <div class="text-center p-2 bg-warning bg-opacity-10 rounded flex-fill">
+                                <div class="h4 fw-bold text-warning mb-0">{{ label }}</div>
+                                <div class="small text-muted">{{ code }}</div>
+                            </div>
+                        {% elif code == "PD" %}
+                            <div class="text-center p-2 bg-danger bg-opacity-10 rounded flex-fill">
+                                <div class="h4 fw-bold text-danger mb-0">{{ label }}</div>
+                                <div class="small text-muted">{{ code }}</div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Action Alerts -->
+{% if patients_needing_attention > 0 %}
+<div class="alert alert-warning border-warning shadow-sm mb-4">
+    <div class="d-flex align-items-center gap-3">
+        <div style="font-size: 2rem;">⚠️</div>
+        <div class="flex-grow-1">
+            <h3 class="h6 alert-heading mb-2">
+                <span class="t-en">⚠️ Attention Required</span>
+                <span class="t-it">⚠️ Attenzione Richiesta</span>
+            </h3>
+            <p class="mb-2">
+                <span class="t-en">
+                    <strong>{{ patients_needing_attention }}</strong> patient(s) show concerning indicators in the last 30 days:
+                    progressive disease (PD) or abnormally high FLC ratio (&gt;10).
+                </span>
+                <span class="t-it">
+                    <strong>{{ patients_needing_attention }}</strong> paziente/i mostrano indicatori preoccupanti negli ultimi 30 giorni:
+                    malattia progressiva (PD) o rapporto FLC anormalmente alto (&gt;10).
+                </span>
+            </p>
+            <a href="{% url 'clinic:patient_list' %}" class="btn btn-sm btn-warning">
+                <span class="t-en">📋 Review Patients</span>
+                <span class="t-it">📋 Rivedi Pazienti</span>
+            </a>
+        </div>
+    </div>
+</div>
+{% endif %}
 
 <!-- Recent Assessments Table -->
 <div class="card shadow-sm">
