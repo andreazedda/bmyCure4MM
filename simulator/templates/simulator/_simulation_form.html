@@ -12,6 +12,19 @@
           hx-indicator="#simulation-indicator"
           hx-disabled-elt="button, input, select, textarea">
         {% csrf_token %}
+        {% if game_mode %}
+            <input type="hidden" name="game_mode" value="1">
+            <div class="alert alert-dark mb-3" role="alert">
+                <strong>🎮 <span class="t-en">Game Mode</span><span class="t-it">Modalità Gioco</span></strong>
+                <div class="small">
+                    <span class="t-en">Goal: maximize tumor reduction while keeping healthy loss low. Each run updates your score.</span>
+                    <span class="t-it">Obiettivo: massimizza la riduzione tumorale mantenendo bassa la perdita di cellule sane. Ogni run aggiorna il punteggio.</span>
+                </div>
+            </div>
+        {% endif %}
+        {% if game_mode %}
+            <input type="hidden" name="game_mode" value="1">
+        {% endif %}
         {% if warnings %}
             <div class="alert alert-warning" role="alert">
                 {% for warning in warnings %}
@@ -141,10 +154,24 @@
         </fieldset>
 
         <fieldset class="mb-4">
-            <legend class="h6 mb-3">4. <span class="t-en">Advanced</span><span class="t-it">Avanzate</span></legend>
+            <legend class="h6 mb-3">
+                4. <span class="t-en">Advanced &amp; Twin</span><span class="t-it">Avanzate &amp; Gemello</span>
+                <a href="{% url 'simulator:interactive_tutorial' %}" class="btn btn-sm btn-outline-info ms-2" target="_blank">
+                    <span class="t-en">🎓 How to use Twin?</span>
+                    <span class="t-it">🎓 Come usare il Twin?</span>
+                </a>
+            </legend>
             <div class="novice-tip alert alert-info mb-3">
-                <span class="t-en">Tweak biology and interactions cautiously; pair with Patient Twin for lab-driven values.</span>
-                <span class="t-it">Modifica biologia e interazioni con cautela; usa il Gemello Paziente per valori guidati dai lab.</span>
+                <div class="mb-2">
+                    <span class="t-en">Tweak biology and interactions cautiously; pair with Patient Twin for lab-driven values.</span>
+                    <span class="t-it">Modifica biologia e interazioni con cautela; usa il Gemello Paziente per valori guidati dai lab.</span>
+                </div>
+                <div class="small">
+                    <strong class="t-en">⚡ Quick Twin Setup:</strong>
+                    <strong class="t-it">⚡ Setup Rapido Twin:</strong>
+                    <span class="t-en">1️⃣ Create Patient (Clinic) → 2️⃣ Add Assessment with labs → 3️⃣ Enable Twin below → 4️⃣ Select Assessment → 5️⃣ Choose "Auto" mode → 6️⃣ Run!</span>
+                    <span class="t-it">1️⃣ Crea Paziente (Clinica) → 2️⃣ Aggiungi Assessment con lab → 3️⃣ Abilita Twin qui sotto → 4️⃣ Seleziona Assessment → 5️⃣ Scegli modo "Auto" → 6️⃣ Lancia!</span>
+                </div>
             </div>
             <div class="row g-3">
                 <div class="col-12 col-md-4">
@@ -175,6 +202,33 @@
                     {% if form.use_twin.errors %}
                         <div class="invalid-feedback d-block">{{ form.use_twin.errors|striptags }}</div>
                     {% endif %}
+                </div>
+                <div class="col-12 col-md-6">
+                    {% include "simulator/_form_field.html" with field=form.twin_assessment_id help_en="Select the Assessment snapshot used for Patient Twin (create it in Clinic → Patient → Add Assessment)." help_it="Seleziona lo snapshot (Assessment) usato dal Gemello Paziente (si crea in Clinica → Paziente → Aggiungi Assessment)." help_slug="twin" %}
+                    <div class="form-text">
+                        <a href="{% url 'simulator:visibility_diagnostics' %}" target="_blank">
+                            <span class="t-en">Why don't I see all assessments?</span>
+                            <span class="t-it">Perché non vedo tutti gli assessment?</span>
+                        </a>
+                    </div>
+                    {% if form.twin_assessment_id.field.disabled %}
+                        <div class="alert alert-warning mt-2 mb-0" role="alert">
+                            <span class="t-en"><strong>No accessible assessments.</strong> Load demo data (DEMO) or create a patient + assessment you own.</span>
+                            <span class="t-it"><strong>Nessun assessment accessibile.</strong> Carica i dati demo (DEMO) oppure crea un paziente + assessment di cui sei owner.</span>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-12 col-md-6">
+                    {% include "simulator/_form_field.html" with field=form.twin_biology_mode help_en="Auto derives biology from the selected Assessment; Manual keeps the values you enter below." help_it="Auto deriva la biologia dall'Assessment selezionato; Manual mantiene i valori inseriti qui sotto." help_slug="twin" %}
+                </div>
+                <div class="col-12 col-md-4">
+                    {% include "simulator/_form_field.html" with field=form.carrying_capacity_tumor help_en="Twin-driven unless set to Manual." help_it="Derivato dal Twin salvo modalità Manual." unit="cells" help_slug="twin" %}
+                </div>
+                <div class="col-12 col-md-4">
+                    {% include "simulator/_form_field.html" with field=form.carrying_capacity_healthy help_en="Twin-driven unless set to Manual." help_it="Derivato dal Twin salvo modalità Manual." unit="cells" help_slug="twin" %}
+                </div>
+                <div class="col-12 col-md-4">
+                    {% include "simulator/_form_field.html" with field=form.immune_compromise_index help_en="Twin-driven unless set to Manual." help_it="Derivato dal Twin salvo modalità Manual." help_slug="twin" %}
                 </div>
                 <div class="col-12 col-md-6">
                     {% include "simulator/_form_field.html" with field=form.seed help_en=helptext_en|dict_get:'seed' help_it=helptext_it|dict_get:'seed' help_slug="quickstart" %}

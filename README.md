@@ -54,15 +54,46 @@ Perfect for researchers, clinicians, and students working on multiple myeloma tr
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start (For Learners & New Users)
 
-### Prerequisites
+**Want to learn how to simulate treatments? Start here! 👇**
 
-- **Python 3.10+**
-- **Redis** (for background tasks)
-- **Git**
+### 🎓 Option 1: Quick Start with Demo Data (Recommended)
 
-### Installation
+Perfect for learning the platform without creating data manually:
+
+```bash
+# Clone the repository
+git clone https://github.com/andreazedda/bmyCure4MM.git
+cd bmyCure4MM
+
+# Create and activate virtual environment
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# 🎉 ONE-COMMAND SETUP with demo patients!
+./quick_start.sh
+
+# Start the server
+python manage.py runserver
+```
+
+**✅ You now have:**
+- ✓ 3 demo patients (high/medium/low risk)
+- ✓ 4 pre-filled clinical assessments
+- ✓ Admin user (username: `admin`, password: `admin123`)
+- ✓ Ready to simulate treatments immediately!
+
+**📖 Next Step:** Visit `http://127.0.0.1:8000` and look for the blue **"🚀 New to the Platform?"** card on the dashboard. It will guide you through your first simulation step-by-step.
+
+---
+
+### 🔧 Option 2: Manual Setup
+
+For production or custom setup:
 
 ```bash
 # Clone the repository
@@ -76,7 +107,7 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 # Install dependencies
 pip install -r requirements.txt
 
-# Set up environment variables
+# Set up environment variables (optional)
 cp .env.example .env
 
 # IMPORTANT: Generate and set DJANGO_SECRET_KEY

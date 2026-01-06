@@ -1,0 +1,104 @@
+[
+  {
+    "model": "clinic.patient",
+    "pk": 1,
+    "fields": {
+      "mrn": "DEMO001",
+      "first_name": "Mario",
+      "last_name": "Rossi",
+      "birth_date": "1960-01-15",
+      "diagnosis_date": "2025-06-10",
+      "sex": "M",
+      "notes": "Demo patient - High risk Multiple Myeloma (R-ISS III). Created for tutorial and testing purposes.",
+      "owner": null
+    }
+  },
+  {
+    "model": "clinic.patient",
+    "pk": 2,
+    "fields": {
+      "mrn": "DEMO002",
+      "first_name": "Anna",
+      "last_name": "Bianchi",
+      "birth_date": "1965-08-22",
+      "diagnosis_date": "2025-09-15",
+      "sex": "F",
+      "notes": "Demo patient - Intermediate risk Multiple Myeloma (R-ISS II). Created for tutorial and testing purposes.",
+      "owner": null
+    }
+  },
+  {
+    "model": "clinic.patient",
+    "pk": 3,
+    "fields": {
+      "mrn": "DEMO003",
+      "first_name": "Giuseppe",
+      "last_name": "Verdi",
+      "birth_date": "1958-03-10",
+      "diagnosis_date": "2025-11-20",
+      "sex": "M",
+      "notes": "Demo patient - Low risk Multiple Myeloma (R-ISS I). Created for tutorial and testing purposes.",
+      "owner": null
+    }
+  },
+  {
+    "model": "clinic.assessment",
+    "pk": 1,
+    "fields": {
+      "patient": 1,
+      "date": "2026-01-01",
+      "r_iss": "III",
+      "ldH_u_l": "600.0",
+      "beta2m_mg_l": "12.0",
+      "flc_ratio": "8.5",
+      "m_protein_g_dl": "4.5",
+      "response": "PD",
+      "notes": "High-risk presentation: Elevated LDH, very high β2-microglobulin, severely imbalanced FLC ratio. Patient shows progressive disease requiring immediate intervention."
+    }
+  },
+  {
+    "model": "clinic.assessment",
+    "pk": 2,
+    "fields": {
+      "patient": 2,
+      "date": "2026-01-02",
+      "r_iss": "II",
+      "ldH_u_l": "320.0",
+      "beta2m_mg_l": "5.5",
+      "flc_ratio": "3.2",
+      "m_protein_g_dl": "3.1",
+      "response": "SD",
+      "notes": "Intermediate-risk presentation: Moderately elevated biomarkers. Stable disease, considering treatment optimization."
+    }
+  },
+  {
+    "model": "clinic.assessment",
+    "pk": 3,
+    "fields": {
+      "patient": 3,
+      "date": "2026-01-03",
+      "r_iss": "I",
+      "ldH_u_l": "200.0",
+      "beta2m_mg_l": "2.8",
+      "flc_ratio": "1.1",
+      "m_protein_g_dl": "1.8",
+      "response": "PR",
+      "notes": "Low-risk presentation: Biomarkers near normal ranges. Patient showing partial response to current treatment, good prognosis."
+    }
+  },
+  {
+    "model": "clinic.assessment",
+    "pk": 4,
+    "fields": {
+      "patient": 1,
+      "date": "2025-12-15",
+      "r_iss": "III",
+      "ldH_u_l": "550.0",
+      "beta2m_mg_l": "11.5",
+      "flc_ratio": "9.2",
+      "m_protein_g_dl": "4.8",
+      "response": "PD",
+      "notes": "Baseline assessment before current cycle. Shows disease progression from previous line."
+    }
+  }
+]

@@ -34,6 +34,49 @@
     </div>
 </div>
 
+<!-- Getting Started Tutorial Card -->
+<div class="alert alert-info border-info mb-4" style="border-left: 5px solid #0dcaf0 !important;">
+    <div class="d-flex align-items-start gap-3">
+        <div style="font-size: 2.5rem;">🎓</div>
+        <div class="flex-grow-1">
+            <h2 class="h5 mb-2">
+                <span class="t-en">🚀 New to the Platform? Start Here!</span>
+                <span class="t-it">🚀 Nuovo sulla Piattaforma? Inizia Qui!</span>
+            </h2>
+            <div class="t-en mb-2">
+                <p class="mb-2"><strong>Want to run your first simulation?</strong> Follow the step-by-step tutorial:</p>
+                <ol class="mb-2" style="line-height: 1.8;">
+                    <li>Create a Patient (Clinic → Patients → New Patient)</li>
+                    <li>Add Lab Values (Assessment: R-ISS, LDH, β2M, FLC ratio)</li>
+                    <li>Go to Simulator → Choose a Scenario</li>
+                    <li>Enable Patient Twin (uses your lab values to personalize the simulation)</li>
+                    <li>Run & see tumor curves, toxicity, and outcomes!</li>
+                </ol>
+            </div>
+            <div class="t-it mb-2">
+                <p class="mb-2"><strong>Vuoi fare la tua prima simulazione?</strong> Segui il tutorial passo-passo:</p>
+                <ol class="mb-2" style="line-height: 1.8;">
+                    <li>Crea un Paziente (Clinica → Pazienti → Nuovo Paziente)</li>
+                    <li>Aggiungi Valori Lab (Assessment: R-ISS, LDH, β2M, FLC ratio)</li>
+                    <li>Vai al Simulatore → Scegli uno Scenario</li>
+                    <li>Abilita Patient Twin (usa i tuoi valori lab per personalizzare la simulazione)</li>
+                    <li>Lancia e vedi curve tumorali, tossicità e risultati!</li>
+                </ol>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{% url 'simulator:interactive_tutorial' %}" class="btn btn-primary btn-lg">
+                    <span class="t-en">🎓 Start Interactive Tutorial</span>
+                    <span class="t-it">🎓 Inizia Tutorial Interattivo</span>
+                </a>
+                <a href="{% url 'clinic:patient_list' %}" class="btn btn-success btn-sm">
+                    <span class="t-en">➡️ Start Now: Create Patient</span>
+                    <span class="t-it">➡️ Inizia Ora: Crea Paziente</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Quick Actions -->
 <div class="row g-3 mb-4">
     <div class="col-md-3">

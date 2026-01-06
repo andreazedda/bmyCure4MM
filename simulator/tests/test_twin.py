@@ -55,6 +55,8 @@ class PatientTwinTests(TestCase):
 
     @override_settings(PREDLAB_V2=True)
     def test_twin_serialization_written_to_results(self) -> None:
+        self.patient.owner = self.user
+        self.patient.save(update_fields=["owner"])
         attempt = models.SimulationAttempt.objects.create(
             scenario=self.scenario,
             user=self.user,

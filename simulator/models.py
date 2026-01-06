@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from pathlib import Path
 
 from django.conf import settings
@@ -24,7 +25,10 @@ IMWG_RESPONSE_CHOICES = [
 
 from .models_simulation import MathematicalModel
 from .pharmaco import registry as pharmaco_registry
+from .permissions import is_editor
 from .twin import build_patient_twin
+
+logger = logging.getLogger(__name__)
 
 AUTO_SENTINELS = {"auto", "AUTO", "Auto", ""}
 DEFAULT_PK_PARAMS = {
@@ -332,31 +336,46 @@ class SimulationAttempt(models.Model):
         twin_assessment = None
 
         use_predlab = getattr(settings, "PREDLAB_V2", False)
-        if use_predlab and resolved_params.get("use_twin", True):
+        use_twin = resolved_params.get("use_twin", True)
+        twin_mode = (resolved_params.get("twin_biology_mode") or "auto").strip().lower()
+        if use_twin:
             assessment_id = resolved_params.get("twin_assessment_id") or resolved_params.get("assessment_id")
             if assessment_id:
                 try:
                     from clinic.models import Assessment
+                    from .access import get_accessible_assessment_by_id
 
-                    twin_assessment = Assessment.objects.get(pk=assessment_id)
+                    if self.user and getattr(self.user, "is_authenticated", False):
+                        is_privileged = self.user.is_staff or is_editor(self.user)
+                        if is_privileged:
+                            twin_assessment = Assessment.objects.filter(pk=assessment_id).first()
+                        else:
+                            twin_assessment = get_accessible_assessment_by_id(self.user, int(assessment_id))
+                    else:
+                        twin_assessment = None
                 except Exception:
                     twin_assessment = None
             if twin_assessment:
                 twin_payload = build_patient_twin(twin_assessment)
-                resolved_params = self._merge_twin_parameters(resolved_params, twin_payload)
+                if twin_mode == "auto":
+                    resolved_params = self._merge_twin_parameters(resolved_params, twin_payload)
 
-        baseline_tumor = self._float_or(resolved_params.get("baseline_tumor_cells"), 1.0e9)
-        baseline_healthy = self._float_or(resolved_params.get("baseline_healthy_cells"), 5.0e11)
-        time_horizon = self._float_or(resolved_params.get("time_horizon"), 90.0)
-        growth_rates = {
-            "tumor": self._float_or(resolved_params.get("tumor_growth_rate"), 0.023),
-            "healthy": self._float_or(resolved_params.get("healthy_growth_rate"), 0.015),
-        }
-        drug_doses = {
-            "lenalidomide": self._float_or(resolved_params.get("lenalidomide_dose"), 25.0),
-            "bortezomib": self._float_or(resolved_params.get("bortezomib_dose"), 1.3),
-            "daratumumab": self._float_or(resolved_params.get("daratumumab_dose"), 16.0),
-        }
+        try:
+            solver_inputs = self._resolve_solver_inputs(resolved_params)
+        except ValueError as exc:
+            logger.warning(
+                "solver-input-resolution-failed attempt_id=%s user_id=%s twin_mode=%s error=%s",
+                self.pk,
+                self.user_id,
+                (resolved_params.get("twin_biology_mode") or "auto"),
+                str(exc),
+            )
+            raise
+        baseline_tumor = solver_inputs["baseline_tumor_cells"]
+        baseline_healthy = solver_inputs["baseline_healthy_cells"]
+        time_horizon = solver_inputs["time_horizon"]
+        growth_rates = solver_inputs["growth_rates"]
+        drug_doses = solver_inputs["drug_doses"]
         default_pk = {drug: values.copy() for drug, values in DEFAULT_PK_PARAMS.items()}
         default_pd = {drug: values.copy() for drug, values in DEFAULT_PD_PARAMS.items()}
         if use_predlab:
@@ -370,11 +389,11 @@ class SimulationAttempt(models.Model):
             pk_params = default_pk
             pd_params = default_pd
             dose_functions = {}
-        interaction_strength = self._float_or(resolved_params.get("interaction_strength"), 0.05)
+        interaction_strength = solver_inputs["interaction_strength"]
         interaction_matrix = np.eye(len(drug_doses), dtype=float) * interaction_strength
-        immune_index = self._float_or(resolved_params.get("immune_compromise_index"), 1.0)
-        carrying_t_override = self._float_or(resolved_params.get("carrying_capacity_tumor"), None)
-        carrying_h_override = self._float_or(resolved_params.get("carrying_capacity_healthy"), None)
+        immune_index = solver_inputs["immune_compromise_index"]
+        carrying_t_override = solver_inputs["carrying_capacity_tumor"]
+        carrying_h_override = solver_inputs["carrying_capacity_healthy"]
 
         model = MathematicalModel(
             baseline_tumor_cells=baseline_tumor,
@@ -494,6 +513,74 @@ class SimulationAttempt(models.Model):
         self.save(update_fields=["results", "results_summary", "artifacts"])
         return summary
 
+    @classmethod
+    def _resolve_solver_inputs(cls, resolved_params: dict) -> dict:
+        """Centralized conversion layer before the solver.
+
+        Contract: no string (including 'auto') may reach MathematicalModel.
+        """
+        baseline_tumor = cls._float_or_strict(
+            resolved_params.get("baseline_tumor_cells"), 1.0e9, "baseline_tumor_cells"
+        )
+        baseline_healthy = cls._float_or_strict(
+            resolved_params.get("baseline_healthy_cells"), 5.0e11, "baseline_healthy_cells"
+        )
+        time_horizon = cls._float_or_strict(resolved_params.get("time_horizon"), 90.0, "time_horizon")
+        growth_rates = {
+            "tumor": cls._float_or_strict(
+                resolved_params.get("tumor_growth_rate"), 0.023, "growth_rates.tumor"
+            ),
+            "healthy": cls._float_or_strict(
+                resolved_params.get("healthy_growth_rate"), 0.015, "growth_rates.healthy"
+            ),
+        }
+        drug_doses = {
+            "lenalidomide": cls._float_or_strict(
+                resolved_params.get("lenalidomide_dose"), 25.0, "drug_doses.lenalidomide"
+            ),
+            "bortezomib": cls._float_or_strict(
+                resolved_params.get("bortezomib_dose"), 1.3, "drug_doses.bortezomib"
+            ),
+            "daratumumab": cls._float_or_strict(
+                resolved_params.get("daratumumab_dose"), 16.0, "drug_doses.daratumumab"
+            ),
+        }
+        interaction_strength = cls._float_or_strict(
+            resolved_params.get("interaction_strength"), 0.05, "interaction_strength"
+        )
+        immune_index = cls._float_or_strict(
+            resolved_params.get("immune_compromise_index"), 1.0, "immune_compromise_index"
+        )
+        carrying_t_override = cls._float_or_strict(
+            resolved_params.get("carrying_capacity_tumor"), None, "carrying_capacity_tumor"
+        )
+        carrying_h_override = cls._float_or_strict(
+            resolved_params.get("carrying_capacity_healthy"), None, "carrying_capacity_healthy"
+        )
+
+        return {
+            "baseline_tumor_cells": baseline_tumor,
+            "baseline_healthy_cells": baseline_healthy,
+            "time_horizon": time_horizon,
+            "growth_rates": growth_rates,
+            "drug_doses": drug_doses,
+            "interaction_strength": interaction_strength,
+            "immune_compromise_index": immune_index,
+            "carrying_capacity_tumor": carrying_t_override,
+            "carrying_capacity_healthy": carrying_h_override,
+        }
+
+    @staticmethod
+    def _float_or_strict(value, default, name: str):
+        if value in AUTO_SENTINELS or value is None:
+            return default
+        if isinstance(value, str) and value.strip().lower() in {"auto", "", "none", "null"}:
+            return default
+        try:
+            return float(value)
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f"Invalid solver input for {name}: {value!r}") from exc
+
     @staticmethod
     def _merge_twin_parameters(params: dict, twin_payload: dict) -> dict:
         merged = dict(params)
@@ -504,18 +591,30 @@ class SimulationAttempt(models.Model):
             "carrying_capacity_healthy",
             "immune_compromise_index",
         }
+
+        def _is_auto(value) -> bool:
+            if value is None:
+                return True
+            if value in AUTO_SENTINELS:
+                return True
+            if isinstance(value, str) and value.strip().lower() in {"auto", "", "none", "null"}:
+                return True
+            return False
+
         for key in allowed:
             twin_value = twin_payload.get(key)
             if twin_value is None:
                 continue
             current = merged.get(key)
-            if key not in merged or current in AUTO_SENTINELS or current is None:
+            if key not in merged or _is_auto(current):
                 merged[key] = twin_value
         return merged
 
     @staticmethod
     def _float_or(value, default):
         if value in AUTO_SENTINELS or value is None:
+            return default
+        if isinstance(value, str) and value.strip().lower() in {"auto", "", "none", "null"}:
             return default
         try:
             return float(value)

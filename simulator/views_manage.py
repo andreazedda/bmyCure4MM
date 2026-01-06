@@ -305,7 +305,8 @@ def simulate_scenario(request: HttpRequest, pk: int) -> HttpResponse:
     if request.method != "POST":
         return HttpResponseBadRequest("Invalid request method.")
     scenario = get_object_or_404(models.Scenario, pk=pk, active=True)
-    form = forms.SimulationParameterForm(request.POST)
+    form = forms.SimulationParameterForm(request.POST, user=request.user)
+    game_mode = request.POST.get("game_mode") == "1"
 
     def _profile_with_ranges(drug: str):
         profile = pharmaco_registry.get_drug_profile(drug)
@@ -335,6 +336,7 @@ def simulate_scenario(request: HttpRequest, pk: int) -> HttpResponse:
                 "helptext_en": forms.SIMULATION_FORM_HELP_TEXT_EN,
                 "is_editor": is_editor(request.user),
                 "preset_descriptions": _preset_descriptions(),
+                "game_mode": game_mode,
             },
             request=request,
         )
@@ -379,7 +381,12 @@ def simulate_scenario(request: HttpRequest, pk: int) -> HttpResponse:
         "results": attempt.results,
         "warnings": parameter_warnings + summary_warnings,
         "kpi": explain.KPI,
+        "game_mode": game_mode,
     }
+    if game_mode:
+        from .game import compute_game_metrics
+
+        context["game"] = compute_game_metrics(attempt.results_summary)
     html = render_to_string("simulator/_simulation_results.html", context, request=request)
     return HttpResponse(html)
 

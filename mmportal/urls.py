@@ -18,6 +18,7 @@ urlpatterns = [
     path("", include(("clinic.urls", "clinic"), namespace="clinic")),
     path("chem/", include(("chemtools.urls", "chemtools"), namespace="chemtools")),
     path("sim/", include(("simulator.urls", "simulator"), namespace="simulator")),
+    path("simulator/", include(("simulator.urls", "simulator"), namespace="simulator_alias")),
     path("docs/", include(("docs_viewer.urls", "docs_viewer"), namespace="docs_viewer")),
     path("api/", include("clinic.api")),
     path("api/glossary/", glossary, name="api_glossary"),

@@ -77,7 +77,7 @@ class TestDocsViewerE2E:
         if download_link.count() > 0:
             # Just verify link exists and is clickable
             expect(download_link.first).to_be_visible()
-            expect(download_link.first).to have_attribute("href", lambda href: '/docs/raw/' in href)
+            expect(download_link.first).to_have_attribute("href", lambda href: '/docs/raw/' in href)
     
     def test_code_blocks_highlighted(self, page: Page, live_server):
         """Code blocks should have syntax highlighting."""

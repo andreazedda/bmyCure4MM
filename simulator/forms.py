@@ -678,9 +678,10 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
 
     PRESET_CHOICES = [(key, value["label"]) for key, value in PRESETS.items()]
 
-    preset = forms.ChoiceField(choices=PRESET_CHOICES, required=True, label="Treatment preset")
+    preset = forms.ChoiceField(choices=PRESET_CHOICES, required=False, label="Treatment preset")
 
     creatinine_clearance = forms.FloatField(
+        required=False,
         min_value=5,
         widget=forms.NumberInput(
             attrs={
@@ -695,12 +696,14 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
         help_text="Renal function estimate driving lenalidomide dose adjustments (thresholds at 60 and 30 ml/min).",
     )
     neuropathy_grade = forms.ChoiceField(
+        required=False,
         choices=[(str(i), f"Grade {i}") for i in range(0, 4)],
         label="Peripheral neuropathy (grade)",
         widget=forms.Select(attrs={"class": "form-select"}),
         help_text="CTCAE sensory neuropathy grade (0–3). Grades ≥2 restrict bortezomib to ≤1.0 mg/m².",
     )
     anc = forms.FloatField(
+        required=False,
         min_value=0.1,
         widget=forms.NumberInput(
             attrs={
@@ -715,6 +718,7 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
         help_text="ANC <1.0 ×10⁹/L indicates clinically significant neutropenia and blocks simulation.",
     )
     platelets = forms.FloatField(
+        required=False,
         min_value=10,
         widget=forms.NumberInput(
             attrs={
@@ -828,6 +832,8 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
     cohort_size = forms.TypedChoiceField(
         choices=[(1, "1"), (10, "10"), (50, "50"), (200, "200")],
         coerce=int,
+        required=False,
+        empty_value=1,
         initial=1,
         label="Virtual cohort size",
         widget=forms.Select(attrs={"class": "form-select"}),
@@ -878,6 +884,69 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
         label="Drug interaction strength",
         help_text="Synergy/toxicity coupling between agents (dimensionless). Values >0.2 are unsupported.",
     )
+
+    twin_assessment_id = forms.TypedChoiceField(
+        required=False,
+        coerce=int,
+        choices=[("", "— Select assessment —")],
+        widget=forms.Select(attrs={"class": "form-select"}),
+        label="Patient Twin assessment",
+        help_text="Select the lab snapshot (Assessment) used to derive Patient Twin biology.",
+    )
+    twin_biology_mode = forms.ChoiceField(
+        required=False,
+        initial="auto",
+        choices=[("auto", "Auto"), ("manual", "Manual")],
+        widget=forms.Select(attrs={"class": "form-select"}),
+        label="Twin-driven biology",
+        help_text="Auto uses Patient Twin-derived biology. Manual keeps your entered values.",
+    )
+    carrying_capacity_tumor = forms.FloatField(
+        required=False,
+        min_value=0.0,
+        widget=forms.NumberInput(
+            attrs={
+                "class": "form-control",
+                "step": "1",
+                "min": "0",
+                "inputmode": "decimal",
+                "readonly": "readonly",
+            }
+        ),
+        label="Tumor carrying capacity (cells)",
+        help_text="Maximum tumor burden for logistic growth. Leave on Auto for Twin-driven value.",
+    )
+    carrying_capacity_healthy = forms.FloatField(
+        required=False,
+        min_value=0.0,
+        widget=forms.NumberInput(
+            attrs={
+                "class": "form-control",
+                "step": "1",
+                "min": "0",
+                "inputmode": "decimal",
+                "readonly": "readonly",
+            }
+        ),
+        label="Healthy carrying capacity (cells)",
+        help_text="Maximum healthy plasma cell pool for logistic growth. Leave on Auto for Twin-driven value.",
+    )
+    immune_compromise_index = forms.FloatField(
+        required=False,
+        min_value=0.0,
+        widget=forms.NumberInput(
+            attrs={
+                "class": "form-control",
+                "step": "0.01",
+                "min": "0",
+                "max": "5",
+                "inputmode": "decimal",
+                "readonly": "readonly",
+            }
+        ),
+        label="Immune compromise index",
+        help_text="Dimensionless immune impairment multiplier. Leave on Auto for Twin-derived value.",
+    )
     use_twin = forms.BooleanField(
         required=False,
         initial=True,
@@ -901,6 +970,7 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
         self.warnings: list[str] = []
         self.preset_key = self.data.get("preset") or self.initial.get("preset") or self.PRESET_CHOICES[0][0]
@@ -934,7 +1004,76 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
         if "platelets" not in self.data:
             self.fields["platelets"].initial = 150
 
+        if "carrying_capacity_tumor" not in self.data:
+            self.fields["carrying_capacity_tumor"].initial = 1.0e9
+        if "carrying_capacity_healthy" not in self.data:
+            self.fields["carrying_capacity_healthy"].initial = 5.0e11
+        if "immune_compromise_index" not in self.data:
+            self.fields["immune_compromise_index"].initial = 1.0
+
+        self._init_twin_assessment_choices()
+
         self.slider_bounds = self._compute_slider_bounds(defaults, slider_fields)
+
+    def _init_twin_assessment_choices(self) -> None:
+        """Populate assessment choices.
+
+        Ownership policy (PR1.1):
+        - user sees assessments for patients they own
+        - staff/editor sees all
+        """
+        if not self.user or not getattr(self.user, "is_authenticated", False):
+            self.fields["twin_assessment_id"].choices = [("", "— Select assessment —")]
+            self.fields["twin_assessment_id"].disabled = True
+            return
+
+        from simulator.permissions import is_editor
+
+        is_privileged = getattr(self.user, "is_staff", False) or is_editor(self.user)
+
+        try:
+            from clinic.models import Assessment
+            from django.db.models import Q
+
+            qs = Assessment.objects.select_related("patient").order_by("-date")
+            if not is_privileged:
+                qs = qs.filter(Q(patient__owner=self.user) | Q(patient__mrn__startswith="DEMO"))
+        except Exception:
+            self.fields["twin_assessment_id"].choices = [("", "— Select assessment —")]
+            return
+
+        if not is_privileged and not qs.exists():
+            self.fields["twin_assessment_id"].choices = [("", "— Select assessment —")]
+            self.fields["twin_assessment_id"].disabled = True
+            return
+
+        choices: list[tuple[object, str]] = [("", "— Select assessment —")]
+        for assessment in qs[:200]:
+            label = f"{assessment.patient.mrn} · {assessment.patient.last_name} · {assessment.date}"
+            choices.append((assessment.pk, label))
+        self.fields["twin_assessment_id"].choices = choices
+
+    def clean(self):
+        cleaned = super().clean()
+        use_twin = bool(cleaned.get("use_twin"))
+        assessment_id = cleaned.get("twin_assessment_id")
+        biology_mode = (cleaned.get("twin_biology_mode") or "auto").lower()
+
+        if use_twin and not assessment_id:
+            self.add_error("twin_assessment_id", "Select an Assessment to enable Patient Twin.")
+
+        twin_keys = (
+            "tumor_growth_rate",
+            "healthy_growth_rate",
+            "carrying_capacity_tumor",
+            "carrying_capacity_healthy",
+            "immune_compromise_index",
+        )
+        if use_twin and biology_mode == "auto":
+            for key in twin_keys:
+                cleaned[key] = None
+        cleaned["twin_biology_mode"] = biology_mode
+        return cleaned
 
     def _compute_slider_bounds(self, defaults: dict[str, float], slider_fields: list[str]) -> dict[str, dict[str, float]]:
         bounds = {}
@@ -992,10 +1131,10 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
         baseline_tumor = self._clean_numeric(cleaned, "baseline_tumor_cells")
         baseline_healthy = self._clean_numeric(cleaned, "baseline_healthy_cells")
         interaction_strength = self._clean_numeric(cleaned, "interaction_strength")
-        creatinine = cleaned.get("creatinine_clearance")
-        neuropathy = int(cleaned.get("neuropathy_grade") or 0)
-        anc = cleaned.get("anc")
-        platelets = cleaned.get("platelets")
+        creatinine = self._clean_numeric(cleaned, "creatinine_clearance")
+        neuropathy = int(cleaned.get("neuropathy_grade") or (self.fields["neuropathy_grade"].initial or 0))
+        anc = self._clean_numeric(cleaned, "anc")
+        platelets = self._clean_numeric(cleaned, "platelets")
         pregnancy = cleaned.get("pregnancy")
 
         errors: dict[str, ValidationError] = {}

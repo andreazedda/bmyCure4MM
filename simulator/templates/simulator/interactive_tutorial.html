@@ -1,0 +1,535 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Progress Bar -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <span class="t-en">🎓 Interactive Tutorial: Your First Simulation</span>
+                        <span class="t-it">🎓 Tutorial Interattivo: La Tua Prima Simulazione</span>
+                    </h5>
+                    <div class="progress" style="height: 30px;">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 0%" id="tutorial-progress">
+                            <span class="fw-bold">Step 1/5</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tutorial Steps -->
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Step 1: Check Demo Data -->
+            <div class="card mb-4 tutorial-step active" id="step-1" data-step="1">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <span class="t-en">Step 1: Demo Patients</span>
+                        <span class="t-it">Passo 1: Pazienti Demo</span>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% if has_demo_data %}
+                        <div class="alert alert-success">
+                            <h5 class="alert-heading">
+                                <span class="t-en">✅ Great! You have {{ demo_patients_count }} demo patient(s) ready</span>
+                                <span class="t-it">✅ Ottimo! Hai {{ demo_patients_count }} paziente/i demo pronto/i</span>
+                            </h5>
+                            <p class="t-en">We found these patients with lab data already in your system:</p>
+                            <p class="t-it">Abbiamo trovato questi pazienti con dati lab già nel sistema:</p>
+                            <ul class="mt-3">
+                                {% for patient in demo_patients %}
+                                    <li class="mb-2">
+                                        <strong>{{ patient.first_name }} {{ patient.last_name }}</strong> (MRN: {{ patient.mrn }})
+                                        - {{ patient.assessments.count }} Assessment(s)
+                                        {% if patient.assessments.exists %}
+                                            {% with latest=patient.assessments.first %}
+                                                <br>
+                                                <small class="text-muted">
+                                                    Latest: R-ISS {{ latest.r_iss|default:"N/A" }}, 
+                                                    LDH {{ latest.ldH_u_l|default:"N/A" }} U/L, 
+                                                    β2M {{ latest.beta2m_mg_l|default:"N/A" }} mg/L
+                                                </small>
+                                            {% endwith %}
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                            <button class="btn btn-success" onclick="completeStep(1)">
+                                <span class="t-en">✓ Got it, continue →</span>
+                                <span class="t-it">✓ Capito, continua →</span>
+                            </button>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            <h5 class="alert-heading">
+                                <span class="t-en">⚠️ No demo data found</span>
+                                <span class="t-it">⚠️ Nessun dato demo trovato</span>
+                            </h5>
+                            <p class="t-en">You need to load demo patients first. Run this command in your terminal:</p>
+                            <p class="t-it">Devi caricare i pazienti demo prima. Esegui questo comando nel terminale:</p>
+                            <pre class="bg-dark text-white p-3 rounded"><code>./quick_start.sh</code></pre>
+                            <p class="t-en">Or manually:</p>
+                            <p class="t-it">Oppure manualmente:</p>
+                            <pre class="bg-dark text-white p-3 rounded"><code>python manage.py loaddata clinic/fixtures/demo_patients.json</code></pre>
+                            <button class="btn btn-primary" onclick="location.reload()">
+                                <span class="t-en">🔄 I loaded it, refresh page</span>
+                                <span class="t-it">🔄 L'ho caricato, ricarica pagina</span>
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Step 2: Understand Demo Patients -->
+            <div class="card mb-4 tutorial-step d-none" id="step-2" data-step="2">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">
+                        <span class="t-en">Step 2: Understanding Your Patients</span>
+                        <span class="t-it">Passo 2: Comprendere i Pazienti</span>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <p class="lead t-en">Demo patients represent 3 different risk levels:</p>
+                    <p class="lead t-it">I pazienti demo rappresentano 3 livelli di rischio diversi:</p>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-4">
+                            <div class="card border-danger">
+                                <div class="card-body">
+                                    <h5 class="card-title text-danger">🔴 High Risk</h5>
+                                    <p class="t-en"><strong>Mario Rossi</strong></p>
+                                    <p class="t-it"><strong>Mario Rossi</strong></p>
+                                    <ul class="small">
+                                        <li>R-ISS III</li>
+                                        <li>LDH: 600 U/L (very high)</li>
+                                        <li>β2M: 12.0 mg/L (very high)</li>
+                                        <li>FLC: 8.5 (imbalanced)</li>
+                                    </ul>
+                                    <p class="small text-danger t-en"><strong>Aggressive tumor</strong> - needs intensive therapy</p>
+                                    <p class="small text-danger t-it"><strong>Tumore aggressivo</strong> - necessita terapia intensiva</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card border-warning">
+                                <div class="card-body">
+                                    <h5 class="card-title text-warning">🟡 Intermediate</h5>
+                                    <p class="t-en"><strong>Anna Bianchi</strong></p>
+                                    <p class="t-it"><strong>Anna Bianchi</strong></p>
+                                    <ul class="small">
+                                        <li>R-ISS II</li>
+                                        <li>LDH: 320 U/L (moderate)</li>
+                                        <li>β2M: 5.5 mg/L (elevated)</li>
+                                        <li>FLC: 3.2 (imbalanced)</li>
+                                    </ul>
+                                    <p class="small text-warning t-en"><strong>Typical case</strong> - standard triplet works</p>
+                                    <p class="small text-warning t-it"><strong>Caso tipico</strong> - triplet standard funziona</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card border-success">
+                                <div class="card-body">
+                                    <h5 class="card-title text-success">🟢 Low Risk</h5>
+                                    <p class="t-en"><strong>Giuseppe Verdi</strong></p>
+                                    <p class="t-it"><strong>Giuseppe Verdi</strong></p>
+                                    <ul class="small">
+                                        <li>R-ISS I</li>
+                                        <li>LDH: 200 U/L (normal)</li>
+                                        <li>β2M: 2.8 mg/L (near normal)</li>
+                                        <li>FLC: 1.1 (normal)</li>
+                                    </ul>
+                                    <p class="small text-success t-en"><strong>Good prognosis</strong> - responds well</p>
+                                    <p class="small text-success t-it"><strong>Prognosi favorevole</strong> - risponde bene</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-primary mt-4">
+                        <h6 class="t-en">💡 Key Concept: Patient Twin</h6>
+                        <h6 class="t-it">💡 Concetto Chiave: Patient Twin</h6>
+                        <p class="t-en">
+                            The <strong>Patient Twin</strong> uses these lab values to calculate biological parameters 
+                            (tumor growth rate, carrying capacity, etc.) that personalize the simulation.
+                        </p>
+                        <p class="t-it">
+                            Il <strong>Patient Twin</strong> usa questi valori lab per calcolare parametri biologici 
+                            (velocità crescita tumorale, capacità portante, ecc.) che personalizzano la simulazione.
+                        </p>
+                    </div>
+                    
+                    <button class="btn btn-info" onclick="completeStep(2)">
+                        <span class="t-en">✓ I understand the risk levels →</span>
+                        <span class="t-it">✓ Capisco i livelli di rischio →</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: Go to Simulator -->
+            <div class="card mb-4 tutorial-step d-none" id="step-3" data-step="3">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">
+                        <span class="t-en">Step 3: Open the Simulator</span>
+                        <span class="t-it">Passo 3: Apri il Simulatore</span>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <p class="lead t-en">Now let's simulate a treatment!</p>
+                    <p class="lead t-it">Ora simuliamo un trattamento!</p>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="t-en">What you'll do:</h5>
+                            <h5 class="t-it">Cosa farai:</h5>
+                            <ol>
+                                <li class="t-en">Browse available scenarios (virtual patients)</li>
+                                <li class="t-it">Sfoglia gli scenari disponibili (pazienti virtuali)</li>
+                                <li class="t-en">Pick one (we recommend any scenario)</li>
+                                <li class="t-it">Scegline uno (consigliamo qualsiasi scenario)</li>
+                                <li class="t-en">Configure treatment parameters</li>
+                                <li class="t-it">Configura parametri trattamento</li>
+                                <li class="t-en">Enable Patient Twin</li>
+                                <li class="t-it">Abilita Patient Twin</li>
+                                <li class="t-en">Run simulation!</li>
+                                <li class="t-it">Lancia simulazione!</li>
+                            </ol>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="alert alert-light border">
+                                <h6 class="t-en">🎯 Your Goal:</h6>
+                                <h6 class="t-it">🎯 Il Tuo Obiettivo:</h6>
+                                <p class="t-en">
+                                    Compare how <strong>Mario Rossi</strong> (high risk) and 
+                                    <strong>Giuseppe Verdi</strong> (low risk) respond to the 
+                                    <strong>SAME treatment regimen</strong>.
+                                </p>
+                                <p class="t-it">
+                                    Confronta come <strong>Mario Rossi</strong> (alto rischio) e 
+                                    <strong>Giuseppe Verdi</strong> (basso rischio) rispondono allo 
+                                    <strong>STESSO regime terapeutico</strong>.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <a href="{% url 'simulator:scenario_list' %}" class="btn btn-success btn-lg">
+                            <span class="t-en">→ Go to Simulator (Open in New Tab)</span>
+                            <span class="t-it">→ Vai al Simulatore (Apri in Nuova Tab)</span>
+                        </a>
+                        <button class="btn btn-outline-success" onclick="completeStep(3)">
+                            <span class="t-en">✓ I opened the simulator, next →</span>
+                            <span class="t-it">✓ Ho aperto il simulatore, avanti →</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Configure Simulation -->
+            <div class="card mb-4 tutorial-step d-none" id="step-4" data-step="4">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">
+                        <span class="t-en">Step 4: Configure & Enable Twin</span>
+                        <span class="t-it">Passo 4: Configura & Abilita Twin</span>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <p class="lead t-en">In the simulator form, follow these steps:</p>
+                    <p class="lead t-it">Nel form del simulatore, segui questi passi:</p>
+                    
+                    <div class="accordion" id="configAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#config1">
+                                    <span class="t-en">1️⃣ Section "1. Baseline" - Choose a Preset</span>
+                                    <span class="t-it">1️⃣ Sezione "1. Baseline" - Scegli un Preset</span>
+                                </button>
+                            </h2>
+                            <div id="config1" class="accordion-collapse collapse show" data-bs-parent="#configAccordion">
+                                <div class="accordion-body">
+                                    <p class="t-en">Select <strong>"standard_triplet"</strong> from the Preset dropdown.</p>
+                                    <p class="t-it">Seleziona <strong>"standard_triplet"</strong> dal menu Preset.</p>
+                                    <img src="{% static 'img/tutorial-preset.png' %}" class="img-fluid border rounded mt-2" alt="Preset selection" onerror="this.style.display='none'">
+                                    <p class="small text-muted mt-2 t-en">This auto-populates safe doses for a typical regimen.</p>
+                                    <p class="small text-muted mt-2 t-it">Questo popola automaticamente dosi sicure per un regime tipico.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#config2">
+                                    <span class="t-en">2️⃣ Scroll to "4. Advanced & Twin"</span>
+                                    <span class="t-it">2️⃣ Scorri a "4. Avanzate & Gemello"</span>
+                                </button>
+                            </h2>
+                            <div id="config2" class="accordion-collapse collapse" data-bs-parent="#configAccordion">
+                                <div class="accordion-body">
+                                    <ul>
+                                        <li class="t-en">Toggle <strong>"Use Patient Twin"</strong> to ON (✅)</li>
+                                        <li class="t-it">Attiva <strong>"Usa Gemello Paziente"</strong> su ON (✅)</li>
+                                        <li class="t-en">Select <strong>Assessment</strong>: Choose "Mario Rossi - 2026-01-01" from dropdown</li>
+                                        <li class="t-it">Seleziona <strong>Assessment</strong>: Scegli "Mario Rossi - 2026-01-01" dal menu</li>
+                                        <li class="t-en"><strong>Twin Biology Mode</strong>: Select "Auto"</li>
+                                        <li class="t-it"><strong>Modalità Biologia Twin</strong>: Seleziona "Auto"</li>
+                                    </ul>
+                                    <div class="alert alert-info mt-2">
+                                        <strong class="t-en">What "Auto" means:</strong>
+                                        <strong class="t-it">Cosa significa "Auto":</strong>
+                                        <p class="mb-0 t-en">The Twin automatically calculates biological parameters from Mario's lab values.</p>
+                                        <p class="mb-0 t-it">Il Twin calcola automaticamente i parametri biologici dai valori lab di Mario.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#config3">
+                                    <span class="t-en">3️⃣ Set Time Horizon</span>
+                                    <span class="t-it">3️⃣ Imposta Orizzonte Temporale</span>
+                                </button>
+                            </h2>
+                            <div id="config3" class="accordion-collapse collapse" data-bs-parent="#configAccordion">
+                                <div class="accordion-body">
+                                    <p class="t-en"><strong>Time Horizon:</strong> 180 days (6 months)</p>
+                                    <p class="t-it"><strong>Orizzonte Temporale:</strong> 180 giorni (6 mesi)</p>
+                                    <p class="t-en"><strong>Cohort Size:</strong> 1 (for simplicity)</p>
+                                    <p class="t-it"><strong>Dimensione Coorte:</strong> 1 (per semplicità)</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#config4">
+                                    <span class="t-en">4️⃣ Click "Run Simulation"</span>
+                                    <span class="t-it">4️⃣ Clicca "Esegui Simulazione"</span>
+                                </button>
+                            </h2>
+                            <div id="config4" class="accordion-collapse collapse" data-bs-parent="#configAccordion">
+                                <div class="accordion-body">
+                                    <p class="t-en">Blue button at the bottom. Wait 10-30 seconds for results!</p>
+                                    <p class="t-it">Bottone blu in basso. Aspetta 10-30 secondi per i risultati!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-warning mt-4" onclick="completeStep(4)">
+                        <span class="t-en">✓ I ran the simulation →</span>
+                        <span class="t-it">✓ Ho lanciato la simulazione →</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 5: Analyze Results -->
+            <div class="card mb-4 tutorial-step d-none" id="step-5" data-step="5">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <span class="t-en">Step 5: Understand Results</span>
+                        <span class="t-it">Passo 5: Comprendi i Risultati</span>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <p class="lead t-en">You should now see simulation results below the form. Let's interpret them:</p>
+                    <p class="lead t-it">Dovresti ora vedere i risultati della simulazione sotto il form. Interpretiamoli:</p>
+                    
+                    <h5 class="mt-4 t-en">📊 What to Look For:</h5>
+                    <h5 class="mt-4 t-it">📊 Cosa Cercare:</h5>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card border-primary mb-3">
+                                <div class="card-header">
+                                    <span class="t-en">A) Time Plot (Graph)</span>
+                                    <span class="t-it">A) Grafico Temporale</span>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="small">
+                                        <li class="t-en"><strong>Red curve:</strong> Tumor cells (should go DOWN!)</li>
+                                        <li class="t-it"><strong>Curva rossa:</strong> Cellule tumorali (deve SCENDERE!)</li>
+                                        <li class="t-en"><strong>Green curve:</strong> Healthy cells (try to keep UP)</li>
+                                        <li class="t-it"><strong>Curva verde:</strong> Cellule sane (cerca di MANTENERE SU)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-success mb-3">
+                                <div class="card-header">
+                                    <span class="t-en">B) KPIs (Key Metrics)</span>
+                                    <span class="t-it">B) KPI (Metriche Chiave)</span>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="small">
+                                        <li class="t-en"><strong>Tumor Reduction %:</strong> Higher = better efficacy</li>
+                                        <li class="t-it"><strong>Riduzione Tumorale %:</strong> Più alto = migliore efficacia</li>
+                                        <li class="t-en"><strong>Healthy Loss %:</strong> Lower = less toxicity</li>
+                                        <li class="t-it"><strong>Perdita Sane %:</strong> Più basso = meno tossicità</li>
+                                        <li class="t-en"><strong>Time to Recurrence:</strong> Longer = better durability</li>
+                                        <li class="t-it"><strong>Tempo a Ricaduta:</strong> Più lungo = migliore durata</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <h6 class="t-en">🔬 Download <code>twin_params.json</code></h6>
+                        <h6 class="t-it">🔬 Scarica <code>twin_params.json</code></h6>
+                        <p class="t-en">
+                            This file shows the biological parameters the Twin calculated from Mario's labs:
+                        </p>
+                        <p class="t-it">
+                            Questo file mostra i parametri biologici che il Twin ha calcolato dai lab di Mario:
+                        </p>
+                        <ul class="small">
+                            <li><code>risk_score</code>: ~0.80-0.85 (high risk)</li>
+                            <li><code>tumor_growth_rate</code>: ~0.035 (grows fast!)</li>
+                            <li><code>healthy_growth_rate</code>: ~0.013 (recovers slowly)</li>
+                        </ul>
+                    </div>
+                    
+                    <h5 class="mt-4 t-en">🔁 Next Exercise:</h5>
+                    <h5 class="mt-4 t-it">🔁 Esercizio Successivo:</h5>
+                    <p class="t-en">
+                        Repeat the simulation with <strong>Giuseppe Verdi</strong> (low risk) and compare:
+                    </p>
+                    <p class="t-it">
+                        Ripeti la simulazione con <strong>Giuseppe Verdi</strong> (basso rischio) e confronta:
+                    </p>
+                    <ul>
+                        <li class="t-en">Is tumor reduction better?</li>
+                        <li class="t-it">La riduzione tumorale è migliore?</li>
+                        <li class="t-en">Is toxicity lower?</li>
+                        <li class="t-it">La tossicità è più bassa?</li>
+                        <li class="t-en">How do the twin parameters differ?</li>
+                        <li class="t-it">Come differiscono i parametri del twin?</li>
+                    </ul>
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <button class="btn btn-success btn-lg" onclick="completeTutorial()">
+                            <span class="t-en">🎉 I completed the tutorial!</span>
+                            <span class="t-it">🎉 Ho completato il tutorial!</span>
+                        </button>
+                        <a href="{% url 'simulator:scenario_list' %}" class="btn btn-primary">
+                            <span class="t-en">→ Back to Simulator</span>
+                            <span class="t-it">→ Torna al Simulatore</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar: Quick Reference -->
+        <div class="col-lg-4">
+            <div class="card sticky-top" style="top: 20px;">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">
+                        <span class="t-en">📌 Quick Reference</span>
+                        <span class="t-it">📌 Riferimento Rapido</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="t-en">🎯 Your Learning Goals:</h6>
+                    <h6 class="t-it">🎯 I Tuoi Obiettivi:</h6>
+                    <ul class="small">
+                        <li class="t-en">Understand demo patients (risk levels)</li>
+                        <li class="t-it">Capire pazienti demo (livelli rischio)</li>
+                        <li class="t-en">Run a simulation with Patient Twin</li>
+                        <li class="t-it">Lanciare simulazione con Patient Twin</li>
+                        <li class="t-en">Interpret results (graph + KPIs)</li>
+                        <li class="t-it">Interpretare risultati (grafico + KPI)</li>
+                        <li class="t-en">Compare different patients</li>
+                        <li class="t-it">Confrontare pazienti diversi</li>
+                    </ul>
+                    
+                    <hr>
+                    
+                    <h6 class="t-en">🔑 Key Terms:</h6>
+                    <h6 class="t-it">🔑 Termini Chiave:</h6>
+                    <dl class="small">
+                        <dt class="t-en">Assessment</dt>
+                        <dt class="t-it">Assessment</dt>
+                        <dd class="t-en">Lab snapshot (R-ISS, LDH, β2M, FLC)</dd>
+                        <dd class="t-it">Snapshot lab (R-ISS, LDH, β2M, FLC)</dd>
+                        
+                        <dt class="t-en">Patient Twin</dt>
+                        <dt class="t-it">Patient Twin</dt>
+                        <dd class="t-en">Converts labs → biological parameters</dd>
+                        <dd class="t-it">Converte lab → parametri biologici</dd>
+                        
+                        <dt class="t-en">Preset</dt>
+                        <dt class="t-it">Preset</dt>
+                        <dd class="t-en">Pre-configured drug doses</dd>
+                        <dd class="t-it">Dosi farmaci pre-configurate</dd>
+                        
+                        <dt class="t-en">Time Horizon</dt>
+                        <dt class="t-it">Orizzonte Temporale</dt>
+                        <dd class="t-en">Simulation duration (days)</dd>
+                        <dd class="t-it">Durata simulazione (giorni)</dd>
+                    </dl>
+                    
+                    <hr>
+                    
+                    <h6 class="t-en">❓ Need Help?</h6>
+                    <h6 class="t-it">❓ Serve Aiuto?</h6>
+                    <p class="small t-en">Click the <strong>?</strong> icons next to fields in the simulator for contextual help.</p>
+                    <p class="small t-it">Clicca le icone <strong>?</strong> accanto ai campi nel simulatore per aiuto contestuale.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentStep = 1;
+
+function completeStep(step) {
+    // Hide current step
+    document.getElementById(`step-${step}`).classList.add('d-none');
+    document.getElementById(`step-${step}`).classList.remove('active');
+    
+    // Show next step
+    const nextStep = step + 1;
+    if (nextStep <= 5) {
+        document.getElementById(`step-${nextStep}`).classList.remove('d-none');
+        document.getElementById(`step-${nextStep}`).classList.add('active');
+        currentStep = nextStep;
+        
+        // Update progress bar
+        const progress = (nextStep / 5) * 100;
+        const progressBar = document.getElementById('tutorial-progress');
+        progressBar.style.width = `${progress}%`;
+        progressBar.innerHTML = `<span class="fw-bold">Step ${nextStep}/5</span>`;
+        
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+}
+
+function completeTutorial() {
+    alert('🎉 Tutorial completed! You now know how to simulate treatments with Patient Twin. Try comparing different patients and doses!');
+    window.location.href = "{% url 'simulator:scenario_list' %}";
+}
+</script>
+
+<style>
+.tutorial-step {
+    transition: opacity 0.3s ease-in-out;
+}
+
+.tutorial-step.active {
+    opacity: 1;
+}
+
+.tutorial-step.d-none {
+    opacity: 0;
+}
+</style>
+{% endblock %}

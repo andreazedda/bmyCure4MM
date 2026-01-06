@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
@@ -14,6 +15,14 @@ class Patient(models.Model):
     ]
 
     mrn = models.CharField("MRN", max_length=32, unique=True)
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="owned_patients",
+        help_text="Primary owner of this patient record (minimal access control).",
+    )
     first_name = models.CharField(max_length=64)
     last_name = models.CharField(max_length=64)
     birth_date = models.DateField()

@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Visibility diagnostics - bmyCure4MM{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+        <div>
+            <h1 class="h3 mb-1">
+                <span class="t-en">🔎 Data visibility diagnostics</span>
+                <span class="t-it">🔎 Diagnostica visibilità dati</span>
+            </h1>
+            <div class="text-muted">
+                <span class="t-en">This page explains why some Patients/Assessments do not appear in Twin selection.</span>
+                <span class="t-it">Questa pagina spiega perché alcuni Pazienti/Assessment non compaiono nella selezione Twin.</span>
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-primary" href="{% url 'clinic:patient_list' %}">
+                <span class="t-en">Patients</span><span class="t-it">Pazienti</span>
+            </a>
+            <a class="btn btn-primary" href="{% url 'simulator:scenario_list' %}">
+                <span class="t-en">Go to Simulator</span><span class="t-it">Vai al Simulatore</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-muted small">
+                        <span class="t-en">Total Assessments</span><span class="t-it">Assessment totali</span>
+                    </div>
+                    <div class="display-6 fw-bold">{{ total_assessments }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="card h-100 border-success">
+                <div class="card-body">
+                    <div class="text-muted small">
+                        <span class="t-en">Accessible for Twin</span><span class="t-it">Accessibili per Twin</span>
+                    </div>
+                    <div class="display-6 fw-bold text-success">{{ accessible_count }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="card h-100 border-warning">
+                <div class="card-body">
+                    <div class="text-muted small">
+                        <span class="t-en">Hidden (permission)</span><span class="t-it">Nascosti (permessi)</span>
+                    </div>
+                    <div class="display-6 fw-bold text-warning">{{ inaccessible_count }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-info">
+        <div class="fw-semibold mb-1">
+            <span class="t-en">How access works</span><span class="t-it">Come funziona l'accesso</span>
+        </div>
+        {% if is_privileged %}
+            <span class="t-en">You are staff/editor: you can use any Assessment for Twin.</span>
+            <span class="t-it">Sei staff/editor: puoi usare qualunque Assessment per il Twin.</span>
+        {% else %}
+            <ul class="mb-0">
+                <li>
+                    <span class="t-en">You can use Assessments of patients you own (Patient.owner = you).</span>
+                    <span class="t-it">Puoi usare gli Assessment dei pazienti di cui sei owner (Patient.owner = tu).</span>
+                </li>
+                <li>
+                    <span class="t-en">You can also use demo Assessments (MRN starts with “{{ demo_prefix }}”).</span>
+                    <span class="t-it">Puoi anche usare gli Assessment demo (MRN inizia con “{{ demo_prefix }}”).</span>
+                </li>
+                <li>
+                    <span class="t-en">Everything else is hidden to prevent cross-user access.</span>
+                    <span class="t-it">Il resto è nascosto per evitare accesso tra utenti diversi.</span>
+                </li>
+            </ul>
+        {% endif %}
+    </div>
+
+    {% if inaccessible_sample %}
+        <div class="card">
+            <div class="card-header">
+                <span class="t-en">Examples of hidden assessments</span>
+                <span class="t-it">Esempi di assessment nascosti</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped mb-0">
+                        <thead>
+                            <tr>
+                                <th>MRN</th>
+                                <th><span class="t-en">Date</span><span class="t-it">Data</span></th>
+                                <th><span class="t-en">Why hidden</span><span class="t-it">Perché nascosto</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for a in inaccessible_sample %}
+                                <tr>
+                                    <td>{{ a.patient.mrn }}</td>
+                                    <td>{{ a.date }}</td>
+                                    <td>
+                                        {% if a.patient.owner_id %}
+                                            <span class="t-en">Owned by another user.</span>
+                                            <span class="t-it">Owner diverso dal tuo.</span>
+                                        {% else %}
+                                            <span class="t-en">Owner not assigned (staff/editor only).</span>
+                                            <span class="t-it">Owner non assegnato (solo staff/editor).</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -54,6 +54,13 @@
                             📚 Docs
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-warning fw-bold" href="{% url 'simulator:interactive_tutorial' %}" 
+                           data-bs-toggle="tooltip" 
+                           title="Step-by-step interactive tutorial">
+                            🎓 <span class="t-en">Tutorial</span><span class="t-it">Tutorial</span>
+                        </a>
+                    </li>
                     {% if request.user.is_authenticated and user_is_simulator_editor %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="manageMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -412,7 +419,7 @@
         if (HELP_CACHE.has(key)) {
             return HELP_CACHE.get(key);
         }
-        const url = `${API_HELP_ITEM_URL_TEMPLATE.replace('__slug__', slug)}/?lang=${lang}`;
+        const url = `${API_HELP_ITEM_URL_TEMPLATE.replace('__slug__', slug)}?lang=${lang}`;
         const res = await fetch(url);
         if (!res.ok) {
             throw new Error('help-not-found');

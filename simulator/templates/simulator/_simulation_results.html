@@ -14,6 +14,32 @@
         </span>
     </div>
     <div class="card-body">
+        {% if game_mode %}
+            <div class="alert alert-dark d-flex flex-wrap justify-content-between align-items-center gap-2" role="alert">
+                <div>
+                    <strong>🎮 <span class="t-en">Game Mode</span><span class="t-it">Modalità Gioco</span></strong>
+                    <div class="small">
+                        <span class="t-en">Mission: reach ≥{{ game.mission.tumor_reduction_target }} tumor reduction AND keep healthy loss ≤{{ game.mission.healthy_loss_max }}.</span>
+                        <span class="t-it">Missione: ottenere ≥{{ game.mission.tumor_reduction_target }} riduzione tumorale E mantenere perdita sani ≤{{ game.mission.healthy_loss_max }}.</span>
+                    </div>
+                </div>
+                <div class="text-end">
+                    <div class="small text-muted">
+                        <span class="t-en">Best (this browser)</span><span class="t-it">Migliore (questo browser)</span>
+                        <span id="game-best-score" class="ms-1">—</span>
+                    </div>
+                    <div class="fw-bold">
+                        <span class="t-en">Score</span><span class="t-it">Punteggio</span>: <span id="game-current-score">{% if game %}{{ game.score }}{% else %}—{% endif %}</span>/100
+                        {% if game and game.win %}
+                            <span class="badge bg-success ms-2">
+                                <span class="t-en">WIN</span><span class="t-it">VITTORIA</span>
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div id="game-score" data-game-scenario="{{ scenario.pk }}" data-game-score="{% if game %}{{ game.score }}{% endif %}"></div>
+        {% endif %}
         {% if warnings %}
             <div class="alert alert-warning d-flex flex-column gap-1" role="alert">
                 {% for warning in warnings %}

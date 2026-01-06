@@ -11,3 +11,4 @@ django-filter>=23.0
 djangorestframework>=3.14.0
 optuna>=3.6.0
 PyYAML>=6.0
+Markdown>=3.5.0

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
@@ -26,6 +27,54 @@ def scenario_list(request):
 def getting_started(request):
     """Getting started page with tutorials and practice scenarios."""
     return render(request, "simulator/getting_started.html")
+
+
+@login_required
+def interactive_tutorial(request):
+    """Interactive step-by-step tutorial for creating a patient and running first simulation."""
+    from clinic.models import Patient, Assessment
+    
+    # Check if demo patients exist
+    demo_patients = Patient.objects.filter(mrn__startswith='DEMO').prefetch_related('assessments')
+    has_demo_data = demo_patients.exists()
+    
+    context = {
+        'has_demo_data': has_demo_data,
+        'demo_patients': demo_patients,
+        'demo_patients_count': demo_patients.count(),
+    }
+    return render(request, "simulator/interactive_tutorial.html", context)
+
+
+@login_required
+def visibility_diagnostics(request):
+    """Explain what assessments a user can/can't use (and why)."""
+    from clinic.models import Assessment
+    from .access import DEMO_MRN_PREFIX, accessible_assessments
+
+    all_qs = Assessment.objects.select_related("patient")
+    total_assessments = all_qs.count()
+
+    is_privileged = request.user.is_staff or is_editor(request.user)
+    if is_privileged:
+        accessible_count = total_assessments
+        inaccessible_count = 0
+        inaccessible_sample = []
+    else:
+        access_q = Q(patient__owner=request.user) | Q(patient__mrn__startswith=DEMO_MRN_PREFIX)
+        accessible_count = accessible_assessments(request.user, base_qs=all_qs).count()
+        inaccessible_count = all_qs.exclude(access_q).count()
+        inaccessible_sample = list(all_qs.exclude(access_q).order_by("-date")[:50])
+
+    context = {
+        "is_privileged": is_privileged,
+        "total_assessments": total_assessments,
+        "accessible_count": accessible_count,
+        "inaccessible_count": inaccessible_count,
+        "inaccessible_sample": inaccessible_sample,
+        "demo_prefix": DEMO_MRN_PREFIX,
+    }
+    return render(request, "simulator/visibility_diagnostics.html", context)
 
 
 @login_required
@@ -70,6 +119,9 @@ def scenario_detail(request, pk: int):
     )
     latest_summary = latest_simulation.results_summary if latest_simulation else None
     latest_results = latest_simulation.results if latest_simulation else {}
+    game_mode = request.GET.get("game") == "1"
+    from .game import compute_game_metrics
+    game = compute_game_metrics(latest_summary) if game_mode else None
     latest_warnings: list[str] = []
     if latest_summary:
         healthy_loss = latest_summary.get("healthy_loss")
@@ -130,11 +182,13 @@ def scenario_detail(request, pk: int):
         "regimen_names": regimen_names,
         "is_editor": editor,
         "available_regimens": available_regimens,
-        "simulation_parameter_form": forms.SimulationParameterForm(),
+        "simulation_parameter_form": forms.SimulationParameterForm(user=request.user),
         "latest_simulation": latest_simulation,
         "latest_simulation_summary": latest_summary,
         "latest_simulation_results": latest_results,
         "latest_simulation_warnings": latest_warnings,
+        "game_mode": game_mode,
+        "game": game,
         "drug_profiles": drug_profiles,
         "sim_form_help_it": forms.SIMULATION_FORM_HELP_TEXT_IT,
         "sim_form_help_en": forms.SIMULATION_FORM_HELP_TEXT_EN,

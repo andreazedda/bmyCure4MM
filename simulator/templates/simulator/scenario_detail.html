@@ -417,7 +417,7 @@
         {% if request.user.is_authenticated %}
             <!-- Fix overlapping cards and ensure single simulation results container -->
             <div id="simulation-results" class="mt-3">
-                {% include "simulator/_simulation_results.html" with scenario=scenario attempt=latest_simulation summary=latest_simulation_summary results=latest_simulation_results kpi=kpi %}
+                {% include "simulator/_simulation_results.html" with scenario=scenario attempt=latest_simulation summary=latest_simulation_summary results=latest_simulation_results kpi=kpi game_mode=game_mode game=game %}
             </div>
             {% if not latest_simulation %}
                 {% include "simulator/_simulation_wizard.html" %}
@@ -574,7 +574,7 @@
 {% endif %}
 
 {% if request.user.is_authenticated %}
-<div class="collapse" id="simulateScenarioPanel">
+<div class="collapse {% if game_mode %}show{% endif %}" id="simulateScenarioPanel">
     <div class="card shadow-sm mt-3">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h2 class="h6 mb-0">Run Mathematical Simulation</h2>
@@ -582,9 +582,38 @@
         </div>
         <div class="card-body">
             {% include "simulator/_onboarding.html" %}
-            {% include "simulator/_simulation_form.html" with form=simulation_parameter_form scenario=scenario drug_profiles=drug_profiles helptext_it=sim_form_help_it helptext_en=sim_form_help_en is_editor=is_editor preset_descriptions=preset_descriptions %}
+                        {% include "simulator/_simulation_form.html" with form=simulation_parameter_form scenario=scenario drug_profiles=drug_profiles helptext_it=sim_form_help_it helptext_en=sim_form_help_en is_editor=is_editor preset_descriptions=preset_descriptions game_mode=game_mode %}
         </div>
     </div>
 </div>
 {% endif %}
+
+<script>
+(() => {
+    const updateBest = () => {
+        const node = document.getElementById('game-score');
+        if (!node) return;
+        const scenarioId = node.getAttribute('data-game-scenario');
+        const scoreRaw = node.getAttribute('data-game-score');
+        if (!scenarioId || !scoreRaw) return;
+        const score = parseInt(scoreRaw, 10);
+        if (!Number.isFinite(score)) return;
+        const key = `mm.game.best.${scenarioId}`;
+        const prev = parseInt(localStorage.getItem(key) || '', 10);
+        const best = Number.isFinite(prev) ? Math.max(prev, score) : score;
+        localStorage.setItem(key, String(best));
+        const bestEl = document.getElementById('game-best-score');
+        if (bestEl) bestEl.textContent = best;
+    };
+
+    document.body.addEventListener('htmx:afterSwap', (event) => {
+        if (event.detail && event.detail.target && event.detail.target.id === 'simulation-results') {
+            updateBest();
+        }
+    });
+
+    // Initial render
+    updateBest();
+})();
+</script>
 {% endblock %}
