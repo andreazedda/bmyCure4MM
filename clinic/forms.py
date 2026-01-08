@@ -370,10 +370,37 @@ class AssessmentForm(BootstrapValidationMixin, forms.ModelForm):
 class PatientTherapyForm(BootstrapValidationMixin, forms.ModelForm):
     """Manage therapy course entries."""
 
-    start_date = forms.DateField(widget=forms.DateInput(attrs={"type": "date"}))
+    regimen = forms.ModelChoiceField(
+        queryset=models.Regimen.objects.all(),
+        widget=forms.Select(attrs={"class": "form-select"}),
+    )
+
+    start_date = forms.DateField(widget=forms.DateInput(attrs={"type": "date", "class": "form-control"}))
     end_date = forms.DateField(
-        widget=forms.DateInput(attrs={"type": "date"}),
+        widget=forms.DateInput(attrs={"type": "date", "class": "form-control"}),
         required=False,
+    )
+
+    outcome = forms.CharField(
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Select or type (e.g., CR, VGPR, PR, SD, PD)",
+                "list": "therapy-outcome-options",
+            }
+        ),
+    )
+
+    adverse_events = forms.CharField(
+        required=False,
+        widget=forms.Textarea(
+            attrs={
+                "class": "form-control",
+                "rows": 2,
+                "placeholder": "Optional (e.g., neuropathy G2; neutropenia; infection)",
+            }
+        ),
     )
 
     class Meta:
@@ -385,3 +412,50 @@ class PatientTherapyForm(BootstrapValidationMixin, forms.ModelForm):
             "outcome",
             "adverse_events",
         ]
+
+
+class RegimenForm(BootstrapValidationMixin, forms.ModelForm):
+    name = forms.CharField(
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "e.g., VRd (bortezomib + lenalidomide + dexamethasone)"})
+    )
+    line = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "e.g., frontline / relapsed / maintenance"}),
+    )
+    components = forms.CharField(
+        widget=forms.Textarea(
+            attrs={
+                "class": "form-control",
+                "rows": 3,
+                "placeholder": "bortezomib, lenalidomide, dexamethasone",
+            }
+        )
+    )
+    notes = forms.CharField(
+        required=False,
+        widget=forms.Textarea(
+            attrs={
+                "class": "form-control",
+                "rows": 3,
+                "placeholder": "Optional: schedule hints, context, rationale (does not change Twin by itself)",
+            }
+        ),
+    )
+
+    class Meta:
+        model = models.Regimen
+        fields = ["name", "line", "components", "notes"]
+
+    def clean_components(self):
+        raw = self.cleaned_data.get("components") or ""
+        parts = [p.strip() for p in raw.split(",")]
+        parts = [p for p in parts if p]
+        normalized: list[str] = []
+        seen: set[str] = set()
+        for part in parts:
+            key = " ".join(part.split()).lower()
+            if not key or key in seen:
+                continue
+            seen.add(key)
+            normalized.append(key)
+        return ", ".join(normalized)

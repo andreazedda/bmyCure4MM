@@ -1,0 +1,545 @@
+{% extends "base.html" %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-3">
+  <ol class="breadcrumb mb-0">
+    <li class="breadcrumb-item"><a href="{% url 'clinic:dashboard' %}">Dashboard</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'clinic:regimen_list' %}">Regimens</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Add</li>
+  </ol>
+</nav>
+
+<div class="card shadow-sm">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h1 class="h5 mb-0">Add Regimen</h1>
+    <a class="btn btn-sm btn-outline-secondary" href="{% url 'clinic:regimen_list' %}">Back</a>
+  </div>
+  <div class="card-body">
+    <div class="card border-0 bg-light mb-3">
+      <div class="card-body">
+        <div class="fw-semibold mb-2">
+          <span class="t-en">Start here: choose a template (1 click)</span>
+          <span class="t-it">Inizia qui: scegli un template (1 click)</span>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+          <button type="button" class="btn btn-sm btn-outline-primary" data-regimen-template
+                  data-name="VRd" data-line="frontline"
+                  data-components="bortezomib, lenalidomide, dexamethasone">
+            VRd
+          </button>
+          <button type="button" class="btn btn-sm btn-outline-primary" data-regimen-template
+                  data-name="Dara-Rd" data-line="frontline"
+                  data-components="daratumumab, lenalidomide, dexamethasone">
+            Dara-Rd
+          </button>
+          <button type="button" class="btn btn-sm btn-outline-primary" data-regimen-template
+                  data-name="Dara-VRd" data-line="frontline"
+                  data-components="daratumumab, bortezomib, lenalidomide, dexamethasone">
+            Dara-VRd
+          </button>
+          <button type="button" class="btn btn-sm btn-outline-primary" data-regimen-template
+                  data-name="KRd" data-line="relapsed"
+                  data-components="carfilzomib, lenalidomide, dexamethasone">
+            KRd
+          </button>
+          <button type="button" class="btn btn-sm btn-outline-primary" data-regimen-template
+                  data-name="KPd" data-line="relapsed"
+                  data-components="carfilzomib, pomalidomide, dexamethasone">
+            KPd
+          </button>
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-regimen-template
+                  data-name="Rd" data-line="frontline"
+                  data-components="lenalidomide, dexamethasone">
+            Rd
+          </button>
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-regimen-template
+                  data-name="Vd" data-line="relapsed"
+                  data-components="bortezomib, dexamethasone">
+            Vd
+          </button>
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-regimen-template
+                  data-name="Kd" data-line="relapsed"
+                  data-components="carfilzomib, dexamethasone">
+            Kd
+          </button>
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-regimen-template
+                  data-name="CyBorD" data-line="frontline"
+                  data-components="cyclophosphamide, bortezomib, dexamethasone">
+            CyBorD
+          </button>
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-regimen-template
+                  data-name="IRd" data-line="relapsed"
+                  data-components="ixazomib, lenalidomide, dexamethasone">
+            IRd
+          </button>
+        </div>
+        <div class="text-muted small mt-2">
+          <span class="t-en">You can always edit fields after selecting a template.</span>
+          <span class="t-it">Puoi sempre modificare i campi dopo aver scelto un template.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card border-0 bg-light mb-3" id="regimen-wizard">
+      <div class="card-body">
+        <div class="fw-semibold mb-1">
+          <span class="t-en">Or use the guided wizard (step-by-step)</span>
+          <span class="t-it">Oppure usa il wizard guidato (passo‑passo)</span>
+        </div>
+        <div class="text-muted small mb-3">
+          <span class="t-en">Answer 2–3 choices and the form will be filled automatically.</span>
+          <span class="t-it">Rispondi a 2–3 scelte e il form si compila automaticamente.</span>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-lg-4">
+            <div class="fw-semibold mb-2">1) <span class="t-en">Line</span><span class="t-it">Linea</span></div>
+            <div class="d-flex flex-wrap gap-2">
+              <button type="button" class="btn btn-sm btn-outline-secondary" data-wiz-line="frontline">frontline</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" data-wiz-line="relapsed">relapsed</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" data-wiz-line="refractory">refractory</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" data-wiz-line="maintenance">maintenance</button>
+            </div>
+            <div class="form-text">
+              <span class="t-en">If unsure, pick <strong>frontline</strong> to start learning.</span>
+              <span class="t-it">Se non sei sicuro, scegli <strong>frontline</strong> per iniziare.</span>
+            </div>
+          </div>
+
+          <div class="col-lg-8">
+            <div class="fw-semibold mb-2">2) <span class="t-en">Pick a regimen family</span><span class="t-it">Scegli una famiglia di regimen</span></div>
+            <div class="row g-2">
+              <div class="col-md-6">
+                <button type="button" class="btn btn-outline-primary w-100 text-start" data-wiz-family
+                        data-name="Rd" data-components="lenalidomide, dexamethasone">
+                  <div class="fw-semibold">Rd</div>
+                  <div class="small text-muted">
+                    <span class="t-en">IMiD + steroid (simple baseline)</span>
+                    <span class="t-it">IMiD + steroide (baseline semplice)</span>
+                  </div>
+                </button>
+              </div>
+              <div class="col-md-6">
+                <button type="button" class="btn btn-outline-primary w-100 text-start" data-wiz-family
+                        data-name="VRd" data-components="bortezomib, lenalidomide, dexamethasone">
+                  <div class="fw-semibold">VRd</div>
+                  <div class="small text-muted">
+                    <span class="t-en">PI + IMiD + steroid (common triplet)</span>
+                    <span class="t-it">PI + IMiD + steroide (triplet comune)</span>
+                  </div>
+                </button>
+              </div>
+              <div class="col-md-6">
+                <button type="button" class="btn btn-outline-primary w-100 text-start" data-wiz-family
+                        data-name="Dara-Rd" data-components="daratumumab, lenalidomide, dexamethasone">
+                  <div class="fw-semibold">Dara-Rd</div>
+                  <div class="small text-muted">
+                    <span class="t-en">Anti‑CD38 + Rd</span>
+                    <span class="t-it">Anti‑CD38 + Rd</span>
+                  </div>
+                </button>
+              </div>
+              <div class="col-md-6">
+                <button type="button" class="btn btn-outline-primary w-100 text-start" data-wiz-family
+                        data-name="Dara-VRd" data-components="daratumumab, bortezomib, lenalidomide, dexamethasone">
+                  <div class="fw-semibold">Dara-VRd</div>
+                  <div class="small text-muted">
+                    <span class="t-en">Anti‑CD38 + VRd (quartet)</span>
+                    <span class="t-it">Anti‑CD38 + VRd (quartet)</span>
+                  </div>
+                </button>
+              </div>
+              <div class="col-md-6">
+                <button type="button" class="btn btn-outline-secondary w-100 text-start" data-wiz-family
+                        data-name="KRd" data-components="carfilzomib, lenalidomide, dexamethasone">
+                  <div class="fw-semibold">KRd</div>
+                  <div class="small text-muted">
+                    <span class="t-en">Carfilzomib triplet</span>
+                    <span class="t-it">Triplet con carfilzomib</span>
+                  </div>
+                </button>
+              </div>
+              <div class="col-md-6">
+                <button type="button" class="btn btn-outline-secondary w-100 text-start" data-wiz-family
+                        data-name="KPd" data-components="carfilzomib, pomalidomide, dexamethasone">
+                  <div class="fw-semibold">KPd</div>
+                  <div class="small text-muted">
+                    <span class="t-en">Carfilzomib + pomalidomide</span>
+                    <span class="t-it">Carfilzomib + pomalidomide</span>
+                  </div>
+                </button>
+              </div>
+              <div class="col-md-6">
+                <button type="button" class="btn btn-outline-secondary w-100 text-start" data-wiz-family
+                        data-name="CyBorD" data-components="cyclophosphamide, bortezomib, dexamethasone">
+                  <div class="fw-semibold">CyBorD</div>
+                  <div class="small text-muted">
+                    <span class="t-en">Cyclophosphamide + bortezomib</span>
+                    <span class="t-it">Ciclofosfamide + bortezomib</span>
+                  </div>
+                </button>
+              </div>
+              <div class="col-md-6">
+                <button type="button" class="btn btn-outline-secondary w-100 text-start" data-wiz-family
+                        data-name="IRd" data-components="ixazomib, lenalidomide, dexamethasone">
+                  <div class="fw-semibold">IRd</div>
+                  <div class="small text-muted">
+                    <span class="t-en">Oral PI triplet</span>
+                    <span class="t-it">Triplet con PI orale</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+            <div class="form-text mt-2">
+              <span class="t-en">This wizard fills <strong>Name</strong> + <strong>Components</strong>; you can refine everything below.</span>
+              <span class="t-it">Questo wizard compila <strong>Nome</strong> + <strong>Componenti</strong>; puoi rifinire tutto sotto.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert-info" role="alert">
+      <div class="fw-semibold mb-1">
+        <span class="t-en">💡 Quick guide</span>
+        <span class="t-it">💡 Guida rapida</span>
+      </div>
+      <div class="small">
+        <div class="t-en">A regimen is a reusable label + components list (it does not run calculations by itself). Use generic drug names separated by commas.</div>
+        <div class="t-it">Un regimen è un'etichetta riutilizzabile + lista componenti (non avvia calcoli da solo). Usa nomi generici dei farmaci separati da virgole.</div>
+      </div>
+      <div class="table-responsive mt-2">
+        <table class="table table-sm mb-0">
+          <thead>
+            <tr>
+              <th><span class="t-en">Example</span><span class="t-it">Esempio</span></th>
+              <th><span class="t-en">Name</span><span class="t-it">Nome</span></th>
+              <th><span class="t-en">Line</span><span class="t-it">Linea</span></th>
+              <th><span class="t-en">Components</span><span class="t-it">Componenti</span></th>
+            </tr>
+          </thead>
+          <tbody class="small">
+            <tr>
+              <td>Triplet</td>
+              <td><strong>VRd</strong></td>
+              <td>frontline</td>
+              <td>bortezomib, lenalidomide, dexamethasone</td>
+            </tr>
+            <tr>
+              <td>Antibody + doublet</td>
+              <td><strong>Dara-Rd</strong></td>
+              <td>frontline / relapsed</td>
+              <td>daratumumab, lenalidomide, dexamethasone</td>
+            </tr>
+            <tr>
+              <td>Proteasome + IMiD</td>
+              <td><strong>KRd</strong></td>
+              <td>relapsed</td>
+              <td>carfilzomib, lenalidomide, dexamethasone</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="text-muted small mt-2">
+        <span class="t-en">Tip: keep spelling consistent (e.g., “lenalidomide”, “bortezomib”, “daratumumab”). Notes are optional and are for humans.</span>
+        <span class="t-it">Suggerimento: mantieni una nomenclatura coerente (es. “lenalidomide”, “bortezomib”, “daratumumab”). Le note sono opzionali e sono per uso umano.</span>
+      </div>
+    </div>
+
+    <form method="post" class="row g-3" id="regimen-form">
+      {% csrf_token %}
+
+      <div class="col-12">
+        <label class="form-label">Name</label>
+        {{ form.name }}
+        {% if form.name.errors %}<div class="invalid-feedback d-block">{{ form.name.errors|striptags }}</div>{% endif %}
+        <div class="form-text">
+          <span class="t-en">Short label like VRd, Dara-Rd, KRd.</span>
+          <span class="t-it">Etichetta breve tipo VRd, Dara-Rd, KRd.</span>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Line</label>
+        {{ form.line }}
+        {% if form.line.errors %}<div class="invalid-feedback d-block">{{ form.line.errors|striptags }}</div>{% endif %}
+        <div class="form-text">
+          <span class="t-en">Optional. Examples: frontline, relapsed, refractory, maintenance.</span>
+          <span class="t-it">Opzionale. Esempi: frontline, relapsed, refractory, maintenance.</span>
+        </div>
+        <div class="mt-2 d-flex flex-wrap gap-2">
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-line-chip="frontline">frontline</button>
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-line-chip="relapsed">relapsed</button>
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-line-chip="refractory">refractory</button>
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-line-chip="maintenance">maintenance</button>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Components</label>
+        {{ form.components }}
+        {% if form.components.errors %}<div class="invalid-feedback d-block">{{ form.components.errors|striptags }}</div>{% endif %}
+        <div class="form-text">
+          <span class="t-en">Comma-separated agents (e.g., bortezomib, lenalidomide, dexamethasone).</span>
+          <span class="t-it">Farmaci separati da virgola (es. bortezomib, lenalidomide, dexamethasone).</span>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="fw-semibold mb-2">
+              <span class="t-en">Guided builder: pick drugs (no typing)</span>
+              <span class="t-it">Builder guidato: seleziona i farmaci (senza scrivere)</span>
+            </div>
+            <div class="row g-2">
+              <div class="col-md-4">
+                <div class="form-check">
+                  <input class="form-check-input regimen-agent" type="checkbox" value="daratumumab" id="agent-daratumumab">
+                  <label class="form-check-label" for="agent-daratumumab">daratumumab</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input regimen-agent" type="checkbox" value="isatuximab" id="agent-isatuximab">
+                  <label class="form-check-label" for="agent-isatuximab">isatuximab</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input regimen-agent" type="checkbox" value="elotuzumab" id="agent-elotuzumab">
+                  <label class="form-check-label" for="agent-elotuzumab">elotuzumab</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input regimen-agent" type="checkbox" value="bortezomib" id="agent-bortezomib">
+                  <label class="form-check-label" for="agent-bortezomib">bortezomib</label>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-check">
+                  <input class="form-check-input regimen-agent" type="checkbox" value="carfilzomib" id="agent-carfilzomib">
+                  <label class="form-check-label" for="agent-carfilzomib">carfilzomib</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input regimen-agent" type="checkbox" value="ixazomib" id="agent-ixazomib">
+                  <label class="form-check-label" for="agent-ixazomib">ixazomib</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input regimen-agent" type="checkbox" value="lenalidomide" id="agent-lenalidomide">
+                  <label class="form-check-label" for="agent-lenalidomide">lenalidomide</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input regimen-agent" type="checkbox" value="pomalidomide" id="agent-pomalidomide">
+                  <label class="form-check-label" for="agent-pomalidomide">pomalidomide</label>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-check">
+                  <input class="form-check-input regimen-agent" type="checkbox" value="dexamethasone" id="agent-dexamethasone">
+                  <label class="form-check-label" for="agent-dexamethasone">dexamethasone</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input regimen-agent" type="checkbox" value="cyclophosphamide" id="agent-cyclophosphamide">
+                  <label class="form-check-label" for="agent-cyclophosphamide">cyclophosphamide</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input regimen-agent" type="checkbox" value="melphalan" id="agent-melphalan">
+                  <label class="form-check-label" for="agent-melphalan">melphalan</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input regimen-agent" type="checkbox" value="selinexor" id="agent-selinexor">
+                  <label class="form-check-label" for="agent-selinexor">selinexor</label>
+                </div>
+              </div>
+            </div>
+            <div class="text-muted small mt-2">
+              <span class="t-en">Selecting drugs will automatically fill the Components field above.</span>
+              <span class="t-it">Selezionando i farmaci, il campo Componenti sopra si compila automaticamente.</span>
+            </div>
+
+            <details class="mt-3">
+              <summary class="fw-semibold" style="cursor:pointer;">
+                <span class="t-en">What do these drugs affect in the model?</span>
+                <span class="t-it">Cosa influenzano questi farmaci nel modello?</span>
+              </summary>
+              <div class="small text-muted mt-2">
+                <span class="t-en">This is <strong>platform-specific</strong>: it lists the health parameters currently used by the simulator for dose limits / safety checks (not a full clinical monograph).</span>
+                <span class="t-it">Questo è <strong>specifico della piattaforma</strong>: mostra i parametri di salute attualmente usati dal simulatore per limiti dose / controlli di sicurezza (non è una scheda tecnica completa).</span>
+              </div>
+              <div class="table-responsive mt-2">
+                <table class="table table-sm align-middle mb-0">
+                  <thead>
+                    <tr>
+                      <th style="width:22%"><span class="t-en">Drug</span><span class="t-it">Farmaco</span></th>
+                      <th style="width:38%"><span class="t-en">Health parameters used</span><span class="t-it">Parametri di salute usati</span></th>
+                      <th><span class="t-en">How it shows up</span><span class="t-it">Come si vede</span></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>lenalidomide</strong></td>
+                      <td>
+                        <span class="badge bg-secondary">creatinine clearance</span>
+                        <span class="badge bg-secondary">ANC</span>
+                        <span class="badge bg-secondary">platelets</span>
+                      </td>
+                      <td>
+                        <span class="t-en">Dose warnings/limits when renal function is low; simulation blocked if ANC/platelets too low.</span>
+                        <span class="t-it">Warning/limiti dose con funzione renale bassa; simulazione bloccata se ANC/piastrine troppo basse.</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>bortezomib</strong></td>
+                      <td>
+                        <span class="badge bg-secondary">neuropathy grade</span>
+                      </td>
+                      <td>
+                        <span class="t-en">Dose warnings/limits when neuropathy grade is high.</span>
+                        <span class="t-it">Warning/limiti dose con neuropatia elevata.</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>daratumumab</strong></td>
+                      <td>
+                        <span class="badge bg-secondary">(warnings)</span>
+                      </td>
+                      <td>
+                        <span class="t-en">High dose triggers a platform warning about immunosuppression (model simplification).</span>
+                        <span class="t-it">Dose alta genera un warning della piattaforma su immunosoppressione (semplificazione modello).</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>dexamethasone</strong></td>
+                      <td><span class="text-muted">—</span></td>
+                      <td>
+                        <span class="t-en">No dedicated health-parameter rule in the current simulator; included as regimen component.</span>
+                        <span class="t-it">Nessuna regola dedicata su parametri di salute nel simulatore attuale; incluso come componente del regimen.</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>carfilzomib / ixazomib / pomalidomide / cyclophosphamide / melphalan / selinexor</strong></td>
+                      <td><span class="text-muted">—</span></td>
+                      <td>
+                        <span class="t-en">Currently treated as components for regimen labeling; no specific safety rule is applied yet in the simulator UI.</span>
+                        <span class="t-it">Al momento usati come componenti per etichettare il regimen; non c'è ancora una regola di sicurezza specifica nella UI del simulatore.</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="alert alert-light border mt-2 mb-0 py-2">
+                <div class="small">
+                  <span class="t-en">Where to see these parameters: open <strong>Simulator → Baseline</strong> (creatinine clearance, neuropathy, ANC, platelets). The simulator will show warnings or block unsafe runs.</span>
+                  <span class="t-it">Dove vedere questi parametri: vai in <strong>Simulatore → Baseline</strong> (creatinine clearance, neuropathy, ANC, platelets). Il simulatore mostra warning o blocca run non sicure.</span>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <label class="form-label">Notes</label>
+        {{ form.notes }}
+        {% if form.notes.errors %}<div class="invalid-feedback d-block">{{ form.notes.errors|striptags }}</div>{% endif %}
+        <div class="form-text">
+          <span class="t-en">Optional free text (schedule hints, rationale). It doesn’t automatically change Twin calculations.</span>
+          <span class="t-it">Testo libero opzionale (schedula, razionale). Non modifica automaticamente i calcoli del Twin.</span>
+        </div>
+      </div>
+
+      <div class="col-12 d-flex justify-content-end">
+        <button class="btn btn-primary" type="submit">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+(() => {
+  const nameEl = document.getElementById('id_name');
+  const lineEl = document.getElementById('id_line');
+  const componentsEl = document.getElementById('id_components');
+  const notesEl = document.getElementById('id_notes');
+  const agentEls = Array.from(document.querySelectorAll('.regimen-agent'));
+  const wizardEl = document.getElementById('regimen-wizard');
+
+  const normalizeList = (text) => {
+    if (!text) return [];
+    return text
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean)
+      .map(s => s.replace(/\s+/g, ' ').toLowerCase());
+  };
+
+  const setAgentsFromComponents = () => {
+    const selected = new Set(normalizeList(componentsEl ? componentsEl.value : ''));
+    for (const el of agentEls) {
+      el.checked = selected.has((el.value || '').toLowerCase());
+    }
+  };
+
+  const rebuildComponentsFromAgents = () => {
+    if (!componentsEl) return;
+    const selected = agentEls
+      .filter(el => el.checked)
+      .map(el => (el.value || '').toLowerCase());
+    componentsEl.value = selected.join(', ');
+  };
+
+  for (const el of agentEls) {
+    el.addEventListener('change', rebuildComponentsFromAgents);
+  }
+
+  for (const btn of document.querySelectorAll('[data-regimen-template]')) {
+    btn.addEventListener('click', () => {
+      if (nameEl) nameEl.value = btn.getAttribute('data-name') || '';
+      if (lineEl) lineEl.value = btn.getAttribute('data-line') || '';
+      if (componentsEl) componentsEl.value = btn.getAttribute('data-components') || '';
+      if (notesEl && !notesEl.value) notesEl.value = '';
+      setAgentsFromComponents();
+      const form = document.getElementById('regimen-form');
+      if (form) form.scrollIntoView({behavior: 'smooth', block: 'start'});
+    });
+  }
+
+  const applyWizard = (opts) => {
+    if (!opts) return;
+    if (opts.line && lineEl) lineEl.value = opts.line;
+    if (opts.name && nameEl) nameEl.value = opts.name;
+    if (opts.components && componentsEl) componentsEl.value = opts.components;
+    setAgentsFromComponents();
+    const form = document.getElementById('regimen-form');
+    if (form) form.scrollIntoView({behavior: 'smooth', block: 'start'});
+  };
+
+  if (wizardEl) {
+    for (const btn of wizardEl.querySelectorAll('[data-wiz-line]')) {
+      btn.addEventListener('click', () => {
+        const line = btn.getAttribute('data-wiz-line') || '';
+        applyWizard({ line });
+      });
+    }
+    for (const btn of wizardEl.querySelectorAll('[data-wiz-family]')) {
+      btn.addEventListener('click', () => {
+        const name = btn.getAttribute('data-name') || '';
+        const components = btn.getAttribute('data-components') || '';
+        // keep current line selection if present
+        const line = (lineEl && lineEl.value) ? lineEl.value : '';
+        applyWizard({ name, components, line });
+      });
+    }
+  }
+
+  for (const btn of document.querySelectorAll('[data-line-chip]')) {
+    btn.addEventListener('click', () => {
+      if (lineEl) lineEl.value = btn.getAttribute('data-line-chip') || '';
+      if (lineEl) lineEl.focus();
+    });
+  }
+
+  if (componentsEl) {
+    componentsEl.addEventListener('input', setAgentsFromComponents);
+    setAgentsFromComponents();
+  }
+})();
+</script>
+{% endblock %}

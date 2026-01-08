@@ -106,6 +106,9 @@ class TwinPR1IntegrationTests(TestCase):
         response = self.client.get(url, {"id": self.assessment.pk})
         self.assertEqual(response.status_code, 200)
         data = response.json()
+        self.assertIn("assessment", data)
+        self.assertIn("inputs", data["assessment"])
+        self.assertIn("ldh_u_l", data["assessment"]["inputs"])
         self.assertIn("twin", data)
         self.assertIn("risk_score", data["twin"])
 

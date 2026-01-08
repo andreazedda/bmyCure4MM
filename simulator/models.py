@@ -360,6 +360,8 @@ class SimulationAttempt(models.Model):
                 if twin_mode == "auto":
                     resolved_params = self._merge_twin_parameters(resolved_params, twin_payload)
 
+        resolved_params = self._apply_guided_twin_choices(resolved_params)
+
         try:
             solver_inputs = self._resolve_solver_inputs(resolved_params)
         except ValueError as exc:
@@ -608,6 +610,56 @@ class SimulationAttempt(models.Model):
             current = merged.get(key)
             if key not in merged or _is_auto(current):
                 merged[key] = twin_value
+        return merged
+
+    @staticmethod
+    def _apply_guided_twin_choices(params: dict) -> dict:
+        """Apply guided (non-numeric) clinician choices as small multipliers.
+
+        This enables guided exploration without manual typing. Adjustments apply to the
+        currently resolved biology (Twin Auto values or Manual numeric values).
+        """
+
+        def _maybe_float(value):
+            if value is None or value in AUTO_SENTINELS:
+                return None
+            if isinstance(value, str) and value.strip().lower() in {"auto", "", "none", "null"}:
+                return None
+            try:
+                return float(value)
+            except (TypeError, ValueError):
+                return None
+
+        def _clamp(value: float, lo: float, hi: float) -> float:
+            return max(lo, min(hi, value))
+
+        merged = dict(params)
+        tumor_choice = (merged.get("guided_tumor_aggressiveness") or "").strip().lower()
+        immune_choice = (merged.get("guided_immune_status") or "").strip().lower()
+
+        tumor_factor_map = {
+            "lower": 0.85,
+            "typical": 1.0,
+            "higher": 1.15,
+        }
+        immune_factor_map = {
+            "better": 0.9,
+            "typical": 1.0,
+            "worse": 1.1,
+        }
+
+        tumor_factor = tumor_factor_map.get(tumor_choice)
+        if tumor_factor is not None:
+            current = _maybe_float(merged.get("tumor_growth_rate"))
+            if current is not None:
+                merged["tumor_growth_rate"] = _clamp(current * tumor_factor, 0.0, 0.1)
+
+        immune_factor = immune_factor_map.get(immune_choice)
+        if immune_factor is not None:
+            current = _maybe_float(merged.get("immune_compromise_index"))
+            if current is not None:
+                merged["immune_compromise_index"] = _clamp(current * immune_factor, 0.1, 5.0)
+
         return merged
 
     @staticmethod

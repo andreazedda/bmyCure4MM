@@ -14,9 +14,9 @@
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h1 class="h4 mb-0">{{ patient.first_name }} {{ patient.last_name }}</h1>
                 {% if user.is_staff %}
-                <a href="{% url 'clinic:patient_edit' patient.pk %}" class="btn btn-outline-primary btn-sm">
-                    <i class="bi bi-pencil"></i> Edit
-                </a>
+                    <a href="{% url 'clinic:patient_edit' patient.pk %}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-pencil"></i> Edit
+                    </a>
                 {% endif %}
             </div>
             <div class="card-body">
@@ -57,13 +57,57 @@
                 {% if patient.notes %}
                     <hr>
                     <h2 class="h5">Clinical Notes</h2>
+                    <div class="text-muted small mb-2">
+                        <span class="t-en">Notes are for humans. They don’t automatically change Twin parameters.</span>
+                        <span class="t-it">Le note sono per uso umano. Non modificano automaticamente i parametri del Twin.</span>
+                    </div>
                     <p class="mb-0">{{ patient.notes }}</p>
                 {% endif %}
+
+                <hr>
+                <div class="alert alert-info mb-0" role="alert">
+                    <div class="fw-semibold mb-1">
+                        <span class="t-en">Where do I see results?</span>
+                        <span class="t-it">Dove vedo i risultati?</span>
+                    </div>
+                    <div class="small">
+                        <ul class="mb-2">
+                            <li>
+                                <span class="t-en"><strong>Lab Trends</strong> and <strong>Twin Inputs</strong> (charts) show the patient’s recorded assessments over time.</span>
+                                <span class="t-it"><strong>Lab Trends</strong> e <strong>Twin Inputs</strong> (grafici) mostrano gli assessment del paziente nel tempo.</span>
+                            </li>
+                            <li>
+                                <span class="t-en"><strong>Therapies</strong> track what was given (regimen/dates/outcome/AEs). “Observed effect” appears when there is an assessment before and after start.</span>
+                                <span class="t-it"><strong>Therapies</strong> traccia cosa è stato dato (regimen/date/outcome/AEs). “Observed effect” appare quando c’è un assessment prima e dopo l’inizio.</span>
+                            </li>
+                            <li>
+                                <span class="t-en"><strong>Model simulation results</strong> are in <strong>Simulator</strong>: open Simulator → pick a scenario → click <strong>Run Simulation</strong> → results show on that same scenario page (right column, <strong>Simulation Results</strong>).</span>
+                                <span class="t-it"><strong>I risultati del modello</strong> sono nel <strong>Simulator</strong>: apri Simulator → scegli uno scenario → clicca <strong>Run Simulation</strong> → i risultati appaiono nella stessa pagina scenario (colonna destra, <strong>Risultati della simulazione</strong>).</span>
+                            </li>
+                        </ul>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% if can_edit_patient %}
+                                <a class="btn btn-sm btn-outline-primary" href="{% url 'clinic:assessment_new' patient.id %}">
+                                    <span class="t-en">1) Add Assessment</span><span class="t-it">1) Aggiungi Assessment</span>
+                                </a>
+                                <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#addTherapy" aria-expanded="false" aria-controls="addTherapy">
+                                    <span class="t-en">2) Add Therapy</span><span class="t-it">2) Aggiungi Terapia</span>
+                                </button>
+                            {% endif %}
+                            <a class="btn btn-sm btn-primary" href="{% url 'simulator:scenario_list' %}{% if latest_assessment_id %}?twin_assessment_id={{ latest_assessment_id }}{% endif %}">
+                                <span class="t-en">3) Open Simulator</span><span class="t-it">3) Apri Simulator</span>
+                            </a>
+                            <a class="btn btn-sm btn-outline-secondary" href="{% url 'simulator:interactive_tutorial' %}">
+                                <span class="t-en">Tutorial</span><span class="t-it">Tutorial</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     <div class="col-lg-4">
-        <div class="card shadow-sm h-100">
+        <div class="card shadow-sm mb-3">
             <div class="card-body">
                 <h2 class="h5">Lab Trends</h2>
                 <!-- constrain chart height so Chart.js doesn't grow the canvas to match an unconstrained container -->
@@ -72,13 +116,26 @@
                 </div>
             </div>
         </div>
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h2 class="h5">Twin Inputs (over time)</h2>
+                <div class="text-muted small mb-2">R-ISS (1–3), LDH, β2M</div>
+                <div class="chart-wrapper" style="height:220px;">
+                    <canvas id="twinChart"></canvas>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 <div class="card shadow-sm mb-3">
-    <div class="card-header d-flex justify-content-between align-items-center">
+    <div class="card-header d-flex justify-content-between align-items-center" id="assessments">
         <h2 class="h5 mb-0">Assessments</h2>
-        <a class="btn btn-sm btn-primary" href="{% url 'clinic:assessment_new' patient.id %}">Add Assessment</a>
+        {% if can_edit_patient %}
+            <a class="btn btn-sm btn-primary" href="{% url 'clinic:assessment_new' patient.id %}">Add Assessment</a>
+        {% else %}
+            <span class="text-muted small">No edit permissions for this patient.</span>
+        {% endif %}
     </div>
     <div class="card-body p-0">
         {% if assessments %}
@@ -107,6 +164,10 @@
                         {% endfor %}
                     </tbody>
                 </table>
+            </div>
+            <div class="p-2 small text-muted">
+                <span class="t-en">Tip: To influence the Twin, add a new Assessment after a therapy starts (updated labs). Notes alone won’t change the model.</span>
+                <span class="t-it">Suggerimento: per influenzare il Twin, aggiungi un nuovo Assessment dopo l’inizio di una terapia (lab aggiornati). Le sole note non cambiano il modello.</span>
             </div>
         {% else %}
             <p class="m-3 text-muted">No assessments recorded.</p>
@@ -150,11 +211,202 @@
     </div>
     <div class="col-lg-6">
         <div class="card shadow-sm h-100">
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between align-items-center" id="therapies">
                 <h2 class="h5 mb-0">Therapies</h2>
+                {% if can_edit_patient %}
+                    <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#addTherapy" aria-expanded="false" aria-controls="addTherapy">Add Therapy</button>
+                {% endif %}
             </div>
             <div class="card-body p-0">
+                {% if can_edit_patient %}
+                    <div id="addTherapy" class="collapse" data-latest-assessment-date="{{ latest_assessment_date_iso|default:'' }}">
+                        <form method="post" class="p-3 border-bottom">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="add_therapy">
+
+                            <div class="alert alert-info py-2 mb-3" role="alert">
+                                <div class="small">
+                                    <div class="fw-semibold mb-1">
+                                        <span class="t-en">Quick guide (4 steps)</span>
+                                        <span class="t-it">Guida rapida (4 passi)</span>
+                                    </div>
+                                    <ol class="mb-0 ps-3">
+                                        <li>
+                                            <span class="t-en">Pick the regimen</span>
+                                            <span class="t-it">Scegli il regimen</span>
+                                        </li>
+                                        <li>
+                                            <span class="t-en">Set start date (required) and end date (optional for ongoing)</span>
+                                            <span class="t-it">Imposta data inizio (obbligatoria) e data fine (opzionale se ongoing)</span>
+                                        </li>
+                                        <li>
+                                            <span class="t-en">Optionally record outcome (CR/VGPR/PR/SD/PD…)</span>
+                                            <span class="t-it">Opzionale: outcome (CR/VGPR/PR/SD/PD…)</span>
+                                        </li>
+                                        <li>
+                                            <span class="t-en">Optionally add adverse events (free text)</span>
+                                            <span class="t-it">Opzionale: adverse events (testo libero)</span>
+                                        </li>
+                                    </ol>
+                                </div>
+                            </div>
+
+                            <div class="row g-2">
+                                <div class="col-12">
+                                    <div class="mb-2">
+                                        <div class="small fw-semibold">
+                                            <span class="t-en">Presets (optional)</span>
+                                            <span class="t-it">Preset (opzionale)</span>
+                                        </div>
+                                        <div class="d-flex flex-wrap gap-1">
+                                            <button class="btn btn-sm btn-outline-primary" type="button" data-therapy-preset-regimen="Rd">Rd</button>
+                                            <button class="btn btn-sm btn-outline-primary" type="button" data-therapy-preset-regimen="VRd">VRd</button>
+                                            <button class="btn btn-sm btn-outline-primary" type="button" data-therapy-preset-regimen="Dara-Rd">Dara-Rd</button>
+                                            <button class="btn btn-sm btn-outline-primary" type="button" data-therapy-preset-regimen="KRd">KRd</button>
+                                            <button class="btn btn-sm btn-outline-primary" type="button" data-therapy-preset-regimen="Kd">Kd</button>
+                                            <button class="btn btn-sm btn-outline-primary" type="button" data-therapy-preset-regimen="VCd">VCd</button>
+
+                                            <button class="btn btn-sm btn-outline-secondary ms-2" type="button" data-therapy-preset-start="today">
+                                                <span class="t-en">Start today</span><span class="t-it">Inizio oggi</span>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-secondary" type="button" data-therapy-preset-start="latest_assessment">
+                                                <span class="t-en">Start = latest assessment</span><span class="t-it">Inizio = ultimo assessment</span>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-secondary" type="button" data-therapy-preset-end="clear">
+                                                <span class="t-en">Ongoing</span><span class="t-it">Ongoing</span>
+                                            </button>
+                                        </div>
+                                        <div id="therapyPresetMsg" class="small text-muted mt-1"></div>
+                                    </div>
+                                    <label class="form-label">Regimen</label>
+                                    {{ therapy_form.regimen }}
+                                    {% if therapy_form.regimen.errors %}<div class="invalid-feedback d-block">{{ therapy_form.regimen.errors|striptags }}</div>{% endif %}
+                                    <div class="form-text">
+                                        <span class="t-en">A regimen is a reusable template (e.g., VRd, Dara-Rd). You define regimens once, then you assign them to a patient with start/end dates.</span>
+                                        <span class="t-it">Un regimen è un “template” riutilizzabile (es. VRd, Dara-Rd). I regimens si definiscono una volta, poi li assegni al paziente con date inizio/fine.</span>
+                                    </div>
+                                    {% if regimen_count == 0 %}
+                                        <div class="alert alert-warning mt-2 mb-0" role="alert">
+                                            <span class="t-en"><strong>No regimens available.</strong> Create one in the platform, then come back here.</span>
+                                            <span class="t-it"><strong>Nessun regimen disponibile.</strong> Creane uno nella piattaforma, poi torna qui.</span>
+                                            {% if regimen_add_url %}
+                                                <div class="mt-2">
+                                                    <a class="btn btn-sm btn-outline-primary" href="{{ regimen_add_url }}" target="_blank" rel="noopener">
+                                                        <span class="t-en">Add Regimen</span><span class="t-it">Aggiungi Regimen</span>
+                                                    </a>
+                                                    <a class="btn btn-sm btn-outline-secondary" href="{{ regimen_list_url }}" target="_blank" rel="noopener">
+                                                        <span class="t-en">View Regimens</span><span class="t-it">Vedi Regimens</span>
+                                                    </a>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    {% else %}
+                                        {% if regimen_list_url %}
+                                            <div class="mt-2">
+                                                <a class="link-secondary small" href="{{ regimen_list_url }}" target="_blank" rel="noopener">
+                                                    <span class="t-en">View / add regimens</span><span class="t-it">Vedi / aggiungi regimens</span>
+                                                </a>
+                                            </div>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Start date</label>
+                                    {{ therapy_form.start_date }}
+                                    {% if therapy_form.start_date.errors %}<div class="invalid-feedback d-block">{{ therapy_form.start_date.errors|striptags }}</div>{% endif %}
+                                    <div class="form-text">
+                                        <span class="t-en">Use the date you actually started this regimen.</span>
+                                        <span class="t-it">Usa la data reale di inizio di questo regimen.</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">End date</label>
+                                    {{ therapy_form.end_date }}
+                                    {% if therapy_form.end_date.errors %}<div class="invalid-feedback d-block">{{ therapy_form.end_date.errors|striptags }}</div>{% endif %}
+                                    <div class="form-text">
+                                        <span class="t-en">Leave blank if ongoing (you can fill it later).</span>
+                                        <span class="t-it">Lascia vuoto se ongoing (puoi compilarla più avanti).</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Outcome</label>
+                                    {{ therapy_form.outcome }}
+                                    {% if therapy_form.outcome.errors %}<div class="invalid-feedback d-block">{{ therapy_form.outcome.errors|striptags }}</div>{% endif %}
+                                    <datalist id="therapy-outcome-options">
+                                        <option value="sCR"></option>
+                                        <option value="CR"></option>
+                                        <option value="VGPR"></option>
+                                        <option value="PR"></option>
+                                        <option value="MR"></option>
+                                        <option value="SD"></option>
+                                        <option value="PD"></option>
+                                        <option value="Relapse"></option>
+                                        <option value="NR"></option>
+                                        <option value="Stopped - toxicity"></option>
+                                        <option value="Stopped - progression"></option>
+                                    </datalist>
+                                    <div class="form-text">
+                                        <span class="t-en">Tip: you can fill outcome after the first response assessment.</span>
+                                        <span class="t-it">Tip: puoi compilare l’outcome dopo il primo assessment di risposta.</span>
+                                    </div>
+                                    <div class="mt-1 d-flex flex-wrap gap-1">
+                                        <button class="btn btn-sm btn-outline-secondary" type="button" data-therapy-preset-outcome="CR">CR</button>
+                                        <button class="btn btn-sm btn-outline-secondary" type="button" data-therapy-preset-outcome="VGPR">VGPR</button>
+                                        <button class="btn btn-sm btn-outline-secondary" type="button" data-therapy-preset-outcome="PR">PR</button>
+                                        <button class="btn btn-sm btn-outline-secondary" type="button" data-therapy-preset-outcome="SD">SD</button>
+                                        <button class="btn btn-sm btn-outline-secondary" type="button" data-therapy-preset-outcome="PD">PD</button>
+                                        <button class="btn btn-sm btn-outline-secondary" type="button" data-therapy-preset-outcome="Stopped - toxicity">
+                                            <span class="t-en">Stop (tox)</span><span class="t-it">Stop (tox)</span>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary" type="button" data-therapy-preset-outcome="Stopped - progression">
+                                            <span class="t-en">Stop (PD)</span><span class="t-it">Stop (PD)</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Adverse events</label>
+                                    {{ therapy_form.adverse_events }}
+                                    {% if therapy_form.adverse_events.errors %}<div class="invalid-feedback d-block">{{ therapy_form.adverse_events.errors|striptags }}</div>{% endif %}
+                                    <div class="form-text">
+                                        <span class="t-en">Examples: neuropathy (G1–G3), neutropenia, thrombocytopenia, infection, rash.</span>
+                                        <span class="t-it">Esempi: neuropatia (G1–G3), neutropenia, trombocitopenia, infezione, rash.</span>
+                                    </div>
+                                    <div class="mt-1 d-flex flex-wrap gap-1">
+                                        <button class="btn btn-sm btn-outline-secondary" type="button" data-therapy-preset-ae="neuropathy G2">
+                                            <span class="t-en">Neuropathy G2</span><span class="t-it">Neuropatia G2</span>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary" type="button" data-therapy-preset-ae="neutropenia">
+                                            <span class="t-en">Neutropenia</span><span class="t-it">Neutropenia</span>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary" type="button" data-therapy-preset-ae="thrombocytopenia">
+                                            <span class="t-en">Thrombocytopenia</span><span class="t-it">Trombocitopenia</span>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary" type="button" data-therapy-preset-ae="infection">
+                                            <span class="t-en">Infection</span><span class="t-it">Infezione</span>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary" type="button" data-therapy-preset-ae="rash">
+                                            <span class="t-en">Rash</span><span class="t-it">Rash</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <div class="text-muted small">
+                                    <span class="t-en">Therapy entries don’t directly change the Twin. The Twin changes when you add new assessments (labs) after therapy start.</span>
+                                    <span class="t-it">Le terapie non modificano direttamente il Twin. Il Twin cambia quando aggiungi nuovi assessment (lab) dopo l’inizio terapia.</span>
+                                </div>
+                                <button class="btn btn-sm btn-success" type="submit">Save</button>
+                            </div>
+                        </form>
+                    </div>
+                {% else %}
+                    <div class="p-3 text-muted small border-bottom">You don't have permission to add therapies for this patient.</div>
+                {% endif %}
                 {% if therapies %}
+                    <div class="px-3 pt-2 pb-0 text-muted small">
+                        <span class="t-en"><strong>Observed effect</strong> uses an assessment before therapy start and one after start. If missing, it shows “–”.</span>
+                        <span class="t-it"><strong>Observed effect</strong> usa un assessment prima dell’inizio terapia e uno dopo. Se mancano, mostra “–”.</span>
+                    </div>
                     <div class="table-responsive">
                         <table class="table table-sm table-striped align-middle mb-0">
                             <thead class="table-light">
@@ -162,25 +414,59 @@
                                     <th>Regimen</th>
                                     <th>Start</th>
                                     <th>End</th>
+                                    <th>Observed effect</th>
                                     <th>Outcome</th>
                                     <th>Adverse Events</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for therapy in therapies %}
+                                {% for row in therapy_rows %}
+                                    {% with therapy=row.therapy eff=row.eff %}
                                     <tr>
                                         <td>{{ therapy.regimen.name }}</td>
                                         <td>{{ therapy.start_date }}</td>
                                         <td>{{ therapy.end_date|default:"Ongoing" }}</td>
+                                        <td class="small">
+                                            {% if eff %}
+                                                {% if eff.delta_m != None %}
+                                                    <span class="text-muted">Δ M</span>: {{ eff.delta_m|floatformat:2 }}
+                                                {% else %}
+                                                    <span class="text-muted">Δ M</span>: –
+                                                {% endif %}
+                                                <span class="text-muted ms-2">Δ risk</span>:
+                                                {% if eff.delta_risk != None %}
+                                                    {{ eff.delta_risk|floatformat:2 }}
+                                                {% else %}
+                                                    –
+                                                {% endif %}
+                                                {% if eff.baseline_date and eff.follow_date %}
+                                                    <div class="text-muted">({{ eff.baseline_date }} → {{ eff.follow_date }})</div>
+                                                {% endif %}
+                                            {% else %}
+                                                –
+                                            {% endif %}
+                                        </td>
                                         <td>{{ therapy.outcome|default:"–" }}</td>
                                         <td>{{ therapy.adverse_events|default:"–" }}</td>
                                     </tr>
+                                    {% endwith %}
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
                 {% else %}
-                    <p class="m-3 text-muted">No therapies recorded.</p>
+                    <div class="m-3">
+                        <div class="text-muted">No therapies recorded.</div>
+                        <div class="text-muted small mt-1">
+                            <span class="t-en">Add a therapy to track which regimen the patient is on. Then add an assessment dated after therapy start to see Twin/lab changes.</span>
+                            <span class="t-it">Aggiungi una terapia per tracciare quale regimen sta facendo il paziente. Poi aggiungi un assessment con data dopo l’inizio terapia per vedere cambiamenti del Twin/lab.</span>
+                        </div>
+                        {% if can_edit_patient %}
+                            <div class="mt-2">
+                                <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#addTherapy" aria-expanded="false" aria-controls="addTherapy">Add Therapy</button>
+                            </div>
+                        {% endif %}
+                    </div>
                 {% endif %}
             </div>
         </div>
@@ -191,12 +477,73 @@
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-const points = {{ chart_points|safe }};
+const points = {{ chart_points_json|default:"[]"|safe }};
+const therapySpans = {{ therapy_spans_json|default:"[]"|safe }};
 if (points.length) {
+    const rootStyle = getComputedStyle(document.documentElement);
+    const cPrimary = rootStyle.getPropertyValue('--bs-primary').trim() || undefined;
+    const cInfo = rootStyle.getPropertyValue('--bs-info').trim() || undefined;
+    const cDanger = rootStyle.getPropertyValue('--bs-danger').trim() || undefined;
+    const cSuccess = rootStyle.getPropertyValue('--bs-success').trim() || undefined;
+    const cSecondary = rootStyle.getPropertyValue('--bs-secondary').trim() || undefined;
+
     const ctx = document.getElementById('trendChart').getContext('2d');
     const labels = points.map(p => p.date);
     const mProtein = points.map(p => p.m);
     const flc = points.map(p => p.flc);
+    const therapyBandPlugin = {
+        id: 'therapyBands',
+        beforeDraw(chart, args, opts) {
+            const spans = (opts && opts.spans) ? opts.spans : [];
+            if (!spans.length) return;
+            const {ctx, chartArea, scales} = chart;
+            const x = scales.x;
+
+            const toRgba = (color, alpha) => {
+                if (!color) return `rgba(108,117,125,${alpha})`;
+                const hex = color.startsWith('#') ? color.slice(1) : null;
+                if (hex && (hex.length === 6 || hex.length === 3)) {
+                    const full = hex.length === 3 ? hex.split('').map(c => c + c).join('') : hex;
+                    const r = parseInt(full.slice(0, 2), 16);
+                    const g = parseInt(full.slice(2, 4), 16);
+                    const b = parseInt(full.slice(4, 6), 16);
+                    return `rgba(${r},${g},${b},${alpha})`;
+                }
+                // fall back to neutral
+                return `rgba(108,117,125,${alpha})`;
+            };
+
+            const findStartIdx = (dateStr) => {
+                if (!dateStr) return 0;
+                const idx = labels.findIndex(l => l >= dateStr);
+                return idx === -1 ? 0 : idx;
+            };
+
+            const findEndIdx = (dateStr) => {
+                const end = dateStr || labels[labels.length - 1];
+                for (let i = labels.length - 1; i >= 0; i--) {
+                    if (labels[i] <= end) return i;
+                }
+                return labels.length - 1;
+            };
+
+            ctx.save();
+            ctx.fillStyle = toRgba(cSecondary, 0.08);
+            for (const span of spans) {
+                if (!span.start) continue;
+                const startIdx = findStartIdx(span.start);
+                const endIdx = findEndIdx(span.end);
+                if (endIdx < startIdx) continue;
+                const x1 = x.getPixelForValue(startIdx);
+                const x2 = x.getPixelForValue(endIdx);
+                const left = Math.min(x1, x2);
+                const width = Math.abs(x2 - x1);
+                ctx.fillRect(left, chartArea.top, width, chartArea.bottom - chartArea.top);
+            }
+            ctx.restore();
+        }
+    };
+
     new Chart(ctx, {
         type: 'line',
         data: {
@@ -206,7 +553,7 @@ if (points.length) {
                     label: 'M-Protein (g/dL)',
                     data: mProtein,
                     spanGaps: true,
-                    borderColor: '#0d6efd',
+                    borderColor: cPrimary,
                     tension: 0.3,
                     fill: false
                 },
@@ -214,7 +561,7 @@ if (points.length) {
                     label: 'FLC Ratio',
                     data: flc,
                     spanGaps: true,
-                    borderColor: '#fd7e14',
+                    borderColor: cInfo,
                     tension: 0.3,
                     fill: false
                 }
@@ -226,9 +573,178 @@ if (points.length) {
             scales: {
                 x: { title: { display: true, text: 'Date' } },
                 y: { title: { display: true, text: 'Value' } }
+            },
+            plugins: {
+                therapyBands: {
+                    spans: therapySpans,
+                }
             }
-        }
+        },
+        plugins: [therapyBandPlugin],
+    });
+
+    const twinCtx = document.getElementById('twinChart').getContext('2d');
+    const ldh = points.map(p => p.ldh);
+    const beta2m = points.map(p => p.beta2m);
+    const riss = points.map(p => p.riss);
+    new Chart(twinCtx, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: 'LDH (U/L)',
+                    data: ldh,
+                    spanGaps: true,
+                    borderColor: cDanger,
+                    tension: 0.3,
+                    fill: false,
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'β2M (mg/L)',
+                    data: beta2m,
+                    spanGaps: true,
+                    borderColor: cSuccess,
+                    tension: 0.3,
+                    fill: false,
+                    yAxisID: 'y1'
+                },
+                {
+                    label: 'R-ISS (1–3)',
+                    data: riss,
+                    spanGaps: true,
+                    borderColor: cSecondary,
+                    tension: 0.0,
+                    stepped: true,
+                    fill: false,
+                    yAxisID: 'y2'
+                },
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { title: { display: true, text: 'Date' } },
+                y: { position: 'left', title: { display: true, text: 'LDH' } },
+                y1: { position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'β2M' } },
+                y2: { position: 'right', grid: { drawOnChartArea: false }, min: 0, max: 3.5, ticks: { stepSize: 1 }, title: { display: true, text: 'R-ISS' } },
+            },
+            plugins: {
+                therapyBands: {
+                    spans: therapySpans,
+                }
+            }
+        },
+        plugins: [therapyBandPlugin],
     });
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('addTherapy');
+    if (!container) return;
+
+    const form = container.querySelector('form');
+    if (!form) return;
+
+    const regimenSelect = form.querySelector('select[name="regimen"]');
+    const startInput = form.querySelector('input[name="start_date"]');
+    const endInput = form.querySelector('input[name="end_date"]');
+    const outcomeInput = form.querySelector('input[name="outcome"]');
+    const adverseTextarea = form.querySelector('textarea[name="adverse_events"]');
+    const msg = document.getElementById('therapyPresetMsg');
+
+    const latestAssessmentDate = (container.dataset.latestAssessmentDate || '').trim();
+
+    const setMsg = (text) => {
+        if (!msg) return;
+        msg.textContent = text || '';
+    };
+
+    const todayIso = () => {
+        const d = new Date();
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    };
+
+    const findRegimenOption = (name) => {
+        if (!regimenSelect) return null;
+        const wanted = (name || '').toLowerCase().trim();
+        if (!wanted) return null;
+        const options = Array.from(regimenSelect.options || []);
+        const exact = options.find(o => (o.textContent || '').trim().toLowerCase() === wanted);
+        if (exact) return exact;
+        const contains = options
+            .filter(o => (o.textContent || '').trim().toLowerCase().includes(wanted))
+            .sort((a, b) => (a.textContent || '').length - (b.textContent || '').length);
+        return contains[0] || null;
+    };
+
+    const setRegimenByName = (name) => {
+        const opt = findRegimenOption(name);
+        if (!opt) {
+            setMsg(`Preset "${name}" not found in Regimens.`);
+            return;
+        }
+        regimenSelect.value = opt.value;
+        regimenSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        setMsg('');
+    };
+
+    const appendAdverseEvent = (text) => {
+        if (!adverseTextarea) return;
+        const t = (text || '').trim();
+        if (!t) return;
+        const current = (adverseTextarea.value || '').trim();
+        if (!current) {
+            adverseTextarea.value = t;
+            return;
+        }
+        if (current.toLowerCase().includes(t.toLowerCase())) return;
+        adverseTextarea.value = `${current}; ${t}`;
+    };
+
+    document.querySelectorAll('[data-therapy-preset-regimen]').forEach(btn => {
+        btn.addEventListener('click', () => setRegimenByName(btn.dataset.therapyPresetRegimen));
+    });
+
+    document.querySelectorAll('[data-therapy-preset-start]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (!startInput) return;
+            const mode = btn.dataset.therapyPresetStart;
+            if (mode === 'today') startInput.value = todayIso();
+            if (mode === 'latest_assessment') {
+                if (!latestAssessmentDate) {
+                    setMsg('No assessments found: cannot set start date from latest assessment.');
+                    return;
+                }
+                startInput.value = latestAssessmentDate;
+                setMsg('');
+            }
+        });
+    });
+
+    document.querySelectorAll('[data-therapy-preset-end]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (!endInput) return;
+            const mode = btn.dataset.therapyPresetEnd;
+            if (mode === 'clear') endInput.value = '';
+        });
+    });
+
+    document.querySelectorAll('[data-therapy-preset-outcome]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (!outcomeInput) return;
+            outcomeInput.value = btn.dataset.therapyPresetOutcome || '';
+        });
+    });
+
+    document.querySelectorAll('[data-therapy-preset-ae]').forEach(btn => {
+        btn.addEventListener('click', () => appendAdverseEvent(btn.dataset.therapyPresetAe));
+    });
+});
 </script>
 {% endblock %}

@@ -342,7 +342,7 @@
                                     data-bs-toggle="collapse"
                                     data-bs-target="#simulateScenarioPanel"
                                     aria-controls="simulateScenarioPanel"
-                                    aria-expanded="false">
+                                    aria-expanded="{% if game_mode or prefill_twin %}true{% else %}false{% endif %}">
                                 Run Simulation
                             </button>
                             {% if is_editor %}
@@ -574,13 +574,19 @@
 {% endif %}
 
 {% if request.user.is_authenticated %}
-<div class="collapse {% if game_mode %}show{% endif %}" id="simulateScenarioPanel">
+<div class="collapse {% if game_mode or prefill_twin %}show{% endif %}" id="simulateScenarioPanel">
     <div class="card shadow-sm mt-3">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h2 class="h6 mb-0">Run Mathematical Simulation</h2>
             <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#simulateScenarioPanel" aria-label="Close">&times;</button>
         </div>
         <div class="card-body">
+            <div class="alert alert-info mb-3" role="alert">
+                <div class="small">
+                    <span class="t-en"><strong>Where are results?</strong> After you click <strong>Run</strong>, results appear on this page in the right column under <strong>Simulation Results</strong>.</span>
+                    <span class="t-it"><strong>Dove sono i risultati?</strong> Dopo aver cliccato <strong>Run</strong>, i risultati appaiono in questa pagina nella colonna a destra sotto <strong>Risultati della simulazione</strong>.</span>
+                </div>
+            </div>
             {% include "simulator/_onboarding.html" %}
                         {% include "simulator/_simulation_form.html" with form=simulation_parameter_form scenario=scenario drug_profiles=drug_profiles helptext_it=sim_form_help_it helptext_en=sim_form_help_en is_editor=is_editor preset_descriptions=preset_descriptions game_mode=game_mode %}
         </div>

@@ -164,6 +164,58 @@
                             (velocità crescita tumorale, capacità portante, ecc.) che personalizzano la simulazione.
                         </p>
                     </div>
+
+                    <div class="card border-0 bg-light mt-3">
+                        <div class="card-body">
+                            <h6 class="mb-2">
+                                <span class="t-en">What influences what? (Twin mapping)</span>
+                                <span class="t-it">Cosa influenza cosa? (Mapping Twin)</span>
+                            </h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm align-middle mb-2">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:38%"><span class="t-en">Your input / choice</span><span class="t-it">Input / scelta utente</span></th>
+                                            <th style="width:22%"><span class="t-en">Used by Twin</span><span class="t-it">Usato dal Twin</span></th>
+                                            <th><span class="t-en">Impacts these model parameters</span><span class="t-it">Impatta questi parametri del modello</span></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>Assessment labs</strong>: R-ISS, LDH, β2M, FLC ratio</td>
+                                            <td><span class="text-muted">→</span> <code>risk_score</code></td>
+                                            <td>
+                                                <span class="text-muted">→</span> <code>tumor_growth_rate</code>, <code>healthy_growth_rate</code>,
+                                                <code>carrying_capacity_tumor</code>, <code>carrying_capacity_healthy</code>, <code>immune_compromise_index</code>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Toggle</strong>: “Use Patient Twin”</td>
+                                            <td><span class="text-muted">on/off</span></td>
+                                            <td>
+                                                <span class="t-en">If off, the simulator uses your manually entered biology values.</span>
+                                                <span class="t-it">Se off, il simulatore usa i valori di biologia inseriti manualmente.</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Mode</strong>: Twin biology mode = Auto vs Manual</td>
+                                            <td><span class="text-muted">resolution</span></td>
+                                            <td>
+                                                <span class="t-en"><strong>Auto</strong> overwrites biology parameters from labs; <strong>Manual</strong> keeps your typed values.</span>
+                                                <span class="t-it"><strong>Auto</strong> sovrascrive i parametri biologici dai lab; <strong>Manual</strong> mantiene i valori digitati.</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="alert alert-warning mb-0 py-2">
+                                <div class="small">
+                                    <span class="t-en"><strong>Important:</strong> Free-text notes are stored for human context, but they are <strong>not</strong> used in Twin calculations or auto-corrections. To change the Twin, you must add/update an Assessment (labs) or switch to Manual and edit biology parameters.</span>
+                                    <span class="t-it"><strong>Importante:</strong> Le note testuali sono salvate per contesto umano, ma <strong>non</strong> vengono usate nei calcoli del Twin o per auto-correzioni. Per cambiare il Twin devi aggiungere/aggiornare un Assessment (lab) oppure passare a Manual e modificare i parametri biologici.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     
                     <button class="btn btn-info" onclick="completeStep(2)">
                         <span class="t-en">✓ I understand the risk levels →</span>

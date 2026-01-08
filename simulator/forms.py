@@ -901,6 +901,31 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
         label="Twin-driven biology",
         help_text="Auto uses Patient Twin-derived biology. Manual keeps your entered values.",
     )
+
+    guided_tumor_aggressiveness = forms.ChoiceField(
+        required=False,
+        choices=[
+            ("", "— No guided adjustment —"),
+            ("lower", "Lower"),
+            ("typical", "Typical"),
+            ("higher", "Higher"),
+        ],
+        widget=forms.Select(attrs={"class": "form-select"}),
+        label="Guided choice: tumor aggressiveness",
+        help_text="Optional. Applies a small adjustment to tumor growth rate without manual typing.",
+    )
+    guided_immune_status = forms.ChoiceField(
+        required=False,
+        choices=[
+            ("", "— No guided adjustment —"),
+            ("better", "Better"),
+            ("typical", "Typical"),
+            ("worse", "Worse"),
+        ],
+        widget=forms.Select(attrs={"class": "form-select"}),
+        label="Guided choice: immune status",
+        help_text="Optional. Applies a small adjustment to immune compromise index without manual typing.",
+    )
     carrying_capacity_tumor = forms.FloatField(
         required=False,
         min_value=0.0,
@@ -1049,7 +1074,10 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
 
         choices: list[tuple[object, str]] = [("", "— Select assessment —")]
         for assessment in qs[:200]:
-            label = f"{assessment.patient.mrn} · {assessment.patient.last_name} · {assessment.date}"
+            first = (assessment.patient.first_name or "").strip()
+            last = (assessment.patient.last_name or "").strip()
+            full_name = (f"{first} {last}").strip() or last or first or "(unknown)"
+            label = f"{assessment.patient.mrn} · {full_name} · {assessment.date}"
             choices.append((assessment.pk, label))
         self.fields["twin_assessment_id"].choices = choices
 

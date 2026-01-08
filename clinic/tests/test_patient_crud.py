@@ -9,7 +9,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 from django.urls import reverse
 
-from clinic.models import Patient, Assessment
+from clinic.models import Patient, Assessment, Regimen, PatientTherapy
 from clinic.forms import PatientForm, AssessmentForm
 
 
@@ -198,6 +198,148 @@ class PatientCRUDViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Detail View")
         self.assertContains(response, "MM-DETAIL-TEST")
+
+
+class DemoEditPermissionsTests(TestCase):
+    def setUp(self) -> None:
+        self.user = get_user_model().objects.create_user(
+            "nonstaff",
+            password="testpass123",
+            is_staff=False,
+        )
+        self.client = Client()
+        self.client.force_login(self.user)
+
+        self.demo_patient = Patient.objects.create(
+            mrn="DEMO001",
+            first_name="Mario",
+            last_name="Rossi",
+            birth_date=date(1960, 1, 1),
+            sex="M",
+            diagnosis_date=date(2025, 6, 10),
+            owner=None,
+        )
+
+        self.real_patient = Patient.objects.create(
+            mrn="MM-REAL-001",
+            first_name="Real",
+            last_name="Patient",
+            birth_date=date(1960, 1, 1),
+            sex="M",
+            diagnosis_date=date(2025, 6, 10),
+            owner=None,
+        )
+
+        self.regimen = Regimen.objects.create(
+            name="VRd",
+            line="frontline",
+            components="bortezomib, lenalidomide, dexamethasone",
+        )
+
+    def test_non_staff_can_add_therapy_for_demo_patient(self) -> None:
+        url = reverse("clinic:patient_detail", args=[self.demo_patient.pk])
+        response = self.client.post(
+            url,
+            data={
+                "action": "add_therapy",
+                "regimen": self.regimen.pk,
+                "start_date": "2025-12-01",
+                "end_date": "",
+                "outcome": "PR",
+                "adverse_events": "",
+            },
+            follow=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(PatientTherapy.objects.filter(patient=self.demo_patient).exists())
+
+    def test_non_staff_cannot_add_therapy_for_non_demo_patient(self) -> None:
+        url = reverse("clinic:patient_detail", args=[self.real_patient.pk])
+        response = self.client.post(
+            url,
+            data={
+                "action": "add_therapy",
+                "regimen": self.regimen.pk,
+                "start_date": "2025-12-01",
+            },
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(PatientTherapy.objects.filter(patient=self.real_patient).exists())
+
+    def test_non_staff_can_add_assessment_for_demo_patient(self) -> None:
+        url = reverse("clinic:assessment_new", args=[self.demo_patient.pk])
+        response = self.client.post(
+            url,
+            data={
+                "date": "2026-01-01",
+                "m_protein_g_dl": 4.5,
+                "flc_ratio": 8.5,
+                "r_iss": "III",
+                "response": "PD",
+            },
+            follow=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(Assessment.objects.filter(patient=self.demo_patient).exists())
+
+    def test_non_staff_cannot_add_assessment_for_non_demo_patient(self) -> None:
+        url = reverse("clinic:assessment_new", args=[self.real_patient.pk])
+        response = self.client.post(
+            url,
+            data={
+                "date": "2026-01-01",
+                "m_protein_g_dl": 4.5,
+                "flc_ratio": 8.5,
+                "r_iss": "III",
+                "response": "PD",
+            },
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(Assessment.objects.filter(patient=self.real_patient).exists())
+
+
+class RegimenInAppCRUDTests(TestCase):
+    def setUp(self) -> None:
+        self.user = get_user_model().objects.create_user(
+            "reguser",
+            password="testpass123",
+            is_staff=False,
+        )
+        self.client = Client()
+        self.client.force_login(self.user)
+
+    def test_regimen_list_page_loads(self) -> None:
+        resp = self.client.get(reverse("clinic:regimen_list"))
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "Regimens")
+
+    def test_regimen_create_flow(self) -> None:
+        resp = self.client.post(
+            reverse("clinic:regimen_new"),
+            data={
+                "name": "VRd",
+                "line": "frontline",
+                "components": "bortezomib, lenalidomide, dexamethasone",
+                "notes": "",
+            },
+            follow=True,
+        )
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, "VRd")
+
+    def test_regimen_components_normalized(self) -> None:
+        self.client.post(
+            reverse("clinic:regimen_new"),
+            data={
+                "name": "Test",
+                "line": "",
+                "components": "  Lenalidomide ,  DEXAMETHASONE, lenalidomide  , ",
+                "notes": "",
+            },
+            follow=True,
+        )
+        regimen = Regimen.objects.get(name="Test")
+        self.assertEqual(regimen.components, "lenalidomide, dexamethasone")
 
 
 class AssessmentFormValidationTests(TestCase):

@@ -36,6 +36,50 @@
     </div>
 </div>
 
+{% if twin_assessment_id %}
+<div class="alert alert-info border-info mb-4" role="alert">
+    <div class="d-flex align-items-start gap-3">
+        <div style="font-size: 2rem;">🧬</div>
+        <div class="flex-grow-1">
+            <div class="fw-semibold mb-1">
+                <span class="t-en">Patient Twin selected from Clinic</span>
+                <span class="t-it">Gemello Paziente selezionato dalla Clinica</span>
+            </div>
+            <div class="small">
+                <span class="t-en">Now pick any scenario below → open it → run the simulation. The “Patient Twin assessment” will be preselected.</span>
+                <span class="t-it">Ora scegli uno scenario sotto → aprilo → avvia la simulazione. La “Patient Twin assessment” sarà già preselezionata.</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="alert alert-secondary border-secondary mb-4" role="alert">
+    <div class="d-flex align-items-start gap-3">
+        <div style="font-size: 2rem;">👤</div>
+        <div class="flex-grow-1">
+            <div class="fw-semibold mb-1">
+                <span class="t-en">Looking for a real patient (e.g., Mario Rossi)?</span>
+                <span class="t-it">Cerchi un paziente reale (es. Mario Rossi)?</span>
+            </div>
+            <div class="small mb-2">
+                <span class="t-en">Real patients live in <strong>Clinic</strong>. The Simulator homepage shows only <strong>virtual training scenarios</strong>. To simulate Mario Rossi, open him in Clinic and click <strong>Open Simulator</strong>, then choose a scenario.</span>
+                <span class="t-it">I pazienti reali sono nella <strong>Clinica</strong>. La home del Simulator mostra solo <strong>scenari virtuali</strong>. Per simulare Mario Rossi, aprilo in Clinica e clicca <strong>Apri Simulator</strong>, poi scegli uno scenario.</span>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-sm btn-outline-dark" href="{% url 'clinic:patient_list' %}">
+                    <span class="t-en">Go to Clinic → Patients</span>
+                    <span class="t-it">Vai a Clinica → Pazienti</span>
+                </a>
+                <a class="btn btn-sm btn-outline-primary" href="{% url 'simulator:visibility_diagnostics' %}">
+                    <span class="t-en">Why don’t I see my patient?</span>
+                    <span class="t-it">Perché non vedo il mio paziente?</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Getting Started CTA -->
 <div class="alert alert-success border-success mb-4" role="alert">
     <div class="d-flex align-items-center">
@@ -85,7 +129,7 @@
             <div class="col-md-4">
                 <div class="card h-100 border-warning">
                     <div class="card-body">
-                        <h6 class="text-warning">� Intermediate Risk</h6>
+                        <h6 class="text-warning">🟡 Intermediate Risk</h6>
                         <p class="small mb-1 t-en"><strong>Who:</strong> Patients with moderate disease or complications</p>
                         <p class="small mb-1 t-it"><strong>Chi:</strong> Pazienti con malattia moderata o complicazioni</p>
                         <p class="small mb-1 t-en"><strong>Treatment:</strong> May need dose adjustments</p>
@@ -189,16 +233,20 @@
                     <div class="card-footer bg-light border-top">
                         <div class="d-flex justify-content-between align-items-center">
                             <small class="text-muted">
-                                <span class="t-en">👆 Click to open patient details</span>
-                                <span class="t-it">👆 Clicca per aprire dettagli paziente</span>
+                                <span class="t-en">👆 Click to open scenario details</span>
+                                <span class="t-it">👆 Clicca per aprire dettagli scenario</span>
                             </small>
                             <div class="d-flex gap-2">
-                                <a class="badge bg-primary text-decoration-none" href="{% url 'simulator:scenario_detail' scenario.pk %}" onclick="event.stopPropagation();">
+                                <a class="badge bg-primary text-decoration-none" href="{% url 'simulator:scenario_detail' scenario.pk %}{% if twin_assessment_id %}?twin_assessment_id={{ twin_assessment_id|urlencode }}{% endif %}" onclick="event.stopPropagation();">
                                     <span class="t-en">View →</span>
                                     <span class="t-it">Vedi →</span>
                                 </a>
                                 {% if request.user.is_authenticated %}
-                                    <a class="badge bg-dark text-decoration-none" href="{% url 'simulator:scenario_detail' scenario.pk %}?game=1#simulateScenarioPanel" onclick="event.stopPropagation();">
+                                    {% if twin_assessment_id %}
+                                        <a class="badge bg-dark text-decoration-none" href="{% url 'simulator:scenario_detail' scenario.pk %}?twin_assessment_id={{ twin_assessment_id|urlencode }}&game=1#simulateScenarioPanel" onclick="event.stopPropagation();">
+                                    {% else %}
+                                        <a class="badge bg-dark text-decoration-none" href="{% url 'simulator:scenario_detail' scenario.pk %}?game=1#simulateScenarioPanel" onclick="event.stopPropagation();">
+                                    {% endif %}
                                         <span class="t-en">🎮 Game</span>
                                         <span class="t-it">🎮 Gioco</span>
                                     </a>

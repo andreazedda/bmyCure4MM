@@ -19,7 +19,10 @@ from .permissions import is_editor
 
 def scenario_list(request):
     scenarios = models.Scenario.objects.filter(active=True).prefetch_related("recommended_regimens")
-    context = {"scenarios": scenarios}
+    context = {
+        "scenarios": scenarios,
+        "twin_assessment_id": (request.GET.get("twin_assessment_id") or "").strip(),
+    }
     return render(request, "simulator/scenario_list.html", context)
 
 
@@ -174,6 +177,12 @@ def scenario_detail(request, pk: int):
         for article in HelpArticle.objects.order_by("slug")
     ]
 
+    twin_assessment_id = (request.GET.get("twin_assessment_id") or "").strip()
+    sim_initial = {}
+    if twin_assessment_id.isdigit():
+        sim_initial["twin_assessment_id"] = int(twin_assessment_id)
+    prefill_twin = bool(sim_initial)
+
     context = {
         "scenario": scenario,
         "attempts": attempts,
@@ -182,7 +191,8 @@ def scenario_detail(request, pk: int):
         "regimen_names": regimen_names,
         "is_editor": editor,
         "available_regimens": available_regimens,
-        "simulation_parameter_form": forms.SimulationParameterForm(user=request.user),
+        "simulation_parameter_form": forms.SimulationParameterForm(user=request.user, initial=sim_initial),
+        "prefill_twin": prefill_twin,
         "latest_simulation": latest_simulation,
         "latest_simulation_summary": latest_summary,
         "latest_simulation_results": latest_results,

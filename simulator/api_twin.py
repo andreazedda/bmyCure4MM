@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, JsonResponse
+from django.urls import reverse
 from django.views.decorators.http import require_GET
 
 from clinic.models import Assessment
@@ -33,12 +34,23 @@ def twin_preview(request: HttpRequest) -> JsonResponse:
         return JsonResponse({"error": "Assessment not found"}, status=404)
 
     payload = build_patient_twin(assessment)
+    patient = getattr(assessment, "patient", None)
+    patient_id = getattr(patient, "pk", None)
     response = {
         "assessment": {
             "id": assessment.pk,
             "date": str(getattr(assessment, "date", "")),
             "patient": {
-                "mrn": getattr(getattr(assessment, "patient", None), "mrn", None),
+                "id": patient_id,
+                "mrn": getattr(patient, "mrn", None),
+                "name": f"{getattr(patient, 'first_name', '')} {getattr(patient, 'last_name', '')}".strip() or None,
+                "detail_url": reverse("clinic:patient_detail", args=[patient_id]) if patient_id else None,
+            },
+            "inputs": {
+                "r_iss": getattr(assessment, "r_iss", None),
+                "ldh_u_l": float(assessment.ldH_u_l) if getattr(assessment, "ldH_u_l", None) is not None else None,
+                "beta2m_mg_l": float(assessment.beta2m_mg_l) if getattr(assessment, "beta2m_mg_l", None) is not None else None,
+                "flc_ratio": float(assessment.flc_ratio) if getattr(assessment, "flc_ratio", None) is not None else None,
             },
         },
         "twin": payload,

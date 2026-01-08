@@ -217,9 +217,56 @@
                             <span class="t-it"><strong>Nessun assessment accessibile.</strong> Carica i dati demo (DEMO) oppure crea un paziente + assessment di cui sei owner.</span>
                         </div>
                     {% endif %}
+                    <div id="twin-preview-panel" class="card mt-2 d-none">
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-start gap-2">
+                                <div>
+                                    <div class="fw-semibold">
+                                        <span class="t-en">Twin snapshot</span><span class="t-it">Snapshot Twin</span>
+                                    </div>
+                                    <div class="small text-muted" id="twin-preview-meta">—</div>
+                                </div>
+                                <a id="twin-preview-patient-link" class="btn btn-sm btn-outline-primary d-none" href="#" target="_blank" rel="noopener">
+                                    <span class="t-en">Patient timeline</span><span class="t-it">Timeline paziente</span>
+                                </a>
+                            </div>
+                            <hr class="my-2">
+                            <div class="row g-2 small">
+                                <div class="col-6">
+                                    <div class="text-muted">R-ISS</div>
+                                    <div id="twin-preview-riss">—</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-muted">LDH (U/L)</div>
+                                    <div id="twin-preview-ldh">—</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-muted">β2M (mg/L)</div>
+                                    <div id="twin-preview-beta2m">—</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-muted">FLC ratio</div>
+                                    <div id="twin-preview-flc">—</div>
+                                </div>
+                            </div>
+                            <div class="alert alert-secondary mt-2 mb-0 py-2 px-3 small">
+                                <div class="d-flex flex-wrap gap-3">
+                                    <div><span class="text-muted">risk_score</span>: <strong id="twin-preview-risk">—</strong></div>
+                                    <div><span class="text-muted">tumor_growth_rate</span>: <strong id="twin-preview-tgr">—</strong></div>
+                                    <div><span class="text-muted">immune_index</span>: <strong id="twin-preview-immune">—</strong></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="col-12 col-md-6">
                     {% include "simulator/_form_field.html" with field=form.twin_biology_mode help_en="Auto derives biology from the selected Assessment; Manual keeps the values you enter below." help_it="Auto deriva la biologia dall'Assessment selezionato; Manual mantiene i valori inseriti qui sotto." help_slug="twin" %}
+                </div>
+                <div class="col-12 col-md-6">
+                    {% include "simulator/_form_field.html" with field=form.guided_tumor_aggressiveness help_en="Guided choice (optional). Applies a small adjustment to tumor growth rate so you don't have to type numbers." help_it="Scelta guidata (opzionale). Applica una piccola correzione alla crescita tumorale senza dover scrivere numeri." help_slug="twin" %}
+                </div>
+                <div class="col-12 col-md-6">
+                    {% include "simulator/_form_field.html" with field=form.guided_immune_status help_en="Guided choice (optional). Applies a small adjustment to immune compromise index." help_it="Scelta guidata (opzionale). Applica una piccola correzione all'indice di compromissione immune." help_slug="twin" %}
                 </div>
                 <div class="col-12 col-md-4">
                     {% include "simulator/_form_field.html" with field=form.carrying_capacity_tumor help_en="Twin-driven unless set to Manual." help_it="Derivato dal Twin salvo modalità Manual." unit="cells" help_slug="twin" %}
@@ -627,5 +674,83 @@
             event.detail.target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     });
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Twin preview (show inputs used + derived params)
+    // ─────────────────────────────────────────────────────────────────────────
+    const twinSelect = document.getElementById('id_twin_assessment_id');
+    const twinPanel = document.getElementById('twin-preview-panel');
+    const twinMeta = document.getElementById('twin-preview-meta');
+    const twinPatientLink = document.getElementById('twin-preview-patient-link');
+    const twinRiss = document.getElementById('twin-preview-riss');
+    const twinLdh = document.getElementById('twin-preview-ldh');
+    const twinBeta2m = document.getElementById('twin-preview-beta2m');
+    const twinFlc = document.getElementById('twin-preview-flc');
+    const twinRisk = document.getElementById('twin-preview-risk');
+    const twinTgr = document.getElementById('twin-preview-tgr');
+    const twinImmune = document.getElementById('twin-preview-immune');
+
+    const fmt = (value, digits = 2) => {
+        if (value === null || value === undefined) return '—';
+        const n = Number(value);
+        if (!Number.isFinite(n)) return String(value);
+        return n.toFixed(digits);
+    };
+
+    const setTwinPanelVisible = (visible) => {
+        if (!twinPanel) return;
+        twinPanel.classList.toggle('d-none', !visible);
+    };
+
+    const loadTwinPreview = async () => {
+        if (!twinSelect || !twinPanel) return;
+        const id = twinSelect.value;
+        if (!id) {
+            setTwinPanelVisible(false);
+            return;
+        }
+        setTwinPanelVisible(true);
+        if (twinMeta) twinMeta.textContent = 'Loading…';
+        try {
+            const res = await fetch(`/sim/api/twin/preview/?id=${encodeURIComponent(id)}`, { headers: { 'Accept': 'application/json' } });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const data = await res.json();
+            const assessment = data.assessment || {};
+            const patient = assessment.patient || {};
+            const inputs = assessment.inputs || {};
+            const twin = data.twin || {};
+
+            if (twinMeta) {
+                const mrn = patient.mrn || '—';
+                const date = assessment.date || '—';
+                twinMeta.textContent = `${mrn} · ${date}`;
+            }
+            if (twinPatientLink) {
+                if (patient.detail_url) {
+                    twinPatientLink.href = patient.detail_url;
+                    twinPatientLink.classList.remove('d-none');
+                } else {
+                    twinPatientLink.classList.add('d-none');
+                }
+            }
+
+            if (twinRiss) twinRiss.textContent = inputs.r_iss || '—';
+            if (twinLdh) twinLdh.textContent = fmt(inputs.ldh_u_l, 0);
+            if (twinBeta2m) twinBeta2m.textContent = fmt(inputs.beta2m_mg_l, 2);
+            if (twinFlc) twinFlc.textContent = fmt(inputs.flc_ratio, 2);
+
+            if (twinRisk) twinRisk.textContent = fmt(twin.risk_score, 2);
+            if (twinTgr) twinTgr.textContent = fmt(twin.tumor_growth_rate, 4);
+            if (twinImmune) twinImmune.textContent = fmt(twin.immune_compromise_index, 2);
+        } catch (err) {
+            if (twinMeta) twinMeta.textContent = 'Preview unavailable.';
+        }
+    };
+
+    if (twinSelect) {
+        twinSelect.addEventListener('change', loadTwinPreview);
+        // initial state
+        loadTwinPreview();
+    }
 })();
 </script>

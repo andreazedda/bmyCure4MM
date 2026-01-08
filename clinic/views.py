@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import json
+
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Count, Prefetch, F
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
@@ -11,6 +13,20 @@ import django_filters
 from . import forms, models
 
 is_staff = user_passes_test(lambda u: u.is_staff)
+
+DEMO_MRN_PREFIX = "DEMO"
+
+
+def can_edit_patient(user, patient: models.Patient) -> bool:
+    if not getattr(user, "is_authenticated", False):
+        return False
+    if getattr(user, "is_staff", False):
+        return True
+    if patient.owner_id and patient.owner_id == user.id:
+        return True
+    if patient.owner_id is None and (patient.mrn or "").upper().startswith(DEMO_MRN_PREFIX):
+        return True
+    return False
 
 
 @login_required
@@ -145,25 +161,152 @@ def patient_detail(request: HttpRequest, pk: int) -> HttpResponse:
         pk=pk,
     )
     assessments = patient.assessments.all()
+    latest_assessment = assessments.first()
+    latest_assessment_id = latest_assessment.pk if latest_assessment else None
+    latest_assessment_date_iso = (
+        latest_assessment.date.isoformat() if latest_assessment and latest_assessment.date else ""
+    )
+
+    editable = can_edit_patient(request.user, patient)
+
+    therapy_form = forms.PatientTherapyForm()
+    if request.method == "POST":
+        action = request.POST.get("action")
+        if action == "add_therapy":
+            if not editable:
+                return HttpResponseForbidden("Not allowed")
+            therapy_form = forms.PatientTherapyForm(request.POST)
+            if therapy_form.is_valid():
+                therapy = therapy_form.save(commit=False)
+                therapy.patient = patient
+                therapy.save()
+                return redirect(reverse("clinic:patient_detail", args=[patient.id]))
     chart_points = [
         {
             "date": assessment.date.isoformat(),
             "m": float(assessment.m_protein_g_dl) if assessment.m_protein_g_dl is not None else None,
             "flc": float(assessment.flc_ratio) if assessment.flc_ratio is not None else None,
+            "ldh": float(assessment.ldH_u_l) if assessment.ldH_u_l is not None else None,
+            "beta2m": float(assessment.beta2m_mg_l) if assessment.beta2m_mg_l is not None else None,
+            "riss": (1 if assessment.r_iss == "I" else 2 if assessment.r_iss == "II" else 3 if assessment.r_iss == "III" else None),
         }
         for assessment in reversed(assessments)
     ]
 
+    # IMPORTANT: serialize as real JSON for safe embedding into JS (null instead of Python None).
+    chart_points_json = json.dumps(chart_points)
+
+    therapy_spans = [
+        {
+            "name": t.regimen.name,
+            "start": t.start_date.isoformat() if t.start_date else None,
+            "end": t.end_date.isoformat() if t.end_date else None,
+        }
+        for t in patient.therapies.all()
+    ]
+
+    therapy_spans_json = json.dumps(therapy_spans)
+
+    # Observed effects: compare last assessment before therapy start vs last assessment during/after.
+    therapy_effects: dict[int, dict[str, object]] = {}
+    try:
+        from simulator.twin import build_patient_twin  # local import to avoid hard dependency at import time
+    except Exception:  # pragma: no cover
+        build_patient_twin = None
+
+    for t in patient.therapies.all():
+        baseline = (
+            models.Assessment.objects.filter(patient=patient, date__lte=t.start_date)
+            .order_by("-date")
+            .first()
+        )
+        follow_until = t.end_date or None
+        follow_qs = models.Assessment.objects.filter(patient=patient)
+        if follow_until:
+            follow_qs = follow_qs.filter(date__lte=follow_until)
+        follow = follow_qs.order_by("-date").first()
+
+        def maybe_float(v):
+            try:
+                return float(v) if v is not None else None
+            except Exception:
+                return None
+
+        baseline_m = maybe_float(getattr(baseline, "m_protein_g_dl", None)) if baseline else None
+        follow_m = maybe_float(getattr(follow, "m_protein_g_dl", None)) if follow else None
+        delta_m = (follow_m - baseline_m) if (baseline_m is not None and follow_m is not None) else None
+
+        baseline_risk = None
+        follow_risk = None
+        if build_patient_twin and baseline:
+            baseline_risk = maybe_float(build_patient_twin(baseline).get("risk_score"))
+        if build_patient_twin and follow:
+            follow_risk = maybe_float(build_patient_twin(follow).get("risk_score"))
+        delta_risk = (
+            (follow_risk - baseline_risk)
+            if (baseline_risk is not None and follow_risk is not None)
+            else None
+        )
+
+        therapy_effects[t.pk] = {
+            "baseline_date": baseline.date.isoformat() if baseline else None,
+            "follow_date": follow.date.isoformat() if follow else None,
+            "delta_m": delta_m,
+            "baseline_risk": baseline_risk,
+            "follow_risk": follow_risk,
+            "delta_risk": delta_risk,
+        }
+
+    therapy_rows = [
+        {"therapy": t, "eff": therapy_effects.get(t.pk)}
+        for t in patient.therapies.all()
+    ]
+
+    regimen_count = models.Regimen.objects.count()
+    regimen_add_url = reverse("clinic:regimen_new")
+    regimen_list_url = reverse("clinic:regimen_list")
+
     context = {
         "patient": patient,
         "assessments": assessments,
+        "latest_assessment_id": latest_assessment_id,
+        "latest_assessment_date_iso": latest_assessment_date_iso,
         "cytogenetics": patient.cytogenetics.all(),
         "therapies": patient.therapies.all(),
         "assessment_form": forms.AssessmentForm(),
-        "therapy_form": forms.PatientTherapyForm(),
+        "therapy_form": therapy_form,
         "chart_points": chart_points,
+        "therapy_spans": therapy_spans,
+        "chart_points_json": chart_points_json,
+        "therapy_spans_json": therapy_spans_json,
+        "can_edit_patient": editable,
+        "regimen_count": regimen_count,
+        "regimen_add_url": regimen_add_url,
+        "regimen_list_url": regimen_list_url,
+        "therapy_rows": therapy_rows,
     }
     return render(request, "clinic/patient_detail.html", context)
+
+
+@login_required
+def regimen_list(request: HttpRequest) -> HttpResponse:
+    regimens = models.Regimen.objects.all().order_by("name")
+    context = {
+        "regimens": regimens,
+    }
+    return render(request, "clinic/regimen_list.html", context)
+
+
+@login_required
+def regimen_new(request: HttpRequest) -> HttpResponse:
+    if request.method == "POST":
+        form = forms.RegimenForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect(reverse("clinic:regimen_list"))
+    else:
+        form = forms.RegimenForm()
+    return render(request, "clinic/regimen_form.html", {"form": form})
 
 
 @login_required
@@ -208,9 +351,10 @@ def patient_edit(request: HttpRequest, pk: int) -> HttpResponse:
 
 
 @login_required
-@is_staff
 def assessment_new(request: HttpRequest, patient_id: int) -> HttpResponse:
     patient = get_object_or_404(models.Patient, pk=patient_id)
+    if not can_edit_patient(request.user, patient):
+        return HttpResponseForbidden("Not allowed")
     if request.method == "POST":
         form = forms.AssessmentForm(request.POST)
         if form.is_valid():
