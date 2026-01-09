@@ -242,7 +242,136 @@ Imagine filling a pool:
 
 ---
 
-## 🎓 Interactive Tutorials
+## � AI-Powered Decision Support
+
+### What is it?
+
+After each simulation, an **intelligent assistant** automatically analyzes your results and provides:
+
+- 📊 **Automatic Interpretation**: Is the result good, caution, or unfavorable?
+- 🎯 **Priority Recommendations**: What specific actions to take (e.g., "Reduce doses by 20%")
+- 🔧 **One-Click Implementation**: Direct buttons to modify scenario and re-run
+- 📈 **6 Smart Scenarios**: Automatic detection of patterns (toxicity, poor efficacy, early recurrence, etc.)
+
+### How to Use It
+
+**Step 1: Run Simulation**
+- Complete a simulation as usual (see above)
+- Return to patient page after simulation completes
+
+**Step 2: Check Quick Assessment**
+At top of results, you'll see a color-coded banner:
+- 🟢 **Green**: "Favorable overall — efficacy and toxicity look balanced"
+- 🟡 **Yellow**: "Mixed signal — review recommendations below"  
+- 🔴 **Red**: "Unfavorable signal — see action plan below"
+
+**Step 3: Review Recommendations**
+If warnings detected, an accordion automatically opens showing:
+- Priority-ranked recommendations (🚨 Critical, ⚠️ High, ⚙️ Medium, ✅ Low)
+- Specific numerical guidance (e.g., "Reduce doses by 20-30%")
+- Clear rationale (why this action is recommended)
+
+**Step 4: Implement with One Click**
+- Each recommendation has a **"🔧 Go to Scenario & Implement"** button
+- Click it to jump directly to the scenario editor
+- Adjust doses/horizon as suggested
+- Re-run simulation to see improved results
+
+### 6 Automatic Scenarios Detected
+
+#### 1. High Toxicity (≥30% healthy loss)
+```
+🚨 Priority: CRITICAL/HIGH
+Action: "Reduce drug doses by 20-30% or shorten time horizon"
+Why: Too much damage to healthy cells. Lower doses preserve immune function.
+```
+
+#### 2. Moderate Toxicity (20-30% healthy loss)
+```
+⚠️ Priority: MEDIUM
+Action: "Consider reducing doses by 10-15% if patient shows clinical signs"
+Why: Borderline toxicity. Monitor closely and reduce if side effects appear.
+```
+
+#### 3. Poor Efficacy (<30% tumor reduction)
+```
+📈 Priority: HIGH
+Action: "Increase drug doses by 15-25% or extend time horizon to 224-280 days"
+Why: More aggressive therapy may improve response if toxicity acceptable.
+```
+
+#### 4. Tumor Growth (negative reduction)
+```
+🚨 Priority: CRITICAL
+Action: "Switch to a different regimen or significantly increase doses"
+Why: Current regimen is ineffective. Consider alternative drug combinations.
+```
+
+#### 5. Early Recurrence (<90 days)
+```
+⏱️ Priority: MEDIUM
+Action: "Extend time horizon to 224-280 days to simulate longer treatment"
+Why: Longer therapy duration may delay recurrence and improve durability.
+```
+
+#### 6. Favorable Balance
+```
+✅ Priority: LOW
+Action: "Fine-tune by testing ±10% dose variations or compare alternative regimens"
+Why: Current settings look promising. Minor adjustments may further optimize.
+```
+
+### Implementation Guide
+
+The accordion includes a 4-step guide:
+
+1. **Review Recommendation**: Read the issue and suggested action carefully
+2. **Click Implementation Button**: Opens scenario directly with current parameters
+3. **Adjust Parameters**: Modify doses or time horizon as recommended
+4. **Re-Run Simulation**: Execute simulation again to verify improvement
+
+### Example Workflow
+
+**Initial Simulation Results:**
+- Tumor Reduction: 35% (moderate)
+- Healthy Loss: 28% (borderline toxicity)
+- Status: 🟡 Yellow - "Mixed signal"
+
+**AI Recommendation:**
+```
+⚠️ MEDIUM Priority
+Issue: "Moderate toxicity (healthy cell loss 20-30%)"
+Action: "Consider reducing doses by 10-15%"
+Rationale: "Borderline toxicity. Monitor closely; reduce if side effects appear."
+```
+
+**Your Action:**
+1. Click "🔧 Go to Scenario & Implement"
+2. Reduce Lenalidomide from 25mg → 22mg (-12%)
+3. Reduce Bortezomib from 1.3 → 1.15 mg/m² (-12%)
+4. Re-run simulation
+
+**Improved Results:**
+- Tumor Reduction: 32% (acceptable trade-off)
+- Healthy Loss: 18% ✅ (now acceptable!)
+- Status: 🟢 Green - "Favorable balance"
+
+### Important Notes
+
+⚠️ **Medical Disclaimer**: Recommendations are heuristic guides based on mathematical models, NOT clinical prescriptions. Always consider:
+- Real patient clinical status
+- Lab values and organ function
+- Patient preferences and quality of life
+- Current clinical guidelines
+- Consult with medical team
+
+✅ **Best For**: Scenario exploration, educational purposes, hypothesis testing, treatment planning discussions
+
+📚 **Learn More**: See [Decision Support System Guide](../features/DECISION_SUPPORT_SYSTEM.md) for technical details
+
+---
+
+## �🎓 Interactive Tutorials
 
 ### Tutorial 1: Your First Patient (Easy)
 

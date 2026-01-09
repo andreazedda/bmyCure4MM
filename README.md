@@ -39,11 +39,21 @@ Perfect for researchers, clinicians, and students working on multiple myeloma tr
 - **Mathematical Models**: Differential equation-based tumor growth and drug response models
 - **Clinical Scenarios**: Educational case studies with comprehensive validation
 - **Difficulty Scoring**: Auto-calculated complexity for training scenarios
+- **📊 NEW: Interactive Plot Embedding**: Inline Plotly visualizations with embed-safe rendering
 
 ### 👥 **Clinic - Patient Management**
-- Patient record management
-- Clinical assessments tracking
+- Patient record management with comprehensive history tracking
+- Clinical assessments tracking (lab values, biomarkers)
 - Treatment history documentation
+- **🎯 NEW: AI-Powered Decision Support System**:
+  - Automatic interpretation of simulation results
+  - Priority-ranked actionable recommendations (Critical/High/Medium/Low)
+  - Smart accordion UI that opens automatically on warnings
+  - Direct links to modify scenarios and implement suggestions
+  - Specific numerical guidance ("Reduce doses by 20-30%", "Extend horizon to 224 days")
+  - 6 intelligent scenarios: high toxicity, low efficacy, tumor growth, early recurrence, moderate toxicity, favorable balance
+  - Step-by-step implementation guides
+  - Bilingual support (English/Italian)
 - CRUD operations with role-based access
 
 ### 📚 **Docs Viewer**
@@ -168,8 +178,10 @@ Comprehensive documentation is available in the [`/docs`](docs/) directory:
 | Getting Started | [Quickstart Guide](docs/en/quickstart.md) |
 | PKPD Simulation | [Simulator Docs](docs/en/simulator.md) |
 | Patient Twins | [Digital Twin System](docs/en/patient_twin.md) |
+| **🆕 Decision Support** | **[AI Assistant Guide](docs/features/DECISION_SUPPORT_SYSTEM.md)** |
 | Drug Discovery | [ChemTools Guide](docs/features/CHEMTOOLS_TESTING_SUMMARY.md) |
 | Mathematical Models | [PKPD Models](docs/features/MATHEMATICAL_MODELS_DOCUMENTATION.md) |
+| Embed Debugging | [Iframe Troubleshooting](docs/development/EMBED_DEBUG_GUIDE.md) |
 | Troubleshooting | [Common Issues](docs/development/TROUBLESHOOTING.md) |
 
 ---

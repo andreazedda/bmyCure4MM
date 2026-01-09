@@ -210,7 +210,136 @@ Immagina di riempire una piscina:
 
 ---
 
-## 🎓 Tutorial Interattivi
+## � Assistente Decisionale AI
+
+### Cos'è?
+
+Dopo ogni simulazione, un **assistente intelligente** analizza automaticamente i risultati e fornisce:
+
+- 📊 **Interpretazione Automatica**: Il risultato è buono, da monitorare o sfavorevole?
+- 🎯 **Raccomandazioni Prioritarie**: Quali azioni specifiche intraprendere (es. "Riduci dosi del 20%")
+- 🔧 **Implementazione con Un Click**: Pulsanti diretti per modificare lo scenario e ri-eseguire
+- 📈 **6 Scenari Intelligenti**: Rilevamento automatico di pattern (tossicità, scarsa efficacia, recidiva precoce, ecc.)
+
+### Come Usarlo
+
+**Passo 1: Esegui Simulazione**
+- Completa una simulazione come al solito (vedi sopra)
+- Torna alla pagina paziente dopo il completamento
+
+**Passo 2: Controlla Valutazione Rapida**
+In cima ai risultati, vedrai un banner colorato:
+- 🟢 **Verde**: "Bilanciamento favorevole — efficacia e tossicità equilibrate"
+- 🟡 **Giallo**: "Segnale misto — rivedi raccomandazioni sotto"  
+- 🔴 **Rosso**: "Segnale sfavorevole — vedi piano d'azione sotto"
+
+**Passo 3: Rivedi Raccomandazioni**
+Se rilevati avvisi, un accordion si apre automaticamente mostrando:
+- Raccomandazioni ordinate per priorità (🚨 Critica, ⚠️ Alta, ⚙️ Media, ✅ Bassa)
+- Guida numerica specifica (es. "Riduci dosi del 20-30%")
+- Razionale chiaro (perché questa azione è raccomandata)
+
+**Passo 4: Implementa con Un Click**
+- Ogni raccomandazione ha un pulsante **"🔧 Vai allo Scenario e Implementa"**
+- Cliccalo per saltare direttamente all'editor dello scenario
+- Aggiusta dosi/orizzonte come suggerito
+- Ri-esegui la simulazione per vedere risultati migliorati
+
+### 6 Scenari Automatici Rilevati
+
+#### 1. Alta Tossicità (≥30% perdita cellule sane)
+```
+🚨 Priorità: CRITICA/ALTA
+Azione: "Riduci dosi farmaci del 20-30% o accorcia orizzonte temporale"
+Perché: Troppo danno alle cellule sane. Dosi più basse preservano funzione immunitaria.
+```
+
+#### 2. Tossicità Moderata (20-30% perdita cellule sane)
+```
+⚠️ Priorità: MEDIA
+Azione: "Considera riduzione dosi del 10-15% se paziente mostra segni clinici"
+Perché: Tossicità borderline. Monitora attentamente e riduci se compaiono effetti collaterali.
+```
+
+#### 3. Scarsa Efficacia (<30% riduzione tumore)
+```
+📈 Priorità: ALTA
+Azione: "Aumenta dosi farmaci del 15-25% o estendi orizzonte a 224-280 giorni"
+Perché: Terapia più aggressiva può migliorare risposta se tossicità accettabile.
+```
+
+#### 4. Crescita Tumore (riduzione negativa)
+```
+🚨 Priorità: CRITICA
+Azione: "Passa a un regime diverso o aumenta significativamente le dosi"
+Perché: Regime attuale inefficace. Considera combinazioni farmaci alternative.
+```
+
+#### 5. Recidiva Precoce (<90 giorni)
+```
+⏱️ Priorità: MEDIA
+Azione: "Estendi orizzonte temporale a 224-280 giorni per simulare trattamento più lungo"
+Perché: Durata terapia più lunga può ritardare recidiva e migliorare durabilità.
+```
+
+#### 6. Bilanciamento Favorevole
+```
+✅ Priorità: BASSA
+Azione: "Ottimizza testando variazioni dosi ±10% o confronta regimi alternativi"
+Perché: Impostazioni attuali promettenti. Aggiustamenti minori possono ottimizzare ulteriormente.
+```
+
+### Guida all'Implementazione
+
+L'accordion include una guida in 4 passi:
+
+1. **Rivedi Raccomandazione**: Leggi attentamente problema e azione suggerita
+2. **Clicca Pulsante Implementazione**: Apre scenario direttamente con parametri attuali
+3. **Aggiusta Parametri**: Modifica dosi o orizzonte temporale come raccomandato
+4. **Ri-Esegui Simulazione**: Esegui di nuovo simulazione per verificare miglioramento
+
+### Esempio di Workflow
+
+**Risultati Simulazione Iniziale:**
+- Riduzione Tumore: 35% (moderata)
+- Perdita Cellule Sane: 28% (tossicità borderline)
+- Stato: 🟡 Giallo - "Segnale misto"
+
+**Raccomandazione AI:**
+```
+⚠️ Priorità MEDIA
+Problema: "Tossicità moderata (perdita cellule sane 20-30%)"
+Azione: "Considera riduzione dosi del 10-15%"
+Razionale: "Tossicità borderline. Monitora attentamente; riduci se compaiono effetti collaterali."
+```
+
+**La Tua Azione:**
+1. Clicca "🔧 Vai allo Scenario e Implementa"
+2. Riduci Lenalidomide da 25mg → 22mg (-12%)
+3. Riduci Bortezomib da 1.3 → 1.15 mg/m² (-12%)
+4. Ri-esegui simulazione
+
+**Risultati Migliorati:**
+- Riduzione Tumore: 32% (compromesso accettabile)
+- Perdita Cellule Sane: 18% ✅ (ora accettabile!)
+- Stato: 🟢 Verde - "Bilanciamento favorevole"
+
+### Note Importanti
+
+⚠️ **Disclaimer Medico**: Le raccomandazioni sono guide euristiche basate su modelli matematici, NON prescrizioni cliniche. Considera sempre:
+- Stato clinico reale del paziente
+- Valori di laboratorio e funzione d'organo
+- Preferenze paziente e qualità della vita
+- Linee guida cliniche correnti
+- Consulta con team medico
+
+✅ **Migliore Per**: Esplorazione scenari, scopi educativi, test ipotesi, discussioni pianificazione terapeutica
+
+📚 **Approfondimenti**: Vedi [Guida Sistema Assistenza Decisionale](../features/DECISION_SUPPORT_SYSTEM.md) per dettagli tecnici
+
+---
+
+## �🎓 Tutorial Interattivi
 
 ### Tutorial 1: Il Tuo Primo Paziente (Facile)
 
