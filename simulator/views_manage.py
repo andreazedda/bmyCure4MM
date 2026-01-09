@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import logging
+from pathlib import Path
 from typing import Iterable, Any
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db import transaction
 from django.db.models import Count, Q
@@ -19,6 +22,7 @@ from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.generic import TemplateView
+from django.views.decorators.clickjacking import xframe_options_sameorigin
 
 from django.apps import apps
 
@@ -30,6 +34,9 @@ from . import explain, forms, models, optim
 from .pharmaco import registry as pharmaco_registry
 from .permissions import is_editor
 from .presets import PRESETS
+
+
+embed_debug_logger = logging.getLogger("embed_debug")
 
 
 class EditorRequiredMixin(UserPassesTestMixin):
@@ -407,6 +414,103 @@ def export_attempt(request: HttpRequest, pk: int) -> HttpResponse:
         "seed": attempt.seed,
     }
     return JsonResponse(payload)
+
+
+@login_required
+@xframe_options_sameorigin
+def attempt_plot_embed(request: HttpRequest, pk: int) -> HttpResponse:
+    """Serve a simulation plot as an iframe-friendly HTML document.
+
+    This endpoint wraps the saved Plotly HTML artifact and injects Plotly.js inline
+    (via the installed python package) so embedding works even when the CDN is blocked.
+    It also forces a stable height so the plot doesn't collapse to 0px in iframes.
+    """
+
+    attempt = get_object_or_404(models.SimulationAttempt, pk=pk)
+    if attempt.user_id and attempt.user_id != request.user.id and not is_editor(request.user):
+        return HttpResponseForbidden("Not allowed")
+
+    artifacts = attempt.artifacts or {}
+    if not isinstance(artifacts, dict):
+        return HttpResponseBadRequest("Invalid artifacts")
+
+    plot_url = artifacts.get("plot")
+    if not plot_url or not isinstance(plot_url, str):
+        return HttpResponseBadRequest("No plot artifact")
+
+    # Convert /media/... URLs into a safe filesystem path under MEDIA_ROOT.
+    rel_path = plot_url
+    media_url = getattr(settings, "MEDIA_URL", "/media/") or "/media/"
+    if rel_path.startswith(media_url):
+        rel_path = rel_path[len(media_url):]
+    else:
+        rel_path = rel_path.lstrip("/")
+        if rel_path.startswith("media/"):
+            rel_path = rel_path[len("media/"):]
+
+    media_root = Path(getattr(settings, "MEDIA_ROOT"))
+    abs_path = (media_root / rel_path)
+    try:
+        abs_resolved = abs_path.resolve()
+        media_resolved = media_root.resolve()
+    except Exception:
+        return HttpResponseForbidden("Invalid plot path")
+
+    if not (abs_resolved == media_resolved or media_resolved in abs_resolved.parents):
+        return HttpResponseForbidden("Invalid plot path")
+
+    if not abs_resolved.exists():
+        return HttpResponseBadRequest("Plot file not found")
+
+    plot_html = abs_resolved.read_text(encoding="utf-8", errors="replace")
+    lower = plot_html.lower()
+    body_html = plot_html
+    if "<body" in lower and "</body>" in lower:
+        start = lower.find("<body")
+        start = lower.find(">", start)
+        if start != -1:
+            start += 1
+            end = lower.rfind("</body>")
+            if end != -1 and end > start:
+                body_html = plot_html[start:end]
+
+    try:
+        import plotly.io as pio
+
+        plotly_js = pio.get_plotlyjs()
+    except Exception as exc:
+        embed_debug_logger.info(
+            "attempt_plot_embed attempt_id=%s error=%r",
+            attempt.id,
+            repr(exc),
+        )
+        plotly_js = ""
+
+    html = (
+        "<!doctype html>\n"
+        "<html><head><meta charset='utf-8'>"
+        "<meta name='viewport' content='width=device-width, initial-scale=1'>"
+        "<title>Simulation plot</title>"
+        "<style>html,body{height:100%;margin:0;}#embed-root{height:100vh;width:100%;}"
+        "#embed-root .plotly-graph-div{height:100% !important;width:100% !important;}</style>"
+        + (f"<script>{plotly_js}</script>" if plotly_js else "")
+        + "</head><body>"
+        "<div id='embed-root'>"
+        + body_html
+        + "</div>"
+        "<script>(function(){\n"
+        "  try {\n"
+        "    var els = document.getElementsByClassName('plotly-graph-div');\n"
+        "    for (var i=0;i<els.length;i++){ els[i].style.height='100%'; els[i].style.width='100%'; }\n"
+        "  } catch(e) {}\n"
+        "})();</script>"
+        "</body></html>"
+    )
+
+    resp = HttpResponse(html, content_type="text/html")
+    # Avoid 304 caches keeping an old, CDN-based plot around.
+    resp["Cache-Control"] = "no-store"
+    return resp
 
 
 # ────────────────────────────────────────────────────────────────────────────────

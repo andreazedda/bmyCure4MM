@@ -14,7 +14,7 @@
                 <p class="mb-2"><strong>What you see below:</strong> These are <strong>virtual patients</strong> (called "scenarios"). Each card represents 1 patient case with specific characteristics.</p>
                 <p class="mb-2"><strong>What to do:</strong></p>
                 <ol class="mb-2">
-                    <li><strong>Choose a patient</strong> by clicking on any card below</li>
+                    <li><strong>Choose a scenario</strong> (virtual case) by clicking any card below</li>
                     <li><strong>Read patient details</strong> (lab values, risk level)</li>
                     <li><strong>Test drug combinations</strong> on that patient</li>
                     <li><strong>See results</strong> (tumor reduction, side effects)</li>
@@ -45,10 +45,33 @@
                 <span class="t-en">Patient Twin selected from Clinic</span>
                 <span class="t-it">Gemello Paziente selezionato dalla Clinica</span>
             </div>
+            {% if twin_label %}
+                <div class="small mb-2">
+                    <span class="t-en"><strong>Selected:</strong> {{ twin_label }}</span>
+                    <span class="t-it"><strong>Selezionato:</strong> {{ twin_label }}</span>
+                </div>
+            {% elif twin_error %}
+                <div class="small text-warning mb-2">
+                    <span class="t-en">{{ twin_error }}</span>
+                    <span class="t-it">{{ twin_error }}</span>
+                </div>
+            {% endif %}
             <div class="small">
-                <span class="t-en">Now pick any scenario below → open it → run the simulation. The “Patient Twin assessment” will be preselected.</span>
-                <span class="t-it">Ora scegli uno scenario sotto → aprilo → avvia la simulazione. La “Patient Twin assessment” sarà già preselezionata.</span>
+                <span class="t-en">Next: open a scenario → open the <strong>Simulation Panel</strong> → click <strong>Run simulation</strong>. Results appear on the scenario page under <strong>Simulation Results</strong> (right column).</span>
+                <span class="t-it">Passo successivo: apri uno scenario → apri il <strong>Pannello Simulazione</strong> → clicca <strong>Esegui simulazione</strong>. I risultati appaiono nella pagina scenario sotto <strong>Risultati della simulazione</strong> (colonna destra).</span>
             </div>
+            {% if quickstart_scenario %}
+                <div class="mt-2 d-flex flex-wrap gap-2">
+                    <a class="btn btn-sm btn-primary" href="{% url 'simulator:scenario_detail' quickstart_scenario.pk %}?twin_assessment_id={{ twin_assessment_id|urlencode }}#simulateScenarioPanel">
+                        <span class="t-en">Start simulation now</span>
+                        <span class="t-it">Avvia subito la simulazione</span>
+                    </a>
+                    <a class="btn btn-sm btn-outline-primary" href="#scenarios">
+                        <span class="t-en">Or choose a scenario below</span>
+                        <span class="t-it">Oppure scegli uno scenario sotto</span>
+                    </a>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -163,7 +186,7 @@
     </div>
 </div>
 
-<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
+<div id="scenarios" class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
     <h1 class="h3 mb-0">
         <span class="t-en">👥 Available Virtual Patients</span>
         <span class="t-it">👥 Pazienti Virtuali Disponibili</span>
@@ -175,10 +198,10 @@
     <div class="d-flex align-items-center gap-2">
         <span style="font-size: 1.5rem;">👇</span>
         <div>
-            <strong class="t-en">Choose a patient below to start:</strong>
-            <strong class="t-it">Scegli un paziente sotto per iniziare:</strong>
-            <span class="t-en">Click on any card to see patient details and simulate treatments</span>
-            <span class="t-it">Clicca su qualsiasi card per vedere dettagli paziente e simulare trattamenti</span>
+            <strong class="t-en">Choose a scenario below to start:</strong>
+            <strong class="t-it">Scegli uno scenario sotto per iniziare:</strong>
+            <span class="t-en">Click on any card to open details and simulate treatments</span>
+            <span class="t-it">Clicca su qualsiasi card per aprire i dettagli e simulare trattamenti</span>
         </div>
     </div>
 </div>

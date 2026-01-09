@@ -34,6 +34,7 @@ urlpatterns = [
     path("regimens/<int:pk>/edit/", views_manage.RegimenUpdateView.as_view(), name="regimen_edit"),
     path("regimens/<int:pk>/delete/", views_manage.RegimenDeleteView.as_view(), name="regimen_delete"),
     path("attempts/<int:pk>/export/", views_manage.export_attempt, name="attempt_export"),
+    path("attempts/<int:pk>/plot/embed/", views_manage.attempt_plot_embed, name="attempt_plot_embed"),
     # Optimization experiments
     path("experiments/", views_manage.ExperimentsView.as_view(), name="experiments"),
     path("experiments/run/<int:pk>/", views_manage.run_experiment, name="run_experiment"),

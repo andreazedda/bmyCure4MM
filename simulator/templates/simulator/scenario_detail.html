@@ -8,6 +8,95 @@
     </ol>
 </nav>
 
+<div class="card shadow-sm mb-3">
+    <div class="card-body">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
+            <div>
+                <div class="fw-semibold">
+                    <span class="t-en">You are viewing</span>
+                    <span class="t-it">Stai visualizzando</span>
+                </div>
+                <div class="text-muted small">
+                    <span class="t-en">A training <strong>Scenario</strong> (virtual) plus an optional <strong>Patient Twin</strong> snapshot from Clinic.</span>
+                    <span class="t-it">Uno <strong>Scenario</strong> di training (virtuale) più un eventuale <strong>Patient Twin</strong> (snapshot) dalla Clinica.</span>
+                </div>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-sm btn-primary" href="#simulateScenarioPanel">
+                    <span class="t-en">Open Simulation Panel</span>
+                    <span class="t-it">Apri Pannello Simulazione</span>
+                </a>
+                <a class="btn btn-sm btn-outline-primary" href="#simulation-results">
+                    <span class="t-en">See Results</span>
+                    <span class="t-it">Vedi Risultati</span>
+                </a>
+                <a class="btn btn-sm btn-outline-secondary" href="{% url 'clinic:patient_list' %}">
+                    <span class="t-en">Open Clinic</span>
+                    <span class="t-it">Apri Clinica</span>
+                </a>
+            </div>
+        </div>
+
+        <hr class="my-3">
+
+        <div class="row g-2">
+            <div class="col-md-6">
+                <div class="border rounded p-2 h-100">
+                    <div class="small text-muted">
+                        <span class="t-en">Scenario (virtual patient)</span>
+                        <span class="t-it">Scenario (paziente virtuale)</span>
+                    </div>
+                    <div class="fw-semibold">{{ scenario.title }}</div>
+                    <div class="small text-muted">{{ scenario.get_clinical_stage_display }}</div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="border rounded p-2 h-100">
+                    <div class="small text-muted">
+                        <span class="t-en">Patient Twin (from Clinic)</span>
+                        <span class="t-it">Patient Twin (dalla Clinica)</span>
+                    </div>
+                    {% if twin_error %}
+                        <div class="text-danger small">{{ twin_error }}</div>
+                        <div class="small text-muted">
+                            <span class="t-en">Pick a patient in Clinic → open Simulator again.</span>
+                            <span class="t-it">Seleziona un paziente in Clinica → riapri il Simulator.</span>
+                        </div>
+                    {% elif twin_label %}
+                        <div class="fw-semibold">{{ twin_label }}</div>
+                        <div class="small">
+                            {% if twin_patient_pk %}
+                                <a href="{% url 'clinic:patient_detail' twin_patient_pk %}" class="text-decoration-none">
+                                    <span class="t-en">View patient in Clinic</span>
+                                    <span class="t-it">Vedi paziente in Clinica</span>
+                                </a>
+                            {% endif %}
+                            <span class="text-muted">·</span>
+                            <a href="{% url 'simulator:scenario_list' %}?twin_assessment_id={{ twin_assessment_id|urlencode }}" class="text-decoration-none">
+                                <span class="t-en">Change scenario</span>
+                                <span class="t-it">Cambia scenario</span>
+                            </a>
+                        </div>
+                        <div class="small text-muted">
+                            <span class="t-en">This uses the selected patient’s labs/assessment as biology inputs (the scenario is still virtual).</span>
+                            <span class="t-it">Questo usa i laboratori/assessment del paziente selezionato come input biologici (lo scenario resta virtuale).</span>
+                        </div>
+                    {% else %}
+                        <div class="fw-semibold">
+                            <span class="t-en">None selected</span>
+                            <span class="t-it">Nessuno selezionato</span>
+                        </div>
+                        <div class="small text-muted">
+                            <span class="t-en">To simulate Mario Rossi: open him in Clinic → click Open Simulator.</span>
+                            <span class="t-it">Per simulare Mario Rossi: aprilo in Clinica → clicca Apri Simulator.</span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- START: Complete Explanation Section -->
 <div class="alert alert-info mb-4">
     <div class="d-flex align-items-start gap-3">
@@ -25,9 +114,9 @@
                 <p class="mb-2 mt-3"><strong>How do I simulate a therapy? (4 Simple Steps)</strong></p>
                 <ol class="mb-0">
                     <li><strong>Check the patient's lab values</strong> below (in "Key Laboratory Snapshot") - if values are out of safe range, the system blocks the simulation for safety</li>
-                    <li><strong>Click "Run Simulation"</strong> button (blue button at top right)</li>
+                    <li><strong>Click "Open Simulation Panel"</strong> (blue button at top right)</li>
                     <li><strong>Choose your drugs and doses</strong> in the form that appears - see drug details below!</li>
-                    <li><strong>Click "Run Simulation"</strong> at the bottom of the form - results appear in 5-30 seconds</li>
+                    <li><strong>Click "Run simulation"</strong> at the bottom of the form - results appear in 5-30 seconds</li>
                 </ol>
 
                 <div class="alert alert-success mt-3 mb-0">
@@ -41,9 +130,9 @@
                 <p class="mb-2 mt-3"><strong>Come simulo una terapia? (4 Passi Semplici)</strong></p>
                 <ol class="mb-0">
                     <li><strong>Controlla i valori di laboratorio</strong> del paziente qui sotto (in "Key Laboratory Snapshot") - se i valori sono fuori dal range sicuro, il sistema blocca la simulazione per sicurezza</li>
-                    <li><strong>Clicca "Run Simulation"</strong> (bottone blu in alto a destra)</li>
+                    <li><strong>Clicca "Apri Pannello Simulazione"</strong> (bottone blu in alto a destra)</li>
                     <li><strong>Scegli farmaci e dosi</strong> nel form che appare - vedi dettagli farmaci sotto!</li>
-                    <li><strong>Clicca "Run Simulation"</strong> in fondo al form - risultati appaiono in 5-30 secondi</li>
+                    <li><strong>Clicca "Esegui simulazione"</strong> in fondo al form - risultati appaiono in 5-30 secondi</li>
                 </ol>
 
                 <div class="alert alert-success mt-3 mb-0">
@@ -227,8 +316,8 @@
                 <span class="t-en">🤝 How to Combine These Drugs (Drug Combos)</span>
                 <span class="t-it">🤝 Come Combinare Questi Farmaci (Combinazioni)</span>
             </h5>
-            <p class="t-en mb-2">When you click "Run Simulation", you'll see a form with 3 sections for the 3 drugs. You can:</p>
-            <p class="t-it mb-2">Quando clicchi "Run Simulation", vedrai un form con 3 sezioni per i 3 farmaci. Puoi:</p>
+            <p class="t-en mb-2">When you click "Open Simulation Panel", you'll see a form with 3 sections for the 3 drugs. You can:</p>
+            <p class="t-it mb-2">Quando clicchi "Apri Pannello Simulazione", vedrai un form con 3 sezioni per i 3 farmaci. Puoi:</p>
             <ul class="mb-2">
                 <li class="t-en"><strong>Use all 3 together</strong> (Triplet therapy - Len + Bort + Dara) = Most powerful!</li>
                 <li class="t-en"><strong>Use 2 drugs</strong> (Doublet therapy - Len + Dara OR Len + Bort) = Good balance</li>
@@ -329,7 +418,7 @@
 
 <div class="row g-3 mb-3">
     <div class="col-lg-8">
-        <div class="card shadow-sm h-100">
+        <div class="card shadow-sm">
             <div class="card-body">
                 <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-start gap-2">
                     <div>
@@ -343,7 +432,8 @@
                                     data-bs-target="#simulateScenarioPanel"
                                     aria-controls="simulateScenarioPanel"
                                     aria-expanded="{% if game_mode or prefill_twin %}true{% else %}false{% endif %}">
-                                Run Simulation
+                                <span class="t-en">Open Simulation Panel</span>
+                                <span class="t-it">Apri Pannello Simulazione</span>
                             </button>
                             {% if is_editor %}
                             <a href="{% url 'simulator:scenario_edit' scenario.pk %}" class="btn btn-outline-secondary btn-sm">Edit</a>
@@ -361,6 +451,56 @@
                 {% if scenario.risk_stratification %}
                     <span class="badge bg-warning text-dark mb-3">{{ scenario.risk_stratification }}</span>
                 {% endif %}
+
+                <div class="alert alert-info small">
+                    <div class="t-en">
+                        <strong>What is this section?</strong> This is the scenario overview (virtual patient). If a <strong>Patient Twin</strong> is selected, its Assessment provides lab-driven biology inputs.
+                    </div>
+                    <div class="t-it">
+                        <strong>Cos'è questa sezione?</strong> Questo è l’overview dello scenario (paziente virtuale). Se selezioni un <strong>Patient Twin</strong>, il suo Assessment fornisce input biologici guidati dai laboratori.
+                    </div>
+                    <div class="mt-2">
+                        {% if twin_label %}
+                            <div>
+                                <span class="t-en"><strong>Patient Twin selected:</strong> {{ twin_label }}</span>
+                                <span class="t-it"><strong>Patient Twin selezionato:</strong> {{ twin_label }}</span>
+                                {% if twin_patient_pk %}
+                                    <span class="text-muted">·</span>
+                                    <a href="{% url 'clinic:patient_detail' twin_patient_pk %}" class="text-decoration-none">
+                                        <span class="t-en">Open in Clinic</span>
+                                        <span class="t-it">Apri in Clinica</span>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        {% elif twin_error %}
+                            <div class="text-danger">{{ twin_error }}</div>
+                        {% else %}
+                            <div class="text-muted">
+                                <span class="t-en"><strong>No Patient Twin selected.</strong> To simulate Mario Rossi: open him in Clinic → Open Simulator.</span>
+                                <span class="t-it"><strong>Nessun Patient Twin selezionato.</strong> Per simulare Mario Rossi: aprilo in Clinica → Apri Simulator.</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <hr class="my-2">
+                    <div class="d-flex flex-wrap gap-2">
+                        <a class="btn btn-sm btn-primary" href="#simulateScenarioPanel">
+                            <span class="t-en">Open Simulation Panel</span>
+                            <span class="t-it">Apri Pannello Simulazione</span>
+                        </a>
+                        <a class="btn btn-sm btn-outline-primary" href="#simulation-results">
+                            <span class="t-en">See Results</span>
+                            <span class="t-it">Vedi Risultati</span>
+                        </a>
+                        <a class="btn btn-sm btn-outline-secondary" href="{% url 'simulator:scenario_list' %}{% if twin_assessment_id %}?twin_assessment_id={{ twin_assessment_id|urlencode }}{% endif %}">
+                            <span class="t-en">Change Scenario</span>
+                            <span class="t-it">Cambia Scenario</span>
+                        </a>
+                    </div>
+                    <div class="mt-2 text-muted">
+                        <span class="t-en">Results always appear on this page under <strong>Simulation Results</strong> (right column).</span>
+                        <span class="t-it">I risultati appaiono sempre in questa pagina sotto <strong>Simulation Results</strong> (colonna destra).</span>
+                    </div>
+                </div>
                 <p>{{ scenario.summary }}</p>
                 {% if scenario.lab_items %}
                     <hr>
@@ -390,9 +530,77 @@
         </div>
     </div>
     <div class="col-lg-4">
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <h2 class="h6 mb-2">
+                    <span class="t-en">What do I do now?</span>
+                    <span class="t-it">Cosa devo fare adesso?</span>
+                </h2>
+                <ol class="small mb-3">
+                    <li>
+                        <span class="t-en">Confirm Patient Twin (optional)</span>
+                        <span class="t-it">Conferma Patient Twin (opzionale)</span>
+                        {% if twin_label %}
+                            <div class="text-muted">{{ twin_label }}</div>
+                        {% else %}
+                            <div class="text-muted">
+                                <span class="t-en">Not selected → to use Mario Rossi, open him in Clinic → Open Simulator.</span>
+                                <span class="t-it">Non selezionato → per usare Mario Rossi, aprilo in Clinica → Apri Simulator.</span>
+                            </div>
+                        {% endif %}
+                    </li>
+                    <li>
+                        <span class="t-en">Open the Simulation Panel</span>
+                        <span class="t-it">Apri il Pannello Simulazione</span>
+                        <div class="text-muted">
+                            <span class="t-en">Use the blue button on the left.</span>
+                            <span class="t-it">Usa il bottone blu a sinistra.</span>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="t-en">Run a first safe test</span>
+                        <span class="t-it">Esegui un primo test sicuro</span>
+                        <div class="text-muted">
+                            <span class="t-en">Inside the panel, click “Beginner: run in 1 click”, or keep the preset and click “Run simulation”.</span>
+                            <span class="t-it">Nel pannello, clicca “Beginner: run in 1 click”, oppure lascia il preset e clicca “Esegui simulazione”.</span>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="t-en">Read outcomes</span>
+                        <span class="t-it">Leggi gli esiti</span>
+                        <div class="text-muted">
+                            <span class="t-en">Results appear below in “Simulation Results”. Check the badges/warnings (Good/Monitor/Toxic).</span>
+                            <span class="t-it">I risultati appaiono sotto in “Simulation Results”. Controlla badge/avvisi (Good/Monitor/Toxic).</span>
+                        </div>
+                    </li>
+                </ol>
+                <div class="d-flex flex-wrap gap-2">
+                    <a class="btn btn-sm btn-primary" href="#simulateScenarioPanel">
+                        <span class="t-en">Open Simulation Panel</span>
+                        <span class="t-it">Apri Pannello</span>
+                    </a>
+                    <a class="btn btn-sm btn-outline-primary" href="#simulation-results">
+                        <span class="t-en">Jump to Results</span>
+                        <span class="t-it">Vai ai Risultati</span>
+                    </a>
+                    <a class="btn btn-sm btn-outline-secondary" href="{% url 'clinic:patient_list' %}">
+                        <span class="t-en">Find patient in Clinic</span>
+                        <span class="t-it">Cerca paziente in Clinica</span>
+                    </a>
+                </div>
+            </div>
+        </div>
         <div class="card shadow-sm">
             <div class="card-body">
                 <h2 class="h5">Submit Your Plan</h2>
+                <div class="alert alert-secondary small" role="alert">
+                    <span class="t-en"><strong>What this does:</strong> Records your chosen regimen/notes for this scenario (training + guideline comparison). It does <strong>not</strong> run the mathematical model.</span>
+                    <span class="t-it"><strong>Cosa fa:</strong> Registra regime/note scelti per questo scenario (training + confronto con linee guida). <strong>Non</strong> esegue il modello matematico.</span>
+                    <div class="mt-1">
+                        <span class="t-en"><strong>To get model results:</strong> open the Simulation Panel (blue button on the left), then click <strong>Run simulation</strong> inside the form. Results appear in <strong>Simulation Results</strong> below.</span>
+                        <span class="t-it"><strong>Per avere risultati del modello:</strong> apri il Pannello Simulazione (bottone blu a sinistra), poi clicca <strong>Esegui simulazione</strong> nel form. I risultati appaiono in <strong>Risultati della simulazione</strong> sotto.</span>
+                    </div>
+                </div>
                 <form method="post" class="pt-2">
                     {% csrf_token %}
                     {% if form.non_field_errors %}
@@ -416,6 +624,15 @@
         </div>
         {% if request.user.is_authenticated %}
             <!-- Fix overlapping cards and ensure single simulation results container -->
+            <div id="simulation-status" class="alert alert-light small py-2 mb-2" role="status" aria-live="polite">
+                {% if latest_simulation %}
+                    <span class="t-en"><strong>Status:</strong> Showing the latest run below. You can run again anytime.</span>
+                    <span class="t-it"><strong>Stato:</strong> Qui sotto vedi l’ultima esecuzione. Puoi rieseguire in qualsiasi momento.</span>
+                {% else %}
+                    <span class="t-en"><strong>Status:</strong> No results yet. Open the Simulation Panel → click <strong>Run simulation</strong>.</span>
+                    <span class="t-it"><strong>Stato:</strong> Nessun risultato ancora. Apri il Pannello Simulazione → clicca <strong>Esegui simulazione</strong>.</span>
+                {% endif %}
+            </div>
             <div id="simulation-results" class="mt-3">
                 {% include "simulator/_simulation_results.html" with scenario=scenario attempt=latest_simulation summary=latest_simulation_summary results=latest_simulation_results kpi=kpi game_mode=game_mode game=game %}
             </div>
@@ -503,11 +720,97 @@
 
 <div class="card shadow-sm mb-3">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h2 class="h5 mb-0">Previous Attempts</h2>
-        <span class="badge bg-secondary">{{ attempts|length }}</span>
+        <h2 class="h5 mb-0">
+            <span class="t-en">Simulation Runs</span>
+            <span class="t-it">Esecuzioni Simulazione</span>
+        </h2>
+        <span class="badge bg-secondary">{{ simulation_runs_count }}</span>
     </div>
     <div class="card-body p-0">
-        {% if attempts %}
+        <div class="px-3 pt-3">
+            <div class="alert alert-info py-2 mb-0">
+                <div class="small">
+                    <span class="t-en"><strong>What happens when you click Run simulation?</strong> The mathematical model runs and the output appears on this page under <strong>Simulation Results</strong> (right column).</span>
+                    <span class="t-it"><strong>Cosa succede quando clicchi Esegui simulazione?</strong> Esegue il modello matematico e l’output appare in questa pagina sotto <strong>Risultati della simulazione</strong> (colonna destra).</span>
+                </div>
+            </div>
+        </div>
+        {% if simulation_runs %}
+            <div class="table-responsive">
+                <table class="table table-sm table-striped align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>When</th>
+                            <th>User</th>
+                            <th>Preset</th>
+                            <th>Twin</th>
+                            <th>Tumor</th>
+                            <th>Healthy</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for run in simulation_runs %}
+                            <tr>
+                                <td>{{ run.submitted|date:"Y-m-d H:i" }}</td>
+                                <td>{{ run.user.username|default:"anonymous" }}</td>
+                                <td>{{ run.parameters.preset|default:"—" }}</td>
+                                <td>
+                                    {% if run.parameters.use_twin %}
+                                        <span class="badge bg-success">On</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Off</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ run.results_summary.tumor_reduction|default_if_none:"—"|floatformat:2 }}</td>
+                                <td>{{ run.results_summary.healthy_loss|default_if_none:"—"|floatformat:2 }}</td>
+                                <td>
+                                    {% if run.results_summary.healthy_loss and run.results_summary.healthy_loss > 0.3 %}
+                                        <span class="badge bg-danger">Toxic</span>
+                                    {% elif run.results_summary.tumor_reduction and run.results_summary.tumor_reduction >= 0.9 and run.results_summary.healthy_loss and run.results_summary.healthy_loss <= 0.25 %}
+                                        <span class="badge bg-success">Good</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">Monitor</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% if simulation_runs_count > 20 %}
+                <div class="px-3 py-2 text-muted small">
+                    <span class="t-en">Showing latest 20 of {{ simulation_runs_count }}.</span>
+                    <span class="t-it">Mostro le ultime 20 di {{ simulation_runs_count }}.</span>
+                </div>
+            {% endif %}
+        {% else %}
+            <p class="m-3 text-muted">
+                <span class="t-en">No simulation runs yet. Open the <strong>Simulation Panel</strong>, then click <strong>Run simulation</strong> to generate results.</span>
+                <span class="t-it">Nessuna simulazione eseguita. Apri il <strong>Pannello Simulazione</strong>, poi clicca <strong>Esegui simulazione</strong> per generare risultati.</span>
+            </p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0">
+            <span class="t-en">Decision Log</span>
+            <span class="t-it">Registro Decisioni</span>
+        </h2>
+        <span class="badge bg-secondary">{{ decision_logs_count }}</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="px-3 pt-3">
+            <div class="alert alert-secondary py-2 mb-0">
+                <div class="small">
+                    <span class="t-en"><strong>What happens when you click Record Decision?</strong> It saves your plan (for training/guideline comparison). It does <strong>not</strong> run the model.</span>
+                    <span class="t-it"><strong>Cosa succede quando clicchi Record Decision?</strong> Salva il tuo piano (training/confronto linee guida). <strong>Non</strong> esegue il modello.</span>
+                </div>
+            </div>
+        </div>
+        {% if decision_logs %}
             <div class="table-responsive">
                 <table class="table table-sm table-striped align-middle mb-0">
                     <thead class="table-light">
@@ -522,7 +825,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for attempt in attempts %}
+                        {% for attempt in decision_logs %}
                             <tr>
                                 <td>{{ attempt.submitted|date:"Y-m-d H:i" }}</td>
                                 <td>{{ attempt.user.username|default:"anonymous" }}</td>
@@ -542,8 +845,17 @@
                     </tbody>
                 </table>
             </div>
+            {% if decision_logs_count > 20 %}
+                <div class="px-3 py-2 text-muted small">
+                    <span class="t-en">Showing latest 20 of {{ decision_logs_count }}.</span>
+                    <span class="t-it">Mostro le ultime 20 di {{ decision_logs_count }}.</span>
+                </div>
+            {% endif %}
         {% else %}
-            <p class="m-3 text-muted">No attempts recorded yet.</p>
+            <p class="m-3 text-muted">
+                <span class="t-en">No decisions recorded yet.</span>
+                <span class="t-it">Nessuna decisione registrata.</span>
+            </p>
         {% endif %}
     </div>
 </div>
@@ -577,14 +889,17 @@
 <div class="collapse {% if game_mode or prefill_twin %}show{% endif %}" id="simulateScenarioPanel">
     <div class="card shadow-sm mt-3">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h2 class="h6 mb-0">Run Mathematical Simulation</h2>
+            <h2 class="h6 mb-0">
+                <span class="t-en">Simulation Panel</span>
+                <span class="t-it">Pannello Simulazione</span>
+            </h2>
             <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#simulateScenarioPanel" aria-label="Close">&times;</button>
         </div>
         <div class="card-body">
             <div class="alert alert-info mb-3" role="alert">
                 <div class="small">
-                    <span class="t-en"><strong>Where are results?</strong> After you click <strong>Run</strong>, results appear on this page in the right column under <strong>Simulation Results</strong>.</span>
-                    <span class="t-it"><strong>Dove sono i risultati?</strong> Dopo aver cliccato <strong>Run</strong>, i risultati appaiono in questa pagina nella colonna a destra sotto <strong>Risultati della simulazione</strong>.</span>
+                    <span class="t-en"><strong>Where are results?</strong> After you click <strong>Run simulation</strong>, results appear on this page in the right column under <strong>Simulation Results</strong>.</span>
+                    <span class="t-it"><strong>Dove sono i risultati?</strong> Dopo aver cliccato <strong>Esegui simulazione</strong>, i risultati appaiono in questa pagina nella colonna a destra sotto <strong>Risultati della simulazione</strong>.</span>
                 </div>
             </div>
             {% include "simulator/_onboarding.html" %}
@@ -596,6 +911,17 @@
 
 <script>
 (() => {
+    const setStatus = (enHtml, itHtml, klass = 'alert-light') => {
+        const el = document.getElementById('simulation-status');
+        if (!el) return;
+        el.classList.remove('alert-light', 'alert-info', 'alert-warning', 'alert-danger', 'alert-success');
+        el.classList.add(klass);
+        const en = el.querySelector('.t-en');
+        const it = el.querySelector('.t-it');
+        if (en) en.innerHTML = enHtml;
+        if (it) it.innerHTML = itHtml;
+    };
+
     const updateBest = () => {
         const node = document.getElementById('game-score');
         if (!node) return;
@@ -612,9 +938,40 @@
         if (bestEl) bestEl.textContent = best;
     };
 
+    document.body.addEventListener('htmx:beforeRequest', (event) => {
+        if (event.detail && event.detail.target && event.detail.target.id === 'simulation-results') {
+            setStatus(
+                '<strong>Status:</strong> Running simulation… this will create a new row in “Simulation Runs”.',
+                '<strong>Stato:</strong> Simulazione in corso… verrà aggiunta una nuova riga in “Esecuzioni Simulazione”.',
+                'alert-info'
+            );
+        }
+    });
+
+    document.body.addEventListener('htmx:responseError', (event) => {
+        if (event.detail && event.detail.target && event.detail.target.id === 'simulation-results') {
+            setStatus(
+                '<strong>Status:</strong> Error while running. Try again or adjust inputs.',
+                '<strong>Stato:</strong> Errore durante l’esecuzione. Riprova o modifica gli input.',
+                'alert-danger'
+            );
+        }
+    });
+
     document.body.addEventListener('htmx:afterSwap', (event) => {
         if (event.detail && event.detail.target && event.detail.target.id === 'simulation-results') {
             updateBest();
+            const now = new Date();
+            setStatus(
+                `<strong>Status:</strong> Completed at ${now.toLocaleTimeString()}. Results updated below.`,
+                `<strong>Stato:</strong> Completato alle ${now.toLocaleTimeString()}. Risultati aggiornati qui sotto.`,
+                'alert-success'
+            );
+            // Make results discoverable: scroll into view after a run.
+            const resultsEl = document.getElementById('simulation-results');
+            if (resultsEl && typeof resultsEl.scrollIntoView === 'function') {
+                resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }
     });
 

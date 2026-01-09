@@ -283,6 +283,27 @@
             </div>
         </fieldset>
 
+        <div class="alert alert-success mb-3" role="alert" data-quickrun="panel">
+            <div class="fw-semibold mb-1">
+                <span class="t-en">🚀 Beginner: run in 1 click</span>
+                <span class="t-it">🚀 Principiante: esegui in 1 click</span>
+            </div>
+            <div class="small mb-2">
+                <span class="t-en">This fills a safe preset and runs immediately. Use it to experiment quickly, then tweak one field at a time.</span>
+                <span class="t-it">Compila un preset sicuro ed esegue subito. Usalo per sperimentare rapidamente, poi modifica un campo alla volta.</span>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <button type="button" class="btn btn-sm btn-primary" data-quick-preset="VRd">
+                    <span class="t-en">Quick Run: VRd</span>
+                    <span class="t-it">Run rapido: VRd</span>
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-primary" data-quick-preset="Dara-Rd">
+                    <span class="t-en">Quick Run: Dara‑Rd</span>
+                    <span class="t-it">Run rapido: Dara‑Rd</span>
+                </button>
+            </div>
+        </div>
+
         <div class="d-flex flex-wrap align-items-center gap-2">
             <button type="button" class="btn btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#simulateScenarioPanel" aria-label="Close">
                 <span class="t-en">Close</span><span class="t-it">Chiudi</span>
@@ -291,7 +312,8 @@
                 <span class="t-en">Reset to preset</span><span class="t-it">Reset al preset</span>
             </button>
             <button type="submit" class="btn btn-primary novice-submit">
-                <span class="t-en">Run simulation</span><span class="t-it">Esegui simulazione</span>
+                    <span class="t-en">Run simulation</span>
+                    <span class="t-it">Esegui simulazione</span>
             </button>
             {% if is_editor %}
                 <button type="button"
@@ -392,6 +414,56 @@
     const presetDescriptions = presetDescEl ? JSON.parse(presetDescEl.textContent) : {};
     const presetCard = document.getElementById('preset-explainer');
     const presetInput = document.getElementById('id_preset');
+
+    const setSelectValue = (selectEl, value) => {
+        if (!selectEl) return;
+        selectEl.value = value;
+        selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+        selectEl.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+
+    const setCheckbox = (checkboxEl, checked) => {
+        if (!checkboxEl) return;
+        checkboxEl.checked = !!checked;
+        checkboxEl.dispatchEvent(new Event('change', { bubbles: true }));
+    };
+
+    const requestSubmit = (formEl) => {
+        if (!formEl) return;
+        if (typeof formEl.requestSubmit === 'function') {
+            formEl.requestSubmit();
+        } else {
+            formEl.submit();
+        }
+    };
+
+    const runQuickPreset = (presetKey) => {
+        const formEl = document.getElementById('simulation-parameters-form');
+        if (!formEl) return;
+
+        const twinAssessmentEl = document.getElementById('id_twin_assessment_id');
+        const useTwinEl = document.getElementById('id_use_twin');
+        const biologyModeEl = document.getElementById('id_twin_biology_mode');
+
+        // Always start from a known preset.
+        setSelectValue(presetInput, presetKey);
+
+        // If a Twin assessment is selected, keep Twin enabled; otherwise disable Twin for frictionless runs.
+        const hasTwinAssessment = twinAssessmentEl && !!twinAssessmentEl.value;
+        setCheckbox(useTwinEl, hasTwinAssessment);
+        if (hasTwinAssessment) {
+            setSelectValue(biologyModeEl, 'auto');
+        }
+
+        requestSubmit(formEl);
+    };
+
+    document.querySelectorAll('[data-quick-preset]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const key = btn.getAttribute('data-quick-preset') || 'VRd';
+            runQuickPreset(key);
+        });
+    });
 
     const DOSE_FIELD_MAP = {
         lenalidomide_dose: 'lenalidomide',

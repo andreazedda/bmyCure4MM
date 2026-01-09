@@ -19,9 +19,34 @@ from .permissions import is_editor
 
 def scenario_list(request):
     scenarios = models.Scenario.objects.filter(active=True).prefetch_related("recommended_regimens")
+    twin_assessment_id = (request.GET.get("twin_assessment_id") or "").strip()
+    twin_label = ""
+    twin_error = ""
+    if twin_assessment_id and twin_assessment_id.isdigit() and getattr(request.user, "is_authenticated", False):
+        try:
+            from clinic.models import Assessment
+            from .access import accessible_assessments
+
+            assessment_pk = int(twin_assessment_id)
+            a = accessible_assessments(request.user, base_qs=Assessment.objects.select_related("patient")).filter(pk=assessment_pk).first()
+            if a and getattr(a, "patient", None):
+                first = (a.patient.first_name or "").strip()
+                last = (a.patient.last_name or "").strip()
+                full_name = (f"{first} {last}").strip() or last or first
+                twin_label = f"{a.patient.mrn} · {full_name} · {a.date}"
+            else:
+                twin_error = "Selected assessment is not accessible (permissions)."
+        except Exception:
+            twin_error = "Could not resolve selected assessment."
+
+    quickstart_scenario = scenarios.order_by("pk").first()
+
     context = {
         "scenarios": scenarios,
-        "twin_assessment_id": (request.GET.get("twin_assessment_id") or "").strip(),
+        "twin_assessment_id": twin_assessment_id,
+        "twin_label": twin_label,
+        "twin_error": twin_error,
+        "quickstart_scenario": quickstart_scenario,
     }
     return render(request, "simulator/scenario_list.html", context)
 
@@ -87,7 +112,18 @@ def scenario_detail(request, pk: int):
         pk=pk,
         active=True,
     )
-    attempts = scenario.attempts.all()
+    # Hide legacy/empty entries (e.g. saved without regimen/response/notes and without simulation outputs)
+    # to reduce beginner confusion.
+    attempts_all = list(scenario.attempts.all())
+    attempts = [
+        a
+        for a in attempts_all
+        if a.selected_regimen_id
+        or (a.predicted_response or "").strip()
+        or (a.notes or "").strip()
+        or bool(a.results_summary)
+    ]
+    hidden_attempts_count = max(0, len(attempts_all) - len(attempts))
     form = forms.SimulationAttemptForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         attempt = form.save(commit=False)
@@ -100,12 +136,12 @@ def scenario_detail(request, pk: int):
         if attempt.is_guideline_aligned:
             messages.success(
                 request,
-                "Simulation submitted. Great choice—aligned with the guideline set for this scenario.",
+                "Plan recorded. Great choice—aligned with the guideline set for this scenario.",
             )
         else:
             messages.warning(
                 request,
-                "Simulation submitted. Review the guideline notes below to compare approaches.",
+                "Plan recorded. Review the guideline notes below to compare approaches.",
             )
         return redirect(reverse("simulator:scenario_detail", args=[scenario.pk]))
 
@@ -178,14 +214,55 @@ def scenario_detail(request, pk: int):
     ]
 
     twin_assessment_id = (request.GET.get("twin_assessment_id") or "").strip()
+    twin_label = ""
+    twin_patient_pk = None
+    twin_error = ""
     sim_initial = {}
     if twin_assessment_id.isdigit():
         sim_initial["twin_assessment_id"] = int(twin_assessment_id)
     prefill_twin = bool(sim_initial)
 
+    if prefill_twin:
+        try:
+            from clinic.models import Assessment
+            from .access import accessible_assessments
+
+            assessment_pk = int(twin_assessment_id)
+            a = (
+                accessible_assessments(request.user, base_qs=Assessment.objects.select_related("patient"))
+                .filter(pk=assessment_pk)
+                .first()
+            )
+            if a and getattr(a, "patient", None):
+                first = (a.patient.first_name or "").strip()
+                last = (a.patient.last_name or "").strip()
+                full_name = (f"{first} {last}").strip() or last or first
+                twin_label = f"{a.patient.mrn} · {full_name} · {a.date}"
+                twin_patient_pk = a.patient.pk
+            else:
+                twin_error = "Selected assessment is not accessible (permissions)."
+        except Exception:
+            twin_error = "Could not resolve selected assessment."
+
+    simulation_runs_qs = scenario.attempts.exclude(results_summary={}).select_related("user").order_by("-submitted")
+    decision_logs_qs = (
+        scenario.attempts.filter(
+            Q(selected_regimen__isnull=False)
+            | ~Q(predicted_response="")
+            | ~Q(notes="")
+        )
+        .select_related("user", "selected_regimen")
+        .order_by("-submitted")
+    )
+    simulation_runs_count = simulation_runs_qs.count()
+    decision_logs_count = decision_logs_qs.count()
+    simulation_runs = list(simulation_runs_qs[:20])
+    decision_logs = list(decision_logs_qs[:20])
+
     context = {
         "scenario": scenario,
         "attempts": attempts,
+        "hidden_attempts_count": hidden_attempts_count,
         "form": form,
         "recommended_regimens": recommended_regimens,
         "regimen_names": regimen_names,
@@ -206,5 +283,13 @@ def scenario_detail(request, pk: int):
         "guide_articles": guides,
         "help_index": help_index,
         "preset_descriptions": preset_descriptions,
+        "twin_assessment_id": twin_assessment_id,
+        "twin_label": twin_label,
+        "twin_patient_pk": twin_patient_pk,
+        "twin_error": twin_error,
+        "simulation_runs": simulation_runs,
+        "simulation_runs_count": simulation_runs_count,
+        "decision_logs": decision_logs,
+        "decision_logs_count": decision_logs_count,
     }
     return render(request, "simulator/scenario_detail.html", context)

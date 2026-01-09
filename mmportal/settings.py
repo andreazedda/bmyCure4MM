@@ -84,10 +84,15 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "mmportal.middleware.EmbedDebugMiddleware",
     "mmportal.middleware.ActivityLoggingMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+# The Clinic embeds locally-generated Plotly HTML reports (e.g., /media/sim_plots/*.html)
+# inside iframes on same-origin pages.
+X_FRAME_OPTIONS = "SAMEORIGIN"
 
 ROOT_URLCONF = "mmportal.urls"
 
@@ -191,6 +196,12 @@ LOGGING = {
             "filename": str(LOGS_DIR / "activity.log"),
             "formatter": "activity",
         },
+        "embed_debug_file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": str(LOGS_DIR / "embed_debug.log"),
+            "formatter": "activity",
+        },
         "console": {
             "class": "logging.StreamHandler",
             "formatter": "verbose",
@@ -209,6 +220,11 @@ LOGGING = {
     "loggers": {
         "activity": {
             "handlers": ["activity_file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "embed_debug": {
+            "handlers": ["embed_debug_file"],
             "level": "INFO",
             "propagate": False,
         },

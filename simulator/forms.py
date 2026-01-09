@@ -1088,7 +1088,13 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
         biology_mode = (cleaned.get("twin_biology_mode") or "auto").lower()
 
         if use_twin and not assessment_id:
-            self.add_error("twin_assessment_id", "Select an Assessment to enable Patient Twin.")
+            # Beginner-friendly behavior: don't hard-block runs when Twin is unavailable.
+            # Twin can only work with a selected Assessment snapshot.
+            cleaned["use_twin"] = False
+            use_twin = False
+            self.warnings.append(
+                "Patient Twin disabled: select an Assessment snapshot to enable Twin-driven biology."
+            )
 
         twin_keys = (
             "tumor_growth_rate",
@@ -1310,3 +1316,16 @@ class SimulationAttemptForm(BootstrapValidationMixin, forms.ModelForm):
     class Meta:
         model = models.SimulationAttempt
         fields = ["selected_regimen", "predicted_response", "confidence", "notes"]
+
+    def clean(self):
+        cleaned = super().clean()
+        selected_regimen = cleaned.get("selected_regimen")
+        predicted_response = (cleaned.get("predicted_response") or "").strip()
+        notes = (cleaned.get("notes") or "").strip()
+
+        if not selected_regimen and not predicted_response and not notes:
+            raise ValidationError(
+                "Please select a regimen or expected response, or add a short note."
+            )
+
+        return cleaned

@@ -55,6 +55,10 @@ class SimulationModelTests(TestCase):
         attempt.run_model()
         attempt.refresh_from_db()
         self.assertIn("tumor_reduction", attempt.results_summary)
+        self.assertIn("durability_index", attempt.results_summary)
+        self.assertIn("nadir", attempt.results_summary)
+        self.assertIn("milestones", attempt.results_summary)
+        self.assertIn("day_30", attempt.results_summary.get("milestones", {}))
         self.assertIn("csv", attempt.results)
 
     def test_simulation_view_returns_partial(self) -> None:
@@ -64,3 +68,18 @@ class SimulationModelTests(TestCase):
         response = self.client.post(url, payload, HTTP_HX_REQUEST="true")
         self.assertEqual(response.status_code, 200)
         self.assertIn("Simulation Results", response.content.decode())
+
+    def test_cohort_size_adds_uncertainty_summary(self) -> None:
+        attempt = models.SimulationAttempt.objects.create(
+            scenario=self.scenario,
+            user=self.user,
+            parameters=self._parameters(lenalidomide=25.0),
+            cohort_size=10,
+            seed=123,
+        )
+        summary = attempt.run_model()
+        self.assertIn("cohort", summary)
+        cohort = summary["cohort"]
+        self.assertEqual(cohort.get("n"), 10)
+        self.assertIn("metrics", cohort)
+        self.assertIn("tumor_reduction", cohort["metrics"])

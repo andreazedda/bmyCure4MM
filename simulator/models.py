@@ -397,6 +397,93 @@ class SimulationAttempt(models.Model):
         carrying_t_override = solver_inputs["carrying_capacity_tumor"]
         carrying_h_override = solver_inputs["carrying_capacity_healthy"]
 
+        def _summarize_trajectory(
+            *,
+            df: pd.DataFrame,
+            time_horizon_days: float,
+            tumor_baseline: float,
+            healthy_baseline: float,
+        ) -> dict:
+            tumor_series_local = df["tumor_cells"]
+            healthy_series_local = df["healthy_cells"]
+            time_series_local = df["time"]
+
+            tumor_start_local = float(tumor_series_local.iloc[0])
+            tumor_end_local = float(tumor_series_local.iloc[-1])
+            healthy_start_local = float(healthy_series_local.iloc[0])
+            healthy_end_local = float(healthy_series_local.iloc[-1])
+
+            tumor_reduction_local = float(1.0 - tumor_end_local / max(tumor_start_local, 1e-9))
+            healthy_loss_local = float(1.0 - healthy_end_local / max(healthy_start_local, 1e-9))
+
+            time_arr_local = np.asarray(time_series_local, dtype=float)
+            tumor_arr_local = np.asarray(tumor_series_local, dtype=float)
+            healthy_arr_local = np.asarray(healthy_series_local, dtype=float)
+
+            nadir_pos_local = int(np.argmin(tumor_arr_local)) if len(tumor_arr_local) else 0
+            nadir_time_local = float(time_arr_local[nadir_pos_local]) if len(time_arr_local) else 0.0
+            nadir_tumor_local = float(tumor_arr_local[nadir_pos_local]) if len(tumor_arr_local) else float(tumor_start_local)
+            nadir_reduction_local = float(1.0 - nadir_tumor_local / max(float(tumor_start_local), 1e-9))
+
+            def _snapshot_at(day: float) -> dict[str, float] | None:
+                if day <= 0 or len(time_arr_local) == 0:
+                    return None
+                if day > float(time_horizon_days):
+                    return None
+                pos = int(np.argmin(np.abs(time_arr_local - float(day))))
+                tumor_val = float(tumor_arr_local[pos])
+                healthy_val = float(healthy_arr_local[pos])
+                return {
+                    "day": float(time_arr_local[pos]),
+                    "tumor_cells": tumor_val,
+                    "healthy_cells": healthy_val,
+                    "tumor_reduction": float(1.0 - tumor_val / max(float(tumor_start_local), 1e-9)),
+                    "healthy_loss": float(1.0 - healthy_val / max(float(healthy_start_local), 1e-9)),
+                }
+
+            milestones_local: dict[str, dict[str, float]] = {}
+            for day in (30.0, 60.0, 90.0):
+                snap = _snapshot_at(day)
+                if snap:
+                    milestones_local[f"day_{int(day)}"] = snap
+            end_snap = _snapshot_at(float(time_horizon_days))
+            if end_snap:
+                milestones_local["end"] = end_snap
+
+            # Durability: fraction of time tumor stays below baseline.
+            durability_index_local = float(
+                np.trapz((tumor_arr_local < float(tumor_start_local)).astype(float), time_arr_local)
+                / max(float(time_horizon_days), 1e-9)
+            )
+
+            # Recurrence after nadir: first time tumor rises above 50% of baseline.
+            recurrence_threshold_local = 0.5 * float(tumor_start_local)
+            time_to_recurrence_local = None
+            if len(time_arr_local) and nadir_pos_local + 1 < len(time_arr_local):
+                post_mask = np.arange(len(time_arr_local)) > nadir_pos_local
+                idxs = np.where(post_mask & (tumor_arr_local > recurrence_threshold_local))[0]
+                if len(idxs):
+                    time_to_recurrence_local = float(time_arr_local[int(idxs[0])])
+
+            auc_local: dict[str, float] = {}
+            for drug in drug_doses.keys():
+                series = df[f"{drug}_concentration"]
+                auc_local[drug] = float(np.trapz(np.asarray(series, dtype=float), time_arr_local))
+
+            return {
+                "tumor_reduction": tumor_reduction_local,
+                "healthy_loss": healthy_loss_local,
+                "time_to_recurrence": time_to_recurrence_local,
+                "durability_index": durability_index_local,
+                "nadir": {
+                    "day": nadir_time_local,
+                    "tumor_cells": nadir_tumor_local,
+                    "tumor_reduction": nadir_reduction_local,
+                },
+                "milestones": milestones_local,
+                "auc": auc_local,
+            }
+
         model = MathematicalModel(
             baseline_tumor_cells=baseline_tumor,
             baseline_healthy_cells=baseline_healthy,
@@ -413,35 +500,120 @@ class SimulationAttempt(models.Model):
         )
         trajectory = model.simulate()
 
-        tumor_series = trajectory["tumor_cells"]
-        healthy_series = trajectory["healthy_cells"]
-        time_series = trajectory["time"]
-        tumor_start = tumor_series.iloc[0]
-        tumor_end = tumor_series.iloc[-1]
-        healthy_start = healthy_series.iloc[0]
-        healthy_end = healthy_series.iloc[-1]
-        tumor_reduction = float(1.0 - tumor_end / max(tumor_start, 1e-9))
-        healthy_loss = float(1.0 - healthy_end / max(healthy_start, 1e-9))
-        nadir_idx = tumor_series.idxmin()
-        post_nadir = trajectory.loc[nadir_idx + 1 :] if nadir_idx + 1 < len(trajectory) else pd.DataFrame()
-        recurrence_threshold = 0.5 * tumor_start
-        time_to_recurrence = None
-        if not post_nadir.empty:
-            recurrence = post_nadir[post_nadir["tumor_cells"] > recurrence_threshold]
-            if not recurrence.empty:
-                time_to_recurrence = float(recurrence["time"].iloc[0])
-        auc_drug = {}
-        for drug in drug_doses.keys():
-            series = trajectory[f"{drug}_concentration"]
-            auc_drug[drug] = float(np.trapz(series, time_series))
-        effective = bool(tumor_reduction > 0.9 and healthy_loss < 0.2)
+        baseline_summary = _summarize_trajectory(
+            df=trajectory,
+            time_horizon_days=float(time_horizon),
+            tumor_baseline=float(baseline_tumor),
+            healthy_baseline=float(baseline_healthy),
+        )
+        effective = bool(
+            baseline_summary["tumor_reduction"] > 0.9 and baseline_summary["healthy_loss"] < 0.2
+        )
         summary = {
-            "tumor_reduction": tumor_reduction,
-            "healthy_loss": healthy_loss,
-            "time_to_recurrence": time_to_recurrence,
-            "auc": auc_drug,
+            **baseline_summary,
             "effective": effective,
         }
+
+        # Optional uncertainty: run an internal cohort without writing extra rows.
+        cohort_n = int(self.cohort_size or resolved_params.get("cohort_size") or 1)
+        if cohort_n > 1:
+            seed = self.seed
+            if seed is None:
+                seed = int(resolved_params.get("seed") or 42)
+            rng = np.random.default_rng(int(seed))
+
+            # Include the baseline patient as the first sample.
+            sample_summaries: list[dict] = [baseline_summary]
+
+            def _lognormal_multiplier(sigma: float) -> float:
+                return float(rng.lognormal(mean=0.0, sigma=sigma))
+
+            # Relative variability around the chosen/patient-twin-derived biology.
+            for _ in range(cohort_n - 1):
+                tumor_mult = _lognormal_multiplier(0.50)
+                healthy_mult = _lognormal_multiplier(0.30)
+                tumor_growth_mult = _lognormal_multiplier(0.25)
+                healthy_growth_mult = _lognormal_multiplier(0.20)
+
+                model_i = MathematicalModel(
+                    baseline_tumor_cells=float(baseline_tumor) * tumor_mult,
+                    baseline_healthy_cells=float(baseline_healthy) * healthy_mult,
+                    drug_doses=drug_doses,
+                    pk_params=pk_params,
+                    pd_params=pd_params,
+                    growth_rates={
+                        "tumor": float(growth_rates["tumor"]) * tumor_growth_mult,
+                        "healthy": float(growth_rates["healthy"]) * healthy_growth_mult,
+                    },
+                    interaction_matrix=interaction_matrix,
+                    time_span=(0.0, time_horizon),
+                    carrying_capacity_tumor=carrying_t_override,
+                    carrying_capacity_healthy=carrying_h_override,
+                    immune_compromise_index=immune_index,
+                    dose_functions=dose_functions,
+                )
+                traj_i = model_i.simulate()
+                sample_summaries.append(
+                    _summarize_trajectory(
+                        df=traj_i,
+                        time_horizon_days=float(time_horizon),
+                        tumor_baseline=float(baseline_tumor),
+                        healthy_baseline=float(baseline_healthy),
+                    )
+                )
+
+            def _stats(values: list[float]) -> dict[str, float]:
+                arr = np.asarray(values, dtype=float)
+                return {
+                    "mean": float(np.mean(arr)),
+                    "p05": float(np.percentile(arr, 5)),
+                    "p95": float(np.percentile(arr, 95)),
+                }
+
+            tumor_reductions = [float(s.get("tumor_reduction", 0.0)) for s in sample_summaries]
+            healthy_losses = [float(s.get("healthy_loss", 0.0)) for s in sample_summaries]
+            durabilities = [float(s.get("durability_index", 0.0)) for s in sample_summaries]
+            auc_totals = [float(sum((s.get("auc") or {}).values())) for s in sample_summaries]
+
+            ttr_values = [s.get("time_to_recurrence") for s in sample_summaries]
+            ttr_numeric = [float(v) for v in ttr_values if v is not None]
+            recurrence_rate = float(np.mean([1.0 if v is not None else 0.0 for v in ttr_values]))
+            ttr_stats = None
+            if ttr_numeric:
+                ttr_stats = {
+                    **_stats(ttr_numeric),
+                    "median": float(np.median(np.asarray(ttr_numeric, dtype=float))),
+                }
+
+            milestone_stats: dict[str, dict[str, dict[str, float]]] = {}
+            for key in ("day_30", "day_60", "day_90", "end"):
+                tumor_vals: list[float] = []
+                healthy_vals: list[float] = []
+                for s in sample_summaries:
+                    snap = (s.get("milestones") or {}).get(key)
+                    if not snap:
+                        continue
+                    tumor_vals.append(float(snap.get("tumor_reduction", 0.0)))
+                    healthy_vals.append(float(snap.get("healthy_loss", 0.0)))
+                if tumor_vals and healthy_vals:
+                    milestone_stats[key] = {
+                        "tumor_reduction": _stats(tumor_vals),
+                        "healthy_loss": _stats(healthy_vals),
+                    }
+
+            summary["cohort"] = {
+                "n": int(cohort_n),
+                "seed": int(seed),
+                "metrics": {
+                    "tumor_reduction": _stats(tumor_reductions),
+                    "healthy_loss": _stats(healthy_losses),
+                    "durability_index": _stats(durabilities),
+                    "auc_total": _stats(auc_totals),
+                    "time_to_recurrence": ttr_stats,
+                    "recurrence_rate": recurrence_rate,
+                },
+                "milestones": milestone_stats,
+            }
 
         media_root = Path(settings.MEDIA_ROOT)
         plot_dir = media_root / "sim_plots"
@@ -452,6 +624,10 @@ class SimulationAttempt(models.Model):
         csv_filename = f"attempt_{self.pk}.csv"
         csv_path = data_dir / csv_filename
         trajectory.to_csv(csv_path, index=False)
+
+        time_series = trajectory["time"]
+        tumor_series = trajectory["tumor_cells"]
+        healthy_series = trajectory["healthy_cells"]
 
         fig = make_subplots(rows=2, cols=1, shared_xaxes=True, row_heights=[0.6, 0.4])
         fig.add_trace(
@@ -482,7 +658,16 @@ class SimulationAttempt(models.Model):
             legend={"orientation": "h"},
             template="plotly_white",
         )
-        plot_html = pio.to_html(fig, full_html=False, include_plotlyjs="cdn")
+        # NOTE: This plot is embedded via <iframe> from the Clinic patient page.
+        # Using a full HTML document + inline Plotly JS + viewport-based height
+        # makes rendering more reliable (no CDN dependency, no 0-height issues).
+        plot_html = pio.to_html(
+            fig,
+            full_html=True,
+            include_plotlyjs="inline",
+            default_height="100vh",
+            default_width="100%",
+        )
         plot_filename = f"attempt_{self.pk}.html"
         plot_path = plot_dir / plot_filename
         plot_path.write_text(plot_html, encoding="utf-8")

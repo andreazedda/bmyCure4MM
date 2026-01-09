@@ -1,4 +1,4 @@
-<div class="card shadow-sm">
+<div class="card shadow-sm" id="simulationResults">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h2 class="h6 mb-0">
             <span class="t-en">Simulation Results</span>
@@ -47,6 +47,92 @@
                 {% endfor %}
             </div>
         {% endif %}
+
+        {% if summary %}
+            <div class="alert alert-light border mt-2" role="alert">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                    <div class="fw-semibold">
+                        <span class="t-en">What to look at (60 seconds)</span>
+                        <span class="t-it">Cosa guardare (60 secondi)</span>
+                    </div>
+                    <div>
+                        {% if summary.healthy_loss and summary.healthy_loss > 0.30 %}
+                            <span class="badge bg-danger">
+                                <span class="t-en">Toxic</span><span class="t-it">Tossico</span>
+                            </span>
+                        {% elif summary.tumor_reduction and summary.tumor_reduction >= 0.90 and summary.healthy_loss and summary.healthy_loss <= 0.25 %}
+                            <span class="badge bg-success">
+                                <span class="t-en">Good balance</span><span class="t-it">Buon equilibrio</span>
+                            </span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">
+                                <span class="t-en">Monitor</span><span class="t-it">Monitorare</span>
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="small mt-2">
+                    {% if summary.healthy_loss and summary.healthy_loss > 0.30 %}
+                        <span class="t-en">This run shows very strong tumor control but high toxicity: <strong>Healthy loss</strong> is above 30%.</span>
+                        <span class="t-it">Questa run mostra ottimo controllo del tumore ma tossicità alta: la <strong>Perdita sani</strong> supera il 30%.</span>
+                    {% elif summary.tumor_reduction and summary.tumor_reduction < 0.70 %}
+                        <span class="t-en">This run is likely under-powered: <strong>Tumor reduction</strong> is below 70% within the chosen horizon.</span>
+                        <span class="t-it">Questa run è probabilmente poco efficace: la <strong>Riduzione tumorale</strong> è sotto 70% nell’orizzonte scelto.</span>
+                    {% else %}
+                        <span class="t-en">Use the three KPIs below to judge the trade-off between efficacy and safety.</span>
+                        <span class="t-it">Usa i tre KPI qui sotto per giudicare il compromesso tra efficacia e sicurezza.</span>
+                    {% endif %}
+                </div>
+
+                <ul class="small mb-0 mt-2">
+                    <li>
+                        <span class="t-en"><strong>Start here:</strong> Tumor reduction (aim ≥ 0.90) vs Healthy loss (aim ≤ 0.25).</span>
+                        <span class="t-it"><strong>Parti da qui:</strong> Riduzione tumorale (target ≥ 0.90) vs Perdita sani (target ≤ 0.25).</span>
+                    </li>
+                    <li>
+                        <span class="t-en"><strong>Then check timepoints:</strong> compare ~1, ~2, ~3 months to see when toxicity starts dominating.</span>
+                        <span class="t-it"><strong>Poi guarda i timepoint:</strong> confronta ~1, ~2, ~3 mesi per capire quando la tossicità “prende il sopravvento”.</span>
+                    </li>
+                    <li>
+                        <span class="t-en"><strong>If you want “average/range”:</strong> set Virtual cohort size to 50–200 (slower) to get mean + P05/P95 bands.</span>
+                        <span class="t-it"><strong>Se vuoi “media/intervallo”:</strong> imposta Virtual cohort size a 50–200 (più lento) per avere media + bande P05/P95.</span>
+                    </li>
+                    <li>
+                        {% if summary.healthy_loss and summary.healthy_loss > 0.30 %}
+                            <span class="t-en"><strong>Concrete next test:</strong> reduce one dose (or shorten horizon) and re-run; keep Tumor reduction ≥ 0.90 while pushing Healthy loss ≤ 0.25.</span>
+                            <span class="t-it"><strong>Prossimo test concreto:</strong> riduci una dose (o accorcia l’orizzonte) e riesegui; mantieni Riduzione ≥ 0.90 portando Perdita sani ≤ 0.25.</span>
+                        {% elif summary.tumor_reduction and summary.tumor_reduction < 0.70 %}
+                            <span class="t-en"><strong>Concrete next test:</strong> launch the Optimization Lab to search doses that improve Tumor reduction without breaking safety constraints.</span>
+                            <span class="t-it"><strong>Prossimo test concreto:</strong> usa l’Optimization Lab per cercare dosi che aumentano la Riduzione tumorale senza superare i vincoli di sicurezza.</span>
+                        {% else %}
+                            <span class="t-en"><strong>Concrete next test:</strong> increase cohort size to verify robustness, or try small dose tweaks (+/- 10–20%) one at a time.</span>
+                            <span class="t-it"><strong>Prossimo test concreto:</strong> aumenta la coorte per verificare robustezza, oppure prova piccoli aggiustamenti (+/- 10–20%) uno alla volta.</span>
+                        {% endif %}
+                    </li>
+                </ul>
+            </div>
+        {% endif %}
+
+        {% if attempt and attempt.parameters %}
+            <details class="mt-2">
+                <summary class="small fw-semibold" style="cursor: pointer;">
+                    <span class="t-en">Inputs used for this run</span>
+                    <span class="t-it">Input usati per questa run</span>
+                </summary>
+                <div class="small text-muted mt-2">
+                    <div><strong>preset</strong>: {{ attempt.parameters.preset|default:"—" }}</div>
+                    <div><strong>Patient Twin assessment</strong>: {{ attempt.parameters.twin_assessment_id|default:"—" }}</div>
+                    <div><strong>use_twin</strong>: {{ attempt.parameters.use_twin|default:"—" }}</div>
+                    <div><strong>cohort_size</strong>: {{ attempt.parameters.cohort_size|default:"—" }}</div>
+                    <div><strong>time_horizon</strong>: {{ attempt.parameters.time_horizon|default:"—" }}</div>
+                    <div><strong>lenalidomide_dose</strong>: {{ attempt.parameters.lenalidomide_dose|default:"—" }}</div>
+                    <div><strong>bortezomib_dose</strong>: {{ attempt.parameters.bortezomib_dose|default:"—" }}</div>
+                    <div><strong>daratumumab_dose</strong>: {{ attempt.parameters.daratumumab_dose|default:"—" }}</div>
+                </div>
+            </details>
+        {% endif %}
+
             {% if summary %}
             <div class="table-responsive">
                 <table class="table table-sm align-middle">
@@ -102,6 +188,31 @@
                                 {% endif %}
                             </td>
                         </tr>
+                        {% if summary.nadir %}
+                        <tr>
+                            <th scope="row">
+                                <span class="t-en">Best response (nadir)</span>
+                                <span class="t-it">Miglior risposta (nadir)</span>
+                            </th>
+                            <td>
+                                <span class="t-en">Day</span><span class="t-it">Giorno</span>
+                                {{ summary.nadir.day|floatformat:1 }} ·
+                                <span class="t-en">reduction</span><span class="t-it">riduzione</span>
+                                {{ summary.nadir.tumor_reduction|floatformat:2 }}
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% if summary.durability_index is not None %}
+                        <tr>
+                            <th scope="row">
+                                <span class="t-en" data-bs-toggle="tooltip" title="{{ kpi.durability_index.en }}" aria-label="{{ kpi.durability_index.en }}">Durability</span>
+                                <span class="t-it" data-bs-toggle="tooltip" title="{{ kpi.durability_index.it }}" aria-label="{{ kpi.durability_index.it }}">Durabilità</span>
+                            </th>
+                            <td>
+                                {{ summary.durability_index|floatformat:2 }}
+                            </td>
+                        </tr>
+                        {% endif %}
                         <tr>
                             <th scope="row">
                                 <span class="t-en" data-bs-toggle="tooltip" title="{{ kpi.auc.en }}" aria-label="{{ kpi.auc.en }}">Drug exposure (AUC)</span>
@@ -141,6 +252,155 @@
                     </tbody>
                 </table>
             </div>
+
+            {% if summary.milestones %}
+            <div class="mt-3">
+                <h3 class="h6 mb-2">
+                    <span class="t-en">Key timepoints</span>
+                    <span class="t-it">Punti chiave nel tempo</span>
+                </h3>
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle">
+                        <thead>
+                            <tr>
+                                <th scope="col"><span class="t-en">Time</span><span class="t-it">Tempo</span></th>
+                                <th scope="col"><span class="t-en">Tumor reduction</span><span class="t-it">Riduzione tumorale</span></th>
+                                <th scope="col"><span class="t-en">Healthy loss</span><span class="t-it">Perdita sani</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if summary.milestones.day_30 %}
+                            <tr>
+                                <th scope="row"><span class="t-en">~1 month</span><span class="t-it">~1 mese</span> ({{ summary.milestones.day_30.day|floatformat:1 }}d)</th>
+                                <td>{{ summary.milestones.day_30.tumor_reduction|floatformat:2 }}</td>
+                                <td>{{ summary.milestones.day_30.healthy_loss|floatformat:2 }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if summary.milestones.day_60 %}
+                            <tr>
+                                <th scope="row"><span class="t-en">~2 months</span><span class="t-it">~2 mesi</span> ({{ summary.milestones.day_60.day|floatformat:1 }}d)</th>
+                                <td>{{ summary.milestones.day_60.tumor_reduction|floatformat:2 }}</td>
+                                <td>{{ summary.milestones.day_60.healthy_loss|floatformat:2 }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if summary.milestones.day_90 %}
+                            <tr>
+                                <th scope="row"><span class="t-en">~3 months</span><span class="t-it">~3 mesi</span> ({{ summary.milestones.day_90.day|floatformat:1 }}d)</th>
+                                <td>{{ summary.milestones.day_90.tumor_reduction|floatformat:2 }}</td>
+                                <td>{{ summary.milestones.day_90.healthy_loss|floatformat:2 }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if summary.milestones.end %}
+                            <tr>
+                                <th scope="row"><span class="t-en">End of horizon</span><span class="t-it">Fine orizzonte</span> ({{ summary.milestones.end.day|floatformat:1 }}d)</th>
+                                <td>{{ summary.milestones.end.tumor_reduction|floatformat:2 }}</td>
+                                <td>{{ summary.milestones.end.healthy_loss|floatformat:2 }}</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if summary.cohort %}
+            <div class="mt-3">
+                <h3 class="h6 mb-2">
+                    <span class="t-en">Uncertainty cohort</span>
+                    <span class="t-it">Coorte di incertezza</span>
+                    <span class="text-muted small ms-2">(n={{ summary.cohort.n }}, seed={{ summary.cohort.seed }})</span>
+                </h3>
+                <div class="small text-muted mb-2">
+                    <span class="t-en">Shows mean and 5th–95th percentile across virtual subjects (not clinical OS).</span>
+                    <span class="t-it">Mostra media e 5°–95° percentile su pazienti virtuali (non è OS clinica).</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle">
+                        <thead>
+                            <tr>
+                                <th scope="col"><span class="t-en">Metric</span><span class="t-it">Metrica</span></th>
+                                <th scope="col"><span class="t-en">Mean</span><span class="t-it">Media</span></th>
+                                <th scope="col"><span class="t-en">P05</span><span class="t-it">P05</span></th>
+                                <th scope="col"><span class="t-en">P95</span><span class="t-it">P95</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th scope="row"><span class="t-en">Tumor reduction</span><span class="t-it">Riduzione tumorale</span></th>
+                                <td>{{ summary.cohort.metrics.tumor_reduction.mean|floatformat:2 }}</td>
+                                <td>{{ summary.cohort.metrics.tumor_reduction.p05|floatformat:2 }}</td>
+                                <td>{{ summary.cohort.metrics.tumor_reduction.p95|floatformat:2 }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row"><span class="t-en">Healthy loss</span><span class="t-it">Perdita sani</span></th>
+                                <td>{{ summary.cohort.metrics.healthy_loss.mean|floatformat:2 }}</td>
+                                <td>{{ summary.cohort.metrics.healthy_loss.p05|floatformat:2 }}</td>
+                                <td>{{ summary.cohort.metrics.healthy_loss.p95|floatformat:2 }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row"><span class="t-en">Durability</span><span class="t-it">Durabilità</span></th>
+                                <td>{{ summary.cohort.metrics.durability_index.mean|floatformat:2 }}</td>
+                                <td>{{ summary.cohort.metrics.durability_index.p05|floatformat:2 }}</td>
+                                <td>{{ summary.cohort.metrics.durability_index.p95|floatformat:2 }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row"><span class="t-en">Recurrence rate</span><span class="t-it">Tasso di recidiva</span></th>
+                                <td colspan="3">{{ summary.cohort.metrics.recurrence_rate|floatformat:2 }}</td>
+                            </tr>
+                            {% if summary.cohort.metrics.time_to_recurrence %}
+                            <tr>
+                                <th scope="row"><span class="t-en">Time to recurrence (days)</span><span class="t-it">Tempo alla recidiva (giorni)</span></th>
+                                <td>{{ summary.cohort.metrics.time_to_recurrence.mean|floatformat:1 }}</td>
+                                <td>{{ summary.cohort.metrics.time_to_recurrence.p05|floatformat:1 }}</td>
+                                <td>{{ summary.cohort.metrics.time_to_recurrence.p95|floatformat:1 }}</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if summary.cohort.milestones %}
+                <div class="small text-muted mt-2">
+                    <span class="t-en">Milestone bands (tumor reduction / healthy loss):</span>
+                    <span class="t-it">Bande ai punti chiave (riduzione / perdita sani):</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle">
+                        <thead>
+                            <tr>
+                                <th scope="col"><span class="t-en">Time</span><span class="t-it">Tempo</span></th>
+                                <th scope="col"><span class="t-en">Tumor mean [P05–P95]</span><span class="t-it">Tumore media [P05–P95]</span></th>
+                                <th scope="col"><span class="t-en">Healthy mean [P05–P95]</span><span class="t-it">Sani media [P05–P95]</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if summary.cohort.milestones.day_30 %}
+                            <tr>
+                                <th scope="row"><span class="t-en">~1 month</span><span class="t-it">~1 mese</span></th>
+                                <td>{{ summary.cohort.milestones.day_30.tumor_reduction.mean|floatformat:2 }} [{{ summary.cohort.milestones.day_30.tumor_reduction.p05|floatformat:2 }}–{{ summary.cohort.milestones.day_30.tumor_reduction.p95|floatformat:2 }}]</td>
+                                <td>{{ summary.cohort.milestones.day_30.healthy_loss.mean|floatformat:2 }} [{{ summary.cohort.milestones.day_30.healthy_loss.p05|floatformat:2 }}–{{ summary.cohort.milestones.day_30.healthy_loss.p95|floatformat:2 }}]</td>
+                            </tr>
+                            {% endif %}
+                            {% if summary.cohort.milestones.day_90 %}
+                            <tr>
+                                <th scope="row"><span class="t-en">~3 months</span><span class="t-it">~3 mesi</span></th>
+                                <td>{{ summary.cohort.milestones.day_90.tumor_reduction.mean|floatformat:2 }} [{{ summary.cohort.milestones.day_90.tumor_reduction.p05|floatformat:2 }}–{{ summary.cohort.milestones.day_90.tumor_reduction.p95|floatformat:2 }}]</td>
+                                <td>{{ summary.cohort.milestones.day_90.healthy_loss.mean|floatformat:2 }} [{{ summary.cohort.milestones.day_90.healthy_loss.p05|floatformat:2 }}–{{ summary.cohort.milestones.day_90.healthy_loss.p95|floatformat:2 }}]</td>
+                            </tr>
+                            {% endif %}
+                            {% if summary.cohort.milestones.end %}
+                            <tr>
+                                <th scope="row"><span class="t-en">End</span><span class="t-it">Fine</span></th>
+                                <td>{{ summary.cohort.milestones.end.tumor_reduction.mean|floatformat:2 }} [{{ summary.cohort.milestones.end.tumor_reduction.p05|floatformat:2 }}–{{ summary.cohort.milestones.end.tumor_reduction.p95|floatformat:2 }}]</td>
+                                <td>{{ summary.cohort.milestones.end.healthy_loss.mean|floatformat:2 }} [{{ summary.cohort.milestones.end.healthy_loss.p05|floatformat:2 }}–{{ summary.cohort.milestones.end.healthy_loss.p95|floatformat:2 }}]</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
             <div class="d-flex flex-wrap gap-2 mt-3">
                 {% if results.plot %}
                     <a class="btn btn-outline-primary btn-sm" href="{{ results.plot }}" target="_blank" rel="noopener">
@@ -202,8 +462,8 @@
                         <span class="t-it">✓ Abilita <strong>Digital Twin</strong> per previsioni personalizzate</span>
                     </li>
                     <li>
-                        <span class="t-en">✓ Click <strong>Run Simulation</strong> button above</span>
-                        <span class="t-it">✓ Clicca il pulsante <strong>Esegui Simulazione</strong> sopra</span>
+                        <span class="t-en">✓ Open the <strong>Simulation Panel</strong> then click <strong>Run simulation</strong></span>
+                        <span class="t-it">✓ Apri il <strong>Pannello Simulazione</strong> poi clicca <strong>Esegui simulazione</strong></span>
                     </li>
                 </ul>
                 <button type="button" class="btn btn-primary mt-3" onclick="if(typeof Tour !== 'undefined') Tour.open();">

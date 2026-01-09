@@ -105,119 +105,30 @@
 
                             {% if latest_simulation_interpretation %}
                                 {% if latest_simulation_interpretation.overall == 'good' %}
-                                    <div class="alert alert-success mb-2" role="alert">
-                                        <span class="t-en"><strong>🎯 Quick read:</strong> looks favorable overall (model estimate).</span>
-                                        <span class="t-it"><strong>🎯 Lettura rapida:</strong> complessivamente favorevole (stima del modello).</span>
+                                    <div class="alert alert-success" role="alert">
+                                        <span class="t-en"><strong>Quick read:</strong> looks favorable overall (model estimate).</span>
+                                        <span class="t-it"><strong>Lettura rapida:</strong> complessivamente favorevole (stima del modello).</span>
                                     </div>
                                 {% elif latest_simulation_interpretation.overall == 'caution' %}
-                                    <div class="alert alert-warning mb-2" role="alert">
-                                        <span class="t-en"><strong>⚠️ Quick read:</strong> mixed signal — review recommendations below.</span>
-                                        <span class="t-it"><strong>⚠️ Lettura rapida:</strong> segnale misto — rivedi raccomandazioni sotto.</span>
+                                    <div class="alert alert-warning" role="alert">
+                                        <span class="t-en"><strong>Quick read:</strong> mixed signal — review toxicity vs benefit.</span>
+                                        <span class="t-it"><strong>Lettura rapida:</strong> segnale misto — valuta beneficio vs tossicità.</span>
                                     </div>
                                 {% elif latest_simulation_interpretation.overall == 'bad' %}
-                                    <div class="alert alert-danger mb-2" role="alert">
-                                        <span class="t-en"><strong>🚨 Quick read:</strong> unfavorable signal — see action plan below.</span>
-                                        <span class="t-it"><strong>🚨 Lettura rapida:</strong> sfavorevole — vedi piano d'azione sotto.</span>
+                                    <div class="alert alert-danger" role="alert">
+                                        <span class="t-en"><strong>Quick read:</strong> unfavorable signal — consider changing doses/regimen in the Simulator.</span>
+                                        <span class="t-it"><strong>Lettura rapida:</strong> sfavorevole — prova a cambiare dosi/regime nel Simulator.</span>
                                     </div>
                                 {% else %}
-                                    <div class="alert alert-secondary mb-2" role="alert">
+                                    <div class="alert alert-secondary" role="alert">
                                         <span class="t-en"><strong>Quick read:</strong> not enough data to grade.</span>
                                         <span class="t-it"><strong>Lettura rapida:</strong> dati insufficienti per un giudizio.</span>
                                     </div>
                                 {% endif %}
-
-                                {% if latest_simulation_interpretation.has_recommendations %}
-                                    <div class="accordion mb-3" id="recommendationsAccordion">
-                                        <div class="accordion-item border-{% if latest_simulation_interpretation.overall == 'bad' %}danger{% elif latest_simulation_interpretation.overall == 'caution' %}warning{% else %}success{% endif %}">
-                                            <h2 class="accordion-header">
-                                                <button class="accordion-button {% if latest_simulation_interpretation.overall == 'good' %}collapsed{% endif %} fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#recommendationsPanel" aria-expanded="{% if latest_simulation_interpretation.overall != 'good' %}true{% else %}false{% endif %}">
-                                                    <span class="t-en">💡 Action Plan ({{ latest_simulation_interpretation.recommendations|length }} recommendations) — Click to {% if latest_simulation_interpretation.overall != 'good' %}review{% else %}optimize{% endif %}</span>
-                                                    <span class="t-it">💡 Piano d'Azione ({{ latest_simulation_interpretation.recommendations|length }} raccomandazioni) — Clicca per {% if latest_simulation_interpretation.overall != 'good' %}rivedere{% else %}ottimizzare{% endif %}</span>
-                                                </button>
-                                            </h2>
-                                            <div id="recommendationsPanel" class="accordion-collapse collapse {% if latest_simulation_interpretation.overall != 'good' %}show{% endif %}" data-bs-parent="#recommendationsAccordion">
-                                                <div class="accordion-body p-2">
-                                                    {% for rec in latest_simulation_interpretation.recommendations %}
-                                                        <div class="card mb-2 {% if rec.priority == 'critical' %}border-danger bg-danger bg-opacity-10{% elif rec.priority == 'high' %}border-warning bg-warning bg-opacity-10{% endif %}">
-                                                            <div class="card-body p-2">
-                                                                <div class="d-flex align-items-start">
-                                                                    <div class="me-2" style="font-size:1.5rem;">{{ rec.icon }}</div>
-                                                                    <div class="flex-fill">
-                                                                        <div class="fw-bold mb-1">
-                                                                            <span class="t-en">{{ rec.issue_en }}</span>
-                                                                            <span class="t-it">{{ rec.issue_it }}</span>
-                                                                            {% if rec.priority == 'critical' %}
-                                                                                <span class="badge bg-danger ms-1">
-                                                                                    <span class="t-en">CRITICAL</span>
-                                                                                    <span class="t-it">CRITICO</span>
-                                                                                </span>
-                                                                            {% elif rec.priority == 'high' %}
-                                                                                <span class="badge bg-warning text-dark ms-1">
-                                                                                    <span class="t-en">HIGH</span>
-                                                                                    <span class="t-it">ALTO</span>
-                                                                                </span>
-                                                                            {% endif %}
-                                                                        </div>
-                                                                        <div class="mb-2 p-2 bg-primary bg-opacity-10 rounded">
-                                                                            <div class="text-primary fw-semibold small">
-                                                                                <span class="t-en">→ ACTION:</span>
-                                                                                <span class="t-it">→ AZIONE:</span>
-                                                                            </div>
-                                                                            <div class="small">
-                                                                                <span class="t-en">{{ rec.action_en }}</span>
-                                                                                <span class="t-it">{{ rec.action_it }}</span>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="small text-muted mb-2">
-                                                                            <strong>
-                                                                                <span class="t-en">Why:</span>
-                                                                                <span class="t-it">Perché:</span>
-                                                                            </strong>
-                                                                            <span class="t-en">{{ rec.rationale_en }}</span>
-                                                                            <span class="t-it">{{ rec.rationale_it }}</span>
-                                                                        </div>
-                                                                        {% if latest_simulation_scenario_url %}
-                                                                            <a href="{{ latest_simulation_scenario_url }}" class="btn btn-sm btn-primary" target="_blank">
-                                                                                <span class="t-en">🔧 Go to Scenario & Implement</span>
-                                                                                <span class="t-it">🔧 Vai allo Scenario e Implementa</span>
-                                                                            </a>
-                                                                        {% endif %}
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    {% endfor %}
-                                                    <div class="alert alert-light border mb-0 mt-2" role="alert">
-                                                        <div class="small">
-                                                            <strong>
-                                                                <span class="t-en">📋 Implementation steps:</span>
-                                                                <span class="t-it">📋 Passi per implementare:</span>
-                                                            </strong>
-                                                            <ol class="mb-0 ps-3 mt-1">
-                                                                <li>
-                                                                    <span class="t-en">Click <strong>"Go to Scenario"</strong> button above</span>
-                                                                    <span class="t-it">Clicca il pulsante <strong>"Vai allo Scenario"</strong> sopra</span>
-                                                                </li>
-                                                                <li>
-                                                                    <span class="t-en">Edit drug doses or time horizon as recommended</span>
-                                                                    <span class="t-it">Modifica dosi dei farmaci o orizzonte temporale come raccomandato</span>
-                                                                </li>
-                                                                <li>
-                                                                    <span class="t-en">Open <strong>Simulation Panel</strong> → click <strong>Run simulation</strong></span>
-                                                                    <span class="t-it">Apri <strong>Pannello Simulazione</strong> → clicca <strong>Esegui simulazione</strong></span>
-                                                                </li>
-                                                                <li>
-                                                                    <span class="t-en">Return to this page to see updated results</span>
-                                                                    <span class="t-it">Torna a questa pagina per vedere i risultati aggiornati</span>
-                                                                </li>
-                                                            </ol>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                {% endif %}
+                                <div class="small text-muted mb-2">
+                                    <span class="t-en">Rule of thumb: higher tumor reduction is better; lower healthy loss is better; longer time to recurrence is better.</span>
+                                    <span class="t-it">Regola pratica: più riduzione tumorale è meglio; meno perdita di sani è meglio; più lungo tempo alla recidiva è meglio.</span>
+                                </div>
                             {% endif %}
 
                             <div class="table-responsive">

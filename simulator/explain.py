@@ -16,8 +16,8 @@ KPI: dict[str, dict[str, str]] = {
         "it": "L’AUC rappresenta l’esposizione totale al farmaco nel tempo. Ridurla limita la tossicità.",
     },
     "durability_index": {
-        "en": "Durability = time below baseline ÷ time horizon. Measures response persistence.",
-        "it": "Durabilità = tempo sotto la baseline ÷ orizzonte. Misura la persistenza della risposta.",
+        "en": "Durability = (time tumor stays below baseline) ÷ (time horizon). Higher means longer sustained response.",
+        "it": "Durabilità = (tempo con tumore sotto la baseline) ÷ (orizzonte). Più alto = risposta più sostenuta.",
     },
     "time_to_recurrence": {
         "en": "Time to recurrence marks when tumor burden rises above 50% of baseline.",

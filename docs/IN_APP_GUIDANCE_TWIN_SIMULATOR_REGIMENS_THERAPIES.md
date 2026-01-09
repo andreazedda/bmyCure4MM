@@ -59,6 +59,43 @@ These apply multiplicative adjustments (with clamping) to the resolved parameter
 
 ---
 
+### 2b) Simulator: results that feel like a “clinical response”
+
+**User expectation:** “Lancio la terapia simulata e voglio un responso: 1 mese, 3 mesi, tempo stimato a recidiva, informazioni significative… altrimenti non è una simulazione.”
+
+**What we implemented:** the results panel now surfaces **readable, timepoint‑based outputs** instead of only a plot/CSV.
+
+#### Output now shown in the Results card
+
+- **Key timepoints** (~1 month/30d, ~2 months/60d, ~3 months/90d, end of horizon)
+  - tumor reduction (proxy of response depth)
+  - healthy loss (proxy of toxicity / immunosuppression)
+- **Best response (nadir)**: day of minimum tumor burden + reduction at nadir
+- **Durability index**: fraction of the horizon where tumor stays below baseline
+- **Time to recurrence** (if reached within horizon): first time tumor rises above a threshold after nadir
+
+#### “Average / mean” outputs via Virtual Cohort Size
+
+The form already exposes **Virtual cohort size** (1/10/50/200). When set > 1, the simulator now runs an internal cohort (no extra DB rows) and displays **mean + P05–P95 bands** for:
+
+- tumor reduction
+- healthy loss
+- durability
+- time‑to‑recurrence stats (when recurrence happens in the cohort)
+- milestone bands at ~1 month, ~3 months, end
+
+#### Important safety note about “overall survival / life expectancy”
+
+The current mathematical model does **not** compute a clinically validated overall survival (“tempo medio di vita”). We therefore show **time‑to‑event proxies** (time to recurrence + durability) and uncertainty bands, clearly labeled as model outputs.
+
+#### Primary code/UX touchpoints (Results)
+
+- `simulator/models.py`: richer `results_summary` (milestones, nadir, durability, cohort bands)
+- `simulator/templates/simulator/_simulation_results.html`: renders timepoints + cohort tables
+- `simulator/explain.py`: updated tooltip copy for durability
+
+---
+
 ### 3) Regimens: strongly guided creation (presets + wizard + drug builder)
 
 **User problem:** regimen creation felt like guesswork (“troppo poco guidato”).
@@ -124,6 +161,10 @@ Also added a small note clarifying how **Observed effect** is computed (needs an
 ## Notes / next optional improvements
 
 These are optional and were discussed as potential follow‑ups:
+
+- Attribution / Attribuzione:
+  - EN: Panel concept by Andrea Zedda, PhD Bioengineer — BMI (Bioingegneria Modulare Italiana) project.
+  - IT: Idea del pannello di Andrea Zedda, PhD Bioengineer — progetto BMI (Bioingegneria Modulare Italiana).
 
 - Add per‑drug badges next to regimen drug checkboxes (so mapping is visible without expanding details).
 - Expand drug → parameter mapping as simulator safety rules grow.

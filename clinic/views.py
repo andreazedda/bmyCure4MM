@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Count, Prefetch, F
@@ -11,6 +12,170 @@ from django.urls import reverse
 import django_filters
 
 from . import forms, models
+
+embed_debug_logger = logging.getLogger("embed_debug")
+
+
+def _interpret_latest_simulation(summary: dict[str, object] | None, parameters: dict[str, object] | None) -> dict[str, object] | None:
+    """Comprehensive decision support: interpretation + actionable recommendations."""
+    if not summary:
+        return None
+
+    def f(name: str) -> float | None:
+        v = summary.get(name)
+        try:
+            return float(v) if v is not None else None
+        except Exception:
+            return None
+
+    tumor_reduction = f("tumor_reduction")
+    healthy_loss = f("healthy_loss")
+    time_to_recurrence = f("time_to_recurrence")
+
+    def band_label(value: float | None, *, good_ge: float | None = None, bad_lt: float | None = None) -> str:
+        if value is None:
+            return "unknown"
+        if good_ge is not None and value >= good_ge:
+            return "good"
+        if bad_lt is not None and value < bad_lt:
+            return "bad"
+        return "caution"
+
+    # Heuristics (UX-only): meant for beginner orientation, not clinical advice.
+    tumor_label = band_label(tumor_reduction, good_ge=0.50, bad_lt=0.0)
+    # Lower healthy loss is better.
+    if healthy_loss is None:
+        healthy_label = "unknown"
+    elif healthy_loss < 0.20:
+        healthy_label = "good"
+    elif healthy_loss < 0.30:
+        healthy_label = "caution"
+    else:
+        healthy_label = "bad"
+
+    # Longer time to recurrence is better (if present).
+    if time_to_recurrence is None:
+        recurrence_label = "unknown"
+    elif time_to_recurrence >= 180:
+        recurrence_label = "good"
+    elif time_to_recurrence >= 90:
+        recurrence_label = "caution"
+    else:
+        recurrence_label = "bad"
+
+    # Overall: worst-of with a slight preference for toxicity (healthy_loss) warnings.
+    labels = [tumor_label, healthy_label, recurrence_label]
+    if "bad" in labels:
+        overall = "bad"
+    elif "caution" in labels:
+        overall = "caution"
+    elif "good" in labels:
+        overall = "good"
+    else:
+        overall = "unknown"
+
+    # Extract current parameters (for recommendations)
+    param = parameters or {}
+    time_horizon = param.get("time_horizon")
+    try:
+        time_horizon = int(time_horizon) if time_horizon is not None else 168
+    except Exception:
+        time_horizon = 168
+
+    # Generate actionable recommendations based on results.
+    recommendations: list[dict[str, str]] = []
+
+    # Scenario 1: High toxicity (healthy_loss ≥ 0.30)
+    if healthy_loss is not None and healthy_loss >= 0.30:
+        recommendations.append({
+            "issue_en": "High toxicity (healthy cell loss ≥30%)",
+            "issue_it": "Alta tossicità (perdita di cellule sane ≥30%)",
+            "action_en": "Reduce drug doses by 20–30% or shorten time horizon",
+            "action_it": "Riduci le dosi dei farmaci del 20–30% o accorcia l'orizzonte temporale",
+            "rationale_en": "Too much damage to healthy plasma cells. Lower doses preserve immune function.",
+            "rationale_it": "Troppo danno alle plasmacellule sane. Dosi più basse preservano la funzione immunitaria.",
+            "icon": "⚠️",
+            "priority": "high",
+        })
+    elif healthy_loss is not None and healthy_loss >= 0.20:
+        recommendations.append({
+            "issue_en": "Moderate toxicity (healthy cell loss 20–30%)",
+            "issue_it": "Tossicità moderata (perdita di cellule sane 20–30%)",
+            "action_en": "Consider reducing doses by 10–15% if patient shows clinical toxicity signs",
+            "action_it": "Considera di ridurre le dosi del 10–15% se il paziente mostra segni clinici di tossicità",
+            "rationale_en": "Borderline toxicity. Monitor closely; reduce if side effects appear.",
+            "rationale_it": "Tossicità al limite. Monitora attentamente; riduci se compaiono effetti collaterali.",
+            "icon": "⚠️",
+            "priority": "medium",
+        })
+
+    # Scenario 2: Poor efficacy (tumor_reduction < 0.30)
+    if tumor_reduction is not None and tumor_reduction < 0.30:
+        if healthy_loss is None or healthy_loss < 0.30:
+            # Low efficacy but tolerable toxicity → try increasing doses or horizon
+            recommendations.append({
+                "issue_en": "Low tumor reduction (<30%)",
+                "issue_it": "Bassa riduzione tumorale (<30%)",
+                "action_en": "Increase drug doses by 15–25% or extend time horizon to 224–280 days",
+                "action_it": "Aumenta le dosi dei farmaci del 15–25% o estendi l'orizzonte a 224–280 giorni",
+                "rationale_en": "More aggressive therapy may improve response if toxicity remains acceptable.",
+                "rationale_it": "Una terapia più aggressiva può migliorare la risposta se la tossicità resta accettabile.",
+                "icon": "📈",
+                "priority": "high",
+            })
+
+    # Scenario 3: Negative tumor reduction (tumor growth)
+    if tumor_reduction is not None and tumor_reduction < 0:
+        recommendations.append({
+            "issue_en": "Tumor growth (negative reduction)",
+            "issue_it": "Crescita tumorale (riduzione negativa)",
+            "action_en": "Switch to a different regimen or significantly increase doses",
+            "action_it": "Cambia regime terapeutico o aumenta significativamente le dosi",
+            "rationale_en": "Current regimen is ineffective. Consider alternative drug combinations.",
+            "rationale_it": "Il regime attuale è inefficace. Considera combinazioni alternative di farmaci.",
+            "icon": "🚨",
+            "priority": "critical",
+        })
+
+    # Scenario 4: Short time to recurrence (if measured)
+    if time_to_recurrence is not None and time_to_recurrence < 90:
+        if time_horizon < 200:
+            recommendations.append({
+                "issue_en": "Early recurrence predicted (<90 days)",
+                "issue_it": "Recidiva precoce prevista (<90 giorni)",
+                "action_en": "Extend time horizon to 224–280 days to simulate longer treatment",
+                "action_it": "Estendi l'orizzonte a 224–280 giorni per simulare un trattamento più lungo",
+                "rationale_en": "Longer therapy duration may delay recurrence and improve durability.",
+                "rationale_it": "Una durata più lunga può ritardare la recidiva e migliorare la durabilità.",
+                "icon": "⏱️",
+                "priority": "medium",
+            })
+
+    # Scenario 5: Good balance
+    if overall == "good":
+        recommendations.append({
+            "issue_en": "Favorable balance (good efficacy, acceptable toxicity)",
+            "issue_it": "Equilibrio favorevole (buona efficacia, tossicità accettabile)",
+            "action_en": "Fine-tune by testing ±10% dose variations or compare alternative regimens",
+            "action_it": "Ottimizza testando variazioni di dose ±10% o confronta regimi alternativi",
+            "rationale_en": "Current settings look promising. Minor adjustments may further optimize.",
+            "rationale_it": "Le impostazioni attuali sono promettenti. Piccole modifiche possono ottimizzare ulteriormente.",
+            "icon": "✅",
+            "priority": "low",
+        })
+
+    # Sort by priority
+    priority_order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
+    recommendations.sort(key=lambda r: priority_order.get(r.get("priority", "low"), 99))
+
+    return {
+        "overall": overall,
+        "tumor_reduction_label": tumor_label,
+        "healthy_loss_label": healthy_label,
+        "time_to_recurrence_label": recurrence_label,
+        "recommendations": recommendations,
+        "has_recommendations": len(recommendations) > 0,
+    }
 
 is_staff = user_passes_test(lambda u: u.is_staff)
 
@@ -266,6 +431,84 @@ def patient_detail(request: HttpRequest, pk: int) -> HttpResponse:
     regimen_add_url = reverse("clinic:regimen_new")
     regimen_list_url = reverse("clinic:regimen_list")
 
+    # Optional: provide a 1-click path into Simulator for beginners.
+    quickstart_scenario_pk = None
+    try:
+        from simulator.models import Scenario
+
+        quickstart_scenario_pk = Scenario.objects.filter(active=True).order_by("pk").values_list("pk", flat=True).first()
+    except Exception:
+        quickstart_scenario_pk = None
+
+    # Optional: surface the most recent Simulator results for this patient (based on latest Assessment snapshot).
+    latest_simulation_attempt = None
+    latest_simulation_summary = None
+    latest_simulation_artifacts = None
+    latest_simulation_scenario_url = None
+    latest_simulation_interpretation = None
+    if latest_assessment_id:
+        try:
+            from django.db.models import Q
+            from simulator.models import SimulationAttempt
+
+            aid = latest_assessment_id
+            latest_simulation_attempt = (
+                SimulationAttempt.objects.select_related("scenario")
+                .filter(
+                    Q(parameters__twin_assessment_id=aid)
+                    | Q(parameters__twin_assessment_id=str(aid))
+                    | Q(parameters__assessment_id=aid)
+                    | Q(parameters__assessment_id=str(aid))
+                )
+                .order_by("-submitted")
+                .first()
+            )
+
+            # Fallback: if no run exists for the *latest* snapshot, show the most recent run
+            # for any snapshot belonging to this patient.
+            if not latest_simulation_attempt:
+                patient_assessment_ids = [a.pk for a in assessments if a.pk is not None]
+                patient_assessment_ids_str = [str(aid) for aid in patient_assessment_ids]
+                if patient_assessment_ids:
+                    latest_simulation_attempt = (
+                        SimulationAttempt.objects.select_related("scenario")
+                        .filter(
+                            Q(parameters__twin_assessment_id__in=patient_assessment_ids)
+                            | Q(parameters__twin_assessment_id__in=patient_assessment_ids_str)
+                            | Q(parameters__assessment_id__in=patient_assessment_ids)
+                            | Q(parameters__assessment_id__in=patient_assessment_ids_str)
+                        )
+                        .order_by("-submitted")
+                        .first()
+                    )
+
+            if latest_simulation_attempt:
+                latest_simulation_summary = latest_simulation_attempt.results_summary or None
+                latest_simulation_artifacts = latest_simulation_attempt.artifacts or None
+                latest_simulation_interpretation = _interpret_latest_simulation(
+                    latest_simulation_summary if isinstance(latest_simulation_summary, dict) else None,
+                    latest_simulation_attempt.parameters if isinstance(latest_simulation_attempt.parameters, dict) else None,
+                )
+                latest_simulation_scenario_url = (
+                    reverse("simulator:scenario_detail", args=[latest_simulation_attempt.scenario_id])
+                    + f"?twin_assessment_id={aid}#simulationResults"
+                )
+
+                plot_url = None
+                if isinstance(latest_simulation_artifacts, dict):
+                    plot_url = latest_simulation_artifacts.get("plot")
+                embed_debug_logger.info(
+                    "patient_detail patient_id=%s assessment_id=%s attempt_id=%s scenario_id=%s plot_url=%r page_path=%s",
+                    patient.id,
+                    aid,
+                    latest_simulation_attempt.id,
+                    latest_simulation_attempt.scenario_id,
+                    plot_url,
+                    request.get_full_path(),
+                )
+        except Exception:
+            latest_simulation_attempt = None
+
     context = {
         "patient": patient,
         "assessments": assessments,
@@ -284,6 +527,12 @@ def patient_detail(request: HttpRequest, pk: int) -> HttpResponse:
         "regimen_add_url": regimen_add_url,
         "regimen_list_url": regimen_list_url,
         "therapy_rows": therapy_rows,
+        "quickstart_scenario_pk": quickstart_scenario_pk,
+        "latest_simulation_attempt": latest_simulation_attempt,
+        "latest_simulation_summary": latest_simulation_summary,
+        "latest_simulation_artifacts": latest_simulation_artifacts,
+        "latest_simulation_scenario_url": latest_simulation_scenario_url,
+        "latest_simulation_interpretation": latest_simulation_interpretation,
     }
     return render(request, "clinic/patient_detail.html", context)
 
