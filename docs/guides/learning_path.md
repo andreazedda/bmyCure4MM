@@ -13,6 +13,7 @@ Questa pagina è il “**GPS**” della documentazione: cosa leggere, in che ord
 | capire l’**Optimization Lab** (Pareto, obiettivi) | `Guides → Optimization Theory` |
 | vedere regole e soglie “auditabili” | `Guides → Decision Algorithm` |
 | avviare local/dev/docker | `Guides → Operations` + `Guides → Development` |
+| consultare documenti lunghi/tecnici | `Deep Dives` |
 
 ## Percorso “Clinico” (30–45 min)
 
@@ -20,6 +21,8 @@ Questa pagina è il “**GPS**” della documentazione: cosa leggere, in che ord
 2. `Guides → Mathematical Models` (solo sezioni “KPI” e “Patient Twin”)
 3. `Guides → Decision Algorithm` (soglie + regole principali)
 4. `IT → Optimization Lab` (come leggere la Pareto table)
+
+Se vuoi un percorso “hands-on” con dati demo: `Deep Dives → Learning (IT) → Guida apprendimento`.
 
 ## Percorso “Developer” (45–90 min)
 
@@ -44,4 +47,3 @@ La search di MkDocs Material è la via più veloce:
 
 !!! tip "Se vedi ‘Syntax error in text’"
     È un errore di parsing Mermaid in una pagina. Vai su `Home` e verifica che *diagramma* e *formula* si vedano; se si vedono lì ma non altrove, il problema è localizzato a un blocco Mermaid specifico.
-

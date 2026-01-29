@@ -9,7 +9,9 @@ Questa documentazione è pensata per:
 !!! tip "Scelta rapida"
     - Vai alla guida **Architettura**: `Guides → Architecture`
     - Vai alla guida **Database**: `Guides → Database`
+    - Mappa oggetti DB: `Reference → Database Objects`
     - Setup dev: `Guides → Development`
+    - Percorso guidato: `Learning Path`
 
 ## Struttura del sito
 

@@ -3,7 +3,7 @@ site_description: Decision support + simulation + chemtools (Django)
 site_url: https://andreazedda.github.io/bmyCure4MM/
 repo_url: https://github.com/andreazedda/bmyCure4MM
 repo_name: andreazedda/bmyCure4MM
-edit_uri: edit/main/docs/
+edit_uri: edit/master/docs/
 
 nav:
   - Home: index.md
@@ -24,16 +24,45 @@ nav:
       - Configuration: reference/configuration.md
       - Database Objects: reference/database_objects.md
       - Scripts: reference/scripts.md
+      - Repo Docs README: repo_readme.md
       - Apps:
           - Clinic: reference/apps/clinic.md
           - Simulator: reference/apps/simulator.md
           - ChemTools: reference/apps/chemtools.md
           - Docs Viewer: reference/apps/docs_viewer.md
   - Deep Dives:
-      - Dynamic Data Architecture: dynamic_data_architecture.md
-      - API Integration Summary: api_integration_summary.md
-      - Mathematical Models: features/MATHEMATICAL_MODELS_DOCUMENTATION.md
-      - Testing Report: features/TESTING_REPORT.md
+      - Data:
+          - Dynamic Data Architecture: dynamic_data_architecture.md
+      - API:
+          - API Integration Summary: api_integration_summary.md
+          - API Integration Guide: API_INTEGRATION_GUIDE.md
+          - API Data Sources Quickref: API_DATA_SOURCES_QUICKREF.md
+          - API Enhancement Summary: API_ENHANCEMENT_SUMMARY.md
+          - MM API Selection Guide: MM_API_SELECTION_GUIDE.md
+      - Simulator:
+          - Twin In-App Guidance: IN_APP_GUIDANCE_TWIN_SIMULATOR_REGIMENS_THERAPIES.md
+          - Patient Twin (As Built): development/PATIENT_TWIN_AS_BUILT.md
+          - MM Efficacy Estimation: MM_EFFICACY_ESTIMATION.md
+          - MM Efficacy Visual Guide: MM_EFFICACY_VISUAL_GUIDE.md
+          - Survival + Toxicity Estimation: SURVIVAL_TOXICITY_ESTIMATION.md
+      - ChemTools:
+          - 3D Viewer Styling: 3D_VIEWER_STYLING.md
+      - Product:
+          - Before/After Comparison: BEFORE_AFTER_COMPARISON.md
+      - Development Logs:
+          - Embed Debug Guide: development/EMBED_DEBUG_GUIDE.md
+          - Implementation Log: development/IMPLEMENTATION_LOG.md
+          - Implementation Summary: development/IMPLEMENTATION_SUMMARY.md
+      - Features:
+          - Decision Support System: features/DECISION_SUPPORT_SYSTEM.md
+          - Docs Viewer (Complete): features/DOCS_VIEWER_COMPLETE.md
+          - Form Enhancements Summary: features/FORM_ENHANCEMENTS_SUMMARY.md
+          - Patient Journey Enhancement: features/PATIENT_JOURNEY_ENHANCEMENT.md
+          - ChemTools Testing Summary: features/CHEMTOOLS_TESTING_SUMMARY.md
+          - Mathematical Models (Long): features/MATHEMATICAL_MODELS_DOCUMENTATION.md
+          - Testing Report: features/TESTING_REPORT.md
+      - Learning (IT):
+          - Guida apprendimento: it/GUIDA_APPRENDIMENTO.md
   - EN:
       - Quickstart: en/quickstart.md
       - Simulator: en/simulator.md
