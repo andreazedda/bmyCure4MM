@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import api_twin, views, views_cohort, views_manage
+from . import api_twin, views, views_cohort, views_manage, api_algorithm
 
 app_name = "simulator"
 
@@ -8,6 +8,9 @@ urlpatterns = [
     path("", views.scenario_list, name="scenario_list"),
     path("getting-started/", views.getting_started, name="getting_started"),
     path("tutorial/", views.interactive_tutorial, name="interactive_tutorial"),
+    # Decision algorithm transparency API
+    path("api/decision-algorithm/", api_algorithm.decision_algorithm_api, name="decision_algorithm_api"),
+    path("algorithm/", views.algorithm_transparency, name="algorithm_transparency"),
     path("diagnostics/visibility/", views.visibility_diagnostics, name="visibility_diagnostics"),
     path("manage/", views_manage.ScenarioManageListView.as_view(), name="scenario_manage_list"),
     path("scenarios/new/", views_manage.ScenarioCreateView.as_view(), name="scenario_create"),

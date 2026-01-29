@@ -1,5 +1,39 @@
-site_name: Predictive Lab Docs
+site_name: bmyCure4MM Docs
+site_description: Decision support + simulation + chemtools (Django)
+site_url: https://andreazedda.github.io/bmyCure4MM/
+repo_url: https://github.com/andreazedda/bmyCure4MM
+repo_name: andreazedda/bmyCure4MM
+edit_uri: edit/main/docs/
+
 nav:
+  - Home: index.md
+  - Learning Path: guides/learning_path.md
+  - Start Here:
+      - Tutorial (EN): en/TUTORIAL_FIRST_RUN.md
+      - Tutorial (IT): it/TUTORIAL_PRIMO_USO.md
+  - Guides:
+      - Architecture: guides/architecture.md
+      - Database: guides/database.md
+      - Mathematical Models: guides/mathematical_models.md
+      - Optimization Theory: guides/optimization_theory.md
+      - Decision Algorithm: guides/decision_algorithm.md
+      - Operations: guides/operations.md
+      - Development: development/DEVELOPMENT.md
+      - Troubleshooting: development/TROUBLESHOOTING.md
+  - Reference:
+      - Configuration: reference/configuration.md
+      - Database Objects: reference/database_objects.md
+      - Scripts: reference/scripts.md
+      - Apps:
+          - Clinic: reference/apps/clinic.md
+          - Simulator: reference/apps/simulator.md
+          - ChemTools: reference/apps/chemtools.md
+          - Docs Viewer: reference/apps/docs_viewer.md
+  - Deep Dives:
+      - Dynamic Data Architecture: dynamic_data_architecture.md
+      - API Integration Summary: api_integration_summary.md
+      - Mathematical Models: features/MATHEMATICAL_MODELS_DOCUMENTATION.md
+      - Testing Report: features/TESTING_REPORT.md
   - EN:
       - Quickstart: en/quickstart.md
       - Simulator: en/simulator.md
@@ -16,11 +50,67 @@ nav:
       - Preset PK/PD: it/pkpd_preset.md
       - Pipeline: it/pipeline.md
       - API: it/api.md
+
 theme:
   name: material
+  language: it
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+    - content.tabs.link
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: pink
+      toggle:
+        icon: material/weather-night
+        name: Dark mode
+    - scheme: slate
+      primary: deep purple
+      accent: teal
+      toggle:
+        icon: material/weather-sunny
+        name: Light mode
+
 plugins:
   - search
+
 markdown_extensions:
-  - toc
   - admonition
+  - attr_list
+  - def_list
+  - md_in_html
   - tables
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_div_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+extra_css:
+  - assets/stylesheets/extra.css
+
+extra_javascript:
+  - https://unpkg.com/mermaid@10.9.0/dist/mermaid.min.js
+  - assets/javascripts/mermaid-init.js
+  - assets/javascripts/mermaid-zoom.js
+  - assets/javascripts/mathjax.js
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js

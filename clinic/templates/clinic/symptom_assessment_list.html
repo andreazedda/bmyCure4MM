@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}
+<span class="t-en">Symptom History</span>
+<span class="t-it">Storico Sintomi</span>
+- {{ patient }}
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'clinic:patient_list' %}">
+                <span class="t-en">Patients</span>
+                <span class="t-it">Pazienti</span>
+            </a></li>
+            <li class="breadcrumb-item"><a href="{% url 'clinic:patient_detail' patient.pk %}">{{ patient }}</a></li>
+            <li class="breadcrumb-item active">
+                <span class="t-en">Symptoms</span>
+                <span class="t-it">Sintomi</span>
+            </li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+            📋 <span class="t-en">Symptom History for {{ patient }}</span>
+            <span class="t-it">Storico Sintomi per {{ patient }}</span>
+        </h2>
+        <a href="{% url 'clinic:symptom_assessment_new' patient.pk %}" class="btn btn-primary">
+            ➕ <span class="t-en">New Assessment</span>
+            <span class="t-it">Nuova Valutazione</span>
+        </a>
+    </div>
+
+    {% if assessments %}
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th><span class="t-en">Date</span><span class="t-it">Data</span></th>
+                    <th><span class="t-en">Pain (NRS)</span><span class="t-it">Dolore (NRS)</span></th>
+                    <th><span class="t-en">Fatigue</span><span class="t-it">Fatica</span></th>
+                    <th><span class="t-en">Neuropathy</span><span class="t-it">Neuropatia</span></th>
+                    <th>CRAB</th>
+                    <th>ECOG</th>
+                    <th><span class="t-en">Infection</span><span class="t-it">Infezione</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in assessments %}
+                <tr>
+                    <td>{{ a.assessment_date|date:"Y-m-d" }}</td>
+                    <td>
+                        {% if a.bone_pain_nrs is not None %}
+                            <span class="badge {% if a.bone_pain_nrs <= 3 %}bg-success{% elif a.bone_pain_nrs <= 6 %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                                {{ a.bone_pain_nrs }}/10
+                            </span>
+                        {% else %}
+                            <span class="text-muted">–</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if a.fatigue_total is not None %}
+                            <span class="badge {% if a.fatigue_total >= 40 %}bg-success{% elif a.fatigue_total >= 20 %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                                {{ a.fatigue_total }}/52
+                            </span>
+                        {% else %}
+                            <span class="text-muted">–</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge {% if a.max_neuropathy_grade == 0 %}bg-success{% elif a.max_neuropathy_grade <= 2 %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                            G{{ a.max_neuropathy_grade }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if a.crab_count > 0 %}
+                            <span class="badge bg-danger">{{ a.crab_string }}</span>
+                        {% else %}
+                            <span class="badge bg-success">
+                                <span class="t-en">None</span>
+                                <span class="t-it">Nessuno</span>
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge {% if a.ecog_status <= 1 %}bg-success{% elif a.ecog_status == 2 %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                            {{ a.ecog_status }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if a.infection_present %}
+                            <span class="badge bg-danger">
+                                <span class="t-en">Yes</span>
+                                <span class="t-it">Sì</span>
+                            </span>
+                        {% else %}
+                            <span class="badge bg-success">No</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <span class="t-en">No symptom assessments recorded yet. Click "New Assessment" to add one.</span>
+        <span class="t-it">Nessuna valutazione sintomi registrata. Clicca "Nuova Valutazione" per aggiungerne una.</span>
+    </div>
+    {% endif %}
+
+    <div class="mt-4">
+        <a href="{% url 'clinic:patient_detail' patient.pk %}" class="btn btn-outline-secondary">
+            ← <span class="t-en">Back to Patient</span><span class="t-it">Torna al Paziente</span>
+        </a>
+    </div>
+</div>
+{% endblock %}

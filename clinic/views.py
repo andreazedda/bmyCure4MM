@@ -5,13 +5,16 @@ import logging
 
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Count, Prefetch, F
-from django.http import HttpRequest, HttpResponse, HttpResponseForbidden
+from django.http import HttpRequest, HttpResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.views.decorators.http import require_http_methods
 
 import django_filters
 
 from . import forms, models
+from .models_symptoms import SymptomAssessment
+from .forms_symptoms import SymptomAssessmentForm, QuickSymptomForm
 
 embed_debug_logger = logging.getLogger("embed_debug")
 
@@ -618,3 +621,264 @@ def assessment_new(request: HttpRequest, patient_id: int) -> HttpResponse:
         "form": form,
     }
     return render(request, "clinic/assessment_form.html", context)
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# SYMPTOM ASSESSMENT VIEWS
+# ══════════════════════════════════════════════════════════════════════════════
+
+@login_required
+def symptom_assessment_new(request: HttpRequest, patient_id: int) -> HttpResponse:
+    """Create a new symptom assessment for a patient."""
+    patient = get_object_or_404(models.Patient, pk=patient_id)
+    if not can_edit_patient(request.user, patient):
+        return HttpResponseForbidden("Not allowed")
+    
+    if request.method == "POST":
+        form = SymptomAssessmentForm(request.POST)
+        if form.is_valid():
+            assessment = form.save(commit=False)
+            assessment.patient = patient
+            assessment.save()
+            return redirect(reverse("clinic:patient_detail", args=[patient.id]))
+    else:
+        form = SymptomAssessmentForm()
+    
+    context = {
+        "patient": patient,
+        "form": form,
+    }
+    return render(request, "clinic/symptom_assessment_form.html", context)
+
+
+@login_required
+def symptom_assessment_list(request: HttpRequest, patient_id: int) -> HttpResponse:
+    """List all symptom assessments for a patient."""
+    patient = get_object_or_404(models.Patient, pk=patient_id)
+    assessments = SymptomAssessment.objects.filter(patient=patient).order_by("-assessment_date")
+    
+    context = {
+        "patient": patient,
+        "assessments": assessments,
+    }
+    return render(request, "clinic/symptom_assessment_list.html", context)
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# PROGNOSIS & TIMELINE VIEWS
+# ══════════════════════════════════════════════════════════════════════════════
+
+@login_required
+def prognosis_timeline(request: HttpRequest, patient_id: int) -> HttpResponse:
+    """Display prognosis estimates and timeline for a patient."""
+    from simulator.prognosis import estimate_prognosis, get_prognosis_explanation, compare_scenarios
+    
+    patient = get_object_or_404(models.Patient, pk=patient_id)
+    
+    # Get latest assessment for R-ISS and response
+    latest_assessment = patient.assessments.first()
+    
+    # Get cytogenetics
+    cytogenetics = list(
+        patient.cytogenetics.values_list("abnormality__code", flat=True)
+    )
+    
+    # Get latest symptom assessment for ECOG
+    latest_symptoms = SymptomAssessment.objects.filter(patient=patient).first()
+    ecog = latest_symptoms.ecog_status if latest_symptoms else None
+    
+    # Count therapy lines
+    therapy_count = patient.therapies.count()
+    line_of_therapy = max(therapy_count, 1)
+    
+    # Build patient parameters
+    patient_params = {
+        "r_iss": latest_assessment.r_iss if latest_assessment and latest_assessment.r_iss else "II",
+        "cytogenetics": cytogenetics,
+        "age": patient.age,
+        "ecog": ecog,
+        "response": latest_assessment.response if latest_assessment else None,
+        "line_of_therapy": line_of_therapy,
+    }
+    
+    # Calculate prognosis estimate
+    estimate = estimate_prognosis(**patient_params)
+    
+    # Get language from session/cookie
+    lang = request.COOKIES.get("lang", "en")
+    explanation = get_prognosis_explanation(estimate, lang=lang)
+    
+    # Calculate intermediate timepoints (3m, 6m) by interpolation
+    import math
+    def survival_prob(median: float, months: float) -> float:
+        if median <= 0:
+            return 0.0
+        lambda_rate = math.log(2) / median
+        return math.exp(-lambda_rate * months) * 100
+    
+    pfs_3m = survival_prob(estimate.median_pfs_months, 3)
+    pfs_6m = survival_prob(estimate.median_pfs_months, 6)
+    
+    # Generate comparison scenarios
+    scenarios = compare_scenarios(
+        base_params={
+            "r_iss": patient_params["r_iss"],
+            "cytogenetics": patient_params["cytogenetics"],
+            "age": patient_params["age"],
+            "ecog": patient_params["ecog"],
+            "line_of_therapy": patient_params["line_of_therapy"],
+        },
+        scenarios=[
+            {"name": "Baseline (PR)", "response": "PR"},
+            {"name": "With VGPR", "response": "VGPR"},
+            {"name": "With CR", "response": "CR"},
+            {"name": "With MRD-negative CR", "response": "CR", "mrd_status": "negative"},
+        ]
+    )
+    
+    context = {
+        "patient": patient,
+        "patient_params": patient_params,
+        "estimate": estimate,
+        "explanation": explanation,
+        "pfs_3m": pfs_3m,
+        "pfs_6m": pfs_6m,
+        "scenarios": scenarios,
+    }
+    return render(request, "clinic/prognosis_timeline.html", context)
+
+
+@login_required
+@require_http_methods(["GET"])
+def prognosis_api(request: HttpRequest, patient_id: int) -> JsonResponse:
+    """JSON API for prognosis data."""
+    from simulator.prognosis import estimate_prognosis
+    
+    patient = get_object_or_404(models.Patient, pk=patient_id)
+    
+    # Get parameters from request or patient data
+    latest_assessment = patient.assessments.first()
+    cytogenetics = list(patient.cytogenetics.values_list("abnormality__code", flat=True))
+    latest_symptoms = SymptomAssessment.objects.filter(patient=patient).first()
+    
+    params = {
+        "r_iss": request.GET.get("r_iss") or (latest_assessment.r_iss if latest_assessment else "II"),
+        "cytogenetics": request.GET.getlist("cytogenetics") or cytogenetics,
+        "age": int(request.GET.get("age", patient.age)),
+        "ecog": int(request.GET.get("ecog")) if request.GET.get("ecog") else (latest_symptoms.ecog_status if latest_symptoms else None),
+        "response": request.GET.get("response") or (latest_assessment.response if latest_assessment else None),
+        "mrd_status": request.GET.get("mrd_status"),
+        "line_of_therapy": int(request.GET.get("line", 1)),
+    }
+    
+    estimate = estimate_prognosis(**params)
+    
+    return JsonResponse({
+        "patient_id": patient_id,
+        "parameters": params,
+        "estimate": estimate.to_dict(),
+    })
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# REGIMEN SUGGESTER VIEWS
+# ══════════════════════════════════════════════════════════════════════════════
+
+@login_required
+def regimen_suggestions(request: HttpRequest, patient_id: int) -> HttpResponse:
+    """Display treatment regimen suggestions for a patient."""
+    from simulator.regimen_suggester import suggest_regimens
+    
+    patient = get_object_or_404(models.Patient, pk=patient_id)
+    
+    # Get patient characteristics
+    latest_assessment = patient.assessments.first()
+    latest_symptoms = SymptomAssessment.objects.filter(patient=patient).first()
+    
+    # Determine transplant eligibility based on age
+    age = patient.age
+    transplant_eligible = age < 70  # Simplified heuristic
+    
+    # Get cytogenetics risk
+    high_risk_cytos = ["del(17p)", "t(4;14)", "t(14;16)", "1q21"]
+    patient_cytos = list(patient.cytogenetics.values_list("abnormality__code", flat=True))
+    has_high_risk = any(
+        any(hr.lower() in pc.lower() for hr in high_risk_cytos) 
+        for pc in patient_cytos
+    )
+    
+    # Get prior therapies
+    prior_therapies = list(
+        patient.therapies.values_list("regimen__components", flat=True)
+    )
+    prior_agents = []
+    for pt in prior_therapies:
+        if pt:
+            prior_agents.extend([a.strip() for a in pt.split(",")])
+    
+    # Get neuropathy grade from symptoms
+    neuropathy = 0
+    if latest_symptoms:
+        neuropathy = latest_symptoms.max_neuropathy_grade
+    
+    # Count therapy lines
+    line_of_therapy = max(patient.therapies.count(), 1)
+    
+    # Get suggestions
+    suggestions = suggest_regimens(
+        age=age,
+        transplant_eligible=transplant_eligible,
+        ecog=latest_symptoms.ecog_status if latest_symptoms else 0,
+        r_iss=latest_assessment.r_iss if latest_assessment else None,
+        high_risk_cytogenetics=has_high_risk,
+        line_of_therapy=line_of_therapy,
+        prior_therapies=prior_agents,
+        neuropathy_grade=neuropathy,
+    )
+    
+    context = {
+        "patient": patient,
+        "suggestions": suggestions,
+        "patient_info": {
+            "age": age,
+            "transplant_eligible": transplant_eligible,
+            "high_risk_cytogenetics": has_high_risk,
+            "line_of_therapy": line_of_therapy,
+            "neuropathy_grade": neuropathy,
+        },
+    }
+    return render(request, "clinic/regimen_suggestions.html", context)
+
+
+@login_required
+@require_http_methods(["GET"])
+def regimen_suggestions_api(request: HttpRequest, patient_id: int) -> JsonResponse:
+    """JSON API for regimen suggestions."""
+    from simulator.regimen_suggester import suggest_regimens
+    
+    patient = get_object_or_404(models.Patient, pk=patient_id)
+    
+    # Parse parameters from request
+    age = int(request.GET.get("age", patient.age))
+    transplant_eligible = request.GET.get("transplant_eligible", "").lower() == "true"
+    ecog = int(request.GET.get("ecog", 0))
+    r_iss = request.GET.get("r_iss")
+    high_risk = request.GET.get("high_risk", "").lower() == "true"
+    line = int(request.GET.get("line", 1))
+    neuropathy = int(request.GET.get("neuropathy", 0))
+    
+    suggestions = suggest_regimens(
+        age=age,
+        transplant_eligible=transplant_eligible,
+        ecog=ecog,
+        r_iss=r_iss,
+        high_risk_cytogenetics=high_risk,
+        line_of_therapy=line,
+        neuropathy_grade=neuropathy,
+    )
+    
+    return JsonResponse({
+        "patient_id": patient_id,
+        "suggestions": suggestions,
+    })
+

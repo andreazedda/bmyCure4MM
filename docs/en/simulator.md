@@ -50,6 +50,33 @@ Our equations consider:
 
 ---
 
+## 🧠 Under the hood: model + diagrams (Mermaid)
+
+### Simulation pipeline (inputs → ODE → KPIs)
+
+```mermaid
+flowchart TD
+  A[Scenario + Parameters] --> B[PK/PD + Schedule]
+  B --> C[ODE solve]
+  C --> D["Trajectories T(t), H(t), Ci(t)"]
+  D --> E[KPIs: tumor_reduction, healthy_loss, AUC, milestones]
+  E --> F[Charts + Artifacts]
+```
+
+### Key equations (human version)
+
+$$
+\frac{dT}{dt} = r_T T \left(1-\frac{T}{K_T}\right) - \left(\sum_i E_i(C_i)\right)T
+$$
+
+$$
+\frac{dC_i}{dt} = -k_{elim,i}C_i + u_i(t)
+$$
+
+Full deep dive (theory + implementation + metrics): `Guides → Mathematical Models`.
+
+---
+
 ## 🚀 How to Use the Simulator - Step by Step
 
 ### Step 1: Choose a Scenario (Patient)

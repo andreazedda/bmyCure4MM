@@ -52,9 +52,9 @@ In pratica:
 
 File principali:
 
-- Implementazione core: [simulator/twin.py](../../simulator/twin.py)
-- Config dei pesi e range: [simulator/presets/twin_risk.yaml](../../simulator/presets/twin_risk.yaml)
-- Applicazione al modello e serializzazione artifact: [simulator/models.py](../../simulator/models.py)
+- Implementazione core: [simulator/twin.py](https://github.com/andreazedda/bmyCure4MM/blob/main/simulator/twin.py)
+- Config dei pesi e range: [simulator/presets/twin_risk.yaml](https://github.com/andreazedda/bmyCure4MM/blob/main/simulator/presets/twin_risk.yaml)
+- Applicazione al modello e serializzazione artifact: [simulator/models.py](https://github.com/andreazedda/bmyCure4MM/blob/main/simulator/models.py)
 
 ---
 
@@ -82,7 +82,7 @@ Ma i parametri del Twin **non cambiano durante la simulazione** (non ci sono upd
 
 ### 3.1 Modello `Assessment`
 
-Il modello è in [clinic/models.py](../../clinic/models.py) (`class Assessment`). Campi rilevanti:
+Il modello è in [clinic/models.py](https://github.com/andreazedda/bmyCure4MM/blob/main/clinic/models.py) (`class Assessment`). Campi rilevanti:
 
 - `r_iss` (string, choices I/II/III)
 - `ldH_u_l` (DecimalField)  
@@ -92,7 +92,7 @@ Il modello è in [clinic/models.py](../../clinic/models.py) (`class Assessment`)
 
 ### 3.2 Casting e valori null
 
-In [simulator/twin.py](../../simulator/twin.py) la funzione `_maybe_float(value)` gestisce:
+In [simulator/twin.py](https://github.com/andreazedda/bmyCure4MM/blob/main/simulator/twin.py) la funzione `_maybe_float(value)` gestisce:
 
 - `None` o stringa vuota → `None`
 - altrimenti prova `float(value)`
@@ -108,7 +108,7 @@ Quindi i `DecimalField` di Django vengono convertiti a float quando possibile.
 
 Il Twin legge **sempre** questo file:
 
-- [simulator/presets/twin_risk.yaml](../../simulator/presets/twin_risk.yaml)
+- [simulator/presets/twin_risk.yaml](https://github.com/andreazedda/bmyCure4MM/blob/main/simulator/presets/twin_risk.yaml)
 
 Caricamento:
 
@@ -283,7 +283,7 @@ $$
 
 L’integrazione avviene in:
 
-- `simulator.models.SimulationAttempt.run_model()` ([simulator/models.py](../../simulator/models.py))
+- `simulator.models.SimulationAttempt.run_model()` ([simulator/models.py](https://github.com/andreazedda/bmyCure4MM/blob/main/simulator/models.py))
 
 Flusso (semplificato ma fedele):
 
@@ -309,7 +309,7 @@ Flusso (semplificato ma fedele):
 
 Con PR1, il Patient Twin **non è più gated** da `PREDLAB_V2`:
 
-- `PREDLAB_V2 = os.environ.get("PREDLAB_V2", "0") == "1"` in [mmportal/settings.py](../../mmportal/settings.py)
+- `PREDLAB_V2 = os.environ.get("PREDLAB_V2", "0") == "1"` in [mmportal/settings.py](https://github.com/andreazedda/bmyCure4MM/blob/main/mmportal/settings.py)
 - Anche con `PREDLAB_V2=0`, il Twin può essere calcolato e serializzato come artifact, e (in modalità `auto`) può applicare override biologici.
 
 **Cosa resta gated da `PREDLAB_V2`:** la risoluzione PK/PD “avanzata” tramite `pharmaco_registry.resolve(...)` (se `PREDLAB_V2` è off, vengono usati i parametri PK/PD di default hard-coded).
@@ -343,7 +343,7 @@ Preview endpoint (PR1):
 
 La logica di merge è in:
 
-- `SimulationAttempt._merge_twin_parameters(params, twin_payload)` ([simulator/models.py](../../simulator/models.py))
+- `SimulationAttempt._merge_twin_parameters(params, twin_payload)` ([simulator/models.py](https://github.com/andreazedda/bmyCure4MM/blob/main/simulator/models.py))
 
 Regole:
 
@@ -364,7 +364,7 @@ Questo è coerente con l’idea “override solo se marcato auto”.
 **Dettaglio importante (implicazione):**
 
 - Nel form UI, campi come `tumor_growth_rate`/`healthy_growth_rate` sono `FloatField` e vengono tipicamente sempre inviati come numeri → quindi **non** sono `auto` e **non** vengono sovrascritti.
-- Il test [simulator/tests/test_twin.py](../../simulator/tests/test_twin.py) passa un `parameters` senza `tumor_growth_rate` ecc., quindi lì il Twin viene applicato.
+- Il test [simulator/tests/test_twin.py](https://github.com/andreazedda/bmyCure4MM/blob/main/simulator/tests/test_twin.py) passa un `parameters` senza `tumor_growth_rate` ecc., quindi lì il Twin viene applicato.
 
 ---
 
@@ -395,7 +395,7 @@ Inoltre:
 
 File test:
 
-- [simulator/tests/test_twin.py](../../simulator/tests/test_twin.py)
+- [simulator/tests/test_twin.py](https://github.com/andreazedda/bmyCure4MM/blob/main/simulator/tests/test_twin.py)
 
 Casi principali:
 

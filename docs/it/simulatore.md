@@ -42,6 +42,35 @@ Le nostre equazioni considerano:
 
 ---
 
+## 🧠 “Sotto il cofano”: modello e grafi (Mermaid)
+
+### Pipeline di simulazione (input → ODE → KPI)
+
+```mermaid
+flowchart TD
+  A[Scenario + Parametri] --> B[PK/PD + Schedule]
+  B --> C[ODE solve]
+  C --> D["Traiettorie T(t), H(t), Ci(t)"]
+  D --> E[KPI: tumor_reduction, healthy_loss, AUC, milestones]
+  E --> F[Grafici + Artifact]
+```
+
+### Equazioni chiave (versione “umana”)
+
+Il modello implementato usa una crescita logistica con kill dipendente dall’effetto PD:
+
+$$
+\frac{dT}{dt} = r_T T \left(1-\frac{T}{K_T}\right) - \left(\sum_i E_i(C_i)\right)T
+$$
+
+$$
+\frac{dC_i}{dt} = -k_{elim,i}C_i + u_i(t)
+$$
+
+Approfondimento completo (teoria + implementazione + KPI): `Guides → Mathematical Models`.
+
+---
+
 ## 🚀 Come Usare il Simulatore - Passo dopo Passo
 
 ### Passo 1: Scegli uno Scenario (Paziente)

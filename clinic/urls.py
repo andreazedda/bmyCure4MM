@@ -15,5 +15,38 @@ urlpatterns = [
         views.assessment_new,
         name="assessment_new",
     ),
+    # Symptom Assessments
+    path(
+        "patients/<int:patient_id>/symptoms/new/",
+        views.symptom_assessment_new,
+        name="symptom_assessment_new",
+    ),
+    path(
+        "patients/<int:patient_id>/symptoms/",
+        views.symptom_assessment_list,
+        name="symptom_assessment_list",
+    ),
+    # Prognosis & Timeline
+    path(
+        "patients/<int:patient_id>/prognosis/",
+        views.prognosis_timeline,
+        name="prognosis_timeline",
+    ),
+    path(
+        "api/patients/<int:patient_id>/prognosis/",
+        views.prognosis_api,
+        name="prognosis_api",
+    ),
+    # Regimen Suggestions
+    path(
+        "patients/<int:patient_id>/regimens/",
+        views.regimen_suggestions,
+        name="regimen_suggestions",
+    ),
+    path(
+        "api/patients/<int:patient_id>/regimens/",
+        views.regimen_suggestions_api,
+        name="regimen_suggestions_api",
+    ),
 ]
 

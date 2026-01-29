@@ -61,6 +61,13 @@
                             🎓 <span class="t-en">Tutorial</span><span class="t-it">Tutorial</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'simulator:algorithm_transparency' %}"
+                           data-bs-toggle="tooltip"
+                           title="View decision algorithm thresholds and rules">
+                            🔍 <span class="t-en">Algorithm</span><span class="t-it">Algoritmo</span>
+                        </a>
+                    </li>
                     {% if request.user.is_authenticated and user_is_simulator_editor %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="manageMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">

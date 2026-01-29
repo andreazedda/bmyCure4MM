@@ -151,3 +151,7 @@ class PatientTherapy(models.Model):
 
     def __str__(self) -> str:
         return f"{self.patient} - {self.regimen.name}"
+
+
+# Import SymptomAssessment to make it available in Django admin and migrations
+from .models_symptoms import SymptomAssessment  # noqa: E402, F401

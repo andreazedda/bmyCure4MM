@@ -407,6 +407,41 @@
         </div>
     </div>
     <div class="col-lg-4">
+        <!-- NEW: Patient Journey Quick Actions -->
+        <div class="card shadow-sm mb-3 border-primary">
+            <div class="card-header bg-primary text-white">
+                <h2 class="h6 mb-0">
+                    🩺 <span class="t-en">Patient Journey Tools</span>
+                    <span class="t-it">Strumenti Percorso Paziente</span>
+                </h2>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'clinic:symptom_assessment_new' patient.id %}" class="btn btn-outline-primary btn-sm">
+                        📋 <span class="t-en">Record Symptoms</span>
+                        <span class="t-it">Registra Sintomi</span>
+                    </a>
+                    <a href="{% url 'clinic:prognosis_timeline' patient.id %}" class="btn btn-outline-success btn-sm">
+                        📊 <span class="t-en">View Prognosis & Timeline</span>
+                        <span class="t-it">Vedi Prognosi e Timeline</span>
+                    </a>
+                    <a href="{% url 'clinic:regimen_suggestions' patient.id %}" class="btn btn-outline-info btn-sm">
+                        💊 <span class="t-en">Get Treatment Suggestions</span>
+                        <span class="t-it">Suggerimenti Terapie</span>
+                    </a>
+                    <a href="{% url 'simulator:algorithm_transparency' %}" class="btn btn-outline-secondary btn-sm">
+                        🔍 <span class="t-en">View Algorithm</span>
+                        <span class="t-it">Vedi Algoritmo</span>
+                    </a>
+                </div>
+                <hr class="my-2">
+                <p class="small text-muted mb-0">
+                    <span class="t-en">These tools provide transparent decision support with full algorithm visibility.</span>
+                    <span class="t-it">Questi strumenti forniscono supporto decisionale trasparente con visibilità completa dell'algoritmo.</span>
+                </p>
+            </div>
+        </div>
+        
         <div class="card shadow-sm mb-3">
             <div class="card-body">
                 <h2 class="h5">Lab Trends</h2>
@@ -427,6 +462,7 @@
         </div>
     </div>
 </div>
+
 
 <div class="card shadow-sm mb-3">
     <div class="card-header d-flex justify-content-between align-items-center" id="assessments">

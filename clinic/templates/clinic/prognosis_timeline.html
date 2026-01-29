@@ -1,0 +1,469 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+<span class="t-en">Prognosis & Timeline</span>
+<span class="t-it">Prognosi e Timeline</span>
+- {{ patient }}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.prognosis-card {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.risk-badge {
+    font-size: 1.1rem;
+    padding: 0.5rem 1.25rem;
+    border-radius: 20px;
+}
+.risk-standard { background: #d1e7dd; color: #0f5132; }
+.risk-intermediate { background: #fff3cd; color: #664d03; }
+.risk-high { background: #f8d7da; color: #842029; }
+.risk-very_high { background: #842029; color: white; }
+
+.survival-stat {
+    text-align: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+.survival-stat .value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #0d6efd;
+}
+.survival-stat .label {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.timeline-container {
+    position: relative;
+    padding: 2rem 0;
+}
+
+.timeline-axis {
+    height: 4px;
+    background: linear-gradient(to right, #198754, #ffc107, #dc3545);
+    border-radius: 2px;
+    position: relative;
+    margin: 3rem 0;
+}
+
+.timeline-point {
+    position: absolute;
+    top: -12px;
+    transform: translateX(-50%);
+    text-align: center;
+}
+
+.timeline-marker {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: white;
+    border: 3px solid #0d6efd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.75rem;
+}
+
+.timeline-label {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+.timeline-prob {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+.timeline-prob.high { color: #198754; }
+.timeline-prob.medium { color: #fd7e14; }
+.timeline-prob.low { color: #dc3545; }
+
+.modifier-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.modifier-list li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.modifier-list li:last-child { border-bottom: none; }
+
+.scenario-comparison {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.scenario-card {
+    background: white;
+    border: 2px solid #dee2e6;
+    border-radius: 12px;
+    padding: 1.25rem;
+    transition: all 0.2s;
+}
+.scenario-card.baseline {
+    border-color: #0d6efd;
+    background: #f0f7ff;
+}
+.scenario-card.improved {
+    border-color: #198754;
+}
+.scenario-card.worse {
+    border-color: #dc3545;
+}
+
+.diff-badge {
+    font-size: 0.85rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+}
+.diff-badge.positive { background: #d1e7dd; color: #0f5132; }
+.diff-badge.negative { background: #f8d7da; color: #842029; }
+
+.disclaimer {
+    background: #fff3cd;
+    border: 1px solid #ffecb5;
+    border-radius: 8px;
+    padding: 1rem;
+    font-size: 0.9rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'patient_list' %}">
+                <span class="t-en">Patients</span>
+                <span class="t-it">Pazienti</span>
+            </a></li>
+            <li class="breadcrumb-item"><a href="{% url 'patient_detail' patient.pk %}">{{ patient }}</a></li>
+            <li class="breadcrumb-item active">
+                <span class="t-en">Prognosis</span>
+                <span class="t-it">Prognosi</span>
+            </li>
+        </ol>
+    </nav>
+
+    <h2 class="mb-4">
+        📊 <span class="t-en">Prognosis & Timeline for {{ patient }}</span>
+        <span class="t-it">Prognosi e Timeline per {{ patient }}</span>
+    </h2>
+
+    <!-- Disclaimer -->
+    <div class="disclaimer mb-4">
+        ⚠️ <strong><span class="t-en">Disclaimer:</span><span class="t-it">Avvertenza:</span></strong>
+        <span class="t-en">These are statistical estimates based on population data. Individual outcomes may vary significantly. Consult with healthcare providers for personalized assessment.</span>
+        <span class="t-it">Queste sono stime statistiche basate su dati di popolazione. I risultati individuali possono variare significativamente. Consultare i medici per una valutazione personalizzata.</span>
+    </div>
+
+    <div class="row">
+        <!-- Main Prognosis Card -->
+        <div class="col-lg-8">
+            <div class="card prognosis-card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <span class="t-en">Survival Estimates</span>
+                        <span class="t-it">Stime di Sopravvivenza</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Risk Category -->
+                    <div class="text-center mb-4">
+                        <span class="risk-badge risk-{{ estimate.risk_category }}">
+                            {{ explanation.summary }}
+                        </span>
+                        <p class="text-muted mt-2 mb-0">
+                            <span class="t-en">Confidence: {{ estimate.confidence|floatformat:0 }}%</span>
+                            <span class="t-it">Affidabilità: {{ estimate.confidence|floatformat:0 }}%</span>
+                        </p>
+                    </div>
+
+                    <!-- Median Survival Stats -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="survival-stat">
+                                <div class="value">{{ estimate.median_pfs_months|floatformat:0 }}</div>
+                                <div class="label">
+                                    <span class="t-en">Median PFS (months)</span>
+                                    <span class="t-it">PFS Mediana (mesi)</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="survival-stat">
+                                <div class="value">{{ estimate.median_os_months|floatformat:0 }}</div>
+                                <div class="label">
+                                    <span class="t-en">Median OS (months)</span>
+                                    <span class="t-it">OS Mediana (mesi)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Timeline Visualization -->
+                    <h6 class="mb-3">
+                        📅 <span class="t-en">Expected Outcomes Timeline</span>
+                        <span class="t-it">Timeline Esiti Attesi</span>
+                    </h6>
+                    
+                    <div class="timeline-container">
+                        <div class="timeline-axis">
+                            <!-- 3 months -->
+                            <div class="timeline-point" style="left: 10%;">
+                                <div class="timeline-marker">3m</div>
+                                <div class="timeline-label">
+                                    <div class="timeline-prob {% if pfs_3m >= 0.8 %}high{% elif pfs_3m >= 0.5 %}medium{% else %}low{% endif %}">
+                                        {{ pfs_3m|floatformat:0 }}%
+                                    </div>
+                                    <small class="text-muted">PFS</small>
+                                </div>
+                            </div>
+                            
+                            <!-- 6 months -->
+                            <div class="timeline-point" style="left: 25%;">
+                                <div class="timeline-marker">6m</div>
+                                <div class="timeline-label">
+                                    <div class="timeline-prob {% if pfs_6m >= 0.8 %}high{% elif pfs_6m >= 0.5 %}medium{% else %}low{% endif %}">
+                                        {{ pfs_6m|floatformat:0 }}%
+                                    </div>
+                                    <small class="text-muted">PFS</small>
+                                </div>
+                            </div>
+                            
+                            <!-- 12 months -->
+                            <div class="timeline-point" style="left: 45%;">
+                                <div class="timeline-marker">12m</div>
+                                <div class="timeline-label">
+                                    <div class="timeline-prob {% if estimate.pfs_12m >= 0.7 %}high{% elif estimate.pfs_12m >= 0.5 %}medium{% else %}low{% endif %}">
+                                        {{ estimate.pfs_12m|floatformat:0 }}%
+                                    </div>
+                                    <small class="text-muted">PFS</small>
+                                </div>
+                            </div>
+                            
+                            <!-- 24 months -->
+                            <div class="timeline-point" style="left: 70%;">
+                                <div class="timeline-marker">24m</div>
+                                <div class="timeline-label">
+                                    <div class="timeline-prob {% if estimate.pfs_24m >= 0.6 %}high{% elif estimate.pfs_24m >= 0.4 %}medium{% else %}low{% endif %}">
+                                        {{ estimate.pfs_24m|floatformat:0 }}%
+                                    </div>
+                                    <small class="text-muted">PFS</small>
+                                </div>
+                            </div>
+                            
+                            <!-- 36 months -->
+                            <div class="timeline-point" style="left: 90%;">
+                                <div class="timeline-marker">36m</div>
+                                <div class="timeline-label">
+                                    <div class="timeline-prob {% if estimate.pfs_36m >= 0.5 %}high{% elif estimate.pfs_36m >= 0.3 %}medium{% else %}low{% endif %}">
+                                        {{ estimate.pfs_36m|floatformat:0 }}%
+                                    </div>
+                                    <small class="text-muted">PFS</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- What to Expect -->
+                    <div class="mt-4">
+                        <h6>
+                            🔮 <span class="t-en">What to Expect</span>
+                            <span class="t-it">Cosa Aspettarsi</span>
+                        </h6>
+                        <div class="row g-3">
+                            {% for period, data in explanation.timeline.items %}
+                            <div class="col-md-6">
+                                <div class="p-3 bg-light rounded">
+                                    <strong>
+                                        {% if period == "3_months" %}
+                                            <span class="t-en">At 3 months:</span><span class="t-it">A 3 mesi:</span>
+                                        {% elif period == "6_months" %}
+                                            <span class="t-en">At 6 months:</span><span class="t-it">A 6 mesi:</span>
+                                        {% elif period == "12_months" %}
+                                            <span class="t-en">At 12 months:</span><span class="t-it">A 12 mesi:</span>
+                                        {% elif period == "24_months" %}
+                                            <span class="t-en">At 24 months:</span><span class="t-it">A 24 mesi:</span>
+                                        {% endif %}
+                                    </strong>
+                                    <br>
+                                    <small>{{ data.pfs }}</small>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar: Modifiers & Info -->
+        <div class="col-lg-4">
+            <!-- Patient Parameters -->
+            <div class="card prognosis-card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        👤 <span class="t-en">Patient Parameters</span>
+                        <span class="t-it">Parametri Paziente</span>
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm mb-0">
+                        <tr>
+                            <td><strong>R-ISS</strong></td>
+                            <td>{{ patient_params.r_iss|default:"II" }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong><span class="t-en">Age</span><span class="t-it">Età</span></strong></td>
+                            <td>{{ patient.age }} <span class="t-en">years</span><span class="t-it">anni</span></td>
+                        </tr>
+                        {% if patient_params.ecog is not None %}
+                        <tr>
+                            <td><strong>ECOG</strong></td>
+                            <td>{{ patient_params.ecog }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if patient_params.response %}
+                        <tr>
+                            <td><strong><span class="t-en">Response</span><span class="t-it">Risposta</span></strong></td>
+                            <td>{{ patient_params.response }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if patient_params.line_of_therapy > 1 %}
+                        <tr>
+                            <td><strong><span class="t-en">Line</span><span class="t-it">Linea</span></strong></td>
+                            <td>{{ patient_params.line_of_therapy }}</td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+
+            <!-- Modifiers Applied -->
+            {% if estimate.modifiers_applied %}
+            <div class="card prognosis-card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        ⚙️ <span class="t-en">Adjustments Applied</span>
+                        <span class="t-it">Aggiustamenti Applicati</span>
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="modifier-list">
+                        {% for mod in estimate.modifiers_applied %}
+                        <li>
+                            {% if "high-risk" in mod|lower or "poor" in mod|lower %}
+                                <span class="text-danger">▼</span>
+                            {% elif "favorable" in mod|lower or "negative" in mod|lower and "MRD" in mod %}
+                                <span class="text-success">▲</span>
+                            {% else %}
+                                <span class="text-muted">•</span>
+                            {% endif %}
+                            {{ mod }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Reference -->
+            <div class="card prognosis-card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        📚 <span class="t-en">Reference</span>
+                        <span class="t-it">Riferimento</span>
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <small class="text-muted">{{ estimate.reference }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if scenarios %}
+    <!-- Scenario Comparison -->
+    <div class="card prognosis-card mt-4">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">
+                🔄 <span class="t-en">Scenario Comparison</span>
+                <span class="t-it">Confronto Scenari</span>
+            </h5>
+        </div>
+        <div class="card-body">
+            <p class="text-muted mb-4">
+                <span class="t-en">Compare expected outcomes under different response scenarios:</span>
+                <span class="t-it">Confronta gli esiti attesi in diversi scenari di risposta:</span>
+            </p>
+            
+            <div class="scenario-comparison">
+                {% for scenario in scenarios %}
+                <div class="scenario-card {% if scenario.scenario_name == 'Baseline' %}baseline{% elif scenario.vs_baseline.pfs_diff_months > 0 %}improved{% else %}worse{% endif %}">
+                    <h6>{{ scenario.scenario_name }}</h6>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>
+                            <span class="t-en">Median PFS</span>
+                            <span class="t-it">PFS Mediana</span>
+                        </span>
+                        <span>
+                            <strong>{{ scenario.estimate.median_pfs_months|floatformat:0 }}</strong>
+                            <span class="t-en">mo</span><span class="t-it">mesi</span>
+                            {% if scenario.vs_baseline.pfs_diff_months != 0 %}
+                            <span class="diff-badge {% if scenario.vs_baseline.pfs_diff_months > 0 %}positive{% else %}negative{% endif %}">
+                                {{ scenario.vs_baseline.pfs_improvement }}
+                            </span>
+                            {% endif %}
+                        </span>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>
+                            <span class="t-en">Median OS</span>
+                            <span class="t-it">OS Mediana</span>
+                        </span>
+                        <span>
+                            <strong>{{ scenario.estimate.median_os_months|floatformat:0 }}</strong>
+                            <span class="t-en">mo</span><span class="t-it">mesi</span>
+                            {% if scenario.vs_baseline.os_diff_months != 0 %}
+                            <span class="diff-badge {% if scenario.vs_baseline.os_diff_months > 0 %}positive{% else %}negative{% endif %}">
+                                {{ scenario.vs_baseline.os_improvement }}
+                            </span>
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Actions -->
+    <div class="d-flex gap-2 justify-content-end mt-4">
+        <a href="{% url 'patient_detail' patient.pk %}" class="btn btn-outline-secondary">
+            ← <span class="t-en">Back to Patient</span><span class="t-it">Torna al Paziente</span>
+        </a>
+        <a href="{% url 'regimen_suggestions' patient.pk %}" class="btn btn-primary">
+            💊 <span class="t-en">Get Treatment Suggestions</span><span class="t-it">Suggerimenti Terapie</span>
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,429 @@
+{% extends "base.html" %}
+
+{% block title %}Decision Algorithm Transparency - bmyCure4MM{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2">
+                <span class="t-en">🔍 Decision Algorithm - Full Transparency</span>
+                <span class="t-it">🔍 Algoritmo Decisionale - Piena Trasparenza</span>
+            </h1>
+            <p class="text-muted mb-0">
+                <span class="t-en">Version {{ version }} • Last updated: {{ last_updated }}</span>
+                <span class="t-it">Versione {{ version }} • Ultimo aggiornamento: {{ last_updated }}</span>
+            </p>
+        </div>
+        <div>
+            <a href="{% url 'simulator:decision_algorithm_api' %}" class="btn btn-outline-primary btn-sm" target="_blank">
+                <i class="bi bi-download"></i>
+                <span class="t-en">Export JSON</span>
+                <span class="t-it">Esporta JSON</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Intro Card -->
+    <div class="alert alert-info mb-4">
+        <div class="d-flex align-items-start gap-3">
+            <div style="font-size: 2rem;">📋</div>
+            <div>
+                <p class="mb-2 t-en">
+                    <strong>Why is this important?</strong> This platform uses transparent, evidence-based rules to generate 
+                    treatment recommendations. All thresholds and decision logic are disclosed here so you can understand 
+                    exactly how recommendations are made.
+                </p>
+                <p class="mb-2 t-it">
+                    <strong>Perché è importante?</strong> Questa piattaforma usa regole trasparenti e basate sull'evidenza 
+                    per generare raccomandazioni terapeutiche. Tutte le soglie e la logica decisionale sono divulgate qui 
+                    per permetterti di capire esattamente come vengono formulate le raccomandazioni.
+                </p>
+                <p class="mb-0 text-muted small">
+                    <span class="t-en">{{ disclaimer.en }}</span>
+                    <span class="t-it">{{ disclaimer.it }}</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Left Column: Thresholds -->
+        <div class="col-lg-6 mb-4">
+            <!-- Efficacy Thresholds -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <span class="t-en">📈 Efficacy Thresholds (Tumor Reduction)</span>
+                        <span class="t-it">📈 Soglie Efficacia (Riduzione Tumorale)</span>
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 30%">
+                                    <span class="t-en">Level</span>
+                                    <span class="t-it">Livello</span>
+                                </th>
+                                <th>
+                                    <span class="t-en">Condition</span>
+                                    <span class="t-it">Condizione</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for key, thresh in thresholds.efficacy.items %}
+                            <tr>
+                                <td>
+                                    <span class="badge bg-{{ thresh.badge }}">
+                                        {% if key == "good" %}🟢{% elif key == "moderate" %}🟡{% elif key == "poor" %}🔴{% else %}⚫{% endif %}
+                                        {{ key|title }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="t-en">{{ thresh.description_en }}</span>
+                                    <span class="t-it">{{ thresh.description_it }}</span>
+                                    <br><code class="small text-muted">{{ thresh.condition }}</code>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Toxicity Thresholds -->
+            <div class="card mb-4">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <span class="t-en">⚠️ Toxicity Thresholds (Healthy Cell Loss)</span>
+                        <span class="t-it">⚠️ Soglie Tossicità (Perdita Cellule Sane)</span>
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 30%">
+                                    <span class="t-en">Level</span>
+                                    <span class="t-it">Livello</span>
+                                </th>
+                                <th>
+                                    <span class="t-en">Condition</span>
+                                    <span class="t-it">Condizione</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for key, thresh in thresholds.toxicity.items %}
+                            <tr>
+                                <td>
+                                    <span class="badge bg-{{ thresh.badge }}">
+                                        {% if key == "acceptable" %}🟢{% elif key == "borderline" %}🟡{% else %}🔴{% endif %}
+                                        {{ key|title }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="t-en">{{ thresh.description_en }}</span>
+                                    <span class="t-it">{{ thresh.description_it }}</span>
+                                    <br><code class="small text-muted">{{ thresh.condition }}</code>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Durability Thresholds -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <span class="t-en">⏱️ Durability Thresholds (Time to Recurrence)</span>
+                        <span class="t-it">⏱️ Soglie Durabilità (Tempo a Recidiva)</span>
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 30%">
+                                    <span class="t-en">Level</span>
+                                    <span class="t-it">Livello</span>
+                                </th>
+                                <th>
+                                    <span class="t-en">Condition</span>
+                                    <span class="t-it">Condizione</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for key, thresh in thresholds.durability.items %}
+                            <tr>
+                                <td>
+                                    <span class="badge bg-{{ thresh.badge }}">
+                                        {% if key == "good" %}🟢{% elif key == "moderate" %}🟡{% else %}🔴{% endif %}
+                                        {{ key|title }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="t-en">{{ thresh.description_en }}</span>
+                                    <span class="t-it">{{ thresh.description_it }}</span>
+                                    <br><code class="small text-muted">{{ thresh.condition }}</code>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Risk Stratification -->
+        <div class="col-lg-6 mb-4">
+            <!-- R-ISS Staging -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <span class="t-en">📊 R-ISS Risk Stratification</span>
+                        <span class="t-it">📊 Stratificazione Rischio R-ISS</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for key, stage in risk_stratification.items %}
+                    <div class="border rounded p-3 mb-3 {% if 'III' in key %}border-danger{% elif 'II' in key %}border-warning{% else %}border-success{% endif %}">
+                        <h6 class="{% if 'III' in key %}text-danger{% elif 'II' in key %}text-warning{% else %}text-success{% endif %}">
+                            {{ key|slice:"6:" }}
+                            {% if 'III' in key %}🔴 High Risk{% elif 'II' in key %}🟡 Intermediate{% else %}🟢 Low Risk{% endif %}
+                        </h6>
+                        <p class="small mb-2">
+                            <strong>
+                                <span class="t-en">Criteria:</span>
+                                <span class="t-it">Criteri:</span>
+                            </strong>
+                            <code>{{ stage.criteria }}</code>
+                        </p>
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="small text-muted">
+                                    <span class="t-en">Median PFS</span>
+                                    <span class="t-it">PFS Mediana</span>
+                                </div>
+                                <strong>{{ stage.median_PFS_months }} 
+                                    <span class="t-en">months</span>
+                                    <span class="t-it">mesi</span>
+                                </strong>
+                            </div>
+                            <div class="col-4">
+                                <div class="small text-muted">
+                                    <span class="t-en">Median OS</span>
+                                    <span class="t-it">OS Mediana</span>
+                                </div>
+                                <strong>
+                                    {% if stage.median_OS_months %}
+                                        {{ stage.median_OS_months }} 
+                                        <span class="t-en">months</span>
+                                        <span class="t-it">mesi</span>
+                                    {% else %}
+                                        <span class="t-en">Not reached</span>
+                                        <span class="t-it">Non raggiunta</span>
+                                    {% endif %}
+                                </strong>
+                            </div>
+                            <div class="col-4">
+                                <div class="small text-muted">
+                                    <span class="t-en">5-year survival</span>
+                                    <span class="t-it">Sopravvivenza 5 anni</span>
+                                </div>
+                                <strong>{{ stage.five_year_survival_percent }}%</strong>
+                            </div>
+                        </div>
+                        <p class="small mb-0 mt-2 text-muted">
+                            <span class="t-en">{{ stage.description_en }}</span>
+                            <span class="t-it">{{ stage.description_it }}</span>
+                        </p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- High-Risk Cytogenetics -->
+            <div class="card mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">
+                        <span class="t-en">🧬 High-Risk Cytogenetics</span>
+                        <span class="t-it">🧬 Citogenetica ad Alto Rischio</span>
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for key, cyto in high_risk_cytogenetics.items %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-1">{{ cyto.name }} <small class="text-muted">({{ cyto.gene }})</small></h6>
+                            </div>
+                            <p class="mb-1 small">
+                                <span class="t-en"><strong>Impact:</strong> {{ cyto.impact_en }}</span>
+                                <span class="t-it"><strong>Impatto:</strong> {{ cyto.impact_it }}</span>
+                            </p>
+                            <p class="mb-0 small text-muted">
+                                <span class="t-en"><strong>Management:</strong> {{ cyto.management_en }}</span>
+                                <span class="t-it"><strong>Gestione:</strong> {{ cyto.management_it }}</span>
+                            </p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Decision Rules -->
+    <div class="card mb-4">
+        <div class="card-header bg-warning">
+            <h5 class="mb-0">
+                <span class="t-en">📋 Decision Rules ({{ decision_rules|length }} rules)</span>
+                <span class="t-it">📋 Regole Decisionali ({{ decision_rules|length }} regole)</span>
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>
+                                <span class="t-en">Rule Name</span>
+                                <span class="t-it">Nome Regola</span>
+                            </th>
+                            <th>
+                                <span class="t-en">Trigger Condition</span>
+                                <span class="t-it">Condizione Attivazione</span>
+                            </th>
+                            <th>
+                                <span class="t-en">Priority</span>
+                                <span class="t-it">Priorità</span>
+                            </th>
+                            <th>
+                                <span class="t-en">Recommended Action</span>
+                                <span class="t-it">Azione Raccomandata</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rule in decision_rules %}
+                        <tr class="{% if rule.priority == 'critical' %}table-danger{% elif rule.priority == 'high' %}table-warning{% endif %}">
+                            <td><code>{{ rule.id }}</code></td>
+                            <td>
+                                {{ rule.icon }}
+                                <span class="t-en">{{ rule.name_en }}</span>
+                                <span class="t-it">{{ rule.name_it }}</span>
+                            </td>
+                            <td><code>{{ rule.trigger_condition }}</code></td>
+                            <td>
+                                <span class="badge {% if rule.priority == 'critical' %}bg-danger{% elif rule.priority == 'high' %}bg-warning text-dark{% elif rule.priority == 'medium' %}bg-info{% else %}bg-success{% endif %}">
+                                    {{ rule.priority|upper }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="t-en">{{ rule.action_en }}</span>
+                                <span class="t-it">{{ rule.action_it }}</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Expandable Details -->
+            <div class="accordion mt-3" id="ruleDetails">
+                {% for rule in decision_rules %}
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#rule-{{ rule.id }}">
+                            {{ rule.icon }} {{ rule.id }}: 
+                            <span class="t-en ms-1">{{ rule.name_en }}</span>
+                            <span class="t-it ms-1">{{ rule.name_it }}</span>
+                        </button>
+                    </h2>
+                    <div id="rule-{{ rule.id }}" class="accordion-collapse collapse" data-bs-parent="#ruleDetails">
+                        <div class="accordion-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>
+                                        <span class="t-en">Rationale</span>
+                                        <span class="t-it">Razionale</span>
+                                    </h6>
+                                    <p>
+                                        <span class="t-en">{{ rule.rationale_en }}</span>
+                                        <span class="t-it">{{ rule.rationale_it }}</span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>
+                                        <span class="t-en">Evidence Sources</span>
+                                        <span class="t-it">Fonti Evidenza</span>
+                                    </h6>
+                                    <ul class="small">
+                                        {% for evidence in rule.evidence %}
+                                        <li>{{ evidence }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% if rule.suggested_alternatives %}
+                                    <h6 class="mt-3">
+                                        <span class="t-en">Suggested Alternatives</span>
+                                        <span class="t-it">Alternative Suggerite</span>
+                                    </h6>
+                                    <ul class="small">
+                                        {% for alt in rule.suggested_alternatives %}
+                                        <li><strong>{{ alt.name }}</strong>: {{ alt.indication }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Sources -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <span class="t-en">📚 Evidence Sources & References</span>
+                <span class="t-it">📚 Fonti Evidenza & Riferimenti</span>
+            </h5>
+        </div>
+        <div class="card-body">
+            <ul class="list-unstyled mb-0">
+                {% for source in data_sources %}
+                <li class="mb-2">
+                    <strong>{{ source.name }}</strong><br>
+                    <span class="text-muted">{{ source.reference }}</span>
+                    {% if source.doi %}
+                    <br><a href="https://doi.org/{{ source.doi }}" target="_blank" class="small">DOI: {{ source.doi }}</a>
+                    {% endif %}
+                    {% if source.url %}
+                    <br><a href="{{ source.url }}" target="_blank" class="small">{{ source.url }}</a>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Back Navigation -->
+    <div class="text-center">
+        <a href="{% url 'simulator:scenario_list' %}" class="btn btn-primary">
+            <span class="t-en">← Back to Simulator</span>
+            <span class="t-it">← Torna al Simulatore</span>
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,223 +1,149 @@
-# bmyCure4MM Architecture Overview
+# Architecture
 
-## System Architecture
+## Cos’è bmyCure4MM
 
-bmyCure4MM is a Django-based web application for multiple myeloma (MM) clinical decision support and drug discovery research.
+bmyCure4MM è un’applicazione web **Django** orientata a:
 
-## High-Level Architecture
+- **Clinic**: gestione pazienti/assessment/terapie (CRUD + timeline)
+- **Simulator**: scenari clinici e simulazioni (PK/PD, patient twin, reportistica)
+- **ChemTools**: tool di chem-informatics (job asincroni + output in media)
+- **Docs Viewer**: viewer interno per documentazione Markdown (analytics + feedback)
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                      Web Interface (Django)                  │
-│                    Templates + HTMX + Alpine.js              │
-└────────────┬────────────────────────────────┬────────────────┘
-             │                                │
-             ├────────────────┐              │
-             │                │              │
-┌────────────▼──────┐  ┌──────▼───────┐  ┌──▼──────────────┐
-│   Simulator        │  │  ChemTools   │  │  Clinic         │
-│   (PKPD Models)    │  │  (Drug       │  │  (Patient       │
-│                    │  │   Discovery) │  │   Management)   │
-└────────────┬───────┘  └──────┬───────┘  └──┬──────────────┘
-             │                 │              │
-             └─────────────────┴──────────────┘
-                          │
-             ┌────────────▼───────────────┐
-             │   Celery Task Queue        │
-             │   (Background Processing)  │
-             └────────────┬───────────────┘
-                          │
-             ┌────────────▼───────────────┐
-             │   Redis (Message Broker)   │
-             └────────────────────────────┘
-```
+La root app Django è `mmportal/`.
 
-## Core Components
+## Componenti (vista di insieme)
 
-### 1. **Simulator App** 
-**Purpose**: PKPD simulation and clinical scenario management
+```mermaid
+flowchart LR
+  subgraph Client
+    B[Browser]
+  end
 
-**Key Features**:
-- Digital patient twins (virtual patients)
-- Treatment regimen optimization
-- Clinical scenario builder with validation
-- Mathematical pharmacokinetic/pharmacodynamic models
-- Difficulty scoring for educational scenarios
+  subgraph DjangoApp["Django (mmportal)"]
+    URLS[URL routing]
+    VIEWS[Views / DRF ViewSets]
+    TPL[Templates]
+    ORM[Django ORM]
+  end
 
-**Key Models**:
-- `Scenario` - Clinical training scenarios with patient parameters
-- `Regimen` - Treatment protocols with drug dosing
-- `Simulation` - Individual simulation runs
-- `SimulationParameter` - PKPD model parameters
+  subgraph Apps
+    CLINIC[clinic]
+    SIM[simulator]
+    CHEM[chemtools]
+    DV[docs_viewer]
+  end
 
-**Technologies**:
-- NumPy/SciPy for numerical computations
-- Optuna for treatment optimization
-- Mathematical models for drug kinetics
+  subgraph Infra
+    DB[(SQLite / Postgres)]
+    REDIS[(Redis)]
+    CELERY[Celery worker]
+    FS[(media/ + static/)]
+  end
 
-### 2. **ChemTools App**
-**Purpose**: Drug discovery and molecular analysis tools
+  B -->|HTTP| URLS --> VIEWS
+  VIEWS --> TPL
+  VIEWS -->|ORM| ORM --> DB
 
-**Key Features**:
-- Molecular structure visualization (py3Dmol)
-- Drug similarity search
-- ADME property calculation
-- Lipinski's Rule of Five analysis
-- PDB structure fetching and analysis
-- Chemical structure caching
+  VIEWS --> CLINIC
+  VIEWS --> SIM
+  VIEWS --> CHEM
+  VIEWS --> DV
 
-**Key Models**:
-- `DrugParameter` - Pharmacological properties
-- `SimilaritySearch` - Drug similarity results
-
-**Technologies**:
-- RDKit for cheminformatics
-- py3Dmol for 3D visualization
-- BioPython for PDB parsing
-
-### 3. **Clinic App**
-**Purpose**: Patient data management
-
-**Key Features**:
-- Patient records management
-- Clinical assessments
-- Treatment history tracking
-- CRUD operations with validation
-
-**Key Models**:
-- `Patient` - Patient demographics and medical history
-- `Assessment` - Clinical evaluations
-
-### 4. **Docs Viewer App**
-**Purpose**: Multi-language documentation system
-
-**Key Features**:
-- Markdown rendering
-- Multi-language support (EN/IT)
-- Search functionality
-- Dynamic documentation loading
-
-## Data Flow
-
-### Simulation Workflow
-```
-User → Create Scenario → Define Regimen → Configure Parameters
-    ↓
-Run Simulation → Celery Task → PKPD Model Execution
-    ↓
-Store Results → Generate Visualizations → Display to User
+  CHEM -->|enqueue| REDIS --> CELERY
+  CELERY -->|read/write| DB
+  CELERY -->|artifacts| FS
+  SIM -->|plots/artifacts| FS
+  TPL -->|static| FS
 ```
 
-### Drug Discovery Workflow
-```
-User → Input SMILES/PDB → ChemTools Processing
-    ↓
-Calculate Properties → Similarity Search → 3D Visualization
-    ↓
-Cache Results → Display Interactive Viewer
-```
+!!! note "Frontend"
+    La UI è principalmente server-rendered (Django templates) con interazioni incremental-update tramite **HTMX**.
 
-### Treatment Optimization
-```
-Define Patient Twin → Set Optimization Goals → Configure Constraints
-    ↓
-Optuna Trial → Evaluate Regimen → Score Response
-    ↓
-Iterate → Find Optimal Protocol → Present Results
-```
+## Apps (responsabilità)
 
-## Technology Stack
+### `clinic`
 
-### Backend
-- **Framework**: Django 4.x
-- **Database**: SQLite (dev), PostgreSQL (production-ready)
-- **Task Queue**: Celery with Redis
-- **API**: Django REST Framework
+- Anagrafica paziente (`Patient`) + ownership minimo (`owner`)
+- Assessment clinici (`Assessment`)
+- Regimen (`Regimen`) riusati anche dal simulator
+- Terapie per paziente (`PatientTherapy`)
+- Citogenetica (catalogo + storico)
 
-### Frontend
-- **Templates**: Django Templates with Jinja2
-- **Interactivity**: HTMX for dynamic updates
-- **JavaScript**: Alpine.js for reactive components
-- **CSS**: Custom styles + utility classes
-- **Charts**: Chart.js for visualizations
+### `simulator`
 
-### Scientific Computing
-- **NumPy**: Array operations and numerical computing
-- **SciPy**: Differential equation solving (odeint)
-- **RDKit**: Molecular informatics
-- **BioPython**: Biological data structures
-- **Optuna**: Bayesian optimization
+- Scenario didattici (`Scenario`)
+- Esecuzione simulazione e persistenza risultati (`SimulationAttempt`)
+- “Patient twin” e preset PK/PD (`simulator/presets/`)
+- API dedicate e audit UX (`api_*.py`, `api_ux.py`)
 
-### Visualization
-- **py3Dmol**: 3D molecular structures
-- **Matplotlib**: Static plots (converted to base64)
-- **Chart.js**: Interactive web charts
+### `chemtools`
 
-## Database Schema
+- Job di utilità (parametri, similarity, binding) tracciati da `ChemJob`
+- Output salvati in `MEDIA_ROOT` (HTML/CSV) con progress tracking
 
-### Core Relationships
-```
-User ─┬─ Patient ─── Assessment
-      │
-      ├─ Scenario ──┬─── Regimen
-      │             │
-      │             └─── Simulation ─── SimulationParameter
-      │
-      └─ DrugParameter ─── SimilaritySearch
+### `docs_viewer`
+
+- Render e navigazione documenti Markdown interni
+- Analytics e feedback (`DocumentView`, `DocumentFeedback`)
+
+## Flussi principali
+
+### Flusso: simulazione (Scenario → Attempt → Results)
+
+```mermaid
+sequenceDiagram
+  autonumber
+  actor U as Utente
+  participant W as Django view
+  participant DB as DB
+  participant M as Modello matematico
+  participant FS as media/
+
+  U->>W: Submit form (scenario + parametri)
+  W->>DB: Crea/aggiorna SimulationAttempt
+  W->>M: run_model(parameters)
+  M-->>W: trajectory + summary + artifacts
+  W->>DB: Salva results/results_summary/artifacts (JSON)
+  W->>FS: (opzionale) salva HTML/plot in media/
+  W-->>U: Render pagina risultati (HTMX o full page)
 ```
 
-## Configuration
+### Flusso: chemtools (job asincrono)
 
-### Environment Variables
+```mermaid
+sequenceDiagram
+  autonumber
+  actor U as Utente
+  participant W as Django view
+  participant DB as DB
+  participant R as Redis (broker)
+  participant C as Celery worker
+  participant FS as media/
 
-**Required Variables:**
-```bash
-# Django - REQUIRED
-DJANGO_SECRET_KEY          # Secret key (REQUIRED - no default)
-                          # Generate: python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
-                          # Must be strong and random - app will not start without it
+  U->>W: Avvia tool (es. similarity)
+  W->>DB: Crea ChemJob (Queued)
+  W->>R: enqueue task(job_id)
+  C->>R: fetch task
+  C->>DB: update_progress(...)
+  C->>FS: scrive output (html/csv)
+  C->>DB: aggiorna ChemJob (Completed/Failed)
+  W-->>U: UI poll/refresh stato (HTMX)
 ```
 
-**Optional Variables:**
-```bash
-# Django
-DJANGO_DEBUG               # Debug mode (0 or 1, default: 1)
-ALLOWED_HOSTS              # Comma-separated hostnames
-CSRF_TRUSTED_ORIGINS       # Comma-separated origins
+## Dati e persistenza
 
-# Celery
-CELERY_BROKER_URL          # Redis connection (redis://localhost:6379/0)
-CELERY_RESULT_BACKEND      # Result storage
-CELERY_TASK_ALWAYS_EAGER   # Run tasks synchronously (dev)
+- Default database: `db.sqlite3` (sviluppo)
+- In produzione: consigliato Postgres
 
-# Features
-PREDLAB_V2                 # Enable experimental features (0 or 1)
-```
+La guida completa allo schema è in `Guides → Database`.
 
-**Security Note:** The application will refuse to start if `DJANGO_SECRET_KEY` is:
-- Not set in environment
-- Contains "insecure" 
-- Uses a known default value
+## Punti operativi
 
-See `.env.example` for complete configuration template.
+- Static: `mmportal/static/` → `collectstatic` in produzione
+- Media: `media/` (artifact e upload)
+- Logs: `logs/` (Django + activity + Celery)
 
-### File Structure
-```
-bmyCure4MM/
-├── mmportal/              # Project settings
-│   ├── settings.py        # Django configuration
-│   ├── urls.py            # URL routing
-│   └── celery.py          # Celery configuration
-├── simulator/             # PKPD simulation app
-│   ├── models.py          # Data models
-│   ├── views.py           # View logic
-│   ├── forms.py           # Form validation
-│   ├── difficulty_scoring.py  # Mathematical models
-│   └── virtual_patients.py    # Patient archetypes
-├── chemtools/             # Drug discovery app
-│   ├── models.py
-│   ├── views.py
-│   ├── tasks.py           # Celery tasks
+Vedi anche `Guides → Operations` e `Reference → Configuration`.
 │   └── utils.py           # Chemical calculations
 ├── clinic/                # Patient management app
 ├── docs_viewer/           # Documentation system
@@ -367,4 +293,4 @@ The application will automatically refuse to start if:
 
 ---
 
-For implementation details, see [Development Guide](development/DEVELOPMENT.md).
+For implementation details, see [Development Guide](../development/DEVELOPMENT.md).

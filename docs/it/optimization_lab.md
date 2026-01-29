@@ -10,6 +10,20 @@
 - Penalità per violazioni di tossicità o schedule.
 - Pareto ordinato per efficacia decrescente.
 
+## Diagramma (Mermaid)
+
+```mermaid
+flowchart TD
+  P[Trial params] --> R[Run model]
+  R --> K[KPI summary]
+  K --> C{healthy loss <= 0.25?}
+  C -- no --> X[Penalty]
+  C -- yes --> O["Objectives: efficacy, safety, exposure"]
+  O --> F[Pareto front]
+```
+
+Approfondimento teorico (multi-obiettivo, Pareto, search space): `Guides → Optimization Theory`.
+
 ## Riproducibilità
 - Imposta il seed nel form per replicare i trial.
 - Esporta i risultati (JSON) per archiviazione.

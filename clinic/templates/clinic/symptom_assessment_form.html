@@ -1,0 +1,564 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+<span class="t-en">Symptom Assessment</span>
+<span class="t-it">Valutazione Sintomi</span>
+- {{ patient }}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.symptom-section {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid #0d6efd;
+}
+.symptom-section.pain { border-left-color: #dc3545; }
+.symptom-section.fatigue { border-left-color: #fd7e14; }
+.symptom-section.neuropathy { border-left-color: #6f42c1; }
+.symptom-section.crab { border-left-color: #198754; }
+.symptom-section.infection { border-left-color: #0dcaf0; }
+.symptom-section.performance { border-left-color: #6c757d; }
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.pain-scale {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+}
+.pain-scale span:first-child { color: #198754; }
+.pain-scale span:last-child { color: #dc3545; }
+
+.pain-value {
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+.pain-value.low { color: #198754; }
+.pain-value.medium { color: #fd7e14; }
+.pain-value.high { color: #dc3545; }
+
+.crab-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+@media (max-width: 768px) {
+    .crab-grid { grid-template-columns: 1fr; }
+}
+
+.crab-item {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 0.75rem;
+}
+.crab-item.active {
+    border-color: #198754;
+    background: #d1e7dd;
+}
+
+.crab-letter {
+    font-size: 1.5rem;
+    font-weight: bold;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e9ecef;
+}
+.crab-item.active .crab-letter {
+    background: #198754;
+    color: white;
+}
+
+.ecog-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+.ecog-card {
+    flex: 1;
+    min-width: 100px;
+    padding: 0.5rem;
+    border: 2px solid #dee2e6;
+    border-radius: 6px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.ecog-card:hover { border-color: #0d6efd; }
+.ecog-card.selected {
+    border-color: #0d6efd;
+    background: #cfe2ff;
+}
+.ecog-card .grade {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+.ecog-card .label {
+    font-size: 0.7rem;
+    color: #6c757d;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'patient_list' %}">
+                <span class="t-en">Patients</span>
+                <span class="t-it">Pazienti</span>
+            </a></li>
+            <li class="breadcrumb-item"><a href="{% url 'patient_detail' patient.pk %}">{{ patient }}</a></li>
+            <li class="breadcrumb-item active">
+                <span class="t-en">Symptom Assessment</span>
+                <span class="t-it">Valutazione Sintomi</span>
+            </li>
+        </ol>
+    </nav>
+
+    <h2 class="mb-4">
+        <span class="t-en">🩺 Symptom Assessment for {{ patient }}</span>
+        <span class="t-it">🩺 Valutazione Sintomi per {{ patient }}</span>
+    </h2>
+
+    <form method="post" id="symptomForm">
+        {% csrf_token %}
+        
+        <!-- Pain Section -->
+        <div class="symptom-section pain">
+            <div class="section-title">
+                🦴 <span class="t-en">Bone Pain</span><span class="t-it">Dolore Osseo</span>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <label class="form-label">
+                        <span class="t-en">Pain Intensity (NRS 0-10)</span>
+                        <span class="t-it">Intensità Dolore (NRS 0-10)</span>
+                    </label>
+                    <div class="pain-value" id="painValueDisplay">{{ form.bone_pain_nrs.value|default:0 }}</div>
+                    {{ form.bone_pain_nrs }}
+                    <div class="pain-scale">
+                        <span><span class="t-en">No pain</span><span class="t-it">Nessun dolore</span></span>
+                        <span><span class="t-en">Worst pain</span><span class="t-it">Peggior dolore</span></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">
+                        <span class="t-en">Pain Location</span>
+                        <span class="t-it">Localizzazione Dolore</span>
+                    </label>
+                    {{ form.bone_pain_location }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Fatigue Section -->
+        <div class="symptom-section fatigue">
+            <div class="section-title">
+                😴 <span class="t-en">Fatigue (FACIT-F)</span><span class="t-it">Fatica (FACIT-F)</span>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-4">
+                    <label class="form-label">
+                        <span class="t-en">Total Score (0-52)</span>
+                        <span class="t-it">Punteggio Totale (0-52)</span>
+                    </label>
+                    {{ form.fatigue_total }}
+                    <small class="text-muted">
+                        <span class="t-en">Higher = less fatigue</span>
+                        <span class="t-it">Più alto = meno fatica</span>
+                    </small>
+                </div>
+            </div>
+            
+            <hr class="my-3">
+            <p class="text-muted small mb-2">
+                <span class="t-en">Or answer individual questions (past 7 days):</span>
+                <span class="t-it">Oppure rispondi alle domande singole (ultimi 7 giorni):</span>
+            </p>
+            
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label small">
+                        <span class="t-en">I feel fatigued</span>
+                        <span class="t-it">Mi sento affaticato/a</span>
+                    </label>
+                    {{ form.fatigue_feel_tired }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small">
+                        <span class="t-en">I feel weak all over</span>
+                        <span class="t-it">Mi sento debole ovunque</span>
+                    </label>
+                    {{ form.fatigue_feel_weak }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small">
+                        <span class="t-en">I feel listless (washed out)</span>
+                        <span class="t-it">Mi sento svogliato/a</span>
+                    </label>
+                    {{ form.fatigue_feel_listless }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small">
+                        <span class="t-en">I have trouble starting things</span>
+                        <span class="t-it">Ho difficoltà a iniziare le cose</span>
+                    </label>
+                    {{ form.fatigue_trouble_starting }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small">
+                        <span class="t-en">I have trouble finishing things</span>
+                        <span class="t-it">Ho difficoltà a finire le cose</span>
+                    </label>
+                    {{ form.fatigue_trouble_finishing }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Neuropathy Section -->
+        <div class="symptom-section neuropathy">
+            <div class="section-title">
+                ⚡ <span class="t-en">Neuropathy (CTCAE Grade)</span><span class="t-it">Neuropatia (Grado CTCAE)</span>
+            </div>
+            
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">
+                        <span class="t-en">Sensory</span>
+                        <span class="t-it">Sensoriale</span>
+                    </label>
+                    {{ form.neuropathy_sensory }}
+                    <small class="text-muted">
+                        <span class="t-en">Numbness, tingling</span>
+                        <span class="t-it">Intorpidimento, formicolio</span>
+                    </small>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">
+                        <span class="t-en">Motor</span>
+                        <span class="t-it">Motoria</span>
+                    </label>
+                    {{ form.neuropathy_motor }}
+                    <small class="text-muted">
+                        <span class="t-en">Weakness</span>
+                        <span class="t-it">Debolezza</span>
+                    </small>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">
+                        <span class="t-en">Neuropathic Pain</span>
+                        <span class="t-it">Dolore Neuropatico</span>
+                    </label>
+                    {{ form.neuropathy_pain }}
+                    <small class="text-muted">
+                        <span class="t-en">Burning, shooting</span>
+                        <span class="t-it">Bruciante, lancinante</span>
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- CRAB Section -->
+        <div class="symptom-section crab">
+            <div class="section-title">
+                🦀 <span class="t-en">CRAB Criteria</span><span class="t-it">Criteri CRAB</span>
+            </div>
+            
+            <div class="crab-grid">
+                <!-- Calcium -->
+                <div class="crab-item" id="crabC">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <div class="crab-letter">C</div>
+                        <div>
+                            <div class="form-check">
+                                {{ form.crab_hypercalcemia }}
+                                <label class="form-check-label fw-bold">
+                                    <span class="t-en">Hypercalcemia</span>
+                                    <span class="t-it">Ipercalcemia</span>
+                                </label>
+                            </div>
+                            <small class="text-muted">Ca >11 mg/dL</small>
+                        </div>
+                    </div>
+                    {{ form.crab_hypercalcemia_symptoms }}
+                </div>
+                
+                <!-- Renal -->
+                <div class="crab-item" id="crabR">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <div class="crab-letter">R</div>
+                        <div>
+                            <div class="form-check">
+                                {{ form.crab_renal }}
+                                <label class="form-check-label fw-bold">
+                                    <span class="t-en">Renal Insufficiency</span>
+                                    <span class="t-it">Insufficienza Renale</span>
+                                </label>
+                            </div>
+                            <small class="text-muted">Cr >2 mg/dL</small>
+                        </div>
+                    </div>
+                    {{ form.crab_renal_symptoms }}
+                </div>
+                
+                <!-- Anemia -->
+                <div class="crab-item" id="crabA">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <div class="crab-letter">A</div>
+                        <div>
+                            <div class="form-check">
+                                {{ form.crab_anemia }}
+                                <label class="form-check-label fw-bold">
+                                    <span class="t-en">Anemia</span>
+                                    <span class="t-it">Anemia</span>
+                                </label>
+                            </div>
+                            <small class="text-muted">Hb <10 g/dL</small>
+                        </div>
+                    </div>
+                    {{ form.crab_anemia_symptoms }}
+                </div>
+                
+                <!-- Bone -->
+                <div class="crab-item" id="crabB">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <div class="crab-letter">B</div>
+                        <div>
+                            <div class="form-check">
+                                {{ form.crab_bone }}
+                                <label class="form-check-label fw-bold">
+                                    <span class="t-en">Bone Lesions</span>
+                                    <span class="t-it">Lesioni Ossee</span>
+                                </label>
+                            </div>
+                            <small class="text-muted">
+                                <span class="t-en">Lytic lesions/fractures</span>
+                                <span class="t-it">Lesioni litiche/fratture</span>
+                            </small>
+                        </div>
+                    </div>
+                    {{ form.crab_bone_symptoms }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Infection Section -->
+        <div class="symptom-section infection">
+            <div class="section-title">
+                🦠 <span class="t-en">Infections</span><span class="t-it">Infezioni</span>
+            </div>
+            
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <div class="form-check">
+                        {{ form.infection_present }}
+                        <label class="form-check-label fw-bold">
+                            <span class="t-en">Active Infection</span>
+                            <span class="t-it">Infezione Attiva</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="col-md-3" id="infectionTypeGroup">
+                    <label class="form-label">
+                        <span class="t-en">Type</span>
+                        <span class="t-it">Tipo</span>
+                    </label>
+                    {{ form.infection_type }}
+                </div>
+                
+                <div class="col-md-3" id="infectionOrganismGroup">
+                    <label class="form-label">
+                        <span class="t-en">Organism</span>
+                        <span class="t-it">Organismo</span>
+                    </label>
+                    {{ form.infection_organism }}
+                </div>
+                
+                <div class="col-md-3" id="infectionHospGroup">
+                    <div class="form-check mt-4">
+                        {{ form.infection_hospitalized }}
+                        <label class="form-check-label">
+                            <span class="t-en">Required Hospitalization</span>
+                            <span class="t-it">Richiesto Ricovero</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Status -->
+        <div class="symptom-section performance">
+            <div class="section-title">
+                🏃 <span class="t-en">Performance Status</span><span class="t-it">Status di Performance</span>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <label class="form-label">
+                        <span class="t-en">ECOG Performance Status</span>
+                        <span class="t-it">Status di Performance ECOG</span>
+                    </label>
+                    {{ form.ecog_status }}
+                </div>
+            </div>
+            
+            <div class="mt-3">
+                <div class="row g-2 small">
+                    <div class="col"><strong>0:</strong> <span class="t-en">Fully active</span><span class="t-it">Pienamente attivo</span></div>
+                    <div class="col"><strong>1:</strong> <span class="t-en">Restricted strenuous</span><span class="t-it">Attività intensa limitata</span></div>
+                    <div class="col"><strong>2:</strong> <span class="t-en">Ambulatory, no work</span><span class="t-it">Deambulante, non lavora</span></div>
+                    <div class="col"><strong>3:</strong> <span class="t-en">Limited self-care</span><span class="t-it">Autosufficienza limitata</span></div>
+                    <div class="col"><strong>4:</strong> <span class="t-en">Completely disabled</span><span class="t-it">Completamente disabile</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Symptoms -->
+        <div class="symptom-section">
+            <div class="section-title">
+                📋 <span class="t-en">Additional Symptoms</span><span class="t-it">Sintomi Aggiuntivi</span>
+            </div>
+            
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <div class="form-check">
+                        {{ form.appetite_loss }}
+                        <label class="form-check-label">
+                            <span class="t-en">Appetite Loss</span>
+                            <span class="t-it">Perdita Appetito</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">
+                        <span class="t-en">Weight Loss (%)</span>
+                        <span class="t-it">Perdita Peso (%)</span>
+                    </label>
+                    {{ form.weight_loss_pct }}
+                </div>
+                <div class="col-md-3">
+                    <div class="form-check">
+                        {{ form.night_sweats }}
+                        <label class="form-check-label">
+                            <span class="t-en">Night Sweats</span>
+                            <span class="t-it">Sudorazione Notturna</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-check">
+                        {{ form.bruising_bleeding }}
+                        <label class="form-check-label">
+                            <span class="t-en">Easy Bruising/Bleeding</span>
+                            <span class="t-it">Facili Ecchimosi/Sanguinamento</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-3">
+                <label class="form-label">
+                    <span class="t-en">Additional Notes</span>
+                    <span class="t-it">Note Aggiuntive</span>
+                </label>
+                {{ form.additional_notes }}
+            </div>
+        </div>
+
+        <!-- Submit -->
+        <div class="d-flex gap-2 justify-content-end">
+            <a href="{% url 'patient_detail' patient.pk %}" class="btn btn-outline-secondary">
+                <span class="t-en">Cancel</span>
+                <span class="t-it">Annulla</span>
+            </a>
+            <button type="submit" class="btn btn-primary btn-lg">
+                💾 <span class="t-en">Save Assessment</span><span class="t-it">Salva Valutazione</span>
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Pain slider update
+    const painSlider = document.querySelector('input[name="bone_pain_nrs"]');
+    const painDisplay = document.getElementById('painValueDisplay');
+    
+    if (painSlider && painDisplay) {
+        painSlider.addEventListener('input', function() {
+            painDisplay.textContent = this.value;
+            painDisplay.className = 'pain-value';
+            if (this.value <= 3) painDisplay.classList.add('low');
+            else if (this.value <= 6) painDisplay.classList.add('medium');
+            else painDisplay.classList.add('high');
+        });
+        // Initial state
+        painSlider.dispatchEvent(new Event('input'));
+    }
+    
+    // CRAB checkbox visual feedback
+    ['crab_hypercalcemia', 'crab_renal', 'crab_anemia', 'crab_bone'].forEach(function(fieldName) {
+        const checkbox = document.querySelector('input[name="' + fieldName + '"]');
+        const letter = fieldName.split('_')[1][0].toUpperCase();
+        const container = document.getElementById('crab' + letter);
+        
+        if (checkbox && container) {
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    container.classList.add('active');
+                } else {
+                    container.classList.remove('active');
+                }
+            });
+            // Initial state
+            if (checkbox.checked) container.classList.add('active');
+        }
+    });
+    
+    // Infection fields toggle
+    const infectionCheckbox = document.querySelector('input[name="infection_present"]');
+    const infectionFields = ['infectionTypeGroup', 'infectionOrganismGroup', 'infectionHospGroup'];
+    
+    function toggleInfectionFields(show) {
+        infectionFields.forEach(function(id) {
+            const el = document.getElementById(id);
+            if (el) el.style.display = show ? 'block' : 'none';
+        });
+    }
+    
+    if (infectionCheckbox) {
+        infectionCheckbox.addEventListener('change', function() {
+            toggleInfectionFields(this.checked);
+        });
+        // Initial state
+        toggleInfectionFields(infectionCheckbox.checked);
+    }
+});
+</script>
+{% endblock %}

@@ -6,26 +6,12 @@
 
 ## Il Flusso Completo (5 passi)
 
-```
-┌─────────────────┐
-│ 1. Crea Paziente│  ← Scheda anagrafica base
-└────────┬────────┘
-         │
-┌────────▼──────────┐
-│ 2. Aggiungi Labs  │  ← Valori laboratorio (R-ISS, LDH, β2M, FLC)
-└────────┬──────────┘     Questo è lo "snapshot" per il Twin
-         │
-┌────────▼────────────┐
-│ 3. Vai al Simulatore│  ← Scegli uno scenario/regime
-└────────┬────────────┘
-         │
-┌────────▼──────────────────┐
-│ 4. Configura & Abilita Twin│  ← Il Twin usa i lab per calcolare parametri biologici
-└────────┬──────────────────┘
-         │
-┌────────▼──────┐
-│ 5. Lancia & Vedi│  ← Risultati: curve, tossicità, parametri derivati
-└─────────────────┘
+```mermaid
+flowchart TD
+  P1["1) Crea Paziente<br/>Scheda anagrafica base"] --> P2["2) Aggiungi Labs (Assessment)<br/>R-ISS, LDH, beta2M, FLC<br/><i>Snapshot per il Twin</i>"]
+  P2 --> P3["3) Vai al Simulatore<br/>Scegli uno scenario / regime"]
+  P3 --> P4["4) Configura & abilita Twin<br/>Il Twin calcola parametri biologici dai lab"]
+  P4 --> P5["5) Lancia & vedi<br/>Curve, tossicità, parametri derivati"]
 ```
 
 ---

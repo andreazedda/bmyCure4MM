@@ -113,49 +113,41 @@ The bmyCure4MM Binding Visualizer now integrates data from **10+ authoritative e
 
 ## Data Flow Architecture
 
-```
-User Views PDB Structure (e.g., 4KW5 + Lenalidomide)
-                  ↓
-    chemtools/views.py: job_detail()
-                  ↓
-    enrich_pdb_metadata_for_view()
-                  ↓
-    ┌─────────────────────────────────┐
-    │   PDBAPIClient Instance         │
-    └─────────────────────────────────┘
-                  ↓
-    ┌─────────────────────────────────┐
-    │  Parallel API Calls (async-safe)│
-    ├─────────────────────────────────┤
-    │ 1. RCSB PDB: Structure data     │
-    │ 2. PDBe: Validation metrics     │
-    │ 3. PDBe: Binding interactions   │
-    │ 4. ChEMBL: Drug information     │
-    │ 5. PubChem: Chemical data       │
-    │ 6. PubMed: Publications         │
-    │ 7. ClinicalTrials: Active trials│
-    │ 8. STRING: Protein network      │
-    │ 9. Reactome: Pathways           │
-    └─────────────────────────────────┘
-                  ↓
-    Enriched metadata dictionary
-                  ↓
-    chemtools/templates/chemtools/job_detail.html
-                  ↓
-    ┌─────────────────────────────────┐
-    │   Display Components            │
-    ├─────────────────────────────────┤
-    │ • API Sources Banner            │
-    │ • Structure Validation Metrics  │
-    │ • Ligand Interaction Details    │
-    │ • Clinical Trials Table         │
-    │ • ChEMBL Drug Information       │
-    │ • PubMed Literature             │
-    │ • Protein Interaction Network   │
-    │ • Similar Structures            │
-    │ • Educational Resources         │
-    │ • 3D Molecular Viewer           │
-    └─────────────────────────────────┘
+```mermaid
+flowchart TD
+  U["User views PDB structure<br/>(e.g., 4KW5 + Lenalidomide)"] --> V["chemtools/views.py: job_detail()"]
+  V --> E["enrich_pdb_metadata_for_view()"]
+  E --> C["PDBAPIClient instance"]
+
+  subgraph APIS["Parallel API calls (async-safe)"]
+    A1["1) RCSB PDB: structure data"]
+    A2["2) PDBe: validation metrics"]
+    A3["3) PDBe: binding interactions"]
+    A4["4) ChEMBL: drug information"]
+    A5["5) PubChem: chemical data"]
+    A6["6) PubMed: publications"]
+    A7["7) ClinicalTrials: active trials"]
+    A8["8) STRING: protein network"]
+    A9["9) Reactome: pathways"]
+  end
+
+  C --> APIS --> M["Enriched metadata dictionary"]
+  M --> T["chemtools/templates/chemtools/job_detail.html"]
+
+  subgraph UI["Display components"]
+    D1["API sources banner"]
+    D2["Structure validation metrics"]
+    D3["Ligand interaction details"]
+    D4["Clinical trials table"]
+    D5["ChEMBL drug information"]
+    D6["PubMed literature"]
+    D7["Protein interaction network"]
+    D8["Similar structures"]
+    D9["Educational resources"]
+    D10["3D molecular viewer"]
+  end
+
+  T --> UI
 ```
 
 ## Key Features

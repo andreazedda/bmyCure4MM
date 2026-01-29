@@ -10,6 +10,20 @@
 - Penalties applied for toxicity violations or schedule breaches.
 - Pareto front sorted by efficacy desc, safety asc.
 
+## Diagram (Mermaid)
+
+```mermaid
+flowchart TD
+  P[Trial params] --> R[Run model]
+  R --> K[KPI summary]
+  K --> C{healthy loss <= 0.25?}
+  C -- no --> X[Penalty]
+  C -- yes --> O["Objectives: efficacy, safety, exposure"]
+  O --> F[Pareto front]
+```
+
+Deep dive (multi-objective, Pareto, search space): `Guides → Optimization Theory`.
+
 ## Reproducibility
 - Pass a custom seed in the Optimization Lab form or Simulation form.
 - Use **Export study** (coming soon) to capture params + KPIs as JSON.

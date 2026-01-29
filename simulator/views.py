@@ -293,3 +293,32 @@ def scenario_detail(request, pk: int):
         "decision_logs_count": decision_logs_count,
     }
     return render(request, "simulator/scenario_detail.html", context)
+
+
+@login_required
+def algorithm_transparency(request):
+    """
+    View to display the decision algorithm in a human-readable format.
+    
+    This makes the algorithm fully transparent to users, showing:
+    - All thresholds used for efficacy/toxicity/durability classification
+    - All decision rules with their triggers and recommended actions
+    - Risk stratification criteria (R-ISS)
+    - Evidence sources and references
+    """
+    from .decision_algorithm import get_algorithm
+    
+    algorithm = get_algorithm()
+    
+    context = {
+        "algorithm": algorithm,
+        "version": algorithm.get("version"),
+        "last_updated": algorithm.get("last_updated"),
+        "thresholds": algorithm.get("thresholds", {}),
+        "decision_rules": algorithm.get("decision_rules", []),
+        "risk_stratification": algorithm.get("risk_stratification", {}),
+        "high_risk_cytogenetics": algorithm.get("high_risk_cytogenetics", {}),
+        "data_sources": algorithm.get("data_sources", []),
+        "disclaimer": algorithm.get("disclaimer", {}),
+    }
+    return render(request, "simulator/algorithm_transparency.html", context)

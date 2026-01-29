@@ -6,26 +6,12 @@
 
 ## The Complete Flow (5 Steps)
 
-```
-┌─────────────────┐
-│ 1. Create Patient│  ← Basic demographic record
-└────────┬────────┘
-         │
-┌────────▼──────────┐
-│ 2. Add Labs       │  ← Lab values (R-ISS, LDH, β2M, FLC)
-└────────┬──────────┘     This is the "snapshot" for the Twin
-         │
-┌────────▼────────────┐
-│ 3. Go to Simulator  │  ← Choose a scenario/regimen
-└────────┬────────────┘
-         │
-┌────────▼──────────────────┐
-│ 4. Configure & Enable Twin│  ← Twin uses labs to compute biological params
-└────────┬──────────────────┘
-         │
-┌────────▼──────┐
-│ 5. Run & Review│  ← Results: curves, toxicity, derived parameters
-└─────────────────┘
+```mermaid
+flowchart TD
+  P1["1) Create Patient<br/>Basic demographic record"] --> P2["2) Add Labs (Assessment)<br/>R-ISS, LDH, beta2M, FLC<br/><i>Snapshot for the Twin</i>"]
+  P2 --> P3["3) Go to Simulator<br/>Choose a scenario / regimen"]
+  P3 --> P4["4) Configure & enable Twin<br/>Twin computes biological params from labs"]
+  P4 --> P5["5) Run & review<br/>Curves, toxicity, derived parameters"]
 ```
 
 ---
