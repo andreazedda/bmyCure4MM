@@ -1,86 +1,133 @@
 # Optimization Theory (Optimization Lab)
 
-Questa sezione documenta **come** l’Optimization Lab costruisce e valuta le soluzioni, e cosa significano gli obiettivi (multi-obiettivo / Pareto).
+=== "IT"
+    Questa sezione documenta **come** l’Optimization Lab costruisce e valuta le soluzioni (multi-obiettivo / Pareto).
 
-## Obiettivi e vincoli
+    ## Se cerchi…
 
-Nel codice (`simulator/objectives.py`) gli obiettivi sono:
+    | Voglio… | Vai a… |
+    | --- | --- |
+    | come funziona Optuna nel repo | `simulator/optim.py` |
+    | mapping obiettivi/vincoli | `simulator/objectives.py` |
+    | spazio di ricerca | `simulator/search_space.py` |
+    | esempi visivi | `Guides → Simulations Gallery` |
 
-- **Efficacy**: massimizzare `tumor_reduction`
-- **Safety**: minimizzare `healthy_loss` (implementato come massimizzazione di `-healthy_loss`)
-- **Exposure**: minimizzare $\sum_i \mathrm{AUC}_i$ (implementato come massimizzazione di `-sum(AUC)`).
+    ## Obiettivi e vincoli
 
-Vincolo “hard”:
+    Nel codice (`simulator/objectives.py`) gli obiettivi sono:
 
-- `healthy_loss <= 0.25` (soluzione “feasible”)
+    | Nome | Definizione | Direzione |
+    | --- | --- | --- |
+    | Efficacy | `tumor_reduction` | massimizza |
+    | Safety | `-healthy_loss` | massimizza (equivale a minimizzare loss) |
+    | Exposure | `-sum(AUC)` | massimizza (equivale a minimizzare esposizione) |
 
-```mermaid
-flowchart TD
-  S[Trial params] --> R[Run model]
-  R --> K[KPI summary]
-  K --> C{Constraints OK?}
-  C -- no --> P[Penalty -1e6]
-  C -- yes --> O["Objectives (3D)"]
-  O --> PF[Pareto front]
-```
+    Vincolo “hard”:
 
-## Spazio di ricerca (search space)
+    - `healthy_loss <= 0.25` (soluzione “feasible”)
 
-Definito in `simulator/search_space.py` come una griglia/insieme di range:
+    ```mermaid
+    flowchart TD
+      S[Trial params] --> R[Run model]
+      R --> K[KPI summary]
+      K --> C{Constraints OK?}
+      C -- no --> P[Penalty -1e6]
+      C -- yes --> O["Objectives (3D)"]
+      O --> PF[Pareto front]
+    ```
 
-- `lenalidomide_dose` (float, step)
-- `bortezomib_dose` (float, step)
-- `daratumumab_dose` (float, step)
-- `time_horizon` (int, step 28 giorni)
-- `interaction_strength` (float, step 0.01)
+    ## Spazio di ricerca (search space)
 
-Più alcune manopole “di schedule” (annotate come `_schedule` nei parametri), usate per report e future estensioni:
+    Definito in `simulator/search_space.py`:
 
-- `len_on_days`
-- `bor_weekly`
-- `dara_interval`
+    | Parametro | Tipo | Range/step | Note |
+    | --- | --- | --- | --- |
+    | `lenalidomide_dose` | float | 0..40 step 2.5 | dose |
+    | `bortezomib_dose` | float | 0..1.6 step 0.1 | dose |
+    | `daratumumab_dose` | float | 0..16 step 1.0 | dose |
+    | `time_horizon` | int | 56..224 step 28 | 2–8 cicli |
+    | `interaction_strength` | float | 0..0.15 step 0.01 | interazione |
 
-!!! note "Importante"
-    La schedule “runtime” effettiva entra nel modello tramite `dose_functions` (preset YAML).  
-    Queste manopole `_schedule` oggi sono soprattutto metadata per UI/report, non tutte sono necessariamente collegate a \(u(t)\).
+    Manopole schedule (oggi principalmente metadata):
 
-## Algoritmo (Optuna)
+    - `len_on_days`, `bor_weekly`, `dara_interval`
 
-`simulator/optim.py` usa Optuna con:
+    !!! note "Importante"
+        La schedule “runtime” effettiva entra nel modello tramite `dose_functions` (preset YAML).
 
-- sampler: `TPESampler(seed=..., multivariate=True)`
-- pruner: `MedianPruner(n_startup_trials=10, ...)`
-- direzioni: `maximize/maximize/maximize` (perché safety/exposure sono negate)
+    ## Algoritmo (Optuna)
 
-## Pareto front (non-dominated)
+    `simulator/optim.py` usa:
 
-Una soluzione \(A\) domina \(B\) se:
+    - sampler: `TPESampler(seed=..., multivariate=True)`
+    - pruner: `MedianPruner(n_startup_trials=10, ...)`
+    - directions: maximize/maximize/maximize
 
-- \(A\) è **>=** su tutti gli obiettivi
-- ed è **>** su almeno uno
+    ## Pareto front (non-dominated)
 
-```mermaid
-flowchart LR
-  A[Soluzione A] --> D{Domina B?}
-  B[Soluzione B] --> D
-  D -->|tutti >= e uno >| YES[Dominated]
-  D -->|altrimenti| NO[Non-dominated]
-```
+    Una soluzione \(A\) domina \(B\) se:
 
-La UI mostra la Pareto table ordinata per:
+    - \(A\) è **>=** su tutti gli obiettivi
+    - ed è **>** su almeno uno
 
-- efficacia decrescente
-- safety crescente/decrescente a seconda della metrica esposta (nel codice viene “convertita” per UI)
+    ```mermaid
+    flowchart LR
+      A[Soluzione A] --> D{Domina B?}
+      B[Soluzione B] --> D
+      D -->|tutti >= e uno >| YES[Dominated]
+      D -->|altrimenti| NO[Non-dominated]
+    ```
 
-## Interpretazione clinica (pratica)
+    ## Interpretazione pratica
 
-### Come leggere una Pareto table
+    - a parità di `tumor_reduction`, preferisci `healthy_loss` più basso
+    - evita miglioramenti marginali di efficacia con grande costo in tossicità
+    - l’esposizione (AUC) aiuta a scegliere regimi “più parsimoniosi”
 
-- se due soluzioni hanno simile `tumor_reduction`, preferisci quella con `healthy_loss` più basso
-- se un aumento marginale di efficacia “costa” molta tossicità, è spesso una zona da evitare
-- l’esposizione (AUC) aiuta a distinguere regimi che “ottengono lo stesso” con meno farmaco
+=== "EN"
+    This section explains how the Optimization Lab evaluates solutions (multi-objective / Pareto).
 
-### Perché 3 obiettivi?
+    ## Quick find
 
-Perché in clinica di solito non esiste un singolo “best”:  
-si sceglie un compromesso tra efficacia, tollerabilità e intensità complessiva.
+    | I want… | Go to… |
+    | --- | --- |
+    | Optuna implementation | `simulator/optim.py` |
+    | objectives/constraints mapping | `simulator/objectives.py` |
+    | search space | `simulator/search_space.py` |
+    | visual examples | `Guides → Simulations Gallery` |
+
+    ## Objectives & constraints
+
+    | Name | Definition | Direction |
+    | --- | --- | --- |
+    | Efficacy | `tumor_reduction` | maximize |
+    | Safety | `-healthy_loss` | maximize (i.e., minimize loss) |
+    | Exposure | `-sum(AUC)` | maximize (i.e., minimize exposure) |
+
+    Hard constraint:
+
+    - `healthy_loss <= 0.25` (feasible solution)
+
+    ```mermaid
+    flowchart TD
+      S[Trial params] --> R[Run model]
+      R --> K[KPI summary]
+      K --> C{Constraints OK?}
+      C -- no --> P[Penalty -1e6]
+      C -- yes --> O["Objectives (3D)"]
+      O --> PF[Pareto front]
+    ```
+
+    ## Search space
+
+    | Parameter | Type | Range/step | Notes |
+    | --- | --- | --- | --- |
+    | `lenalidomide_dose` | float | 0..40 step 2.5 | dose |
+    | `bortezomib_dose` | float | 0..1.6 step 0.1 | dose |
+    | `daratumumab_dose` | float | 0..16 step 1.0 | dose |
+    | `time_horizon` | int | 56..224 step 28 | 2–8 cycles |
+    | `interaction_strength` | float | 0..0.15 step 0.01 | interaction |
+
+    ## Pareto front
+
+    A solution \(A\) dominates \(B\) if it is not worse on all objectives and better on at least one.

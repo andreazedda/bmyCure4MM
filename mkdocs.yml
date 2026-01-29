@@ -13,8 +13,11 @@ nav:
       - Tutorial (IT): it/TUTORIAL_PRIMO_USO.md
   - Guides:
       - Architecture: guides/architecture.md
+      - Architecture Deep Dive: guides/architecture_deep_dive.md
       - Database: guides/database.md
       - Glossary: guides/glossary.md
+      - Documentation Standard: guides/documentation_standard.md
+      - Documentation Roadmap: guides/documentation_roadmap.md
       - Mathematical Models: guides/mathematical_models.md
       - Optimization Theory: guides/optimization_theory.md
       - Decision Algorithm: guides/decision_algorithm.md

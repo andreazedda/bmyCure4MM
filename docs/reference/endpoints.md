@@ -1,65 +1,89 @@
 # Endpoints (quick reference)
 
-Questa pagina elenca i principali endpoint web “umani” (pagine) e dove cercarli nel codice.
+=== "IT"
+    Questa pagina elenca i principali endpoint web “umani” (pagine) e dove cercarli nel codice.
 
-!!! tip "Approccio"
-    Se vuoi trovare velocemente “dove vive” una pagina:
-    1) apri `mmportal/urls.py` e gli `urls.py` delle app  
-    2) cerca la view corrispondente  
-    3) segui il template in `templates/` o `app/templates/...`
+    !!! tip "Approccio"
+        Se vuoi trovare velocemente “dove vive” una pagina:
+        1) apri `mmportal/urls.py` e gli `urls.py` delle app  
+        2) cerca la view corrispondente  
+        3) segui il template in `templates/` o `app/templates/...`
 
-## Core
+    ## Core
 
-- Home: `/` (vedi `mmportal/urls.py`)
-- Admin: `/admin/`
+    | Area | Path | Codice |
+    | --- | --- | --- |
+    | Home | `/` | `mmportal/urls.py` |
+    | Admin | `/admin/` | Django admin |
 
-## Clinic (pazienti)
+    ## Clinic (pazienti)
 
-Tipicamente:
+    | Pagina | Path (tipico) | URLConf | Views | Templates |
+    | --- | --- | --- | --- | --- |
+    | Lista pazienti | `/patients/` | `clinic/urls.py` | `clinic/views.py` | `clinic/templates/clinic/` |
+    | Nuovo paziente | `/patients/new/` | `clinic/urls.py` | `clinic/views.py` | `clinic/templates/clinic/` |
+    | Dettaglio | `/patients/<id>/` | `clinic/urls.py` | `clinic/views.py` | `clinic/templates/clinic/` |
 
-- Lista pazienti: `/patients/`
-- Nuovo paziente: `/patients/new/` (o simile)
-- Dettaglio paziente: `/patients/<id>/`
+    ## Simulator (scenari e simulazioni)
 
-Codice:
-- URL: `clinic/urls.py`
-- View: `clinic/views.py`
-- Template: `clinic/templates/clinic/`
+    | Pagina | Path (tipico) | URLConf | Views | Templates |
+    | --- | --- | --- | --- | --- |
+    | Lista scenari | `/simulator/` | `simulator/urls.py` | `simulator/views.py` | `simulator/templates/simulator/` |
+    | Dettaglio scenario | `/simulator/scenario/<id>/` | `simulator/urls.py` | `simulator/views.py` | `simulator/templates/simulator/` |
+    | Run simulation | (HTMX/POST) | `simulator/urls.py` | `simulator/views.py` | partials HTMX |
 
-## Simulator (scenari e simulazioni)
+    ## ChemTools
 
-Tipicamente:
+    | Pagina | Path (tipico) | URLConf | Views | Templates |
+    | --- | --- | --- | --- | --- |
+    | Tools home | `/chem/` | `chemtools/urls.py` | `chemtools/views.py` | `chemtools/templates/chemtools/` |
+    | Job detail | `/chem/jobs/<id>/` | `chemtools/urls.py` | `chemtools/views.py` | `chemtools/templates/chemtools/` |
 
-- Lista scenari: `/simulator/`
-- Dettaglio scenario: `/simulator/scenario/<id>/`
-- Run simulation (POST/HTMX): endpoint interno nel dettaglio scenario
+    ## Docs Viewer (interno Django)
 
-Codice:
-- URL: `simulator/urls.py`
-- View: `simulator/views.py`
-- Template: `simulator/templates/simulator/`
+    | Pagina | Path | URLConf | Views |
+    | --- | --- | --- | --- |
+    | Index | `/docs/` | `docs_viewer/urls.py` | `docs_viewer/views.py` |
+    | View | `/docs/view/<path>/` | `docs_viewer/urls.py` | `docs_viewer/views.py` |
+    | Search | `/docs/search/` | `docs_viewer/urls.py` | `docs_viewer/views.py` |
 
-## ChemTools
+=== "EN"
+    This page lists the main human-facing endpoints and where they live in code.
 
-Tipicamente:
+    ## Core
 
-- Home tools: `/chem/` (o simile)
-- Job detail: `/chem/jobs/<id>/`
+    | Area | Path | Code |
+    | --- | --- | --- |
+    | Home | `/` | `mmportal/urls.py` |
+    | Admin | `/admin/` | Django admin |
 
-Codice:
-- URL: `chemtools/urls.py`
-- View: `chemtools/views.py`
-- Template: `chemtools/templates/chemtools/`
+    ## Clinic
 
-## Docs Viewer (interno Django)
+    | Page | Typical path | URLConf | Views | Templates |
+    | --- | --- | --- | --- | --- |
+    | Patients list | `/patients/` | `clinic/urls.py` | `clinic/views.py` | `clinic/templates/clinic/` |
+    | New patient | `/patients/new/` | `clinic/urls.py` | `clinic/views.py` | `clinic/templates/clinic/` |
+    | Detail | `/patients/<id>/` | `clinic/urls.py` | `clinic/views.py` | `clinic/templates/clinic/` |
 
-Tipicamente:
+    ## Simulator
 
-- Index: `/docs/`
-- View: `/docs/view/<path>/`
-- Search: `/docs/search/`
+    | Page | Typical path | URLConf | Views | Templates |
+    | --- | --- | --- | --- | --- |
+    | Scenarios list | `/simulator/` | `simulator/urls.py` | `simulator/views.py` | `simulator/templates/simulator/` |
+    | Scenario detail | `/simulator/scenario/<id>/` | `simulator/urls.py` | `simulator/views.py` | `simulator/templates/simulator/` |
+    | Run simulation | (HTMX/POST) | `simulator/urls.py` | `simulator/views.py` | HTMX partials |
 
-Codice:
-- URL: `docs_viewer/urls.py`
-- View: `docs_viewer/views.py`
+    ## ChemTools
 
+    | Page | Typical path | URLConf | Views | Templates |
+    | --- | --- | --- | --- | --- |
+    | Tools home | `/chem/` | `chemtools/urls.py` | `chemtools/views.py` | `chemtools/templates/chemtools/` |
+    | Job detail | `/chem/jobs/<id>/` | `chemtools/urls.py` | `chemtools/views.py` | `chemtools/templates/chemtools/` |
+
+    ## Docs Viewer
+
+    | Page | Path | URLConf | Views |
+    | --- | --- | --- | --- |
+    | Index | `/docs/` | `docs_viewer/urls.py` | `docs_viewer/views.py` |
+    | View | `/docs/view/<path>/` | `docs_viewer/urls.py` | `docs_viewer/views.py` |
+    | Search | `/docs/search/` | `docs_viewer/urls.py` | `docs_viewer/views.py` |

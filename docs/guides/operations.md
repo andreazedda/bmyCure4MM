@@ -1,72 +1,141 @@
 # Operations (run & deploy)
 
-Questa pagina documenta i modi principali per avviare bmyCure4MM e gli elementi operativi (servizi, static/media, logging).
+=== "IT"
+    Questa pagina documenta i modi principali per avviare bmyCure4MM e gli elementi operativi (servizi, static/media, logging).
 
-## Avvio in sviluppo
+    ## Se cerchi…
 
-1. Crea un virtualenv e installa dipendenze:
+    | Voglio… | Vai a… |
+    | --- | --- |
+    | variabili d’ambiente | `Reference → Configuration` |
+    | endpoint e routing | `Reference → Endpoints` |
+    | troubleshooting | `Guides → Troubleshooting` |
 
-```bash
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-```
+    ## Run modes (tabella)
 
-2. Variabili d’ambiente minime (dev):
+    | Modalità | Quando usarla | Comando |
+    | --- | --- | --- |
+    | Dev locale | sviluppo/debug | `python3 manage.py runserver` |
+    | Docker Compose | stack completo (redis/celery) | `docker compose up --build` |
+    | Produzione | deploy | `collectstatic` + WSGI + worker |
 
-```bash
-export DJANGO_DEBUG=1
-export DJANGO_SECRET_KEY='dev-key-not-for-production'
-```
+    ## Avvio in sviluppo
 
-3. Migrazioni + runserver:
+    1. Crea un virtualenv e installa dipendenze:
 
-```bash
-python3 manage.py migrate
-python3 manage.py runserver
-```
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate
+    pip install -r requirements.txt
+    ```
 
-## Avvio con Docker Compose
+    2. Variabili d’ambiente minime (dev):
 
-Vedi `docker-compose.yml`. Tipicamente include:
+    ```bash
+    export DJANGO_DEBUG=1
+    export DJANGO_SECRET_KEY='dev-key-not-for-production'
+    ```
 
-- Web (Django)
-- Redis (broker Celery)
-- Worker Celery
+    3. Migrazioni + runserver:
 
-```bash
-docker compose up --build
-```
+    ```bash
+    python3 manage.py migrate
+    python3 manage.py runserver
+    ```
 
-## Static & media
+    ## Avvio con Docker Compose
 
-- Static: `STATIC_URL=/static/`, `STATIC_ROOT=staticfiles/`, `STATICFILES_DIRS=[mmportal/static]`
-- Media: `MEDIA_URL=/media/`, `MEDIA_ROOT=media/`
+    Vedi `docker-compose.yml`. Tipicamente include:
 
-In produzione:
+    - Web (Django)
+    - Redis (broker Celery)
+    - Worker Celery
 
-```bash
-python3 manage.py collectstatic
-```
+    ```bash
+    docker compose up --build
+    ```
 
-## Celery
+    ## Static & media
 
-Script presenti:
-- `start_celery.sh`
-- `manage_services.sh`
+    | Tipo | Path | Note |
+    | --- | --- | --- |
+    | static | `STATIC_ROOT=staticfiles/` | `collectstatic` in produzione |
+    | media | `MEDIA_ROOT=media/` | artifact e upload |
 
-!!! tip "Dev"
-    Per debugging rapido puoi impostare `CELERY_TASK_ALWAYS_EAGER=1` (se previsto dal setup) per far girare task in-process.
+    In produzione:
 
-## Logging
+    ```bash
+    python3 manage.py collectstatic
+    ```
 
-Directory: `logs/`
+    ## Celery
 
-File tipici:
-- `logs/django.log`
-- `logs/activity.log`
-- `logs/embed_debug.log`
-- `logs/celery_tasks.log`
+    Script presenti:
+    - `start_celery.sh`
+    - `manage_services.sh`
 
-La configurazione è in `mmportal/settings.py` (`LOGGING`).
+    !!! tip "Dev"
+        Per debugging rapido puoi impostare `CELERY_TASK_ALWAYS_EAGER=1` (se previsto) per eseguire task inline.
 
+    ## Logging
+
+    Directory: `logs/`
+
+    | File | Contenuto |
+    | --- | --- |
+    | `logs/django.log` | log Django |
+    | `logs/activity.log` | activity logging middleware |
+    | `logs/embed_debug.log` | debug embed |
+    | `logs/celery_tasks.log` | task celery |
+
+    Config in `mmportal/settings.py` (`LOGGING`).
+
+=== "EN"
+    This page describes how to run bmyCure4MM and operational concerns (services, static/media, logging).
+
+    ## Quick find
+
+    | I want… | Go to… |
+    | --- | --- |
+    | environment variables | `Reference → Configuration` |
+    | routing/endpoints | `Reference → Endpoints` |
+    | troubleshooting | `Guides → Troubleshooting` |
+
+    ## Run modes
+
+    | Mode | When | Command |
+    | --- | --- | --- |
+    | Local dev | development/debug | `python3 manage.py runserver` |
+    | Docker Compose | full stack (redis/celery) | `docker compose up --build` |
+    | Production | deployment | `collectstatic` + WSGI + workers |
+
+    ## Local development
+
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate
+    pip install -r requirements.txt
+
+    export DJANGO_DEBUG=1
+    export DJANGO_SECRET_KEY='dev-key-not-for-production'
+
+    python3 manage.py migrate
+    python3 manage.py runserver
+    ```
+
+    ## Docker Compose
+
+    ```bash
+    docker compose up --build
+    ```
+
+    ## Static & media
+
+    | Type | Path | Notes |
+    | --- | --- | --- |
+    | static | `STATIC_ROOT=staticfiles/` | run `collectstatic` in production |
+    | media | `MEDIA_ROOT=media/` | artifacts and uploads |
+
+    ## Logging
+
+    Logs live in `logs/` and are configured in `mmportal/settings.py` (`LOGGING`).
