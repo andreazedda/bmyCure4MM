@@ -18,8 +18,14 @@ nav:
       - Glossary: guides/glossary.md
       - Documentation Standard: guides/documentation_standard.md
       - Documentation Roadmap: guides/documentation_roadmap.md
-      - Mathematical Models: guides/mathematical_models.md
+      - Mathematical Models:
+          - Italiano: guides/mathematical_models.md
+          - English: guides/mathematical_models_en.md
       - Optimization Theory: guides/optimization_theory.md
+      - Difficulty Scoring: guides/difficulty_scoring.md
+      - Prognosis: guides/prognosis.md
+      - Virtual Patients: guides/virtual_patients.md
+      - Regimen Suggester: guides/regimen_suggester.md
       - Decision Algorithm: guides/decision_algorithm.md
       - Doc Coverage (Gaps): guides/gaps.md
       - Simulations Gallery: guides/simulations_gallery.md

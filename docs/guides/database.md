@@ -1,55 +1,124 @@
 # Database
 
-Questa applicazione usa **Django ORM** con database **SQLite** in default (`db.sqlite3`), configurato in `mmportal/settings.py`.
+=== "IT"
+    Questa applicazione usa **Django ORM** con database **SQLite** in default (`db.sqlite3`), configurato in `mmportal/settings.py`.
 
-!!! warning "Ambito"
-    Questa pagina descrive:
-    - lo **schema applicativo** attuale (tabelle presenti in `db.sqlite3`)
-    - le **entità Django** (model) e le loro relazioni
-    
-    Nota: alcune classi presenti nel codice potrebbero non avere ancora una migration applicata (es. `clinic.models_symptoms.SymptomAssessment`).
+    !!! warning "Ambito"
+        Questa pagina descrive:
+        - lo **schema applicativo** attuale (tabelle presenti in `db.sqlite3`)
+        - le **entità Django** (model) e le loro relazioni
 
-!!! tip "Non trovi un oggetto DB?"
-    Vai su `Reference → Database Objects` per la mappa **Model ↔ Tabella ↔ File** e esempi rapidi (ORM/SQL).
+        Nota: alcune classi presenti nel codice potrebbero non avere ancora una migration applicata (es. `clinic.models_symptoms.SymptomAssessment`).
 
-## Panoramica entità (ER)
+    !!! tip "Non trovi un oggetto DB?"
+        Vai su `Reference → Database Objects` per la mappa **Model ↔ Tabella ↔ File** e esempi rapidi (ORM/SQL).
 
-```mermaid
-erDiagram
-  AUTH_USER ||--o{ CLINIC_PATIENT : owner
-  CLINIC_PATIENT ||--o{ CLINIC_ASSESSMENT : assessments
-  CLINIC_PATIENT ||--o{ CLINIC_PATIENTTHERAPY : therapies
-  CLINIC_REGIMEN ||--o{ CLINIC_PATIENTTHERAPY : regimen
-  CLINIC_PATIENT ||--o{ CLINIC_PATIENTCYTOGENETICS : cytogenetics
-  CLINIC_CYTOGENETICABNORMALITY ||--o{ CLINIC_PATIENTCYTOGENETICS : abnormality
+    ## Se cerchi…
 
-  SIMULATOR_SCENARIO ||--o{ SIMULATOR_SIMULATIONATTEMPT : attempts
-  AUTH_USER ||--o{ SIMULATOR_SIMULATIONATTEMPT : user
-  CLINIC_REGIMEN ||--o{ SIMULATOR_SIMULATIONATTEMPT : selected_regimen
+    | Voglio… | Vai a… |
+    | --- | --- |
+    | mappa Model ↔ Tabella ↔ File | `Reference → Database Objects` |
+    | query cookbook (ORM/SQL) | `Reference → Database Objects` + `Guides → Operations` |
+    | capire JSONField/Artifact | `Reference → Simulator Parameters` |
+    | DDL completo SQLite | sezione `DDL (SQLite)` in fondo a questa pagina |
 
-  SIMULATOR_SCENARIO ||--o{ SIMULATOR_SCENARIO_RECOMMENDED_REGIMENS : m2m
-  CLINIC_REGIMEN ||--o{ SIMULATOR_SCENARIO_RECOMMENDED_REGIMENS : m2m
+    ## Panoramica entità (ER)
 
-  AUTH_USER ||--o{ CHEMTOOLS_CHEMJOB : user
-  AUTH_USER ||--o{ DOCS_VIEWER_DOCUMENTVIEW : user
-  AUTH_USER ||--o{ DOCS_VIEWER_DOCUMENTFEEDBACK : user
-```
+    ```mermaid
+    erDiagram
+      AUTH_USER ||--o{ CLINIC_PATIENT : owner
+      CLINIC_PATIENT ||--o{ CLINIC_ASSESSMENT : assessments
+      CLINIC_PATIENT ||--o{ CLINIC_PATIENTTHERAPY : therapies
+      CLINIC_REGIMEN ||--o{ CLINIC_PATIENTTHERAPY : regimen
+      CLINIC_PATIENT ||--o{ CLINIC_PATIENTCYTOGENETICS : cytogenetics
+      CLINIC_CYTOGENETICABNORMALITY ||--o{ CLINIC_PATIENTCYTOGENETICS : abnormality
 
-## Configurazione DB (runtime)
+      SIMULATOR_SCENARIO ||--o{ SIMULATOR_SIMULATIONATTEMPT : attempts
+      AUTH_USER ||--o{ SIMULATOR_SIMULATIONATTEMPT : user
+      CLINIC_REGIMEN ||--o{ SIMULATOR_SIMULATIONATTEMPT : selected_regimen
 
-- Engine: `django.db.backends.sqlite3`
-- File: `db.sqlite3`
-- Default: nessun utente/password (SQLite locale)
+      SIMULATOR_SCENARIO ||--o{ SIMULATOR_SCENARIO_RECOMMENDED_REGIMENS : m2m
+      CLINIC_REGIMEN ||--o{ SIMULATOR_SCENARIO_RECOMMENDED_REGIMENS : m2m
 
-Per produzione, valutare Postgres (Django compatibile) e migrazioni standard (`python manage.py migrate`).
+      AUTH_USER ||--o{ CHEMTOOLS_CHEMJOB : user
+      AUTH_USER ||--o{ DOCS_VIEWER_DOCUMENTVIEW : user
+      AUTH_USER ||--o{ DOCS_VIEWER_DOCUMENTFEEDBACK : user
+    ```
 
-## Tabelle applicative (attuali)
+    ## Configurazione DB (runtime)
+
+    - Engine: `django.db.backends.sqlite3`
+    - File: `db.sqlite3`
+    - Default: nessun utente/password (SQLite locale)
+
+    Per produzione, valutare Postgres (Django compatibile) e migrazioni standard (`python manage.py migrate`).
+
+    ## Tabelle applicative (attuali)
+
+=== "EN"
+    This application uses **Django ORM** with default **SQLite** (`db.sqlite3`), configured in `mmportal/settings.py`.
+
+    !!! warning "Scope"
+        This page documents:
+        - the current **application schema** (tables present in `db.sqlite3`)
+        - the **Django entities** (models) and their relations
+
+        Note: some classes may exist in code without migrations applied yet (e.g., `clinic.models_symptoms.SymptomAssessment`).
+
+    !!! tip "Can’t find a DB object?"
+        Go to `Reference → Database Objects` for the **Model ↔ Table ↔ File** map and quick ORM/SQL examples.
+
+    ## Quick find
+
+    | I want… | Go to… |
+    | --- | --- |
+    | Model ↔ Table ↔ File map | `Reference → Database Objects` |
+    | query cookbook (ORM/SQL) | `Reference → Database Objects` + `Guides → Operations` |
+    | understand JSONField/Artifacts | `Reference → Simulator Parameters` |
+    | full SQLite DDL | see `DDL (SQLite)` at the bottom of this page |
+
+    ## Entity overview (ER)
+
+    ```mermaid
+    erDiagram
+      AUTH_USER ||--o{ CLINIC_PATIENT : owner
+      CLINIC_PATIENT ||--o{ CLINIC_ASSESSMENT : assessments
+      CLINIC_PATIENT ||--o{ CLINIC_PATIENTTHERAPY : therapies
+      CLINIC_REGIMEN ||--o{ CLINIC_PATIENTTHERAPY : regimen
+      CLINIC_PATIENT ||--o{ CLINIC_PATIENTCYTOGENETICS : cytogenetics
+      CLINIC_CYTOGENETICABNORMALITY ||--o{ CLINIC_PATIENTCYTOGENETICS : abnormality
+
+      SIMULATOR_SCENARIO ||--o{ SIMULATOR_SIMULATIONATTEMPT : attempts
+      AUTH_USER ||--o{ SIMULATOR_SIMULATIONATTEMPT : user
+      CLINIC_REGIMEN ||--o{ SIMULATOR_SIMULATIONATTEMPT : selected_regimen
+
+      SIMULATOR_SCENARIO ||--o{ SIMULATOR_SCENARIO_RECOMMENDED_REGIMENS : m2m
+      CLINIC_REGIMEN ||--o{ SIMULATOR_SCENARIO_RECOMMENDED_REGIMENS : m2m
+
+      AUTH_USER ||--o{ CHEMTOOLS_CHEMJOB : user
+      AUTH_USER ||--o{ DOCS_VIEWER_DOCUMENTVIEW : user
+      AUTH_USER ||--o{ DOCS_VIEWER_DOCUMENTFEEDBACK : user
+    ```
+
+    ## DB configuration (runtime)
+
+    - Engine: `django.db.backends.sqlite3`
+    - File: `db.sqlite3`
+    - Default: no username/password (local SQLite)
+
+    For production, consider Postgres (Django compatible) and standard migrations (`python manage.py migrate`).
+
+    ## Application tables (current)
+
+## Schema reference (tables, relations, DDL)
+
+Questa sezione è volutamente **bilingue nello stesso testo** (IT/EN) per evitare duplicazioni: i nomi delle colonne/PK/FK e il DDL sono identici indipendentemente dalla lingua.
 
 ### `clinic_patient`
 
-Contiene anagrafica paziente e ownership minimale.
+Contiene anagrafica paziente e ownership minimale. / Patient demographic record + minimal ownership.
 
-| Campo | Tipo | NULL | Note |
+| Campo / Field | Tipo / Type | NULL | Note / Notes |
 | --- | --- | --- | --- |
 | `id` | INTEGER | no | PK |
 | `mrn` | varchar(32) | no | Unique |
@@ -67,9 +136,9 @@ Indici:
 
 ### `clinic_assessment`
 
-Snapshot laboratoristico per valutazioni IMWG + note.
+Snapshot laboratoristico per valutazioni IMWG + note. / Lab snapshot for IMWG-related evaluation + notes.
 
-| Campo | Tipo | NULL | Note |
+| Campo / Field | Tipo / Type | NULL | Note / Notes |
 | --- | --- | --- | --- |
 | `id` | INTEGER | no | PK |
 | `patient_id` | bigint | no | FK → `clinic_patient.id` |
@@ -93,9 +162,9 @@ Indice:
 
 ### `clinic_regimen`
 
-Definizione di regimen terapeutici (riusati da Clinic e Simulator).
+Definizione di regimen terapeutici (riusati da Clinic e Simulator). / Treatment regimen definitions (shared by Clinic and Simulator).
 
-| Campo | Tipo | NULL | Note |
+| Campo / Field | Tipo / Type | NULL | Note / Notes |
 | --- | --- | --- | --- |
 | `id` | INTEGER | no | PK |
 | `name` | varchar(128) | no |  |
@@ -106,9 +175,9 @@ Definizione di regimen terapeutici (riusati da Clinic e Simulator).
 
 ### `clinic_patienttherapy`
 
-Timeline delle terapie per paziente.
+Timeline delle terapie per paziente. / Patient treatment timeline.
 
-| Campo | Tipo | NULL | Note |
+| Campo / Field | Tipo / Type | NULL | Note / Notes |
 | --- | --- | --- | --- |
 | `id` | INTEGER | no | PK |
 | `patient_id` | bigint | no | FK → `clinic_patient.id` |
@@ -124,9 +193,9 @@ Indici:
 
 ### `clinic_cytogeneticabnormality`
 
-Catalogo di anomalie citogenetiche.
+Catalogo di anomalie citogenetiche. / Cytogenetic abnormalities catalog.
 
-| Campo | Tipo | NULL | Note |
+| Campo / Field | Tipo / Type | NULL | Note / Notes |
 | --- | --- | --- | --- |
 | `id` | INTEGER | no | PK |
 | `code` | varchar(32) | no | unique |
@@ -137,9 +206,9 @@ Indice:
 
 ### `clinic_patientcytogenetics`
 
-Storico anomalie per paziente.
+Storico anomalie per paziente. / Patient cytogenetics history.
 
-| Campo | Tipo | NULL | Note |
+| Campo / Field | Tipo / Type | NULL | Note / Notes |
 | --- | --- | --- | --- |
 | `id` | INTEGER | no | PK |
 | `patient_id` | bigint | no | FK → `clinic_patient.id` |
@@ -154,7 +223,7 @@ Indici:
 
 ### `simulator_scenario`
 
-Scenario clinici “didattici” + parametri clinici/biologici.
+Scenari clinici “didattici” + parametri clinici/biologici. / Educational scenarios + clinical/biological parameters.
 
 Campi chiave (estratto):
 
@@ -169,7 +238,7 @@ Campi chiave (estratto):
 
 ### `simulator_simulationattempt`
 
-Tentativi utente su uno scenario.
+Tentativi utente su uno scenario. / User simulation attempts for a scenario.
 
 Relazioni:
 - `scenario_id` → `simulator_scenario.id`
@@ -184,13 +253,13 @@ Payload:
 
 ### `simulator_scenario_recommended_regimens`
 
-Tabella di join M2M (`Scenario.recommended_regimens`).
+Tabella di join M2M (`Scenario.recommended_regimens`). / Join table for M2M.
 
 Unique composito: `scenario_id, regimen_id`
 
 ### `chemtools_chemjob`
 
-Tracking delle esecuzioni (job) di strumenti di chem-informatics.
+Tracking delle esecuzioni (job) di strumenti di chem-informatics. / Chem-informatics job tracking.
 
 Relazione:
 - `user_id` → `auth_user.id` (nullable)
@@ -201,15 +270,15 @@ Campi di stato:
 
 ### `docs_viewer_documentview` / `docs_viewer_documentfeedback`
 
-Analytics e feedback per il viewer di documentazione interno.
+Analytics e feedback per il viewer di documentazione interno. / Analytics and feedback for the internal docs viewer.
 
-## Tabelle Django (standard)
+## Tabelle Django (standard) / Django standard tables
 
 L’istanza SQLite include anche le tabelle standard:
 - `auth_*` (utenti, gruppi, permessi)
 - `django_*` (sessioni, admin log, migrations, content types)
 
-## Modelli presenti nel codice ma non in DB (attenzione)
+## Modelli presenti nel codice ma non in DB (attenzione) / Models in code but not in DB (warning)
 
 ### `clinic.models_symptoms.SymptomAssessment`
 
@@ -222,9 +291,9 @@ python3 manage.py makemigrations clinic
 python3 manage.py migrate
 ```
 
-## DDL completo (SQLite)
+## DDL (SQLite)
 
-Questa sezione riporta le definizioni **esatte** delle tabelle (output `sqlite3 db.sqlite3 ".schema <table>"`).
+Questa sezione riporta le definizioni **esatte** delle tabelle (output `sqlite3 db.sqlite3 ".schema <table>"`). / This section shows the exact table definitions (SQLite `.schema` output).
 
 ??? example "`clinic_patient`"
     ```sql

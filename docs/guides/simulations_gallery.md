@@ -55,6 +55,22 @@
       E --> F["UI: charts + decision rules"]
     ```
 
+    ## 8) Difficulty score — response/toxicity/survival (toy)
+
+    ![Response probabilities vs difficulty](../assets/images/models/difficulty_response_probabilities.svg)
+
+    ![Toxicity risk vs difficulty](../assets/images/models/difficulty_toxicity_risk.svg)
+
+    ![Survival vs difficulty](../assets/images/models/difficulty_survival_vs_score.svg)
+
+    **Cosa mostra**: curve illustrative per capire come uno score composito può essere trasformato in stime “toy” (non cliniche).
+
+    ## 9) Prognosis — baseline OS per R-ISS (toy)
+
+    ![Baseline survival by R-ISS (toy)](../assets/images/models/prognosis_riss_baseline.svg)
+
+    **Cosa mostra**: curve esponenziali illustrative coerenti con mediane diverse per R-ISS.
+
 === "EN"
     This page is a **visual gallery** (plots + maps) to quickly understand the system.
 
@@ -96,3 +112,14 @@
       E --> F["UI: charts + decision rules"]
     ```
 
+    ## 8) Difficulty score — response/toxicity/survival (toy)
+
+    ![Response probabilities vs difficulty](../assets/images/models/difficulty_response_probabilities.svg)
+
+    ![Toxicity risk vs difficulty](../assets/images/models/difficulty_toxicity_risk.svg)
+
+    ![Survival vs difficulty](../assets/images/models/difficulty_survival_vs_score.svg)
+
+    ## 9) Prognosis — baseline OS by R-ISS (toy)
+
+    ![Baseline survival by R-ISS (toy)](../assets/images/models/prognosis_riss_baseline.svg)

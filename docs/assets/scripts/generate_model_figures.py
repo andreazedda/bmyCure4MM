@@ -205,6 +205,116 @@ def figure_pareto_front() -> None:
     ax.legend(loc="upper right")
     _save(fig, "pareto_front.svg")
 
+def _sigmoid(z: np.ndarray) -> np.ndarray:
+    return 1.0 / (1.0 + np.exp(-z))
+
+
+def figure_difficulty_response_probabilities() -> None:
+    # Mirrors simulator/difficulty_scoring.py (toy model)
+    ds = np.linspace(0, 100, 301)
+
+    beta_0_cr = 2.5
+    beta_1_cr = -0.05
+    beta_0_pr = 3.0
+    beta_1_pr = -0.03
+
+    p_cr = _sigmoid(beta_0_cr + beta_1_cr * ds)
+    p_pr = _sigmoid(beta_0_pr + beta_1_pr * ds)
+    p_cr = np.minimum(p_cr, p_pr * 0.6)
+
+    p_partial = np.clip(p_pr - p_cr, 0.0, 1.0)
+    p_stable = np.clip((1.0 - p_pr) * 0.6, 0.0, 1.0)
+    p_progressive = np.clip((1.0 - p_pr) * 0.4, 0.0, 1.0)
+
+    fig, ax = plt.subplots(figsize=(8.0, 4.2))
+    ax.plot(ds, p_cr, label="Complete response (CR)")
+    ax.plot(ds, p_partial, label="Partial response (PR)")
+    ax.plot(ds, p_stable, label="Stable disease (SD)")
+    ax.plot(ds, p_progressive, label="Progressive disease (PD)")
+    ax.set_title("Difficulty (DS) → response probabilities (toy)")
+    ax.set_xlabel("Difficulty score DS (0..100)")
+    ax.set_ylabel("Probability")
+    ax.set_ylim(-0.02, 1.02)
+    ax.grid(True, alpha=0.3)
+    ax.legend(loc="upper right", ncols=2)
+    _save(fig, "difficulty_response_probabilities.svg")
+
+
+def figure_difficulty_toxicity_risk() -> None:
+    # Mirrors simulator/difficulty_scoring.py (toy model)
+    ds = np.linspace(0, 100, 301)
+    frailty_levels = [2.0, 7.0, 12.0]
+
+    fig, ax = plt.subplots(figsize=(8.0, 4.2))
+    for fs in frailty_levels:
+        linear = -2.0 + 0.025 * ds + 0.15 * fs
+        p_severe = _sigmoid(linear)
+        ax.plot(ds, p_severe, label=f"P(Grade≥3), FS={fs:g}")
+
+    ax.set_title("Difficulty (DS) + frailty (FS) → severe toxicity risk (toy)")
+    ax.set_xlabel("Difficulty score DS (0..100)")
+    ax.set_ylabel("Probability of Grade ≥ 3 toxicity")
+    ax.set_ylim(-0.02, 1.02)
+    ax.grid(True, alpha=0.3)
+    ax.legend(loc="lower right")
+    _save(fig, "difficulty_toxicity_risk.svg")
+
+
+def figure_difficulty_survival_vs_score() -> None:
+    # Mirrors simulator/difficulty_scoring.py (toy model)
+    ds = np.linspace(0, 100, 301)
+    lambda_0 = 0.05  # 1/year
+    gamma = 2.0
+    lam = lambda_0 * np.exp(gamma * ds / 100.0)
+
+    median_os_years = np.log(2) / lam
+    median_pfs_years = 0.55 * median_os_years
+    os_5y = np.exp(-lam * 5.0)
+
+    fig, ax = plt.subplots(figsize=(8.0, 4.2))
+    ax.plot(ds, median_os_years, label="Median OS (years)")
+    ax.plot(ds, median_pfs_years, label="Median PFS (years)")
+    ax.set_title("Difficulty (DS) → survival summary (toy)")
+    ax.set_xlabel("Difficulty score DS (0..100)")
+    ax.set_ylabel("Years")
+    ax.grid(True, alpha=0.3)
+
+    ax2 = ax.twinx()
+    ax2.plot(ds, os_5y, color="#2ca02c", alpha=0.9, label="Estimated 5-year survival")
+    ax2.set_ylabel("5-year survival probability")
+    ax2.set_ylim(-0.02, 1.02)
+
+    lines = ax.get_lines() + ax2.get_lines()
+    labels = [l.get_label() for l in lines]
+    ax.legend(lines, labels, loc="upper right")
+    _save(fig, "difficulty_survival_vs_score.svg")
+
+
+def figure_prognosis_riss_baseline() -> None:
+    # Illustrative OS survival curves based on baseline medians in simulator/prognosis.py
+    # (using a simple exponential survival model for visualization)
+    medians_months = {
+        "R-ISS I": 120.0,
+        "R-ISS II": 83.0,
+        "R-ISS III": 43.0,
+    }
+    t_years = np.linspace(0, 10.0, 401)
+
+    fig, ax = plt.subplots(figsize=(8.0, 4.2))
+    for label, median_mo in medians_months.items():
+        median_years = median_mo / 12.0
+        lam = np.log(2) / max(median_years, 1e-9)
+        s = np.exp(-lam * t_years)
+        ax.plot(t_years, s, label=f"{label} (median {median_mo:.0f} mo)")
+
+    ax.set_title("Baseline OS survival by R-ISS (toy exponential curves)")
+    ax.set_xlabel("Time (years)")
+    ax.set_ylabel("Overall survival S(t)")
+    ax.set_ylim(-0.02, 1.02)
+    ax.grid(True, alpha=0.3)
+    ax.legend(loc="upper right")
+    _save(fig, "prognosis_riss_baseline.svg")
+
 
 def main() -> None:
     plt.rcParams.update(
@@ -219,6 +329,10 @@ def main() -> None:
     figure_coupled_dynamics()
     figure_uncertainty_bands()
     figure_pareto_front()
+    figure_difficulty_response_probabilities()
+    figure_difficulty_toxicity_risk()
+    figure_difficulty_survival_vs_score()
+    figure_prognosis_riss_baseline()
     print(f"Generated figures in {OUT_DIR}")
 
 

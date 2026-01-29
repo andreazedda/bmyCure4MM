@@ -5,40 +5,30 @@
 
     ## Gap principali (alto impatto)
 
-    ### 1) Difficulty scoring & expected outcomes
-    Nel codice esiste una pipeline di scoring/predizioni:
+    ### 1) Coverage “quasi completa”: difficulty / prognosis / virtual patients / regimens
 
-    - `simulator/difficulty_scoring.py` (scoring componenti, stime response/toxicity/survival)
-    - `simulator/scenario_extensions.py` (mixin “mathematical” e calcolo difficulty)
+    Ora esistono guide dedicate:
 
-    **Manca** nella doc:
-    - formule/razionale delle componenti di score
-    - mapping “campo scenario” → “score”
-    - esempi con numeri (input → score → badge)
+    - `Guides → Difficulty Scoring` (da `simulator/difficulty_scoring.py`)
+    - `Guides → Prognosis` (da `simulator/prognosis.py`)
+    - `Guides → Virtual Patients` (da `simulator/virtual_patients.py`)
+    - `Guides → Regimen Suggester` (da `simulator/regimen_suggester.py`)
 
-    ### 2) Virtual patients generator
-    Nel codice:
-    - `simulator/virtual_patients.py` (archetipi, generator, parametri)
+    **Restano da migliorare** (se vuoi “perfetto”):
+    - collegamenti diretti UI → funzione (view/template) per ogni output
+    - esempi end-to-end con dati reali/dummy (JSON) salvati come artifact
+    - validazione/benchmark delle assunzioni (documento separato “evidence”)
 
-    **Manca** nella doc:
-    - come vengono generati gli archetipi (distribuzioni, range)
-    - come si collega a Scenario/Twin e ai preset
+    ### 2) Decision support “UI mapping”
 
-    ### 3) Prognosis module
-    Nel codice:
-    - `simulator/prognosis.py` (PFS/OS stimati, modificatori)
+    Nel codice esistono molte regole “auditable” distribuite tra:
+
+    - `clinic/` (input clinici + vincoli)
+    - `simulator/` (validazione parametri + twin + scoring)
 
     **Manca** nella doc:
-    - definizione delle metriche e assunzioni
-    - esempi (R-ISS I vs III, effetto citogenetica/età)
-
-    ### 4) Regimen suggester
-    Nel codice:
-    - `simulator/regimen_suggester.py` (db regimi + motore suggerimenti)
-
-    **Manca** nella doc:
-    - regole di suggerimento (feature→regimi)
-    - come si integra con UI Clinic/Simulator
+    - una tabella “UI field → Model field → file → regola → messaggio badge”
+    - esempi screenshot-first (per PM/clinici) per ogni regola principale
 
     ## Gap medi (utile per dev)
 
@@ -51,45 +41,37 @@
     - schema DB + mappa Model↔Tabella: `Guides → Database`, `Reference → Database Objects`
     - modelli ODE/PK/PD + KPI + grafici toy: `Guides → Mathematical Models`
     - optimization theory e Pareto: `Guides → Optimization Theory`
+    - difficulty/prognosis/virtual patients/regimens (base + teoria): vedi guide dedicate
 
 === "EN"
     This page lists what **exists in code** but is not yet fully explained in the docs, so you can prioritize documentation work.
 
     ## Main gaps (high impact)
 
-    ### 1) Difficulty scoring & expected outcomes
-    In code:
-    - `simulator/difficulty_scoring.py` (component scores + response/toxicity/survival estimation)
-    - `simulator/scenario_extensions.py` (mathematical mixin + difficulty computation)
+    ### 1) “Mostly covered”: difficulty / prognosis / virtual patients / regimens
+
+    Dedicated guides now exist:
+
+    - `Guides → Difficulty Scoring` (from `simulator/difficulty_scoring.py`)
+    - `Guides → Prognosis` (from `simulator/prognosis.py`)
+    - `Guides → Virtual Patients` (from `simulator/virtual_patients.py`)
+    - `Guides → Regimen Suggester` (from `simulator/regimen_suggester.py`)
+
+    **Still worth improving** (if you want it “perfect”):
+    - direct UI → function (view/template) links for each output
+    - end-to-end worked examples with saved artifacts (JSON)
+    - evidence/assumption validation notes (separate “evidence” doc)
+
+    ### 2) Decision support “UI mapping”
+
+    Many auditable rules are spread across:
+
+    - `clinic/` (clinical inputs and constraints)
+    - `simulator/` (parameter validation + twin + scoring)
 
     **Missing in docs:**
-    - the math/rationale behind each component
-    - field mapping “Scenario → score”
-    - worked examples (inputs → score → badges)
-
-    ### 2) Virtual patients generator
-    In code:
-    - `simulator/virtual_patients.py` (archetypes + generator)
-
-    **Missing in docs:**
-    - how archetypes are generated (ranges/distributions)
-    - how it connects to Scenario/Twin and presets
-
-    ### 3) Prognosis module
-    In code:
-    - `simulator/prognosis.py` (estimated PFS/OS + modifiers)
-
-    **Missing in docs:**
-    - metric definitions and assumptions
-    - examples (R-ISS I vs III, cytogenetics/age effect)
-
-    ### 4) Regimen suggester
-    In code:
-    - `simulator/regimen_suggester.py` (regimen DB + suggestion engine)
-
-    **Missing in docs:**
-    - suggestion rules (features → regimens)
-    - how it integrates into Clinic/Simulator UI
+    - a single table: “UI field → Model field → file → rule → badge message”
+    - screenshot-first examples (PM/clinician friendly) for each major rule
 
     ## Medium gaps (dev focused)
 
@@ -102,4 +84,4 @@
     - DB schema + Model↔Table mapping: `Guides → Database`, `Reference → Database Objects`
     - ODE/PK/PD model + KPIs + toy figures: `Guides → Mathematical Models`
     - optimization + Pareto: `Guides → Optimization Theory`
-
+    - difficulty/prognosis/virtual patients/regimens (baseline theory): see dedicated guides
