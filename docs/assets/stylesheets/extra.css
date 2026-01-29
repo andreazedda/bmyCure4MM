@@ -73,3 +73,78 @@
   touch-action: none; /* allow custom pan */
   outline: none;
 }
+
+/* Simple, readable score cards + progress bars (used in visual guides). */
+.bmy-card {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin: 0.75rem 0;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+[data-md-color-scheme="slate"] .bmy-card {
+  background: rgba(30, 30, 30, 0.6);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.bmy-card h3,
+.bmy-card h4 {
+  margin-top: 0;
+}
+
+.bmy-progress {
+  width: 100%;
+  height: 0.9rem;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.bmy-progress::-webkit-progress-bar {
+  background-color: rgba(127, 127, 127, 0.2);
+  border-radius: 999px;
+}
+
+.bmy-progress::-webkit-progress-value {
+  border-radius: 999px;
+}
+
+.bmy-progress--good::-webkit-progress-value {
+  background: linear-gradient(90deg, #12b886, #40c057);
+}
+
+.bmy-progress--mid::-webkit-progress-value {
+  background: linear-gradient(90deg, #fab005, #ffd43b);
+}
+
+.bmy-progress--low::-webkit-progress-value {
+  background: linear-gradient(90deg, #adb5bd, #ced4da);
+}
+
+.bmy-badge {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.bmy-badge--good {
+  background: rgba(18, 184, 134, 0.16);
+  color: #0b6b4c;
+}
+
+.bmy-badge--mid {
+  background: rgba(250, 176, 5, 0.16);
+  color: #8a5a00;
+}
+
+.bmy-badge--low {
+  background: rgba(173, 181, 189, 0.16);
+  color: #495057;
+}
+
+[data-md-color-scheme="slate"] .bmy-badge {
+  border-color: rgba(255, 255, 255, 0.18);
+}

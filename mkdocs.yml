@@ -14,6 +14,7 @@ nav:
   - Guides:
       - Architecture: guides/architecture.md
       - Database: guides/database.md
+      - Glossary: guides/glossary.md
       - Mathematical Models: guides/mathematical_models.md
       - Optimization Theory: guides/optimization_theory.md
       - Decision Algorithm: guides/decision_algorithm.md
@@ -23,6 +24,8 @@ nav:
   - Reference:
       - Configuration: reference/configuration.md
       - Database Objects: reference/database_objects.md
+      - Simulator Parameters: reference/simulator_parameters.md
+      - Endpoints: reference/endpoints.md
       - Scripts: reference/scripts.md
       - Repo Docs README: repo_readme.md
       - Apps:
