@@ -18,6 +18,8 @@ nav:
       - Mathematical Models: guides/mathematical_models.md
       - Optimization Theory: guides/optimization_theory.md
       - Decision Algorithm: guides/decision_algorithm.md
+      - Doc Coverage (Gaps): guides/gaps.md
+      - Simulations Gallery: guides/simulations_gallery.md
       - Operations: guides/operations.md
       - Development: development/DEVELOPMENT.md
       - Troubleshooting: development/TROUBLESHOOTING.md

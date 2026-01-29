@@ -143,6 +143,68 @@ def figure_coupled_dynamics() -> None:
     ax.legend(loc="lower left")
     _save(fig, "coupled_dynamics.svg")
 
+def figure_uncertainty_bands() -> None:
+    # Illustrative uncertainty bands for tumor reduction over time (toy).
+    rng = np.random.default_rng(7)
+    t = np.linspace(0, 180, 181)
+    baseline = np.exp(-t / 80.0)  # decreasing proxy
+
+    samples = []
+    for _ in range(200):
+        noise = rng.normal(0.0, 0.06, size=t.shape)
+        trend = baseline * np.exp(noise)
+        samples.append(trend)
+    arr = np.asarray(samples)
+    p05 = np.percentile(arr, 5, axis=0)
+    p50 = np.percentile(arr, 50, axis=0)
+    p95 = np.percentile(arr, 95, axis=0)
+
+    fig, ax = plt.subplots(figsize=(8.0, 4.2))
+    ax.fill_between(t, p05, p95, alpha=0.25, label="p05–p95 band")
+    ax.plot(t, p50, label="median (p50)")
+    ax.set_title("Uncertainty bands (toy): trajectory variability")
+    ax.set_xlabel("Time (days)")
+    ax.set_ylabel("Relative tumor burden (a.u.)")
+    ax.grid(True, alpha=0.3)
+    ax.legend(loc="upper right")
+    _save(fig, "uncertainty_bands.svg")
+
+
+def figure_pareto_front() -> None:
+    # Illustrative Pareto front scatter in 2D (efficacy vs toxicity).
+    rng = np.random.default_rng(13)
+    n = 120
+    efficacy = rng.uniform(0.2, 0.98, size=n)
+    toxicity = rng.uniform(0.05, 0.45, size=n)
+    # Create a few "good" points
+    efficacy[:15] = rng.uniform(0.75, 0.98, size=15)
+    toxicity[:15] = rng.uniform(0.06, 0.22, size=15)
+
+    # Pareto: maximize efficacy, minimize toxicity
+    points = np.column_stack([efficacy, toxicity])
+    pareto = np.ones(n, dtype=bool)
+    for i in range(n):
+        if not pareto[i]:
+            continue
+        for j in range(n):
+            if i == j:
+                continue
+            if (points[j, 0] >= points[i, 0]) and (points[j, 1] <= points[i, 1]) and (
+                (points[j, 0] > points[i, 0]) or (points[j, 1] < points[i, 1])
+            ):
+                pareto[i] = False
+                break
+
+    fig, ax = plt.subplots(figsize=(8.0, 4.2))
+    ax.scatter(efficacy, toxicity, s=18, alpha=0.6, label="Trials")
+    ax.scatter(efficacy[pareto], toxicity[pareto], s=28, label="Pareto front")
+    ax.set_title("Pareto front (toy): efficacy vs toxicity")
+    ax.set_xlabel("Efficacy (tumor_reduction)")
+    ax.set_ylabel("Toxicity proxy (healthy_loss)")
+    ax.grid(True, alpha=0.3)
+    ax.legend(loc="upper right")
+    _save(fig, "pareto_front.svg")
+
 
 def main() -> None:
     plt.rcParams.update(
@@ -155,9 +217,10 @@ def main() -> None:
     figure_emax_curve()
     figure_pk_profiles()
     figure_coupled_dynamics()
+    figure_uncertainty_bands()
+    figure_pareto_front()
     print(f"Generated figures in {OUT_DIR}")
 
 
 if __name__ == "__main__":
     main()
-

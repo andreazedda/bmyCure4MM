@@ -1,0 +1,98 @@
+# Simulations & Visuals (gallery)
+
+=== "IT"
+    Questa pagina raccoglie esempi **visivi** (grafici + mappe) per capire rapidamente cosa fa il sistema.
+
+    !!! tip
+        Clicca qualsiasi diagramma Mermaid per **zoom/pan**.
+
+    ## 1) Crescita tumorale (logistica) — esempio
+
+    ![Logistic growth](../assets/images/models/logistic_growth.svg)
+
+    **Cosa mostra**: al crescere di \(r_T\) il tumore cresce più rapidamente e raggiunge prima la saturazione vicino a \(K_T\).
+
+    ## 2) PK (concentrazione) — schedule diverso, profilo diverso
+
+    ![PK profiles](../assets/images/models/pk_profiles.svg)
+
+    **Cosa mostra**: una schedule pulsata genera picchi/valle; una input “continuo” è più stabile.
+
+    ## 3) PD (Emax) — esempio di EC50
+
+    ![Emax curve](../assets/images/models/emax_curve.svg)
+
+    **Cosa mostra**: a parità di \(E_{max}\), un EC50 più basso produce effetto elevato già a basse concentrazioni.
+
+    ## 4) Dinamica accoppiata (tumore vs healthy)
+
+    ![Coupled dynamics](../assets/images/models/coupled_dynamics.svg)
+
+    **Cosa mostra**: la terapia riduce \(T(t)\), ma può anche ridurre \(H(t)\) (tossicità).
+
+    ## 5) Incertezza (coorte) — bande p05/p95 (toy)
+
+    ![Uncertainty bands](../assets/images/models/uncertainty_bands.svg)
+
+    **Cosa mostra**: con repliche (cohort_size>1) puoi ottenere una banda di variabilità (percentili).
+
+    ## 6) Optimization Lab — Pareto front (toy)
+
+    ![Pareto front](../assets/images/models/pareto_front.svg)
+
+    **Cosa mostra**: soluzioni Pareto non sono dominate: per migliorare efficacia spesso “paghi” tossicità.
+
+    ## 7) Mappe Mermaid (flussi)
+
+    ### End-to-end (Clinica → Twin → Simulatore → KPI)
+
+    ```mermaid
+    flowchart TD
+      A["Clinic: Patient + Assessment"] --> B["Twin: derive biology (optional)"]
+      B --> C["Simulator: Scenario + Params"]
+      C --> D["ODE solve"]
+      D --> E["KPI + artifacts (CSV/Plot)"]
+      E --> F["UI: charts + decision rules"]
+    ```
+
+=== "EN"
+    This page is a **visual gallery** (plots + maps) to quickly understand the system.
+
+    !!! tip
+        Click any Mermaid diagram to **zoom/pan**.
+
+    ## 1) Tumor growth (logistic) — example
+
+    ![Logistic growth](../assets/images/models/logistic_growth.svg)
+
+    ## 2) PK — schedule changes the profile
+
+    ![PK profiles](../assets/images/models/pk_profiles.svg)
+
+    ## 3) PD (Emax) — EC50 intuition
+
+    ![Emax curve](../assets/images/models/emax_curve.svg)
+
+    ## 4) Coupled dynamics (tumor vs healthy)
+
+    ![Coupled dynamics](../assets/images/models/coupled_dynamics.svg)
+
+    ## 5) Uncertainty bands (toy)
+
+    ![Uncertainty bands](../assets/images/models/uncertainty_bands.svg)
+
+    ## 6) Optimization Lab — Pareto front (toy)
+
+    ![Pareto front](../assets/images/models/pareto_front.svg)
+
+    ## 7) Mermaid maps
+
+    ```mermaid
+    flowchart TD
+      A["Clinic: Patient + Assessment"] --> B["Twin: derive biology (optional)"]
+      B --> C["Simulator: Scenario + Params"]
+      C --> D["ODE solve"]
+      D --> E["KPIs + artifacts (CSV/Plot)"]
+      E --> F["UI: charts + decision rules"]
+    ```
+
