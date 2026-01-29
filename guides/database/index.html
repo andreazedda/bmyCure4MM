@@ -1,0 +1,3024 @@
+
+<!doctype html>
+<html lang="it" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Decision support + simulation + chemtools (Django)">
+      
+      
+      
+      
+        <link rel="prev" href="../architecture/">
+      
+      
+        <link rel="next" href="../mathematical_models/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Database - bmyCure4MM Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="pink">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#database" class="md-skip">
+          Vai al contenuto
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Intestazione">
+    <a href="../.." title="bmyCure4MM Docs" class="md-header__button md-logo" aria-label="bmyCure4MM Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            bmyCure4MM Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Database
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="pink"  aria-label="Dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="teal"  aria-label="Light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Cerca" placeholder="Cerca" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Cerca">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Cancella" aria-label="Cancella" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inizializza la ricerca
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../learning_path/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Learning Path
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../en/TUTORIAL_FIRST_RUN/" class="md-tabs__link">
+          
+  
+  
+  Start Here
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../architecture/" class="md-tabs__link">
+          
+  
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../reference/configuration/" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../dynamic_data_architecture/" class="md-tabs__link">
+          
+  
+  
+  Deep Dives
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../en/quickstart/" class="md-tabs__link">
+          
+  
+  
+  EN
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../it/avvio_rapido/" class="md-tabs__link">
+          
+  
+  
+  IT
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigazione" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="bmyCure4MM Docs" class="md-nav__button md-logo" aria-label="bmyCure4MM Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    bmyCure4MM Docs
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../learning_path/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Learning Path
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Start Here
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Start Here
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../en/TUTORIAL_FIRST_RUN/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorial (EN)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../it/TUTORIAL_PRIMO_USO/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorial (IT)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Indice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Indice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#panoramica-entita-er" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Panoramica entità (ER)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configurazione-db-runtime" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configurazione DB (runtime)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tabelle-applicative-attuali" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tabelle applicative (attuali)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tabelle applicative (attuali)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#clinic_patient" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clinic_patient
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clinic_assessment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clinic_assessment
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clinic_regimen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clinic_regimen
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clinic_patienttherapy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clinic_patienttherapy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clinic_cytogeneticabnormality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clinic_cytogeneticabnormality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clinic_patientcytogenetics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clinic_patientcytogenetics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#simulator_scenario" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        simulator_scenario
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#simulator_simulationattempt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        simulator_simulationattempt
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#simulator_scenario_recommended_regimens" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        simulator_scenario_recommended_regimens
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemtools_chemjob" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        chemtools_chemjob
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#docs_viewer_documentview-docs_viewer_documentfeedback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        docs_viewer_documentview / docs_viewer_documentfeedback
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tabelle-django-standard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tabelle Django (standard)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#modelli-presenti-nel-codice-ma-non-in-db-attenzione" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modelli presenti nel codice ma non in DB (attenzione)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Modelli presenti nel codice ma non in DB (attenzione)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#clinicmodels_symptomssymptomassessment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clinic.models_symptoms.SymptomAssessment
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ddl-completo-sqlite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DDL completo (SQLite)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mathematical_models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mathematical Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../optimization_theory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization Theory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../decision_algorithm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Decision Algorithm
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../operations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/DEVELOPMENT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/TROUBLESHOOTING/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/database_objects/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database Objects
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/scripts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scripts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_4" id="__nav_5_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Apps
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Apps
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/apps/clinic/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Clinic
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/apps/simulator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Simulator
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/apps/chemtools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ChemTools
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/apps/docs_viewer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docs Viewer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deep Dives
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Deep Dives
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../dynamic_data_architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dynamic Data Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api_integration_summary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Integration Summary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/MATHEMATICAL_MODELS_DOCUMENTATION/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mathematical Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/TESTING_REPORT/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    EN
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    EN
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../en/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quickstart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../en/simulator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Simulator
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../en/optimization_lab/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization Lab
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../en/patient_twin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Patient Twin
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../en/pkpd_presets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PK/PD Presets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../en/pipelines/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pipelines
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../en/api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IT
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    IT
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../it/avvio_rapido/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Avvio rapido
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../it/simulatore/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Simulatore
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../it/optimization_lab/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization Lab
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../it/gemello_paziente/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gemello Paziente
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../it/pkpd_preset/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Preset PK/PD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../it/pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../it/api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Indice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Indice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#panoramica-entita-er" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Panoramica entità (ER)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configurazione-db-runtime" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configurazione DB (runtime)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tabelle-applicative-attuali" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tabelle applicative (attuali)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tabelle applicative (attuali)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#clinic_patient" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clinic_patient
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clinic_assessment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clinic_assessment
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clinic_regimen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clinic_regimen
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clinic_patienttherapy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clinic_patienttherapy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clinic_cytogeneticabnormality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clinic_cytogeneticabnormality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#clinic_patientcytogenetics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clinic_patientcytogenetics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#simulator_scenario" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        simulator_scenario
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#simulator_simulationattempt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        simulator_simulationattempt
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#simulator_scenario_recommended_regimens" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        simulator_scenario_recommended_regimens
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chemtools_chemjob" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        chemtools_chemjob
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#docs_viewer_documentview-docs_viewer_documentfeedback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        docs_viewer_documentview / docs_viewer_documentfeedback
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tabelle-django-standard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tabelle Django (standard)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#modelli-presenti-nel-codice-ma-non-in-db-attenzione" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modelli presenti nel codice ma non in DB (attenzione)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Modelli presenti nel codice ma non in DB (attenzione)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#clinicmodels_symptomssymptomassessment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        clinic.models_symptoms.SymptomAssessment
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ddl-completo-sqlite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DDL completo (SQLite)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="database">Database<a class="headerlink" href="#database" title="Permanent link">&para;</a></h1>
+<p>Questa applicazione usa <strong>Django ORM</strong> con database <strong>SQLite</strong> in default (<code>db.sqlite3</code>), configurato in <code>mmportal/settings.py</code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Ambito</p>
+<p>Questa pagina descrive:
+- lo <strong>schema applicativo</strong> attuale (tabelle presenti in <code>db.sqlite3</code>)
+- le <strong>entità Django</strong> (model) e le loro relazioni</p>
+<p>Nota: alcune classi presenti nel codice potrebbero non avere ancora una migration applicata (es. <code>clinic.models_symptoms.SymptomAssessment</code>).</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Non trovi un oggetto DB?</p>
+<p>Vai su <code>Reference → Database Objects</code> per la mappa <strong>Model ↔ Tabella ↔ File</strong> e esempi rapidi (ORM/SQL).</p>
+</div>
+<h2 id="panoramica-entita-er">Panoramica entità (ER)<a class="headerlink" href="#panoramica-entita-er" title="Permanent link">&para;</a></h2>
+<div class="mermaid">erDiagram
+  AUTH_USER ||--o{ CLINIC_PATIENT : owner
+  CLINIC_PATIENT ||--o{ CLINIC_ASSESSMENT : assessments
+  CLINIC_PATIENT ||--o{ CLINIC_PATIENTTHERAPY : therapies
+  CLINIC_REGIMEN ||--o{ CLINIC_PATIENTTHERAPY : regimen
+  CLINIC_PATIENT ||--o{ CLINIC_PATIENTCYTOGENETICS : cytogenetics
+  CLINIC_CYTOGENETICABNORMALITY ||--o{ CLINIC_PATIENTCYTOGENETICS : abnormality
+
+  SIMULATOR_SCENARIO ||--o{ SIMULATOR_SIMULATIONATTEMPT : attempts
+  AUTH_USER ||--o{ SIMULATOR_SIMULATIONATTEMPT : user
+  CLINIC_REGIMEN ||--o{ SIMULATOR_SIMULATIONATTEMPT : selected_regimen
+
+  SIMULATOR_SCENARIO ||--o{ SIMULATOR_SCENARIO_RECOMMENDED_REGIMENS : m2m
+  CLINIC_REGIMEN ||--o{ SIMULATOR_SCENARIO_RECOMMENDED_REGIMENS : m2m
+
+  AUTH_USER ||--o{ CHEMTOOLS_CHEMJOB : user
+  AUTH_USER ||--o{ DOCS_VIEWER_DOCUMENTVIEW : user
+  AUTH_USER ||--o{ DOCS_VIEWER_DOCUMENTFEEDBACK : user</div>
+<h2 id="configurazione-db-runtime">Configurazione DB (runtime)<a class="headerlink" href="#configurazione-db-runtime" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Engine: <code>django.db.backends.sqlite3</code></li>
+<li>File: <code>db.sqlite3</code></li>
+<li>Default: nessun utente/password (SQLite locale)</li>
+</ul>
+<p>Per produzione, valutare Postgres (Django compatibile) e migrazioni standard (<code>python manage.py migrate</code>).</p>
+<h2 id="tabelle-applicative-attuali">Tabelle applicative (attuali)<a class="headerlink" href="#tabelle-applicative-attuali" title="Permanent link">&para;</a></h2>
+<h3 id="clinic_patient"><code>clinic_patient</code><a class="headerlink" href="#clinic_patient" title="Permanent link">&para;</a></h3>
+<p>Contiene anagrafica paziente e ownership minimale.</p>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>NULL</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>INTEGER</td>
+<td>no</td>
+<td>PK</td>
+</tr>
+<tr>
+<td><code>mrn</code></td>
+<td>varchar(32)</td>
+<td>no</td>
+<td>Unique</td>
+</tr>
+<tr>
+<td><code>owner_id</code></td>
+<td>INTEGER</td>
+<td>sì</td>
+<td>FK → <code>auth_user.id</code></td>
+</tr>
+<tr>
+<td><code>first_name</code></td>
+<td>varchar(64)</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td><code>last_name</code></td>
+<td>varchar(64)</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td><code>birth_date</code></td>
+<td>date</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td><code>sex</code></td>
+<td>varchar(1)</td>
+<td>no</td>
+<td>choices <code>M/F/O</code></td>
+</tr>
+<tr>
+<td><code>diagnosis_date</code></td>
+<td>date</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td><code>notes</code></td>
+<td>TEXT</td>
+<td>no</td>
+<td>in Django: <code>blank=True</code></td>
+</tr>
+</tbody>
+</table>
+<p>Indici:
+- <code>sqlite_autoindex_clinic_patient_1</code> su <code>mrn</code> (unique)
+- <code>clinic_patient_owner_id_e445f087</code> su <code>owner_id</code></p>
+<h3 id="clinic_assessment"><code>clinic_assessment</code><a class="headerlink" href="#clinic_assessment" title="Permanent link">&para;</a></h3>
+<p>Snapshot laboratoristico per valutazioni IMWG + note.</p>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>NULL</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>INTEGER</td>
+<td>no</td>
+<td>PK</td>
+</tr>
+<tr>
+<td><code>patient_id</code></td>
+<td>bigint</td>
+<td>no</td>
+<td>FK → <code>clinic_patient.id</code></td>
+</tr>
+<tr>
+<td><code>date</code></td>
+<td>date</td>
+<td>no</td>
+<td>ordinamento <code>-date</code></td>
+</tr>
+<tr>
+<td><code>m_protein_g_dl</code></td>
+<td>decimal</td>
+<td>sì</td>
+<td></td>
+</tr>
+<tr>
+<td><code>kappa_mg_l</code></td>
+<td>decimal</td>
+<td>sì</td>
+<td></td>
+</tr>
+<tr>
+<td><code>lambda_mg_l</code></td>
+<td>decimal</td>
+<td>sì</td>
+<td></td>
+</tr>
+<tr>
+<td><code>flc_ratio</code></td>
+<td>decimal</td>
+<td>sì</td>
+<td></td>
+</tr>
+<tr>
+<td><code>hemoglobin_g_dl</code></td>
+<td>decimal</td>
+<td>sì</td>
+<td></td>
+</tr>
+<tr>
+<td><code>calcium_mg_dl</code></td>
+<td>decimal</td>
+<td>sì</td>
+<td></td>
+</tr>
+<tr>
+<td><code>creatinine_mg_dl</code></td>
+<td>decimal</td>
+<td>sì</td>
+<td></td>
+</tr>
+<tr>
+<td><code>beta2m_mg_l</code></td>
+<td>decimal</td>
+<td>sì</td>
+<td></td>
+</tr>
+<tr>
+<td><code>albumin_g_dl</code></td>
+<td>decimal</td>
+<td>sì</td>
+<td></td>
+</tr>
+<tr>
+<td><code>ldH_u_l</code></td>
+<td>decimal</td>
+<td>sì</td>
+<td></td>
+</tr>
+<tr>
+<td><code>r_iss</code></td>
+<td>varchar(4)</td>
+<td>no</td>
+<td>choices <code>I/II/III</code> (stringa vuota ammessa in Django)</td>
+</tr>
+<tr>
+<td><code>response</code></td>
+<td>varchar(4)</td>
+<td>no</td>
+<td>choices <code>sCR/CR/VGPR/PR/SD/PD</code> (stringa vuota ammessa)</td>
+</tr>
+<tr>
+<td><code>notes</code></td>
+<td>TEXT</td>
+<td>no</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Indice:
+- <code>clinic_assessment_patient_id_fadeb20a</code> su <code>patient_id</code></p>
+<h3 id="clinic_regimen"><code>clinic_regimen</code><a class="headerlink" href="#clinic_regimen" title="Permanent link">&para;</a></h3>
+<p>Definizione di regimen terapeutici (riusati da Clinic e Simulator).</p>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>NULL</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>INTEGER</td>
+<td>no</td>
+<td>PK</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>varchar(128)</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td><code>line</code></td>
+<td>varchar(64)</td>
+<td>no</td>
+<td>es. frontline/salvage</td>
+</tr>
+<tr>
+<td><code>components</code></td>
+<td>TEXT</td>
+<td>no</td>
+<td>agenti comma-separated</td>
+</tr>
+<tr>
+<td><code>intent</code></td>
+<td>varchar(128)</td>
+<td>no</td>
+<td>blank in Django, ma in DB è <code>NOT NULL</code> (stringa vuota)</td>
+</tr>
+<tr>
+<td><code>notes</code></td>
+<td>TEXT</td>
+<td>no</td>
+<td>blank in Django, ma in DB è <code>NOT NULL</code> (stringa vuota)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="clinic_patienttherapy"><code>clinic_patienttherapy</code><a class="headerlink" href="#clinic_patienttherapy" title="Permanent link">&para;</a></h3>
+<p>Timeline delle terapie per paziente.</p>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>NULL</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>INTEGER</td>
+<td>no</td>
+<td>PK</td>
+</tr>
+<tr>
+<td><code>patient_id</code></td>
+<td>bigint</td>
+<td>no</td>
+<td>FK → <code>clinic_patient.id</code></td>
+</tr>
+<tr>
+<td><code>regimen_id</code></td>
+<td>bigint</td>
+<td>no</td>
+<td>FK → <code>clinic_regimen.id</code></td>
+</tr>
+<tr>
+<td><code>start_date</code></td>
+<td>date</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td><code>end_date</code></td>
+<td>date</td>
+<td>sì</td>
+<td></td>
+</tr>
+<tr>
+<td><code>outcome</code></td>
+<td>varchar(128)</td>
+<td>no</td>
+<td>blank in Django, ma <code>NOT NULL</code></td>
+</tr>
+<tr>
+<td><code>adverse_events</code></td>
+<td>TEXT</td>
+<td>no</td>
+<td>blank in Django, ma <code>NOT NULL</code></td>
+</tr>
+</tbody>
+</table>
+<p>Indici:
+- <code>clinic_patienttherapy_patient_id_4699d56d</code> su <code>patient_id</code>
+- <code>clinic_patienttherapy_regimen_id_d266910c</code> su <code>regimen_id</code></p>
+<h3 id="clinic_cytogeneticabnormality"><code>clinic_cytogeneticabnormality</code><a class="headerlink" href="#clinic_cytogeneticabnormality" title="Permanent link">&para;</a></h3>
+<p>Catalogo di anomalie citogenetiche.</p>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>NULL</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>INTEGER</td>
+<td>no</td>
+<td>PK</td>
+</tr>
+<tr>
+<td><code>code</code></td>
+<td>varchar(32)</td>
+<td>no</td>
+<td>unique</td>
+</tr>
+<tr>
+<td><code>description</code></td>
+<td>varchar(255)</td>
+<td>no</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Indice:
+- <code>sqlite_autoindex_clinic_cytogeneticabnormality_1</code> su <code>code</code> (unique)</p>
+<h3 id="clinic_patientcytogenetics"><code>clinic_patientcytogenetics</code><a class="headerlink" href="#clinic_patientcytogenetics" title="Permanent link">&para;</a></h3>
+<p>Storico anomalie per paziente.</p>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>NULL</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>INTEGER</td>
+<td>no</td>
+<td>PK</td>
+</tr>
+<tr>
+<td><code>patient_id</code></td>
+<td>bigint</td>
+<td>no</td>
+<td>FK → <code>clinic_patient.id</code></td>
+</tr>
+<tr>
+<td><code>abnormality_id</code></td>
+<td>bigint</td>
+<td>no</td>
+<td>FK → <code>clinic_cytogeneticabnormality.id</code></td>
+</tr>
+<tr>
+<td><code>detected_on</code></td>
+<td>date</td>
+<td>no</td>
+<td></td>
+</tr>
+<tr>
+<td><code>method</code></td>
+<td>varchar(128)</td>
+<td>no</td>
+<td>blank in Django, ma <code>NOT NULL</code></td>
+</tr>
+</tbody>
+</table>
+<p>Indici:
+- <code>clinic_patientcytogenetics_patient_id_033e4053</code> su <code>patient_id</code>
+- <code>clinic_patientcytogenetics_abnormality_id_9961fbcd</code> su <code>abnormality_id</code>
+- Unique composito: <code>patient_id, abnormality_id, detected_on</code></p>
+<h3 id="simulator_scenario"><code>simulator_scenario</code><a class="headerlink" href="#simulator_scenario" title="Permanent link">&para;</a></h3>
+<p>Scenario clinici “didattici” + parametri clinici/biologici.</p>
+<p>Campi chiave (estratto):</p>
+<ul>
+<li>Identità e metadati: <code>title</code>, <code>clinical_stage</code>, <code>summary</code>, <code>active</code>, <code>created</code>, <code>updated</code></li>
+<li>Risk: <code>riss_stage</code>, citogenetica booleana (<code>del17p</code>, <code>t_4_14</code>, <code>t_14_16</code>, <code>gain_1q21</code>, <code>hyperdiploid</code>, <code>t_11_14</code>)</li>
+<li>Lab/clinica: <code>albumin</code>, <code>beta2_microglobulin</code>, <code>ldh</code>, <code>hemoglobin</code>, <code>calcium</code>, <code>creatinine_clearance</code></li>
+<li>Biologia: <code>tumor_cell_count</code>, <code>tumor_growth_rate</code>, <code>carrying_capacity</code></li>
+<li>Didattica: <code>difficulty_score</code>, <code>difficulty_level</code>, <code>patient_archetype</code></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">JSON in SQLite</p>
+<p>Campi Django <code>JSONField</code> sono memorizzati come <code>TEXT</code> in SQLite (stringa JSON serializzata).</p>
+</div>
+<h3 id="simulator_simulationattempt"><code>simulator_simulationattempt</code><a class="headerlink" href="#simulator_simulationattempt" title="Permanent link">&para;</a></h3>
+<p>Tentativi utente su uno scenario.</p>
+<p>Relazioni:
+- <code>scenario_id</code> → <code>simulator_scenario.id</code>
+- <code>user_id</code> → <code>auth_user.id</code> (nullable)
+- <code>selected_regimen_id</code> → <code>clinic_regimen.id</code> (nullable)</p>
+<p>Payload:
+- <code>parameters</code> (JSON)
+- <code>results</code> (JSON)
+- <code>results_summary</code> (JSON)
+- <code>artifacts</code> (JSON)</p>
+<h3 id="simulator_scenario_recommended_regimens"><code>simulator_scenario_recommended_regimens</code><a class="headerlink" href="#simulator_scenario_recommended_regimens" title="Permanent link">&para;</a></h3>
+<p>Tabella di join M2M (<code>Scenario.recommended_regimens</code>).</p>
+<p>Unique composito: <code>scenario_id, regimen_id</code></p>
+<h3 id="chemtools_chemjob"><code>chemtools_chemjob</code><a class="headerlink" href="#chemtools_chemjob" title="Permanent link">&para;</a></h3>
+<p>Tracking delle esecuzioni (job) di strumenti di chem-informatics.</p>
+<p>Relazione:
+- <code>user_id</code> → <code>auth_user.id</code> (nullable)</p>
+<p>Campi di stato:
+- <code>progress_percent</code>, <code>progress_message</code>, <code>log</code>
+- output: <code>out_html</code>, <code>out_csv</code> (FileField → path)</p>
+<h3 id="docs_viewer_documentview-docs_viewer_documentfeedback"><code>docs_viewer_documentview</code> / <code>docs_viewer_documentfeedback</code><a class="headerlink" href="#docs_viewer_documentview-docs_viewer_documentfeedback" title="Permanent link">&para;</a></h3>
+<p>Analytics e feedback per il viewer di documentazione interno.</p>
+<h2 id="tabelle-django-standard">Tabelle Django (standard)<a class="headerlink" href="#tabelle-django-standard" title="Permanent link">&para;</a></h2>
+<p>L’istanza SQLite include anche le tabelle standard:
+- <code>auth_*</code> (utenti, gruppi, permessi)
+- <code>django_*</code> (sessioni, admin log, migrations, content types)</p>
+<h2 id="modelli-presenti-nel-codice-ma-non-in-db-attenzione">Modelli presenti nel codice ma non in DB (attenzione)<a class="headerlink" href="#modelli-presenti-nel-codice-ma-non-in-db-attenzione" title="Permanent link">&para;</a></h2>
+<h3 id="clinicmodels_symptomssymptomassessment"><code>clinic.models_symptoms.SymptomAssessment</code><a class="headerlink" href="#clinicmodels_symptomssymptomassessment" title="Permanent link">&para;</a></h3>
+<p>Esiste nel codice ma <strong>non risulta</strong> tra le tabelle in <code>db.sqlite3</code> (manca migration applicata o non creata).</p>
+<p>Checklist per allineare:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>python3<span class="w"> </span>manage.py<span class="w"> </span>makemigrations<span class="w"> </span>clinic
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>python3<span class="w"> </span>manage.py<span class="w"> </span>migrate
+</code></pre></div>
+<h2 id="ddl-completo-sqlite">DDL completo (SQLite)<a class="headerlink" href="#ddl-completo-sqlite" title="Permanent link">&para;</a></h2>
+<p>Questa sezione riporta le definizioni <strong>esatte</strong> delle tabelle (output <code>sqlite3 db.sqlite3 ".schema &lt;table&gt;"</code>).</p>
+<details class="example">
+<summary><code>clinic_patient</code></summary>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="ss">&quot;clinic_patient&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;id&quot;</span><span class="w"> </span><span class="nb">integer</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTOINCREMENT</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;mrn&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">UNIQUE</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;first_name&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;last_name&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;birth_date&quot;</span><span class="w"> </span><span class="nb">date</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;sex&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;diagnosis_date&quot;</span><span class="w"> </span><span class="nb">date</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;notes&quot;</span><span class="w"> </span><span class="nb">text</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;owner_id&quot;</span><span class="w"> </span><span class="nb">integer</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="ss">&quot;auth_user&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;id&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">DEFERRABLE</span><span class="w"> </span><span class="k">INITIALLY</span><span class="w"> </span><span class="k">DEFERRED</span><span class="p">);</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="ss">&quot;clinic_patient_owner_id_e445f087&quot;</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="ss">&quot;clinic_patient&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;owner_id&quot;</span><span class="p">);</span>
+</code></pre></div>
+</details>
+<details class="example">
+<summary><code>clinic_assessment</code></summary>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="ss">&quot;clinic_assessment&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;id&quot;</span><span class="w"> </span><span class="nb">integer</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTOINCREMENT</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;date&quot;</span><span class="w"> </span><span class="nb">date</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;m_protein_g_dl&quot;</span><span class="w"> </span><span class="nb">decimal</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;kappa_mg_l&quot;</span><span class="w"> </span><span class="nb">decimal</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;lambda_mg_l&quot;</span><span class="w"> </span><span class="nb">decimal</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;flc_ratio&quot;</span><span class="w"> </span><span class="nb">decimal</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;hemoglobin_g_dl&quot;</span><span class="w"> </span><span class="nb">decimal</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;calcium_mg_dl&quot;</span><span class="w"> </span><span class="nb">decimal</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;creatinine_mg_dl&quot;</span><span class="w"> </span><span class="nb">decimal</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;beta2m_mg_l&quot;</span><span class="w"> </span><span class="nb">decimal</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;albumin_g_dl&quot;</span><span class="w"> </span><span class="nb">decimal</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;ldH_u_l&quot;</span><span class="w"> </span><span class="nb">decimal</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;r_iss&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;response&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;notes&quot;</span><span class="w"> </span><span class="nb">text</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;patient_id&quot;</span><span class="w"> </span><span class="nb">bigint</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="ss">&quot;clinic_patient&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;id&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">DEFERRABLE</span><span class="w"> </span><span class="k">INITIALLY</span><span class="w"> </span><span class="k">DEFERRED</span><span class="p">);</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="ss">&quot;clinic_assessment_patient_id_fadeb20a&quot;</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="ss">&quot;clinic_assessment&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;patient_id&quot;</span><span class="p">);</span>
+</code></pre></div>
+</details>
+<details class="example">
+<summary><code>clinic_regimen</code></summary>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="ss">&quot;clinic_regimen&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;id&quot;</span><span class="w"> </span><span class="nb">integer</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTOINCREMENT</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;name&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">128</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;line&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;components&quot;</span><span class="w"> </span><span class="nb">text</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;intent&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">128</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;notes&quot;</span><span class="w"> </span><span class="nb">text</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">);</span>
+</code></pre></div>
+</details>
+<details class="example">
+<summary><code>clinic_patienttherapy</code></summary>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="ss">&quot;clinic_patienttherapy&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;id&quot;</span><span class="w"> </span><span class="nb">integer</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTOINCREMENT</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;start_date&quot;</span><span class="w"> </span><span class="nb">date</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;end_date&quot;</span><span class="w"> </span><span class="nb">date</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;outcome&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">128</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;adverse_events&quot;</span><span class="w"> </span><span class="nb">text</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;patient_id&quot;</span><span class="w"> </span><span class="nb">bigint</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="ss">&quot;clinic_patient&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;id&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">DEFERRABLE</span><span class="w"> </span><span class="k">INITIALLY</span><span class="w"> </span><span class="k">DEFERRED</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;regimen_id&quot;</span><span class="w"> </span><span class="nb">bigint</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="ss">&quot;clinic_regimen&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;id&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">DEFERRABLE</span><span class="w"> </span><span class="k">INITIALLY</span><span class="w"> </span><span class="k">DEFERRED</span><span class="p">);</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="ss">&quot;clinic_patienttherapy_patient_id_4699d56d&quot;</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="ss">&quot;clinic_patienttherapy&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;patient_id&quot;</span><span class="p">);</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="ss">&quot;clinic_patienttherapy_regimen_id_d266910c&quot;</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="ss">&quot;clinic_patienttherapy&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;regimen_id&quot;</span><span class="p">);</span>
+</code></pre></div>
+</details>
+<details class="example">
+<summary><code>clinic_cytogeneticabnormality</code></summary>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="ss">&quot;clinic_cytogeneticabnormality&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;id&quot;</span><span class="w"> </span><span class="nb">integer</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTOINCREMENT</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;code&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">UNIQUE</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;description&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">);</span>
+</code></pre></div>
+</details>
+<details class="example">
+<summary><code>clinic_patientcytogenetics</code></summary>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="ss">&quot;clinic_patientcytogenetics&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;id&quot;</span><span class="w"> </span><span class="nb">integer</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTOINCREMENT</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;detected_on&quot;</span><span class="w"> </span><span class="nb">date</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;method&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">128</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;abnormality_id&quot;</span><span class="w"> </span><span class="nb">bigint</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="ss">&quot;clinic_cytogeneticabnormality&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;id&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">DEFERRABLE</span><span class="w"> </span><span class="k">INITIALLY</span><span class="w"> </span><span class="k">DEFERRED</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;patient_id&quot;</span><span class="w"> </span><span class="nb">bigint</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="ss">&quot;clinic_patient&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;id&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">DEFERRABLE</span><span class="w"> </span><span class="k">INITIALLY</span><span class="w"> </span><span class="k">DEFERRED</span><span class="p">);</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">UNIQUE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="ss">&quot;clinic_patientcytogenetics_patient_id_abnormality_id_detected_on_f4d7d6ce_uniq&quot;</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="ss">&quot;clinic_patientcytogenetics&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;patient_id&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;abnormality_id&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;detected_on&quot;</span><span class="p">);</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="ss">&quot;clinic_patientcytogenetics_abnormality_id_9961fbcd&quot;</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="ss">&quot;clinic_patientcytogenetics&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;abnormality_id&quot;</span><span class="p">);</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="ss">&quot;clinic_patientcytogenetics_patient_id_033e4053&quot;</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="ss">&quot;clinic_patientcytogenetics&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;patient_id&quot;</span><span class="p">);</span>
+</code></pre></div>
+</details>
+<details class="example">
+<summary><code>simulator_scenario</code></summary>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="ss">&quot;simulator_scenario&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;id&quot;</span><span class="w"> </span><span class="nb">integer</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTOINCREMENT</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;title&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;clinical_stage&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;summary&quot;</span><span class="w"> </span><span class="nb">text</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;risk_stratification&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">128</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;lab_snapshot&quot;</span><span class="w"> </span><span class="nb">text</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">CHECK</span><span class="w"> </span><span class="p">((</span><span class="n">JSON_VALID</span><span class="p">(</span><span class="ss">&quot;lab_snapshot&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="ss">&quot;lab_snapshot&quot;</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="p">)),</span><span class="w"> </span><span class="ss">&quot;guideline_notes&quot;</span><span class="w"> </span><span class="nb">text</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;expected_response&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;created&quot;</span><span class="w"> </span><span class="n">datetime</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;updated&quot;</span><span class="w"> </span><span class="n">datetime</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;active&quot;</span><span class="w"> </span><span class="n">bool</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;del17p&quot;</span><span class="w"> </span><span class="n">bool</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;t_4_14&quot;</span><span class="w"> </span><span class="n">bool</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;t_14_16&quot;</span><span class="w"> </span><span class="n">bool</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;gain_1q21&quot;</span><span class="w"> </span><span class="n">bool</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;hyperdiploid&quot;</span><span class="w"> </span><span class="n">bool</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;t_11_14&quot;</span><span class="w"> </span><span class="n">bool</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;tumor_cell_count&quot;</span><span class="w"> </span><span class="nb">real</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;tumor_growth_rate&quot;</span><span class="w"> </span><span class="nb">real</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;carrying_capacity&quot;</span><span class="w"> </span><span class="nb">real</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;patient_age&quot;</span><span class="w"> </span><span class="nb">integer</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;ecog_performance_status&quot;</span><span class="w"> </span><span class="nb">integer</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;charlson_comorbidity_index&quot;</span><span class="w"> </span><span class="nb">integer</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;creatinine_clearance&quot;</span><span class="w"> </span><span class="nb">real</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;albumin&quot;</span><span class="w"> </span><span class="nb">real</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;beta2_microglobulin&quot;</span><span class="w"> </span><span class="nb">real</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;ldh&quot;</span><span class="w"> </span><span class="nb">real</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;hemoglobin&quot;</span><span class="w"> </span><span class="nb">real</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;calcium&quot;</span><span class="w"> </span><span class="nb">real</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;riss_stage&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;patient_archetype&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;difficulty_score&quot;</span><span class="w"> </span><span class="nb">real</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;difficulty_level&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">);</span>
+</code></pre></div>
+</details>
+<details class="example">
+<summary><code>simulator_simulationattempt</code></summary>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="ss">&quot;simulator_simulationattempt&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;id&quot;</span><span class="w"> </span><span class="nb">integer</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTOINCREMENT</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;predicted_response&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;confidence&quot;</span><span class="w"> </span><span class="nb">smallint</span><span class="w"> </span><span class="n">unsigned</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">CHECK</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;confidence&quot;</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span><span class="w"> </span><span class="ss">&quot;notes&quot;</span><span class="w"> </span><span class="nb">text</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;submitted&quot;</span><span class="w"> </span><span class="n">datetime</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;is_guideline_aligned&quot;</span><span class="w"> </span><span class="n">bool</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;scenario_id&quot;</span><span class="w"> </span><span class="nb">bigint</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="ss">&quot;simulator_scenario&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;id&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">DEFERRABLE</span><span class="w"> </span><span class="k">INITIALLY</span><span class="w"> </span><span class="k">DEFERRED</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;selected_regimen_id&quot;</span><span class="w"> </span><span class="nb">bigint</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="ss">&quot;clinic_regimen&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;id&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">DEFERRABLE</span><span class="w"> </span><span class="k">INITIALLY</span><span class="w"> </span><span class="k">DEFERRED</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;user_id&quot;</span><span class="w"> </span><span class="nb">integer</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="ss">&quot;auth_user&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;id&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">DEFERRABLE</span><span class="w"> </span><span class="k">INITIALLY</span><span class="w"> </span><span class="k">DEFERRED</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;parameters&quot;</span><span class="w"> </span><span class="nb">text</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">CHECK</span><span class="w"> </span><span class="p">((</span><span class="n">JSON_VALID</span><span class="p">(</span><span class="ss">&quot;parameters&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="ss">&quot;parameters&quot;</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="p">)),</span><span class="w"> </span><span class="ss">&quot;results&quot;</span><span class="w"> </span><span class="nb">text</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">CHECK</span><span class="w"> </span><span class="p">((</span><span class="n">JSON_VALID</span><span class="p">(</span><span class="ss">&quot;results&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="ss">&quot;results&quot;</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="p">)),</span><span class="w"> </span><span class="ss">&quot;results_summary&quot;</span><span class="w"> </span><span class="nb">text</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">CHECK</span><span class="w"> </span><span class="p">((</span><span class="n">JSON_VALID</span><span class="p">(</span><span class="ss">&quot;results_summary&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="ss">&quot;results_summary&quot;</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="p">)),</span><span class="w"> </span><span class="ss">&quot;artifacts&quot;</span><span class="w"> </span><span class="nb">text</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">CHECK</span><span class="w"> </span><span class="p">((</span><span class="n">JSON_VALID</span><span class="p">(</span><span class="ss">&quot;artifacts&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="ss">&quot;artifacts&quot;</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="p">)),</span><span class="w"> </span><span class="ss">&quot;cohort_size&quot;</span><span class="w"> </span><span class="nb">integer</span><span class="w"> </span><span class="n">unsigned</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">CHECK</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;cohort_size&quot;</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span><span class="w"> </span><span class="ss">&quot;seed&quot;</span><span class="w"> </span><span class="nb">integer</span><span class="w"> </span><span class="k">NULL</span><span class="p">);</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="ss">&quot;simulator_simulationattempt_scenario_id_10da45ec&quot;</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="ss">&quot;simulator_simulationattempt&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;scenario_id&quot;</span><span class="p">);</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="ss">&quot;simulator_simulationattempt_selected_regimen_id_dc00bf75&quot;</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="ss">&quot;simulator_simulationattempt&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;selected_regimen_id&quot;</span><span class="p">);</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="ss">&quot;simulator_simulationattempt_user_id_3a3fee5c&quot;</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="ss">&quot;simulator_simulationattempt&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;user_id&quot;</span><span class="p">);</span>
+</code></pre></div>
+</details>
+<details class="example">
+<summary><code>simulator_scenario_recommended_regimens</code></summary>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="ss">&quot;simulator_scenario_recommended_regimens&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;id&quot;</span><span class="w"> </span><span class="nb">integer</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTOINCREMENT</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;scenario_id&quot;</span><span class="w"> </span><span class="nb">bigint</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="ss">&quot;simulator_scenario&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;id&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">DEFERRABLE</span><span class="w"> </span><span class="k">INITIALLY</span><span class="w"> </span><span class="k">DEFERRED</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;regimen_id&quot;</span><span class="w"> </span><span class="nb">bigint</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="ss">&quot;clinic_regimen&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;id&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">DEFERRABLE</span><span class="w"> </span><span class="k">INITIALLY</span><span class="w"> </span><span class="k">DEFERRED</span><span class="p">);</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">UNIQUE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="ss">&quot;simulator_scenario_recommended_regimens_scenario_id_regimen_id_7d50b672_uniq&quot;</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="ss">&quot;simulator_scenario_recommended_regimens&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;scenario_id&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;regimen_id&quot;</span><span class="p">);</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="ss">&quot;simulator_scenario_recommended_regimens_scenario_id_96f316b1&quot;</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="ss">&quot;simulator_scenario_recommended_regimens&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;scenario_id&quot;</span><span class="p">);</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="ss">&quot;simulator_scenario_recommended_regimens_regimen_id_75c960bf&quot;</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="ss">&quot;simulator_scenario_recommended_regimens&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;regimen_id&quot;</span><span class="p">);</span>
+</code></pre></div>
+</details>
+<details class="example">
+<summary><code>chemtools_chemjob</code></summary>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="ss">&quot;chemtools_chemjob&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;id&quot;</span><span class="w"> </span><span class="nb">integer</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTOINCREMENT</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;kind&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;created&quot;</span><span class="w"> </span><span class="n">datetime</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;input_a&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;input_b&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;out_html&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;out_csv&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;log&quot;</span><span class="w"> </span><span class="nb">text</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;user_id&quot;</span><span class="w"> </span><span class="nb">integer</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="ss">&quot;auth_user&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;id&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">DEFERRABLE</span><span class="w"> </span><span class="k">INITIALLY</span><span class="w"> </span><span class="k">DEFERRED</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;progress_message&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;progress_percent&quot;</span><span class="w"> </span><span class="nb">integer</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;api_preferences&quot;</span><span class="w"> </span><span class="nb">text</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">CHECK</span><span class="w"> </span><span class="p">((</span><span class="n">JSON_VALID</span><span class="p">(</span><span class="ss">&quot;api_preferences&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="ss">&quot;api_preferences&quot;</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="p">)));</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="ss">&quot;chemtools_chemjob_user_id_cd161adb&quot;</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="ss">&quot;chemtools_chemjob&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;user_id&quot;</span><span class="p">);</span>
+</code></pre></div>
+</details>
+<details class="example">
+<summary><code>docs_viewer_documentview</code></summary>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="ss">&quot;docs_viewer_documentview&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;id&quot;</span><span class="w"> </span><span class="nb">integer</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTOINCREMENT</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;path&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;viewed_at&quot;</span><span class="w"> </span><span class="n">datetime</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;user_id&quot;</span><span class="w"> </span><span class="nb">integer</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="ss">&quot;auth_user&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;id&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">DEFERRABLE</span><span class="w"> </span><span class="k">INITIALLY</span><span class="w"> </span><span class="k">DEFERRED</span><span class="p">);</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="ss">&quot;docs_viewer_documentview_path_c76b9211&quot;</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="ss">&quot;docs_viewer_documentview&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;path&quot;</span><span class="p">);</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="ss">&quot;docs_viewer_documentview_viewed_at_8cf81ea9&quot;</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="ss">&quot;docs_viewer_documentview&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;viewed_at&quot;</span><span class="p">);</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="ss">&quot;docs_viewer_documentview_user_id_7a33112e&quot;</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="ss">&quot;docs_viewer_documentview&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;user_id&quot;</span><span class="p">);</span>
+</code></pre></div>
+</details>
+<details class="example">
+<summary><code>docs_viewer_documentfeedback</code></summary>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="ss">&quot;docs_viewer_documentfeedback&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;id&quot;</span><span class="w"> </span><span class="nb">integer</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTOINCREMENT</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;path&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;rating&quot;</span><span class="w"> </span><span class="nb">integer</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;comment&quot;</span><span class="w"> </span><span class="nb">text</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;created_at&quot;</span><span class="w"> </span><span class="n">datetime</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;user_id&quot;</span><span class="w"> </span><span class="nb">integer</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="ss">&quot;auth_user&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;id&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">DEFERRABLE</span><span class="w"> </span><span class="k">INITIALLY</span><span class="w"> </span><span class="k">DEFERRED</span><span class="p">);</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">UNIQUE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="ss">&quot;docs_viewer_documentfeedback_path_user_id_564fdac8_uniq&quot;</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="ss">&quot;docs_viewer_documentfeedback&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;path&quot;</span><span class="p">,</span><span class="w"> </span><span class="ss">&quot;user_id&quot;</span><span class="p">);</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="ss">&quot;docs_viewer_documentfeedback_path_478cafa8&quot;</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="ss">&quot;docs_viewer_documentfeedback&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;path&quot;</span><span class="p">);</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="ss">&quot;docs_viewer_documentfeedback_user_id_95fa45fa&quot;</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="ss">&quot;docs_viewer_documentfeedback&quot;</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;user_id&quot;</span><span class="p">);</span>
+</code></pre></div>
+</details>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Torna su
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Piede" >
+        
+          
+          <a href="../architecture/" class="md-footer__link md-footer__link--prev" aria-label="Precedente: Architecture">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Precedente
+              </span>
+              <div class="md-ellipsis">
+                Architecture
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../mathematical_models/" class="md-footer__link md-footer__link--next" aria-label="Successivo: Mathematical Models">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Successivo
+              </span>
+              <div class="md-ellipsis">
+                Mathematical Models
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.footer", "toc.follow", "search.highlight", "search.suggest", "content.code.copy", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiato", "clipboard.copy": "Copia", "search.result.more.one": "1 altro in questa pagina", "search.result.more.other": "# altri in questa pagina", "search.result.none": "Nessun documento trovato", "search.result.one": "1 documento trovato", "search.result.other": "# documenti trovati", "search.result.placeholder": "Scrivi per iniziare a cercare", "search.result.term.missing": "Non presente", "select.version": "Seleziona la versione"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@10.9.0/dist/mermaid.min.js"></script>
+      
+        <script src="../../assets/javascripts/mermaid-init.js"></script>
+      
+        <script src="../../assets/javascripts/mermaid-zoom.js"></script>
+      
+        <script src="../../assets/javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

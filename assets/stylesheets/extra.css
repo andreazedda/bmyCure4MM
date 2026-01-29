@@ -1,0 +1,75 @@
+/* Small visual tweaks to make the docs more “colorful” and scannable. */
+
+:root {
+  --bmy-accent: #ff2d8d;
+  --bmy-accent-2: #00c2a8;
+}
+
+.md-header {
+  background: linear-gradient(90deg, var(--md-primary-fg-color), var(--bmy-accent));
+}
+
+.md-typeset a {
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.15em;
+}
+
+.md-typeset code {
+  border-radius: 0.35rem;
+}
+
+.md-typeset .admonition,
+.md-typeset details {
+  border-width: 0.1rem;
+}
+
+/* Mermaid: make diagrams readable and scrollable if wide. */
+.md-typeset .mermaid {
+  overflow: auto;
+  padding: 0.5rem 0;
+}
+
+.md-typeset .mermaid svg {
+  height: auto;
+  max-width: 100%;
+}
+
+/* Mermaid zoom overlay */
+.mermaid-zoom-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 9999;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+.mermaid-zoom-toolbar {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  padding: 0.75rem;
+}
+
+.mermaid-zoom-btn {
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(0, 0, 0, 0.35);
+  color: white;
+  padding: 0.4rem 0.75rem;
+  border-radius: 0.4rem;
+  cursor: pointer;
+}
+
+.mermaid-zoom-stage {
+  overflow: hidden;
+}
+
+.mermaid-zoom-canvas {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  transform-origin: center center;
+  touch-action: none; /* allow custom pan */
+  outline: none;
+}
