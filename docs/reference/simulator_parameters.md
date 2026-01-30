@@ -6,7 +6,15 @@
     !!! info "Fonte nel codice"
         La conversione centrale è in `simulator/models.py` → `SimulationAttempt._resolve_solver_inputs(...)`.
 
-    ## Glossario rapido
+    ## Se cerchi…
+
+    | Voglio… | Vai a… |
+    | --- | --- |
+    | teoria modelli ODE/PK/PD | `Guides → Mathematical Models` |
+    | KPI e soglie | `Guides → Decision Algorithm` |
+    | esempi visivi | `Guides → Simulations Gallery` |
+
+    ## Terminologia
 
     - **resolved_params**: dizionario risultante da form + Twin + default; può contenere stringhe tipo `"auto"`.
     - **solver_inputs**: dizionario “sanificato” (solo numeri), pronto per `MathematicalModel`.
@@ -91,7 +99,15 @@
     !!! info "Code source"
         The central conversion layer is `simulator/models.py` → `SimulationAttempt._resolve_solver_inputs(...)`.
 
-    ## Quick glossary
+    ## Quick find
+
+    | I want… | Go to… |
+    | --- | --- |
+    | ODE/PK/PD theory | `Guides → Mathematical Models` |
+    | KPIs and thresholds | `Guides → Decision Algorithm` |
+    | visual examples | `Guides → Simulations Gallery` |
+
+    ## Terminology
 
     - **resolved_params**: form + Twin + defaults; may contain `"auto"` strings.
     - **solver_inputs**: numeric-only payload used to instantiate `MathematicalModel`.

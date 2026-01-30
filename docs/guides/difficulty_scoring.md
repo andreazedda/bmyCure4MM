@@ -20,6 +20,12 @@
     | modelli ODE/PK/PD e KPI | `Guides → Mathematical Models` |
     | stime PFS/OS “separate” | `Guides → Prognosis` |
 
+    ## Terminologia
+
+    - **DS**: difficulty score (0–100).
+    - **Component score**: contributo parziale (tumor burden, frailty, ecc.).
+    - **Toy estimator**: stima illustrativa non clinicamente validata.
+
     ## Cosa significa “difficulty”
 
     L’idea: alcuni scenari sono più difficili perché combinano:
@@ -226,6 +232,12 @@
     | how it lands on Scenario | `simulator/models.py` (`difficulty_*` fields) |
     | ODE/PK/PD model and KPIs | `Guides → Mathematical Models` |
     | separate PFS/OS estimates | `Guides → Prognosis` |
+
+    ## Terminology
+
+    - **DS**: difficulty score (0–100).
+    - **Component score**: partial contribution (tumor burden, frailty, etc.).
+    - **Toy estimator**: illustrative estimator not clinically validated.
 
     ## What “difficulty” means
 

@@ -3,6 +3,12 @@
 === "IT"
     Questa pagina è il “**GPS**” della documentazione: cosa leggere, in che ordine, e dove trovare rapidamente le informazioni.
 
+    ## Terminologia
+
+    - **Core pages**: pagine guida/reference (Architecture/Database/Models/Operations) che servono a capire il sistema.
+    - **Deep dives**: documenti lunghi (spesso “as built”) utili per dettagli e audit.
+    - **Persona**: profilo di lettore (clinico/dev/research) con obiettivi diversi.
+
     ## Se cerchi… vai qui
 
     | Voglio… | Vai a… |
@@ -52,6 +58,12 @@
 
 === "EN"
     This page is the documentation “**GPS**”: what to read, in what order, and where to find things quickly.
+
+    ## Terminology
+
+    - **Core pages**: guides/reference pages (Architecture/Database/Models/Operations) for understanding the system.
+    - **Deep dives**: longer documents (often “as built”) for details and audit trails.
+    - **Persona**: reader profile (clinician/dev/research) with different goals.
 
     ## Quick find
 

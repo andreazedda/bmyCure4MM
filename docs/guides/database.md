@@ -22,6 +22,14 @@
     | capire JSONField/Artifact | `Reference → Simulator Parameters` |
     | DDL completo SQLite | sezione `DDL (SQLite)` in fondo a questa pagina |
 
+    ## Terminologia
+
+    - **Model (Django)**: classe ORM Python che mappa una tabella.
+    - **PK/FK**: primary key / foreign key.
+    - **M2M**: relazione many-to-many (tabella di join).
+    - **Migration**: versione dello schema (Django migrations).
+    - **JSONField**: campo JSON serializzato (in SQLite: `TEXT` + check JSON).
+
     ## Panoramica entità (ER)
 
     ```mermaid
@@ -76,6 +84,14 @@
     | query cookbook (ORM/SQL) | `Reference → Database Objects` + `Guides → Operations` |
     | understand JSONField/Artifacts | `Reference → Simulator Parameters` |
     | full SQLite DDL | see `DDL (SQLite)` at the bottom of this page |
+
+    ## Terminology
+
+    - **Model (Django)**: Python ORM class mapping to a DB table.
+    - **PK/FK**: primary key / foreign key.
+    - **M2M**: many-to-many relation (join table).
+    - **Migration**: schema versioning (Django migrations).
+    - **JSONField**: JSON field (in SQLite: stored as `TEXT` with JSON checks).
 
     ## Entity overview (ER)
 

@@ -3,6 +3,18 @@
 === "IT"
     ## `update_template.py`
 
+    ## Se cerchi…
+
+    | Voglio… | Vai a… |
+    | --- | --- |
+    | template coinvolti | `clinic/templates/clinic/` |
+    | vedere dove appare in UI | `Reference → Endpoints` |
+
+    ## Terminologia
+
+    - **Marker**: stringa/anchor nel template usata per delimitare la sezione da sostituire.
+    - **Nesting**: profondità `if/endif` da preservare durante il replace.
+
     Scopo: sostituire la sezione “simulation attempt” dentro `clinic/templates/clinic/patient_detail.html` usando il contenuto di `clinic/templates/clinic/patient_detail_decision_support.html`.
 
     Workflow (alto livello):
@@ -27,6 +39,18 @@
 
 === "EN"
     ## `update_template.py`
+
+    ## Quick find
+
+    | I want… | Go to… |
+    | --- | --- |
+    | involved templates | `clinic/templates/clinic/` |
+    | where it appears in UI | `Reference → Endpoints` |
+
+    ## Terminology
+
+    - **Marker**: template anchor string delimiting the section to replace.
+    - **Nesting**: `if/endif` depth that must be preserved during replacement.
 
     Purpose: replace the “simulation attempt” section inside `clinic/templates/clinic/patient_detail.html` using the contents of `clinic/templates/clinic/patient_detail_decision_support.html`.
 

@@ -17,6 +17,12 @@
     | dettagli di un regime per nome | `get_regimen_details(...)` |
     | come sono memorizzati i regimi nel DB | `Guides → Database` (`clinic_regimen`) |
 
+    ## Terminologia
+
+    - **Frontline**: prima linea (line_of_therapy=1).
+    - **Relapsed/Refractory**: linee successive (line_of_therapy>=2) e refrattarietà.
+    - **Contraindication**: condizione che rende un regime da evitare.
+
     ## Input/Output (contratto)
 
     ### Input principali
@@ -139,6 +145,12 @@
     | regimen “database” | `FRONTLINE_REGIMENS`, `RELAPSED_REGIMENS` |
     | fetch regimen details by name | `get_regimen_details(...)` |
     | how regimens are stored in DB | `Guides → Database` (`clinic_regimen`) |
+
+    ## Terminology
+
+    - **Frontline**: first line (line_of_therapy=1).
+    - **Relapsed/Refractory**: later lines (line_of_therapy>=2) and refractoriness.
+    - **Contraindication**: condition that makes a regimen unsuitable.
 
     ## Input/Output (contract)
 

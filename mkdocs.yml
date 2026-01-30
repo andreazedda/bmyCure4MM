@@ -7,29 +7,33 @@ edit_uri: edit/master/docs/
 
 nav:
   - Home: index.md
-  - Learning Path: guides/learning_path.md
   - Start Here:
+      - Learning Path: guides/learning_path.md
       - Tutorial (EN): en/TUTORIAL_FIRST_RUN.md
       - Tutorial (IT): it/TUTORIAL_PRIMO_USO.md
   - Guides:
-      - Architecture: guides/architecture.md
-      - Architecture Deep Dive: guides/architecture_deep_dive.md
-      - Database: guides/database.md
-      - Glossary: guides/glossary.md
-      - Documentation Standard: guides/documentation_standard.md
-      - Documentation Roadmap: guides/documentation_roadmap.md
-      - Mathematical Models:
-          - Italiano: guides/mathematical_models.md
-          - English: guides/mathematical_models_en.md
-      - Optimization Theory: guides/optimization_theory.md
-      - Difficulty Scoring: guides/difficulty_scoring.md
-      - Prognosis: guides/prognosis.md
-      - Virtual Patients: guides/virtual_patients.md
-      - Regimen Suggester: guides/regimen_suggester.md
-      - Decision Algorithm: guides/decision_algorithm.md
-      - Doc Coverage (Gaps): guides/gaps.md
-      - Simulations Gallery: guides/simulations_gallery.md
-      - Operations: guides/operations.md
+      - Core:
+          - Architecture: guides/architecture.md
+          - Architecture Deep Dive: guides/architecture_deep_dive.md
+          - Database: guides/database.md
+          - Operations: guides/operations.md
+      - Modeling:
+          - Mathematical Models:
+              - Italiano: guides/mathematical_models.md
+              - English: guides/mathematical_models_en.md
+          - Optimization Theory: guides/optimization_theory.md
+          - Difficulty Scoring: guides/difficulty_scoring.md
+          - Prognosis: guides/prognosis.md
+          - Virtual Patients: guides/virtual_patients.md
+      - Decision Support:
+          - Regimen Suggester: guides/regimen_suggester.md
+          - Decision Algorithm: guides/decision_algorithm.md
+      - Docs:
+          - Glossary: guides/glossary.md
+          - Simulations Gallery: guides/simulations_gallery.md
+          - Doc Coverage (Gaps): guides/gaps.md
+          - Documentation Standard: guides/documentation_standard.md
+          - Documentation Roadmap: guides/documentation_roadmap.md
       - Development: development/DEVELOPMENT.md
       - Troubleshooting: development/TROUBLESHOOTING.md
   - Reference:

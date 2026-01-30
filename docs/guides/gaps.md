@@ -3,6 +3,19 @@
 === "IT"
     Questa pagina esplicita **cosa c’è nel codice** ma non è ancora spiegato in modo esaustivo nella documentazione, così sai subito dove mancano pezzi e cosa documentare per primi.
 
+    ## Se cerchi…
+
+    | Voglio… | Vai a… |
+    | --- | --- |
+    | standard di scrittura | `Guides → Documentation Standard` |
+    | teoria modelli e KPI | `Guides → Mathematical Models` |
+    | esempi visivi | `Guides → Simulations Gallery` |
+
+    ## Terminologia
+
+    - **Gap**: contenuto presente nel codice ma non ancora documentato a sufficienza.
+    - **Priorità**: quanto un gap impatta comprensione/manutenzione (alto → basso).
+
     ## Gap principali (alto impatto)
 
     ### 1) Coverage “quasi completa”: difficulty / prognosis / virtual patients / regimens
@@ -45,6 +58,19 @@
 
 === "EN"
     This page lists what **exists in code** but is not yet fully explained in the docs, so you can prioritize documentation work.
+
+    ## Quick find
+
+    | I want… | Go to… |
+    | --- | --- |
+    | writing standard | `Guides → Documentation Standard` |
+    | model/KPI theory | `Guides → Mathematical Models` |
+    | visual examples | `Guides → Simulations Gallery` |
+
+    ## Terminology
+
+    - **Gap**: something present in code but not sufficiently documented yet.
+    - **Priority**: how much a gap impacts understanding/maintenance (high → low).
 
     ## Main gaps (high impact)
 

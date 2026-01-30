@@ -11,6 +11,12 @@
     | definizione KPI | `Guides → Mathematical Models` |
     | endpoint/UI che mostra badge | `Reference → Endpoints` |
 
+    ## Terminologia
+
+    - **Threshold**: classificazione di un KPI in una classe (good/moderate/poor).
+    - **Rule**: condizione logica che produce un’azione e un rationale.
+    - **Badge**: etichetta UI derivata da threshold/rule.
+
     ## Perché esiste
 
     L’obiettivo è rendere:
@@ -112,6 +118,12 @@
     | algorithm source file | `simulator/decision_algorithm.py` |
     | KPI definitions | `Guides → Mathematical Models` |
     | endpoint/UI that shows badges | `Reference → Endpoints` |
+
+    ## Terminology
+
+    - **Threshold**: KPI classification into a class (good/moderate/poor).
+    - **Rule**: logical condition producing an action and rationale.
+    - **Badge**: UI label derived from thresholds/rules.
 
     ## Why it exists
 

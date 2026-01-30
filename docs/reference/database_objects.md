@@ -12,6 +12,13 @@
         - Definizioni dei model: file `*/models*.py`
         - Tabelle effettive: `db.sqlite3` (vedi anche `Guides → Database`)
 
+    ## Terminologia
+
+    - **Model**: classe Django ORM.
+    - **Tabella**: nome SQLite (di solito `<app>_<model_lower>`).
+    - **FK**: foreign key (`<field>_id`).
+    - **M2M**: many-to-many (tabella join).
+
     ## Se cerchi…
 
     | Voglio… | Vai a… |
@@ -136,6 +143,13 @@
     !!! info "Source"
         - Model definitions: `*/models*.py`
         - Effective tables: `db.sqlite3` (see also `Guides → Database`)
+
+    ## Terminology
+
+    - **Model**: Django ORM class.
+    - **Table**: SQLite table name (usually `<app>_<model_lower>`).
+    - **FK**: foreign key (`<field>_id`).
+    - **M2M**: many-to-many (join table).
 
     ## Quick find
 

@@ -21,6 +21,13 @@
     | parametri simulazione | `Reference → Simulator Parameters` |
     | teoria modelli (ODE/PK/PD) | `Guides → Mathematical Models` |
 
+    ## Terminologia
+
+    - **App**: modulo Django (es. `clinic`, `simulator`).
+    - **Artifact**: file generato (CSV/HTML/JSON) salvato in `media/`.
+    - **HTMX**: aggiornamenti parziali della UI senza SPA.
+    - **Attempt**: tentativo simulazione persistito (`SimulationAttempt`).
+
     ## Componenti (vista di insieme)
 
     ```mermaid
@@ -153,6 +160,13 @@
     | Model↔Table mapping | `Reference → Database Objects` |
     | simulation parameters | `Reference → Simulator Parameters` |
     | ODE/PK/PD theory | `Guides → Mathematical Models` |
+
+    ## Terminology
+
+    - **App**: Django module (e.g., `clinic`, `simulator`).
+    - **Artifact**: generated file (CSV/HTML/JSON) stored under `media/`.
+    - **HTMX**: partial UI updates without a full SPA.
+    - **Attempt**: persisted simulation attempt (`SimulationAttempt`).
 
     ## High-level components
 

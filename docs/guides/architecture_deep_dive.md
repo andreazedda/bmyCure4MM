@@ -3,6 +3,21 @@
 === "IT"
     Questa pagina raccoglie note “engineering” (pattern, sicurezza, performance, deploy) a complemento di `Guides → Architecture`.
 
+    ## Se cerchi…
+
+    | Voglio… | Vai a… |
+    | --- | --- |
+    | overview architettura | `Guides → Architecture` |
+    | run/deploy operativo | `Guides → Operations` |
+    | configurazione env | `Reference → Configuration` |
+    | oggetti DB | `Guides → Database` + `Reference → Database Objects` |
+
+    ## Terminologia
+
+    - **N+1**: antipattern di query ripetute (riducibile con `select_related/prefetch_related`).
+    - **Broker**: coda messaggi (es. Redis) usata da Celery.
+    - **Worker**: processo che esegue job asincroni (Celery).
+
     ## Struttura repo (alta-level)
 
     ```text
@@ -60,6 +75,21 @@
 === "EN"
     This page collects engineering notes (patterns, security, performance, deployment) as a companion to `Guides → Architecture`.
 
+    ## Quick find
+
+    | I want… | Go to… |
+    | --- | --- |
+    | architecture overview | `Guides → Architecture` |
+    | operational run/deploy | `Guides → Operations` |
+    | env configuration | `Reference → Configuration` |
+    | DB objects | `Guides → Database` + `Reference → Database Objects` |
+
+    ## Terminology
+
+    - **N+1**: repeated query antipattern (reduced via `select_related/prefetch_related`).
+    - **Broker**: message queue backend (e.g., Redis) for Celery.
+    - **Worker**: process executing background jobs (Celery).
+
     ## Repo structure (high level)
 
     ```text
@@ -113,4 +143,3 @@
     - production DB (usually Postgres)
     - static/media strategy (WhiteNoise or reverse proxy)
     - backups + error tracking (e.g., Sentry)
-

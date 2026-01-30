@@ -3,6 +3,21 @@
 === "IT"
     Questa pagina elenca i principali endpoint web “umani” (pagine) e dove cercarli nel codice.
 
+    ## Terminologia
+
+    - **URLConf**: file `urls.py` che mappa path → view.
+    - **View**: funzione/classe Django che gestisce la request.
+    - **Template**: file HTML in `templates/` o `app/templates/...`.
+    - **HTMX**: request parziali (snippet) per UI reattiva.
+
+    ## Se cerchi…
+
+    | Voglio… | Vai a… |
+    | --- | --- |
+    | routing principale | `mmportal/urls.py` + `*/urls.py` |
+    | mapping DB/Models | `Reference → Database Objects` |
+    | come partire | `Guides → Learning Path` |
+
     !!! tip "Approccio"
         Se vuoi trovare velocemente “dove vive” una pagina:
         1) apri `mmportal/urls.py` e gli `urls.py` delle app  
@@ -49,6 +64,21 @@
 
 === "EN"
     This page lists the main human-facing endpoints and where they live in code.
+
+    ## Terminology
+
+    - **URLConf**: `urls.py` mapping path → view.
+    - **View**: Django function/class handling the request.
+    - **Template**: HTML file under `templates/` or `app/templates/...`.
+    - **HTMX**: partial requests (snippets) for reactive UI.
+
+    ## Quick find
+
+    | I want… | Go to… |
+    | --- | --- |
+    | main routing | `mmportal/urls.py` + `*/urls.py` |
+    | DB/Model mapping | `Reference → Database Objects` |
+    | where to start | `Guides → Learning Path` |
 
     ## Core
 

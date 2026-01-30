@@ -42,7 +42,7 @@
     - \(\mathbf{f}(x)\) sono gli **obiettivi** (efficacia, sicurezza, esposizione)
     - \(g(x)\) è un **vincolo hard** (feasibility) costruito dai KPI (es. `healthy_loss`)
 
-    ## Definizioni (terminologia)
+    ## Terminologia
 
     - **Decision variables**: parametri che l’ottimizzazione può scegliere (dosi, orizzonte, ecc.).
     - **Objective function**: funzione che mappa parametri → punteggio (qui 3 punteggi).
@@ -273,7 +273,7 @@
     - \(\mathbf{f}(x)\) are the **objectives** (efficacy, safety, exposure)
     - \(g(x)\) is a **hard constraint** derived from KPIs (e.g., `healthy_loss`)
 
-    ## Definitions
+    ## Terminology
 
     - **Decision variables**: parameters the optimizer can choose (doses, horizon, etc.).
     - **Objective function**: maps parameters → a score (here: 3 scores).

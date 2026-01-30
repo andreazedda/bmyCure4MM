@@ -3,6 +3,19 @@
 === "IT"
     Questa pagina raccoglie la terminologia più usata nella piattaforma, con definizioni **leggibili da umani** e riferimenti a dove si vede in UI/codice.
 
+    ## Se cerchi…
+
+    | Voglio… | Vai a… |
+    | --- | --- |
+    | formule KPI | `Guides → Mathematical Models` |
+    | parametri simulatore | `Reference → Simulator Parameters` |
+    | tabelle e oggetti DB | `Guides → Database` + `Reference → Database Objects` |
+
+    ## Terminologia
+
+    - Le voci sono organizzate per area (Clinica, Modelli, Ottimizzazione, Software).
+    - Quando vedi un termine in UI/codice, cercalo qui e poi segui i link alle guide.
+
     ## Clinica (MM)
 
     - **MM (Multiple Myeloma)**: neoplasia delle plasmacellule; nel simulatore è modellata come carico tumorale \(T(t)\).
@@ -52,6 +65,19 @@
 
 === "EN"
     This page collects the most common terms used in the platform, with **human-readable** definitions and pointers to where they appear in UI/code.
+
+    ## Quick find
+
+    | I want… | Go to… |
+    | --- | --- |
+    | KPI formulas | `Guides → Mathematical Models` |
+    | simulator parameters | `Reference → Simulator Parameters` |
+    | DB tables and objects | `Guides → Database` + `Reference → Database Objects` |
+
+    ## Terminology
+
+    - Entries are grouped by domain (Clinical, Models, Optimization, Software).
+    - When you see a term in UI/code, look it up here and follow links to the relevant guides.
 
     ## Clinical (MM)
 

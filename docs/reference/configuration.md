@@ -3,6 +3,19 @@
 === "IT"
     ## Variabili d’ambiente principali
 
+    ## Se cerchi…
+
+    | Voglio… | Vai a… |
+    | --- | --- |
+    | avvio stack | `Guides → Operations` |
+    | troubleshooting | `Guides → Troubleshooting` |
+    | endpoint principali | `Reference → Endpoints` |
+
+    ## Terminologia
+
+    - **env var**: variabile d’ambiente letta da `mmportal/settings.py`.
+    - **feature flag**: toggle che abilita/disabilita feature.
+
     ### Django
 
     - `DJANGO_DEBUG`: `1` (default) / `0`
@@ -25,6 +38,19 @@
 
 === "EN"
     ## Main environment variables
+
+    ## Quick find
+
+    | I want… | Go to… |
+    | --- | --- |
+    | run the stack | `Guides → Operations` |
+    | troubleshooting | `Guides → Troubleshooting` |
+    | main endpoints | `Reference → Endpoints` |
+
+    ## Terminology
+
+    - **env var**: environment variable read by `mmportal/settings.py`.
+    - **feature flag**: toggle that enables/disables a feature.
 
     ### Django
 

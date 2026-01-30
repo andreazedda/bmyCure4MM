@@ -14,6 +14,12 @@
     | incertezza/cohort e bande | `Guides → Mathematical Models` + `Guides → Simulations Gallery` |
     | difficulty score e outcome | `Guides → Difficulty Scoring` |
 
+    ## Terminologia
+
+    - **Archetipo**: popolazione con distribuzioni parametriche definite.
+    - **Cohort**: insieme di pazienti virtuali campionati (N).
+    - **Seed**: seme random per riproducibilità.
+
     ## Concetto: perché archetipi
 
     In clinica MM non esiste “il paziente medio”: esistono sottopopolazioni con fenotipo/prognosi differenti.
@@ -125,6 +131,12 @@
     | how a parameter is sampled | `ParameterDistribution.sample(...)` |
     | cohort uncertainty bands | `Guides → Mathematical Models` + `Guides → Simulations Gallery` |
     | difficulty score and outcomes | `Guides → Difficulty Scoring` |
+
+    ## Terminology
+
+    - **Archetype**: population with specified parameter distributions.
+    - **Cohort**: sampled set of virtual patients (N).
+    - **Seed**: random seed for reproducibility.
 
     ## Why archetypes
 

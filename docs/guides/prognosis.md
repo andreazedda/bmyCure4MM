@@ -17,6 +17,12 @@
     | relazione con difficulty score | `Guides → Difficulty Scoring` |
     | staging clinico (R-ISS) | `Guides → Database` (`Assessment.r_iss`) |
 
+    ## Terminologia
+
+    - **PFS / OS**: progression-free survival / overall survival.
+    - **HR (hazard ratio)**: HR>1 peggiora la prognosi.
+    - **Baseline**: valori iniziali prima dei modificatori.
+
     ## Obiettivo del modulo
 
     Il modulo produce un oggetto `PrognosisEstimate` con:
@@ -163,6 +169,12 @@
     | cytogenetics / hazard ratios | `simulator/prognosis.py` → `CYTOGENETIC_HAZARD_RATIOS` |
     | relation to difficulty score | `Guides → Difficulty Scoring` |
     | staging (R-ISS) | `Guides → Database` (`Assessment.r_iss`) |
+
+    ## Terminology
+
+    - **PFS / OS**: progression-free survival / overall survival.
+    - **HR (hazard ratio)**: HR>1 means worse prognosis.
+    - **Baseline**: starting values before modifiers.
 
     ## Module goal
 

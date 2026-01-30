@@ -3,6 +3,18 @@
 === "IT"
     Questa roadmap definisce le prossime iterazioni per portare la documentazione a livello “software product”.
 
+    ## Se cerchi…
+
+    | Voglio… | Vai a… |
+    | --- | --- |
+    | standard editoriale/tecnico | `Guides → Documentation Standard` |
+    | gap tra codice e doc | `Guides → Doc Coverage (Gaps)` |
+
+    ## Terminologia
+
+    - **Milestone**: tranche di lavoro con obiettivi e timeframe.
+    - **KPI**: metrica misurabile (es. warning=0, copertura IT/EN).
+
     ## Milestone 1 — Stabilizzazione e coerenza (1–2 giorni)
 
     - Rendere **bilingue (IT/EN)** tutte le pagine “core”:
@@ -45,6 +57,18 @@
 
 === "EN"
     This roadmap defines the next iterations to bring the documentation to a “software product” level.
+
+    ## Quick find
+
+    | I want… | Go to… |
+    | --- | --- |
+    | editorial/technical standard | `Guides → Documentation Standard` |
+    | code vs docs gaps | `Guides → Doc Coverage (Gaps)` |
+
+    ## Terminology
+
+    - **Milestone**: work tranche with goals and timeframe.
+    - **KPI**: measurable metric (e.g., 0 warnings, IT/EN coverage).
 
     ## Milestone 1 — Stabilization and consistency (1–2 days)
 

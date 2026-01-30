@@ -11,6 +11,13 @@
     | endpoint e routing | `Reference → Endpoints` |
     | troubleshooting | `Guides → Troubleshooting` |
 
+    ## Terminologia
+
+    - **Run mode**: modalità di esecuzione (dev, docker, prod).
+    - **Static**: asset serviti (CSS/JS) generati con `collectstatic`.
+    - **Media**: output runtime (artifact) salvati in `media/`.
+    - **Worker**: processo asincrono (Celery) per job lunghi.
+
     ## Run modes (tabella)
 
     | Modalità | Quando usarla | Comando |
@@ -100,6 +107,13 @@
     | environment variables | `Reference → Configuration` |
     | routing/endpoints | `Reference → Endpoints` |
     | troubleshooting | `Guides → Troubleshooting` |
+
+    ## Terminology
+
+    - **Run mode**: execution mode (dev, docker, prod).
+    - **Static**: served assets (CSS/JS) produced by `collectstatic`.
+    - **Media**: runtime outputs (artifacts) stored in `media/`.
+    - **Worker**: background process (Celery) for long jobs.
 
     ## Run modes
 

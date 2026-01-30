@@ -3,6 +3,20 @@
 === "IT"
     Questa pagina raccoglie esempi **visivi** (grafici + mappe) per capire rapidamente cosa fa il sistema.
 
+    ## Terminologia
+
+    - **Toy**: esempio illustrativo (non calibrato su dati reali).
+    - **AUC**: area sotto curva (proxy di esposizione).
+    - **p05/p95**: percentili per bande d’incertezza.
+
+    ## Se cerchi…
+
+    | Voglio… | Vai a… |
+    | --- | --- |
+    | teoria modelli e KPI | `Guides → Mathematical Models` |
+    | ottimizzazione e Pareto | `Guides → Optimization Theory` |
+    | difficulty/prognosis theory | `Guides → Difficulty Scoring` + `Guides → Prognosis` |
+
     !!! tip
         Clicca qualsiasi diagramma Mermaid per **zoom/pan**.
 
@@ -73,6 +87,20 @@
 
 === "EN"
     This page is a **visual gallery** (plots + maps) to quickly understand the system.
+
+    ## Terminology
+
+    - **Toy**: illustrative example (not calibrated to real-world data).
+    - **AUC**: area under the curve (exposure proxy).
+    - **p05/p95**: percentiles for uncertainty bands.
+
+    ## Quick find
+
+    | I want… | Go to… |
+    | --- | --- |
+    | model/KPI theory | `Guides → Mathematical Models` |
+    | optimization and Pareto | `Guides → Optimization Theory` |
+    | difficulty/prognosis theory | `Guides → Difficulty Scoring` + `Guides → Prognosis` |
 
     !!! tip
         Click any Mermaid diagram to **zoom/pan**.
