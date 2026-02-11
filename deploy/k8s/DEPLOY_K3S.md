@@ -6,6 +6,7 @@ Questo cluster non ha IngressClass/cert-manager; l'esposizione HTTP attuale pass
 
 - Hai accesso a `sudo kubectl` (in questo nodo sembra ok)
 - L'immagine container è pubblicata su GHCR: `ghcr.io/andreazedda/bmycure4mm:latest`
+- Un token GHCR (PAT GitHub) con permesso `read:packages` per permettere al cluster di fare pull (se l'immagine non è pubblica)
 
 ## 1) Pubblicare l'immagine su GHCR
 
@@ -23,6 +24,21 @@ DJANGO_SECRET_KEY="$(python3 -c 'from django.core.management.utils import get_ra
 sudo kubectl -n bmycure4mm delete secret bmycure4mm-secrets --ignore-not-found
 sudo kubectl -n bmycure4mm create secret generic bmycure4mm-secrets --from-literal=DJANGO_SECRET_KEY="$DJANGO_SECRET_KEY"
 unset DJANGO_SECRET_KEY
+```
+
+Se l'immagine su GHCR non è pubblica, crea anche un `imagePullSecret` (non viene committato):
+
+```bash
+GHCR_USER="<github-username>"
+GHCR_PAT="<github-pat-with-read:packages>"
+
+sudo kubectl -n bmycure4mm delete secret ghcr-creds --ignore-not-found
+sudo kubectl -n bmycure4mm create secret docker-registry ghcr-creds \
+	--docker-server=ghcr.io \
+	--docker-username="$GHCR_USER" \
+	--docker-password="$GHCR_PAT"
+
+unset GHCR_PAT
 ```
 
 ## 3) Applicare i manifest

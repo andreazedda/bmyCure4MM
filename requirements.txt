@@ -13,3 +13,5 @@ optuna>=3.6.0
 PyYAML>=6.0
 Markdown>=3.5.0
 gunicorn>=21.2.0
+plotly>=5.0.0
+plotly>=5.18.0

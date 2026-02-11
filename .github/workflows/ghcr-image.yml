@@ -48,11 +48,17 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Make GHCR package public
+      - name: Optionally make GHCR package public
+        continue-on-error: true
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GHCR_VISIBILITY_TOKEN }}
         run: |
           set -eu
+          if [ -z "${GH_TOKEN:-}" ]; then
+            echo "GHCR_VISIBILITY_TOKEN not set; skipping visibility change."
+            exit 0
+          fi
+
           api="https://api.github.com/user/packages/container/bmycure4mm/visibility"
           for i in $(seq 1 12); do
             if curl -fsSL -X PATCH \
@@ -66,5 +72,4 @@ jobs:
             echo "retry ${i}/12: waiting for package to be ready" >&2
             sleep 10
           done
-          echo "Failed to set package visibility to public. You can set it manually in GitHub Packages settings." >&2
-          exit 1
+          echo "Failed to set package visibility to public. Set it manually in GitHub Packages settings, or use an imagePullSecret in k8s." >&2

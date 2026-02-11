@@ -116,6 +116,8 @@ spec:
       labels:
         app: web
     spec:
+      imagePullSecrets:
+        - name: ghcr-creds
       containers:
         - name: web
           image: ghcr.io/andreazedda/bmycure4mm:latest
@@ -133,10 +135,17 @@ spec:
               value: "1"
             - name: DJANGO_COLLECTSTATIC
               value: "1"
-          command: ["sh","-lc"]
           args:
-            - |
-              gunicorn mmportal.wsgi:application --bind 0.0.0.0:8001 --workers 2 --threads 4 --timeout 120
+            - gunicorn
+            - mmportal.wsgi:application
+            - --bind
+            - 0.0.0.0:8001
+            - --workers
+            - "2"
+            - --threads
+            - "4"
+            - --timeout
+            - "120"
           volumeMounts:
             - name: data
               mountPath: /data
@@ -195,6 +204,8 @@ spec:
       labels:
         app: celery
     spec:
+      imagePullSecrets:
+        - name: ghcr-creds
       containers:
         - name: celery
           image: ghcr.io/andreazedda/bmycure4mm:latest
@@ -204,10 +215,13 @@ spec:
                 name: bmycure4mm-env
             - secretRef:
                 name: bmycure4mm-secrets
-          command: ["sh","-lc"]
           args:
-            - |
-              celery -A mmportal worker --loglevel=info --pool=solo
+            - celery
+            - -A
+            - mmportal
+            - worker
+            - --loglevel=info
+            - --pool=solo
           volumeMounts:
             - name: data
               mountPath: /data
