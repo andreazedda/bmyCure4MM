@@ -50,13 +50,21 @@ jobs:
 
       - name: Make GHCR package public
         env:
-          OWNER: ${{ github.repository_owner }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -eu
-          api="https://api.github.com/users/${OWNER}/packages/container/bmycure4mm/visibility"
-          curl -fsSL -X PATCH \
-            -H "Authorization: Bearer ${GH_TOKEN}" \
-            -H "Accept: application/vnd.github+json" \
-            "${api}" \
-            -d '{"visibility":"public"}'
+          api="https://api.github.com/user/packages/container/bmycure4mm/visibility"
+          for i in $(seq 1 12); do
+            if curl -fsSL -X PATCH \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              "${api}" \
+              -d '{"visibility":"public"}' >/dev/null; then
+              echo "visibility:public"
+              exit 0
+            fi
+            echo "retry ${i}/12: waiting for package to be ready" >&2
+            sleep 10
+          done
+          echo "Failed to set package visibility to public. You can set it manually in GitHub Packages settings." >&2
+          exit 1
