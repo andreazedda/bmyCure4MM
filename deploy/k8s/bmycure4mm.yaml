@@ -157,12 +157,18 @@ spec:
             httpGet:
               path: /healthz/
               port: 8001
+              httpHeaders:
+                - name: Host
+                  value: bmycure4mm.duckdns.org
             initialDelaySeconds: 20
             periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /healthz/
               port: 8001
+              httpHeaders:
+                - name: Host
+                  value: bmycure4mm.duckdns.org
             initialDelaySeconds: 60
             periodSeconds: 20
       volumes:
