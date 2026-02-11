@@ -14,6 +14,12 @@ flowchart TD
   P4 --> P5["5) Run & review<br/>Curves, toxicity, derived parameters"]
 ```
 
+!!! tip "Quick screenshots (demo)"
+      The images below are auto-generated and act as a visual reference for the steps.
+
+![Clinic (patient list)](../assets/images/screenshots/clinic_patient_list.png)
+![Simulator (scenario list)](../assets/images/screenshots/public_simulator_list.png)
+
 ---
 
 ## STEP 1: Create a Patient
@@ -60,6 +66,8 @@ An **Assessment** = a lab/clinical snapshot **at a specific date**.
 4. **Click on the scenario title** to open the detail page
 
 You'll now see the simulation form panel.
+
+![Simulator (scenario list)](../assets/images/screenshots/public_simulator_list.png)
 
 ---
 

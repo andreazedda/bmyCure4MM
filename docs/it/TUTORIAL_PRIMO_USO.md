@@ -14,6 +14,12 @@ flowchart TD
   P4 --> P5["5) Lancia & vedi<br/>Curve, tossicità, parametri derivati"]
 ```
 
+!!! tip "Screenshot rapidi (demo)"
+      Le immagini qui sotto sono generate automaticamente e servono come riferimento visivo.
+
+![Elenco pazienti (Clinic)](../assets/images/screenshots/clinic_patient_list.png)
+![Lista scenari (Simulator)](../assets/images/screenshots/public_simulator_list.png)
+
 ---
 
 ## PASSO 1: Crea un Paziente
@@ -60,6 +66,8 @@ Un **Assessment** = uno snapshot di laboratorio/clinica **in una data precisa**.
 4. **Clicca sul titolo dello scenario** per aprire la pagina dettaglio
 
 Ora vedrai il pannello con il form di simulazione.
+
+![Simulator (lista scenari)](../assets/images/screenshots/public_simulator_list.png)
 
 ---
 
