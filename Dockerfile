@@ -24,4 +24,7 @@ RUN mkdir -p logs media static
 
 EXPOSE 8001
 
+ENTRYPOINT ["sh", "/app/entrypoint.sh"]
+
+# Default command (dev). Production should override to gunicorn.
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8001"]

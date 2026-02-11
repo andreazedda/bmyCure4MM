@@ -1,0 +1,217 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: bmycure4mm
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bmycure4mm-env
+  namespace: bmycure4mm
+data:
+  DJANGO_DEBUG: "0"
+  ALLOWED_HOSTS: "bmycure4mm.duckdns.org"
+  CSRF_TRUSTED_ORIGINS: "http://bmycure4mm.duckdns.org,https://bmycure4mm.duckdns.org"
+  DJANGO_SQLITE_PATH: "/data/db.sqlite3"
+  CELERY_BROKER_URL: "redis://redis:6379/0"
+  CELERY_RESULT_BACKEND: "redis://redis:6379/0"
+  DJANGO_SECURE_PROXY_SSL_HEADER: "1"
+  DJANGO_SECURE_SSL_REDIRECT: "0"
+  DJANGO_SESSION_COOKIE_SECURE: "0"
+  DJANGO_CSRF_COOKIE_SECURE: "0"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: bmycure4mm-data
+  namespace: bmycure4mm
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: local-path
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: bmycure4mm-media
+  namespace: bmycure4mm
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: local-path
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: bmycure4mm-static
+  namespace: bmycure4mm
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: local-path
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: bmycure4mm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          ports:
+            - containerPort: 6379
+          args: ["--appendonly", "yes"]
+          readinessProbe:
+            tcpSocket:
+              port: 6379
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: 6379
+            initialDelaySeconds: 10
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: bmycure4mm
+spec:
+  selector:
+    app: redis
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: 6379
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: bmycure4mm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - name: web
+          image: ghcr.io/andreazedda/bmycure4mm:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8001
+              name: http
+          envFrom:
+            - configMapRef:
+                name: bmycure4mm-env
+            - secretRef:
+                name: bmycure4mm-secrets
+          env:
+            - name: DJANGO_MIGRATE
+              value: "1"
+            - name: DJANGO_COLLECTSTATIC
+              value: "1"
+          command: ["sh","-lc"]
+          args:
+            - |
+              gunicorn mmportal.wsgi:application --bind 0.0.0.0:8001 --workers 2 --threads 4 --timeout 120
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: media
+              mountPath: /app/media
+            - name: static
+              mountPath: /app/staticfiles
+          readinessProbe:
+            httpGet:
+              path: /healthz/
+              port: 8001
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz/
+              port: 8001
+            initialDelaySeconds: 60
+            periodSeconds: 20
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: bmycure4mm-data
+        - name: media
+          persistentVolumeClaim:
+            claimName: bmycure4mm-media
+        - name: static
+          persistentVolumeClaim:
+            claimName: bmycure4mm-static
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  namespace: bmycure4mm
+spec:
+  selector:
+    app: web
+  ports:
+    - name: http
+      port: 8001
+      targetPort: 8001
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: celery
+  namespace: bmycure4mm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: celery
+  template:
+    metadata:
+      labels:
+        app: celery
+    spec:
+      containers:
+        - name: celery
+          image: ghcr.io/andreazedda/bmycure4mm:latest
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: bmycure4mm-env
+            - secretRef:
+                name: bmycure4mm-secrets
+          command: ["sh","-lc"]
+          args:
+            - |
+              celery -A mmportal worker --loglevel=info --pool=solo
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: bmycure4mm-data

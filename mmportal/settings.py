@@ -118,10 +118,18 @@ WSGI_APPLICATION = "mmportal.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+_sqlite_path = os.environ.get("DJANGO_SQLITE_PATH")
+if _sqlite_path:
+    sqlite_name = Path(_sqlite_path)
+else:
+    sqlite_name = BASE_DIR / "db.sqlite3"
+
+sqlite_name.parent.mkdir(parents=True, exist_ok=True)
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "NAME": sqlite_name,
     }
 }
 
@@ -264,6 +272,18 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.BasicAuthentication",
     ],
 }
+
+# -------------------------------------------------------------------
+# Production security (opt-in via environment)
+# -------------------------------------------------------------------
+
+SECURE_PROXY_SSL_HEADER = None
+if os.environ.get("DJANGO_SECURE_PROXY_SSL_HEADER", "0") == "1":
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+SECURE_SSL_REDIRECT = os.environ.get("DJANGO_SECURE_SSL_REDIRECT", "0") == "1"
+SESSION_COOKIE_SECURE = os.environ.get("DJANGO_SESSION_COOKIE_SECURE", "0") == "1"
+CSRF_COOKIE_SECURE = os.environ.get("DJANGO_CSRF_COOKIE_SECURE", "0") == "1"
 
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://localhost:6379/0")
 CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", CELERY_BROKER_URL)

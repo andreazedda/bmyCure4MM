@@ -1,0 +1,37 @@
+.env
+.env.*
+!.env.example
+
+# Venvs
+.venv
+venv
+env
+ENV
+
+# Python cache
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache
+.ruff_cache
+
+# Logs & runtime data
+logs
+*.log
+
+# Local DB/media/static artifacts
+*.sqlite3
+*.db
+db.sqlite3
+db.sqlite3-journal
+media
+staticfiles
+
+# Docs/build artifacts
+site
+htmlcov
+
+# IDE
+.vscode
+.idea

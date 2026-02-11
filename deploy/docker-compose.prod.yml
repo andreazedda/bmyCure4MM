@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  web:
+    build: ..
+    command: gunicorn mmportal.wsgi:application --bind 0.0.0.0:8001 --workers 2 --threads 4 --timeout 120
+    environment:
+      - DJANGO_DEBUG=${DJANGO_DEBUG:-0}
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
+      - CSRF_TRUSTED_ORIGINS=${CSRF_TRUSTED_ORIGINS}
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - DJANGO_SQLITE_PATH=${DJANGO_SQLITE_PATH:-/data/db.sqlite3}
+      - DJANGO_MIGRATE=${DJANGO_MIGRATE:-1}
+      - DJANGO_COLLECTSTATIC=${DJANGO_COLLECTSTATIC:-1}
+      - DJANGO_SECURE_PROXY_SSL_HEADER=${DJANGO_SECURE_PROXY_SSL_HEADER:-1}
+      - DJANGO_SECURE_SSL_REDIRECT=${DJANGO_SECURE_SSL_REDIRECT:-0}
+      - DJANGO_SESSION_COOKIE_SECURE=${DJANGO_SESSION_COOKIE_SECURE:-0}
+      - DJANGO_CSRF_COOKIE_SECURE=${DJANGO_CSRF_COOKIE_SECURE:-0}
+      - PREDLAB_V2=${PREDLAB_V2:-0}
+    volumes:
+      - app_data:/data
+      - media_data:/app/media
+      - static_data:/app/staticfiles
+      - logs_data:/app/logs
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  celery:
+    build: ..
+    command: celery -A mmportal worker --loglevel=info --pool=solo
+    environment:
+      - DJANGO_DEBUG=${DJANGO_DEBUG:-0}
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
+      - CSRF_TRUSTED_ORIGINS=${CSRF_TRUSTED_ORIGINS}
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - DJANGO_SQLITE_PATH=${DJANGO_SQLITE_PATH:-/data/db.sqlite3}
+      - PREDLAB_V2=${PREDLAB_V2:-0}
+    volumes:
+      - app_data:/data
+      - logs_data:/app/logs
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:1.25-alpine
+    environment:
+      - DOMAIN=${DOMAIN}
+    ports:
+      - "80:80"
+    depends_on:
+      - web
+    volumes:
+      - ./nginx/http.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - static_data:/staticfiles:ro
+      - media_data:/media:ro
+      - certbot_www:/var/www/certbot:ro
+    restart: unless-stopped
+
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - letsencrypt:/etc/letsencrypt
+      - certbot_www:/var/www/certbot
+
+volumes:
+  redis_data:
+  app_data:
+  media_data:
+  static_data:
+  logs_data:
+  letsencrypt:
+  certbot_www:

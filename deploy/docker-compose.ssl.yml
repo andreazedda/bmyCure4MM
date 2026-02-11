@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  nginx:
+    volumes:
+      - ./nginx/https.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - letsencrypt:/etc/letsencrypt:ro
+    ports:
+      - "80:80"
+      - "443:443"
+
+volumes:
+  letsencrypt:
