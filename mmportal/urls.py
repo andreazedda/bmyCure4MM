@@ -8,6 +8,7 @@ from django.contrib import admin
 from django.http import JsonResponse
 from django.urls import include, path
 
+from mmportal import views as portal_views
 from simulator.api import drugs, glossary
 from simulator.api_design import design_report
 from simulator.api_help import help_item, help_search
@@ -15,6 +16,7 @@ from simulator.api_ux import audit as ux_audit
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("", portal_views.home, name="home"),
     path("", include(("clinic.urls", "clinic"), namespace="clinic")),
     path("chem/", include(("chemtools.urls", "chemtools"), namespace="chemtools")),
     path("sim/", include(("simulator.urls", "simulator"), namespace="simulator")),
