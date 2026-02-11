@@ -97,6 +97,15 @@
     - mantenere script di generazione in `docs/assets/scripts/`
     - non dipendere da runtime Python in GitHub Pages
 
+    ## Screenshot UI (PNG)
+
+    Per schermate dell'applicazione (UI):
+
+    - committare immagini sotto `docs/assets/images/screenshots/`
+    - mantenere lo script di generazione in `docs/assets/scripts/`
+    - preferire output deterministici (viewport fisso, full-page) e path stabili
+    - rigenerare quando cambiano layout o percorsi di navigazione
+
     ## Checklist (pre-merge)
 
     - `./venv/bin/mkdocs build --strict` passa
@@ -166,6 +175,15 @@
     - prefer committed SVGs under `docs/assets/images/...`
     - keep generators under `docs/assets/scripts/`
     - do not depend on runtime Python in GitHub Pages
+
+    ## UI screenshots (PNG)
+
+    For application UI screenshots:
+
+    - commit images under `docs/assets/images/screenshots/`
+    - keep generators under `docs/assets/scripts/`
+    - prefer deterministic outputs (fixed viewport, stable filenames)
+
 
     ## Checklist (pre-merge)
 

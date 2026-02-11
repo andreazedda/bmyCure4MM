@@ -51,3 +51,44 @@ Formula:
 $$
 \mathrm{tumor\_reduction} = 1 - \frac{T_{end}}{T_{start}}
 $$
+
+## Demo pubblica: percorsi rapidi (con screenshot)
+
+=== "IT"
+  Questi sono **3 “test di utilizzo”** sintetizzati come percorsi realistici, pensati per chi visita il demo pubblico su **bmycure4mm**.
+
+  !!! note "Nota su login e dati"
+    Il demo pubblico è pensato per consultazione/lettura. Le schermate “cliniche” qui sotto sono prese da un ambiente demo con dati di esempio.
+
+  ### 1) Curioso (first contact)
+  - Apro il sito e capisco “cosa fa” senza login.
+  - Vado su **Docs** e cerco una keyword (es. "twin", "R-ISS", "toxicity").
+  - Leggo il tutorial “primo run” e mi faccio un’idea del flusso.
+
+  ![Docs Viewer (landing)](assets/images/screenshots/public_docs_home.png)
+
+  ### 2) Ricercatore (modelli e simulazioni)
+  - Apro **Simulator** e sfoglio gli scenari disponibili.
+  - Entro in uno scenario e verifico: orizzonte, coorte, parametri Twin.
+  - Confronto regimi diversi e leggo le metriche (tumor reduction / healthy loss).
+
+  ![Simulator (scenario list)](assets/images/screenshots/public_simulator_list.png)
+
+  ### 3) Medico (workflow clinico: pazienti → assessment → suggerimenti)
+  - Accedo in ambiente demo (se disponibile).
+  - Vado su **Pazienti**, apro una scheda e controllo gli assessment (snapshot lab).
+  - Uso la pagina per ragionare su trade-off efficacia/tossicità e su suggerimenti di regime.
+
+  ![Clinic (patient list)](assets/images/screenshots/clinic_patient_list.png)
+
+  !!! tip "Come vengono prodotti gli screenshot"
+    Gli screenshot sono generati con uno script automatico basato su Playwright.
+    Vedi: `docs/assets/scripts/generate_ui_screenshots.py`.
+
+=== "EN"
+  Three compact “usage tests” written as realistic user journeys for the public demo.
+
+  1) **Curious visitor**: read docs without login.
+  2) **Researcher**: browse scenarios and modeling docs.
+  3) **Clinician**: patient/assessment workflow (demo environment).
+

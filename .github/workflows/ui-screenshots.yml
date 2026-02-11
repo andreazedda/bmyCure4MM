@@ -1,0 +1,47 @@
+name: Generate UI Screenshots
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master, main]
+    paths:
+      - "docs/**"
+      - "mmportal/**"
+      - "clinic/**"
+      - "simulator/**"
+      - "docs/assets/scripts/generate_ui_screenshots.py"
+      - "requirements.txt"
+      - "requirements-screenshots.txt"
+
+permissions:
+  contents: read
+
+jobs:
+  screenshots:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install Python deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-screenshots.txt
+
+      - name: Install Playwright Chromium
+        run: |
+          python -m playwright install --with-deps chromium
+
+      - name: Generate screenshots
+        run: |
+          python docs/assets/scripts/generate_ui_screenshots.py
+
+      - name: Upload screenshots artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-screenshots
+          path: docs/assets/images/screenshots
