@@ -13,7 +13,8 @@
 
     | Voglio… | Vai a… |
     | --- | --- |
-    | teoria modelli e KPI | `Guides → Mathematical Models` |
+    | teoria modelli | `Guides → Mathematical Models` |
+    | come leggere i KPI | `Guides → Docs → Simulator KPIs (How to Read)` |
     | ottimizzazione e Pareto | `Guides → Optimization Theory` |
     | difficulty/prognosis theory | `Guides → Difficulty Scoring` + `Guides → Prognosis` |
 
@@ -124,7 +125,8 @@
 
     | I want… | Go to… |
     | --- | --- |
-    | model/KPI theory | `Guides → Mathematical Models` |
+    | model theory | `Guides → Mathematical Models` |
+    | how to read KPIs | `Guides → Docs → Simulator KPIs (How to Read)` |
     | optimization and Pareto | `Guides → Optimization Theory` |
     | difficulty/prognosis theory | `Guides → Difficulty Scoring` + `Guides → Prognosis` |
 

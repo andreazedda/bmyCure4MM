@@ -44,6 +44,10 @@
         - **AUC** per la chiave custom
         - curva di concentrazione nel plot
 
+    Per capire come interpretare **AUC** e gli altri KPI del `results_summary`, vedi:
+
+    - `Guides → Docs → Simulator KPIs (How to Read)`
+
     ![Esempio: plot con custom drug](../assets/images/screenshots/custom_drug_plot.png)
 
     ## Esempio rapido (valori plausibili “toy”)
@@ -97,6 +101,10 @@
     - Results include:
         - **AUC** for the custom key
         - concentration curve in the plot
+
+    For how to interpret **AUC** and other `results_summary` KPIs, see:
+
+    - `Guides → Docs → Simulator KPIs (How to Read)`
 
     ![Example: plot with custom drug](../assets/images/screenshots/custom_drug_plot.png)
 
