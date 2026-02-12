@@ -120,6 +120,7 @@ data/
 outputs/
 pipelines/data/outputs/
 pipelines/data/logs/
+pipelines/data/paths.json
 *.csv
 *.pkl
 *.pickle

@@ -399,7 +399,7 @@ class PubChemAPIIntegrationTests(TestCase):
             mock_get.side_effect = [sim_response, props_response]
             
             from LigandSimilaritySearcher.sources.lib.similarity import search_similar_compounds
-            result = search_similar_compounds("CCO", n_results=1)
+            result = search_similar_compounds("CCO", n_results=1, include_properties=True)
             
             # Verify two API calls
             self.assertEqual(mock_get.call_count, 2)

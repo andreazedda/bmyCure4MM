@@ -43,7 +43,7 @@ def main() -> None:
 
         logging.info("Searching similar compounds for %s", input_smiles)
         ranked = similarity.search_similar_compounds(
-            input_smiles, fp_type, radius, n_results
+            input_smiles, fp_type, radius, n_results, include_properties=True
         )
 
         if not ranked:

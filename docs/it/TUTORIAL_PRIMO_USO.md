@@ -109,6 +109,8 @@ Se hai scelto un preset, le dosi sono già popolate. Altrimenti:
 2. **Aspetta** 10-30 secondi (vedrai un indicatore di caricamento)
 3. **Risultati comparsi sotto il form:**
 
+![Esempio output (plot)](../assets/images/screenshots/simulation_plot.png)
+
 ### Cosa vedrai:
 
 #### A) **Grafico Temporale (Plot Interattivo)**

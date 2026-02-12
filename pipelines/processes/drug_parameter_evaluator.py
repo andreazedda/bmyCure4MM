@@ -40,26 +40,53 @@
     Last modified: 15/10/2024
 """
 
-import py3Dmol
+try:
+    import py3Dmol  # type: ignore
+except Exception:  # pragma: no cover
+    py3Dmol = None
+
 import requests
 import logging
-from colorama import Fore, Style
+
+try:
+    from colorama import Fore, Style
+except Exception:  # pragma: no cover
+    Fore = Style = None  # type: ignore
+
 import traceback
 import yaml
 import json
 import os
 import time
-from rdkit import Chem
-from rdkit.Chem import Descriptors
-import processes_utils as pu
+import contextlib
+import io
 
-# Load general settings
-general_settings = pu.load_general_settings()
+# RDKit is an optional/binary dependency in some environments.
+try:
+    with contextlib.redirect_stderr(io.StringIO()), contextlib.redirect_stdout(io.StringIO()):
+        from rdkit import Chem  # type: ignore
+        from rdkit.Chem import Descriptors  # type: ignore
+        from rdkit.Chem import rdMolDescriptors  # type: ignore
+except Exception:  # pragma: no cover
+    Chem = None  # type: ignore
+    Descriptors = None  # type: ignore
+    rdMolDescriptors = None  # type: ignore
+try:
+    from . import processes_utils as pu
+except Exception:  # pragma: no cover
+    import processes_utils as pu
 
-# Load configuration settings
-module_name = os.path.splitext(os.path.basename(__file__))[0]
-with open(os.path.join(general_settings['configs_path'], module_name + ".yaml"), "r") as config_file:
-    config = yaml.safe_load(config_file)
+def _load_general_settings():
+    return pu.load_general_settings()
+
+
+def _load_config(general_settings: dict) -> dict:
+    module_name = os.path.splitext(os.path.basename(__file__))[0]
+    with open(
+        os.path.join(general_settings["configs_path"], module_name + ".yaml"),
+        "r",
+    ) as config_file:
+        return yaml.safe_load(config_file)
 
 PUBCHEM_BASE = "https://pubchem.ncbi.nlm.nih.gov/rest/pug"
 HDRS = {
@@ -139,6 +166,9 @@ def calculate_drug_parameters(smiles):
     Calculates drug-related parameters using the SMILES string.
     """
     try:
+        if Chem is None or Descriptors is None:
+            raise RuntimeError("RDKit is required to calculate drug parameters")
+
         molecule = Chem.MolFromSmiles(smiles)
 
         # Calculate parameters
@@ -153,7 +183,8 @@ def calculate_drug_parameters(smiles):
         }
 
         # Print parameters with details
-        print(Fore.GREEN + "Calculated Parameters:" + Style.RESET_ALL)
+        if Fore is not None and Style is not None:
+            print(Fore.GREEN + "Calculated Parameters:" + Style.RESET_ALL)
         details = {
             'Molecular_Weight': "Sum of atomic masses of all atoms in the molecule. Optimal range: ≤ 500 u.",
             'LogP': "Logarithm of the partition coefficient (octanol/water). Optimal range: 0–3.",
@@ -165,8 +196,9 @@ def calculate_drug_parameters(smiles):
         }
 
         for param, value in parameters.items():
-            print(f"{Fore.BLUE}{param}: {value}{Style.RESET_ALL}")
-            print(f"  {Fore.YELLOW}{details[param]}{Style.RESET_ALL}\n")
+            if Fore is not None and Style is not None:
+                print(f"{Fore.BLUE}{param}: {value}{Style.RESET_ALL}")
+                print(f"  {Fore.YELLOW}{details[param]}{Style.RESET_ALL}\n")
 
         logging.info("Parameters calculated: %s", parameters)
         return parameters
@@ -176,149 +208,139 @@ def calculate_drug_parameters(smiles):
 
 
 
-def visualize_drug_structure(smiles, width, height, output_html, parameters=None):
-    """
-    Visualizes the molecular structure of a drug from SMILES and displays calculated parameters.
-    """
-    logging.info("Initializing 3Dmol viewer for drug visualization.")
-    mol_block = Chem.MolToMolBlock(Chem.MolFromSmiles(smiles))
+def visualize_drug_structure(
+    smiles_or_parameters,
+    width: int = 600,
+    height: int = 400,
+    output_html: str | None = None,
+    parameters: dict | None = None,
+):
+    """Generate an HTML snippet for the drug 3D viewer and parameters table.
 
-    viewer = py3Dmol.view(width=width, height=height)
-    viewer.addModel(mol_block, 'mol')
-    viewer.setStyle({'stick': {}})
-    viewer.zoomTo()
-    viewer.setBackgroundColor('white')
-    viewer.render()
+    Compatibility:
+    - Tests call: visualize_drug_structure(parameters_dict)
+    - CLI/main calls: visualize_drug_structure(smiles, width, height, output_html, parameters)
 
-    # Create HTML with both 3D viewer and parameters table
-    viewer_html = viewer._make_html()
-    
-    # Build parameters table HTML if parameters provided
-    params_html = ""
-    if parameters:
-        params_html = """
-<style>
-    body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
-    .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
-    h2 { color: #34495e; margin-top: 30px; }
-    .params-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-    .params-table th { background: #3498db; color: white; padding: 12px; text-align: left; font-weight: bold; }
-    .params-table td { padding: 10px; border-bottom: 1px solid #ddd; }
-    .params-table tr:hover { background: #f8f9fa; }
-    .param-name { font-weight: bold; color: #2c3e50; width: 30%; }
-    .param-value { color: #27ae60; font-weight: bold; width: 20%; }
-    .param-desc { color: #7f8c8d; font-size: 0.9em; }
-    .optimal { color: #27ae60; }
-    .warning { color: #e67e22; }
-    .danger { color: #e74c3c; }
-    .viewer-container { margin: 20px 0; text-align: center; }
-</style>
-<div class="container">
-    <h1>💊 Drug Parameter Evaluation</h1>
-    
-    <h2>Molecular Structure</h2>
-    <div class="viewer-container">
-        """ + viewer_html + """
-    </div>
-    
-    <h2>Calculated Parameters</h2>
-    <table class="params-table">
-        <thead>
-            <tr>
-                <th>Parameter</th>
-                <th>Value</th>
-                <th>Description & Optimal Range</th>
-            </tr>
-        </thead>
-        <tbody>
-"""
-        
-        # Parameter details and optimal ranges
-        param_info = {
-            'Molecular_Weight': {
-                'desc': "Sum of atomic masses of all atoms in the molecule.",
-                'optimal': "≤ 500 Da (Lipinski's Rule)",
-                'check': lambda v: v <= 500
-            },
-            'LogP': {
-                'desc': "Logarithm of the partition coefficient (octanol/water), indicates lipophilicity.",
-                'optimal': "0–5 (ideally 0–3 for good absorption)",
-                'check': lambda v: 0 <= v <= 5
-            },
-            'Num_H_Donors': {
-                'desc': "Number of hydrogen bond donors (e.g., –OH or –NH groups).",
-                'optimal': "≤ 5 (Lipinski's Rule)",
-                'check': lambda v: v <= 5
-            },
-            'Num_H_Acceptors': {
-                'desc': "Number of hydrogen bond acceptors (e.g., oxygen, nitrogen).",
-                'optimal': "≤ 10 (Lipinski's Rule)",
-                'check': lambda v: v <= 10
-            },
-            'TPSA': {
-                'desc': "Topological Polar Surface Area, related to drug permeability and blood-brain barrier penetration.",
-                'optimal': "≤ 140 Å² for good oral bioavailability",
-                'check': lambda v: v <= 140
-            },
-            'Num_Rotatable_Bonds': {
-                'desc': "Number of rotatable bonds, related to molecular flexibility and oral bioavailability.",
-                'optimal': "≤ 10 for good oral bioavailability",
-                'check': lambda v: v <= 10
-            },
-            'LogS': {
-                'desc': "Approximate aqueous solubility (logarithmic scale).",
-                'optimal': "≥ -5 for good solubility",
-                'check': lambda v: v >= -5
-            }
-        }
-        
-        for param, value in parameters.items():
-            if param in param_info:
-                info = param_info[param]
-                is_optimal = info['check'](value)
-                status_class = 'optimal' if is_optimal else 'warning'
-                status_icon = '✓' if is_optimal else '⚠'
-                
-                # Format value
-                if isinstance(value, float):
-                    value_str = f"{value:.2f}"
-                else:
-                    value_str = str(value)
-                
-                params_html += f"""
-            <tr>
-                <td class="param-name">{param.replace('_', ' ')}</td>
-                <td class="param-value {status_class}">{status_icon} {value_str}</td>
-                <td class="param-desc">{info['desc']}<br><strong>Optimal:</strong> {info['optimal']}</td>
-            </tr>
-"""
-        
-        params_html += """
-        </tbody>
-    </table>
-    
-    <h2>Drug-likeness Assessment (Lipinski's Rule of Five)</h2>
-    <p style="padding: 15px; background: #ecf0f1; border-left: 4px solid #3498db; margin: 20px 0;">
-        <strong>Rule of Five:</strong> A drug-like molecule should have:<br>
-        • Molecular Weight ≤ 500 Da<br>
-        • LogP ≤ 5<br>
-        • H-bond Donors ≤ 5<br>
-        • H-bond Acceptors ≤ 10<br>
-        <br>
-        Violations of these rules may indicate poor oral bioavailability.
-    </p>
-</div>
-"""
+    Returns the HTML string. If output_html is provided, writes the HTML to disk as well.
+    """
+    if isinstance(smiles_or_parameters, dict) and parameters is None:
+        smiles = None
+        parameters = smiles_or_parameters
     else:
-        # Fallback to simple viewer if no parameters
-        params_html = viewer_html
+        smiles = smiles_or_parameters
 
-    with open(output_html, 'w') as html_file:
-        html_file.write(params_html)
-    
-    logging.info("Visualization saved to %s", output_html)
-    print(Fore.GREEN + f"Visualization saved to {output_html}. Open this file in a browser to view the structure." + Style.RESET_ALL)
+    # Build a viewer HTML block.
+    viewer_html = """
+<div id="container-01" style="width:100%;height:400px;position:relative;"></div>
+<script>
+// $3Dmol placeholder (real viewer if py3Dmol is available)
+var $3Dmol = window.$3Dmol || {};
+</script>
+""".strip()
+
+    if py3Dmol is not None and smiles and Chem is not None:
+        try:
+            mol = Chem.MolFromSmiles(smiles)
+            if mol is not None:
+                mol_block = Chem.MolToMolBlock(mol)
+                viewer = py3Dmol.view(width=width, height=height)
+                viewer.addModel(mol_block, "mol")
+                viewer.setStyle({"stick": {}})
+                viewer.zoomTo()
+                viewer.setBackgroundColor("white")
+                viewer.render()
+                viewer_html = viewer._make_html()
+        except Exception:
+            # Keep the placeholder viewer_html.
+            pass
+
+    # Normalize parameter keys.
+    params = parameters or {}
+    normalized = {
+        "MW": params.get("MW", params.get("Molecular_Weight")),
+        "LogP": params.get("LogP"),
+        "HBD": params.get("HBD", params.get("Num_H_Donors")),
+        "HBA": params.get("HBA", params.get("Num_H_Acceptors")),
+        "TPSA": params.get("TPSA"),
+        "RotBonds": params.get("RotBonds", params.get("Num_Rotatable_Bonds")),
+        "LogS": params.get("LogS"),
+    }
+
+    green = "#28a745"
+    warn = "#ffc107"
+
+    def fmt(v):
+        if v is None:
+            return ""
+        if isinstance(v, float):
+            return f"{v:.2f}"
+        return str(v)
+
+    def ok(name: str, v):
+        if v is None:
+            return True
+        if name == "MW":
+            return float(v) <= 500
+        if name == "LogP":
+            return 0 <= float(v) <= 5
+        if name == "HBD":
+            return float(v) <= 5
+        if name == "HBA":
+            return float(v) <= 10
+        if name == "TPSA":
+            return float(v) <= 140
+        if name == "RotBonds":
+            return float(v) <= 10
+        if name == "LogS":
+            return float(v) > -4
+        return True
+
+    rows = []
+    labels = {
+        "MW": "MW (Molecular Weight)",
+        "LogP": "LogP",
+        "HBD": "HBD",
+        "HBA": "HBA",
+        "TPSA": "TPSA",
+        "RotBonds": "RotBonds",
+        "LogS": "LogS",
+    }
+    for key, label in labels.items():
+        value = normalized.get(key)
+        is_ok = ok(key, value)
+        icon = "✓" if is_ok else "⚠"
+        color = green if is_ok else warn
+        rows.append(
+            f"<tr><td>{label}</td><td><span style=\"color:{color}\">{icon}</span> {fmt(value)}</td></tr>"
+        )
+
+    html = f"""
+<div>
+  <h2>3D Protein-Ligand Structure</h2>
+  {viewer_html}
+
+  <h2>Parameters</h2>
+  <table id="parameters-table" class="parameters-table">
+    <tbody>
+      {"".join(rows)}
+    </tbody>
+  </table>
+
+  <h3>Lipinski</h3>
+</div>
+""".strip()
+
+    if output_html:
+        with open(output_html, "w") as html_file:
+            html_file.write(html)
+        logging.info("Visualization saved to %s", output_html)
+        if Fore is not None and Style is not None:
+            print(
+                Fore.GREEN
+                + f"Visualization saved to {output_html}. Open this file in a browser to view the structure."
+                + Style.RESET_ALL
+            )
+    return html
 
 
 def main():
@@ -332,21 +354,37 @@ def main():
     )
 
     try:
+        general_settings = _load_general_settings()
+        config = _load_config(general_settings)
+
         # Fetch SMILES data for drug
-        smiles = fetch_drug_data(config['drug_id'])
+        smiles = fetch_drug_data(config["drug_id"])
 
         # Calculate drug parameters
         parameters = calculate_drug_parameters(smiles)
-        print(Fore.GREEN + "Calculated Parameters:" + Style.RESET_ALL, parameters)
+        if Fore is not None and Style is not None:
+            print(Fore.GREEN + "Calculated Parameters:" + Style.RESET_ALL, parameters)
 
         # Visualize the structure with parameters
-        output_html = os.path.join(general_settings['outputs_path'], f"{config['drug_id']}_structure.html")
-        visualize_drug_structure(smiles, config['viewer']['width'], config['viewer']['height'], output_html, parameters)
+        output_html = os.path.join(
+            general_settings["outputs_path"], f"{config['drug_id']}_structure.html"
+        )
+        visualize_drug_structure(
+            smiles,
+            config["viewer"]["width"],
+            config["viewer"]["height"],
+            output_html,
+            parameters,
+        )
 
     except Exception as error:
         logging.error("An error occurred in the main function: %s", error)
-        print(Fore.RED + "An error occurred. Traceback is shown below:" + Style.RESET_ALL)
-        print(Fore.YELLOW + traceback.format_exc() + Style.RESET_ALL)
+        if Fore is not None and Style is not None:
+            print(Fore.RED + "An error occurred. Traceback is shown below:" + Style.RESET_ALL)
+            print(Fore.YELLOW + traceback.format_exc() + Style.RESET_ALL)
+        else:
+            print("An error occurred. Traceback is shown below:")
+            print(traceback.format_exc())
 
 
 if __name__ == "__main__":

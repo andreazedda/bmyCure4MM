@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed - February 2026
+
+- **Test suite robustness**: `python3 manage.py test` runs cleanly even when optional/binary dependencies (e.g., RDKit) are unavailable or incompatible.
+- **ChemTools pipeline helpers**: `visualize_drug_structure()` made compatible with test usage and returns HTML while remaining usable from CLI scripts.
+- **Pipeline configuration portability**: `pipelines/configs/general_settings.json` switched to repo-relative paths (expanded at runtime) to avoid machine-specific absolute paths.
+
+### Security - February 2026
+
+- **No runtime artifacts in repo**: stopped tracking runtime logs and generated pipeline path files so they are not pushed to the public repository.
+
 ### Added - January 2026
 
 #### 🎯 AI-Powered Decision Support System

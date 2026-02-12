@@ -236,6 +236,8 @@ python3 manage.py test chemtools.tests.test_forms --keepdb
 
 Run with coverage:
 ```bash
+# Optional: if you use pytest locally, you can run it with coverage.
+# The project’s CI/test baseline is Django’s built-in runner (pytest is not required).
 python3 -m pytest chemtools/tests/ -v --cov=chemtools --cov-report=html
 ```
 

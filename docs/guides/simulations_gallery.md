@@ -69,6 +69,24 @@
       E --> F["UI: charts + decision rules"]
     ```
 
+    ## 7b) Output simulazione — esempio reale (da test automatici)
+
+    Questo è un esempio di **output reale** generato automaticamente (vedi script screenshots).
+
+    ![Esempio output simulazione (plot)](../assets/images/screenshots/simulation_plot.png)
+
+    **Artifact prodotti dal simulatore** (per ogni attempt):
+
+    - CSV con la traiettoria (time, tumor_cells, healthy_cells, concentrazioni)
+    - HTML Plotly con i grafici (visualizzabile anche via `/media/...`)
+
+    **Sanity checks numeriche** (regressioni):
+
+    - KPI finiti (no NaN/inf)
+    - traiettorie senza NaN/inf
+    - cellule non-negative
+    - tempo monotono e nel range richiesto
+
     ## 8) Difficulty score — response/toxicity/survival (toy)
 
     ![Response probabilities vs difficulty](../assets/images/models/difficulty_response_probabilities.svg)
@@ -139,6 +157,24 @@
       D --> E["KPIs + artifacts (CSV/Plot)"]
       E --> F["UI: charts + decision rules"]
     ```
+
+    ## 7b) Simulation output — real example (from automated tests)
+
+    This is a **real output** example generated automatically (see screenshots script).
+
+    ![Simulation output example (plot)](../assets/images/screenshots/simulation_plot.png)
+
+    **Artifacts produced** (per attempt):
+
+    - CSV trajectory (time, tumor_cells, healthy_cells, concentrations)
+    - Plotly HTML (also viewable via `/media/...`)
+
+    **Numerical sanity checks** (regression guards):
+
+    - finite KPIs (no NaN/inf)
+    - trajectories with no NaN/inf
+    - non-negative cell counts
+    - monotonic time within requested horizon
 
     ## 8) Difficulty score — response/toxicity/survival (toy)
 

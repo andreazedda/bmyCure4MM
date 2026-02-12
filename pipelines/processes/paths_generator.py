@@ -3,7 +3,10 @@
     All paths are stored in the settings dictionary, which is then saved to a JSON file.
 """
 
-import processes_utils as pu
+try:
+    from . import processes_utils as pu
+except Exception:  # pragma: no cover
+    import processes_utils as pu
 import os
 import json
 import logging

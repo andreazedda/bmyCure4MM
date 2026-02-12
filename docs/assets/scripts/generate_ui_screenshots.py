@@ -63,12 +63,15 @@ def main() -> int:
     with tempfile.TemporaryDirectory(prefix="bmycure4mm-screens-") as tmp:
         tmp_path = Path(tmp)
         db_path = tmp_path / "db.sqlite3"
+        media_root = tmp_path / "media"
+        media_root.mkdir(parents=True, exist_ok=True)
 
         env = os.environ.copy()
         env.update(
             {
                 "DJANGO_DEBUG": "1",
                 "DJANGO_SQLITE_PATH": str(db_path),
+                "DJANGO_MEDIA_ROOT": str(media_root),
                 "ALLOWED_HOSTS": "127.0.0.1,localhost",
                 "PYTHONUNBUFFERED": "1",
             }
@@ -95,6 +98,23 @@ def main() -> int:
                 "User=get_user_model(); "
                 "User.objects.filter(username='admin').exists() or "
                 "User.objects.create_superuser('admin','admin@example.com','admin123')",
+            ],
+            env=env,
+        )
+
+        # Create a minimal scenario + run one attempt so we can screenshot a real output plot.
+        _run(
+            [
+                sys.executable,
+                "manage.py",
+                "shell",
+                "-c",
+                "from django.contrib.auth import get_user_model; "
+                "from simulator import models; "
+                "User=get_user_model(); u=User.objects.get(username='admin'); "
+                "s=models.Scenario.objects.create(title='Screenshot scenario', clinical_stage='newly_diagnosed', summary='Auto-generated', risk_stratification='Standard', guideline_notes=''); "
+                "a=models.SimulationAttempt.objects.create(scenario=s, user=u, parameters={'baseline_tumor_cells':1e9,'baseline_healthy_cells':5e11,'lenalidomide_dose':25.0,'bortezomib_dose':1.3,'daratumumab_dose':16.0,'time_horizon':60.0,'tumor_growth_rate':0.023,'healthy_growth_rate':0.015,'interaction_strength':0.05,'immune_compromise_index':1.0}); "
+                "a.run_model(); print(a.pk)",
             ],
             env=env,
         )
@@ -142,6 +162,9 @@ def main() -> int:
                 snap("clinic_patient_list.png", "/patients/")
                 snap("clinic_dashboard.png", "/")
 
+                # Real simulation plot output (generated above)
+                snap("simulation_plot.png", "/media/sim_plots/attempt_1.html")
+
                 context.close()
                 browser.close()
 
@@ -167,6 +190,7 @@ def main() -> int:
         "public_simulator_list.png",
         "clinic_patient_list.png",
         "clinic_dashboard.png",
+        "simulation_plot.png",
     ]
     missing = [p for p in expected if not (out_dir / p).exists()]
     if missing:

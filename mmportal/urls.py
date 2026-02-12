@@ -18,7 +18,10 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", portal_views.home, name="home"),
     path("", include(("clinic.urls", "clinic"), namespace="clinic")),
-    path("chem/", include(("chemtools.urls", "chemtools"), namespace="chemtools")),
+    # Canonical chemtools URLs
+    path("chemtools/", include(("chemtools.urls", "chemtools"), namespace="chemtools")),
+    # Backward-compatible alias
+    path("chem/", include("chemtools.urls")),
     path("sim/", include(("simulator.urls", "simulator"), namespace="simulator")),
     path("simulator/", include(("simulator.urls", "simulator"), namespace="simulator_alias")),
     path("docs/", include(("docs_viewer.urls", "docs_viewer"), namespace="docs_viewer")),

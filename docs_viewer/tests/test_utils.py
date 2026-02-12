@@ -2,7 +2,7 @@
 Unit tests for documentation viewer utility functions.
 """
 import os
-import pytest
+from django.test import SimpleTestCase
 from django.conf import settings
 from docs_viewer.utils import (
     is_safe_path,
@@ -15,54 +15,54 @@ from docs_viewer.utils import (
 )
 
 
-class TestPathSecurity:
+class PathSecurityTests(SimpleTestCase):
     """Test path validation and security controls."""
     
     def test_safe_path_allows_whitelisted_files(self):
         """Whitelist files should be accessible."""
-        assert is_safe_path('README.md') is True
-        assert is_safe_path('IMPLEMENTATION_LOG.md') is True
+        self.assertTrue(is_safe_path("README.md"))
+        self.assertTrue(is_safe_path("docs/development/IMPLEMENTATION_LOG.md"))
     
     def test_safe_path_rejects_path_traversal(self):
         """Path traversal attempts should be blocked."""
-        assert is_safe_path('../etc/passwd') is False
-        assert is_safe_path('docs/../../etc/passwd') is False
-        assert is_safe_path('./docs/../../../etc/passwd') is False
+        self.assertFalse(is_safe_path("../etc/passwd"))
+        self.assertFalse(is_safe_path("docs/../../etc/passwd"))
+        self.assertFalse(is_safe_path("./docs/../../../etc/passwd"))
     
     def test_safe_path_rejects_absolute_paths(self):
         """Absolute paths should be blocked."""
-        assert is_safe_path('/etc/passwd') is False
-        assert is_safe_path('/var/www/html/') is False
+        self.assertFalse(is_safe_path("/etc/passwd"))
+        self.assertFalse(is_safe_path("/var/www/html/"))
     
     def test_safe_path_rejects_non_whitelisted(self):
         """Files outside whitelist should be blocked."""
-        assert is_safe_path('manage.py') is False
-        assert is_safe_path('mmportal/settings.py') is False
-        assert is_safe_path('db.sqlite3') is False
+        self.assertFalse(is_safe_path("manage.py"))
+        self.assertFalse(is_safe_path("mmportal/settings.py"))
+        self.assertFalse(is_safe_path("db.sqlite3"))
     
     def test_safe_path_rejects_nonexistent_files(self):
         """Non-existent files should be blocked."""
-        assert is_safe_path('docs/nonexistent.md') is False
+        self.assertFalse(is_safe_path("docs/nonexistent.md"))
     
     def test_sanitize_path_removes_dangerous_chars(self):
         """Sanitization should remove null bytes and normalize."""
-        assert sanitize_path('docs\0/file.md') == 'docs/file.md'
-        assert sanitize_path('docs\\file.md') == 'docs/file.md'
-        assert sanitize_path('//docs///file.md') == 'docs/file.md'
-        assert sanitize_path('/docs/file.md/') == 'docs/file.md'
+        self.assertEqual(sanitize_path("docs\0/file.md"), "docs/file.md")
+        self.assertEqual(sanitize_path("docs\\file.md"), "docs/file.md")
+        self.assertEqual(sanitize_path("//docs///file.md"), "docs/file.md")
+        self.assertEqual(sanitize_path("/docs/file.md/"), "docs/file.md")
 
 
-class TestMarkdownRendering:
+class MarkdownRenderingTests(SimpleTestCase):
     """Test markdown to HTML conversion."""
     
     def test_render_markdown_basic(self):
         """Basic markdown should render correctly."""
         content = "# Hello World\n\nThis is **bold** text."
         html, toc = render_markdown(content)
-        
-        assert '<h1' in html
-        assert 'Hello World' in html
-        assert '<strong>bold</strong>' in html
+
+        self.assertIn("<h1", html)
+        self.assertIn("Hello World", html)
+        self.assertIn("<strong>bold</strong>", html)
     
     def test_render_markdown_code_blocks(self):
         """Code blocks should render with syntax highlighting."""
@@ -73,7 +73,7 @@ def hello():
 ```
 """
         html, toc = render_markdown(content)
-        assert '<code' in html or '<pre' in html
+        self.assertTrue("<code" in html or "<pre" in html)
     
     def test_render_markdown_tables(self):
         """Tables should render correctly."""
@@ -83,9 +83,9 @@ def hello():
 | Cell 1   | Cell 2   |
 """
         html, toc = render_markdown(content)
-        assert '<table' in html
-        assert '<th' in html
-        assert '<td' in html
+        self.assertIn("<table", html)
+        self.assertIn("<th", html)
+        self.assertIn("<td", html)
     
     def test_render_markdown_generates_toc(self):
         """TOC should be generated from headings."""
@@ -96,27 +96,27 @@ def hello():
 ## Section 2
 """
         html, toc = render_markdown(content)
-        assert 'Section 1' in toc
-        assert 'Section 2' in toc
+        self.assertIn("Section 1", toc)
+        self.assertIn("Section 2", toc)
 
 
-class TestTitleExtraction:
+class TitleExtractionTests(SimpleTestCase):
     """Test title extraction from markdown."""
     
     def test_extract_title_from_h1(self):
         """First H1 should be extracted as title."""
         content = "# Main Title\n\nSome content\n\n## Subtitle"
         title = extract_title(content)
-        assert title == "Main Title"
+        self.assertEqual(title, "Main Title")
     
     def test_extract_title_no_heading(self):
         """Should return default when no heading found."""
         content = "Just plain text without headings."
         title = extract_title(content)
-        assert title == "Untitled Document"
+        self.assertEqual(title, "Untitled Document")
 
 
-class TestBreadcrumbs:
+class BreadcrumbsTests(SimpleTestCase):
     """Test breadcrumb generation."""
     
     def test_breadcrumbs_root_file(self):

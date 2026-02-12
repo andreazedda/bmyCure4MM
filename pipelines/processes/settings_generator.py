@@ -54,13 +54,15 @@ def save_json_settings():
     Save the pipeline settings to a JSON file.
     """
     try:
+        # Portable schema: these paths are expanded relative to the pipelines root
+        # by pipelines/processes/processes_utils.py.
         settings = {
-            "root_path": ABSOLUTE_PATH,
-            "data_path": DATA_PATH,
-            "logs_path": LOGS_PATH,
-            "outputs_path": OUTPUTS_PATH,
-            "pickles_path": PICKLES_PATH,
-            "configs_path": CONFIGS_PATH
+            "root_path": ".",
+            "data_path": "data",
+            "logs_path": "data/logs",
+            "outputs_path": "data/outputs",
+            "pickles_path": "data/outputs/pickles",
+            "configs_path": "configs",
         }
 
         with open(os.path.join(CONFIGS_PATH, "general_settings.json"), "w") as settings_file:

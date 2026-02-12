@@ -28,7 +28,7 @@ Perfect for researchers, clinicians, and students working on multiple myeloma tr
 
 ### 🔬 **ChemTools - Drug Discovery Suite**
 - **3D Molecular Visualization**: Interactive py3Dmol-based structure viewer
-- **Similarity Search**: Find similar compounds using RDKit fingerprints
+- **Similarity Search**: Find similar compounds using RDKit fingerprints (best-effort; if RDKit isn’t available in your environment, similarity scoring may be omitted)
 - **ADME Prediction**: Calculate drug-like properties (Lipinski's Rule of Five)
 - **PDB Integration**: Fetch and analyze protein structures from Protein Data Bank
 - **Structure Caching**: Fast retrieval of previously analyzed molecules

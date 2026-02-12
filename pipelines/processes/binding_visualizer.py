@@ -1,4 +1,7 @@
-import py3Dmol
+try:
+    import py3Dmol  # type: ignore
+except Exception:  # pragma: no cover
+    py3Dmol = None
 import requests
 import logging
 from colorama import Fore, Style
@@ -6,7 +9,10 @@ import traceback
 import yaml
 import json
 import os
-import processes_utils as pu
+try:
+    from . import processes_utils as pu
+except Exception:  # pragma: no cover
+    import processes_utils as pu
 
 # Load general settings
 general_settings = pu.load_general_settings()

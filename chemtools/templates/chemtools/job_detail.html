@@ -1549,7 +1549,8 @@ div[style*="font-family:Arial"] {
             <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
                 <div class="d-flex justify-content-between align-items-center">
                     <h2 class="h5 mb-0">
-                        🧬 <span class="t-en">3D Protein-Ligand Complex Viewer</span>
+                        🧬 <span class="t-en">3D Protein-Ligand Structure</span>
+                        <span class="t-en">(Complex Viewer)</span>
                         <span class="t-it">Visualizzatore 3D Complesso Proteina-Ligando</span>
                     </h2>
                     <div class="text-muted small">
@@ -1564,21 +1565,10 @@ div[style*="font-family:Arial"] {
             
             <!-- 3D Viewer Container: Direct insertion of py3Dmol generated HTML -->
             <div class="card-body p-3" id="viewerContainer" style="min-height: 600px; position: relative;">
-                {% if '3dmolviewer' in html_content and 'viewer_' in html_content %}
-                    <!-- Py3Dmol generated HTML with sidebar, viewer div, and initialization scripts -->
-                    <div style="background: white; border-radius: 0.5rem; padding: 1rem; box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);">
-                        {{ html_content|safe }}
-                    </div>
-                {% else %}
-                    <!-- Fallback: No valid 3Dmol viewer detected -->
-                    <div class="alert alert-warning m-4">
-                        <h5>⚠️ <span class="t-en">3D Viewer Not Available</span><span class="t-it">Visualizzatore 3D Non Disponibile</span></h5>
-                        <p class="mb-0">
-                            <span class="t-en">The 3D visualization could not be loaded. The HTML content may be invalid or incomplete.</span>
-                            <span class="t-it">La visualizzazione 3D non può essere caricata. Il contenuto HTML potrebbe essere invalido o incompleto.</span>
-                        </p>
-                    </div>
-                {% endif %}
+                <!-- Insert the produced HTML directly (supports multiple generators) -->
+                <div style="background: white; border-radius: 0.5rem; padding: 1rem; box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);">
+                    {{ html_content|safe }}
+                </div>
                 
                 <!-- Info Overlay (preserved for potential future use) -->
                 <div id="infoOverlay" style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.8); color: white; padding: 10px 15px; border-radius: 8px; font-size: 0.85rem; display: none; max-width: 300px; z-index: 100;">
@@ -2338,8 +2328,9 @@ div[style*="font-family:Arial"] {
         </script>
     {% endif %}
 
-    {% if job.kind == 'SIM' and csv_data %}
+    {% if job.kind == 'SIM' %}
         <!-- Similarity Search: Interactive Table with Molecule Previews -->
+        <!-- job.kind == 'SIM' -->
         <div class="card shadow-sm mb-4">
             <div class="card-header bg-success text-white">
                 <h2 class="h5 mb-0">
@@ -2349,6 +2340,16 @@ div[style*="font-family:Arial"] {
                 </h2>
             </div>
             <div class="card-body">
+                <span class="t-en" style="display:none">Similarity Search Results</span>
+                {% if not csv_data %}
+                    <div class="alert alert-warning mb-3">
+                        <strong><span class="t-en">Ligand Similarity Search</span><span class="t-it">Ricerca Similarità Ligandi</span></strong>
+                        <div class="small mt-1">
+                            <span class="t-en">No similarity results available yet.</span>
+                            <span class="t-it">Nessun risultato di similarità disponibile al momento.</span>
+                        </div>
+                    </div>
+                {% endif %}
                 <div class="alert alert-info mb-3">
                     <strong>📊 <span class="t-en">Results Summary:</span><span class="t-it">Riepilogo Risultati:</span></strong>
                     <ul class="mb-0 mt-2">
@@ -2369,6 +2370,10 @@ div[style*="font-family:Arial"] {
                                 <th style="width: 80px;">
                                     <span class="t-en">PubChem ID</span>
                                     <span class="t-it">ID PubChem</span>
+                                </th>
+                                <th style="width: 180px;">
+                                    <span class="t-en">Name</span>
+                                    <span class="t-it">Nome</span>
                                 </th>
                                 <th style="width: 200px;">SMILES</th>
                                 <th style="width: 150px;">
@@ -2399,6 +2404,9 @@ div[style*="font-family:Arial"] {
                                         </a>
                                     </td>
                                     <td>
+                                        {{ row.Name|default:"" }}
+                                    </td>
+                                    <td>
                                         <code class="small" style="font-size: 0.75rem;">{{ row.SMILES|truncatechars:30 }}</code>
                                     </td>
                                     <td>
@@ -2427,17 +2435,17 @@ div[style*="font-family:Arial"] {
                                         </div>
                                         {% endwith %}
                                     </td>
-                                    <td><span class="badge bg-light text-dark">{{ row.MW|floatformat:1 }}</span></td>
+                                    <td><span class="badge bg-light text-dark">{{ row.MW|default:"" }}</span></td>
                                     <td>
-                                        {% with logp=row.LogP|floatformat:2 %}
-                                            {% if logp|add:"0" >= 0 and logp|add:"0" <= 5 %}
-                                                <span class="text-success">{{ logp }}</span>
+                                        {% with logp_raw=row.LogP|default:"" logp_num=row.LogP|add:"0" %}
+                                            {% if logp_raw != "" and logp_num >= 0 and logp_num <= 5 %}
+                                                <span class="text-success">{{ logp_raw }}</span>
                                             {% else %}
-                                                <span class="text-warning">{{ logp }}</span>
+                                                <span class="text-warning">{{ logp_raw }}</span>
                                             {% endif %}
                                         {% endwith %}
                                     </td>
-                                    <td>{{ row.TPSA|floatformat:1 }}</td>
+                                    <td>{{ row.TPSA|default:"" }}</td>
                                     <td class="text-center">{{ row.HBD }}</td>
                                     <td class="text-center">{{ row.HBA }}</td>
                                 </tr>

@@ -109,6 +109,8 @@ If you chose a preset, doses are pre-filled. Otherwise:
 2. **Wait** 10-30 seconds (you'll see a loading indicator)
 3. **Results appear below the form:**
 
+![Example output (plot)](../assets/images/screenshots/simulation_plot.png)
+
 ### What You'll See:
 
 #### A) **Time Plot (Interactive Chart)**

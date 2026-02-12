@@ -136,8 +136,12 @@ pip install -r requirements.txt
 
 3. **Run tests:**
    ```bash
-   python manage.py test chemtools.tests
+   python manage.py test
    ```
+
+   Notes:
+   - The repo’s test suite is designed to run via Django’s built-in test runner.
+   - Optional/binary dependencies (e.g., RDKit) are best-effort: if they are unavailable or incompatible in your environment, tests should still run.
 
 4. **Stop services:** Press Ctrl+C
 

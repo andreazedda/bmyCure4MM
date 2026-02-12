@@ -297,7 +297,7 @@ class SimilaritySearchAPITests(TestCase):
             mock_get.side_effect = [sim_response, props_response]
             
             from LigandSimilaritySearcher.sources.lib.similarity import search_similar_compounds
-            result = search_similar_compounds("CCO", threshold=90, max_records=1)
+            result = search_similar_compounds("CCO", threshold=90, max_records=1, include_properties=True)
             
             # Verify properties endpoint was called
             self.assertEqual(mock_get.call_count, 2)

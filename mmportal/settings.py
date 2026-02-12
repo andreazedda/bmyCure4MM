@@ -174,7 +174,8 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS: list[Path] = [BASE_DIR / "mmportal" / "static"]
 
 MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
+_media_root = os.environ.get("DJANGO_MEDIA_ROOT")
+MEDIA_ROOT = Path(_media_root) if _media_root else (BASE_DIR / "media")
 
 LOGIN_URL = "/admin/login/"
 LOGIN_REDIRECT_URL = "/"

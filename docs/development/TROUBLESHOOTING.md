@@ -12,6 +12,13 @@ WorkerLostError: Worker exited prematurely: signal 11 (SIGSEGV)
 ### Causa
 RDKit e altre librerie scientifiche non sono fork-safe su macOS. Quando Celery usa il pool di processi prefork (default), i worker crashano con segmentation fault.
 
+### Nota (NumPy 2 / RDKit)
+In alcuni ambienti (tipicamente Linux con `numpy>=2`), una build di RDKit compilata per NumPy 1.x può fallire all’import con errori del tipo `_ARRAY_API not found`.
+
+Comportamento del progetto:
+- Le funzionalità che richiedono RDKit (fingerprint/similarity “vera”) degradano in modo **best-effort** quando RDKit non è disponibile.
+- I test e lo sviluppo locale dovrebbero comunque funzionare usando il Django test runner.
+
 ### Soluzione
 Usare `--pool=solo` invece del default prefork:
 
