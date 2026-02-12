@@ -119,6 +119,24 @@ def main() -> int:
             env=env,
         )
 
+        # Create a ChemTools binding job so we can screenshot a real molecule viewer inside Job detail.
+        _run(
+            [
+                sys.executable,
+                "manage.py",
+                "shell",
+                "-c",
+                "from django.contrib.auth import get_user_model; "
+                "from chemtools import models; "
+                "from chemtools.tasks import run_binding_viz_job; "
+                "User=get_user_model(); u=User.objects.get(username='admin'); "
+                "job=models.ChemJob.objects.create(kind=models.ChemJob.BIND, input_a='5LF3', input_b='', user=u); "
+                "run_binding_viz_job.run(job.pk, '5LF3', ''); "
+                "print(job.pk)",
+            ],
+            env=env,
+        )
+
         # Start dev server
         server = subprocess.Popen(
             [
@@ -151,6 +169,7 @@ def main() -> int:
                 # Public-facing pages
                 snap("public_docs_home.png", "/docs/")
                 snap("public_simulator_list.png", "/sim/")
+                snap("public_chemtools_home.png", "/chem/")
 
                 # Authenticated clinician view (via Django admin login)
                 page.goto(f"{args.base_url}/admin/login/", wait_until="domcontentloaded")
@@ -161,6 +180,10 @@ def main() -> int:
 
                 snap("clinic_patient_list.png", "/patients/")
                 snap("clinic_dashboard.png", "/")
+
+                # ChemTools (authenticated) - show the tools landing and a real binding viewer job detail.
+                snap("chemtools_home.png", "/chem/")
+                snap("chemtools_binding_job.png", "/chem/job/1/")
 
                 # Real simulation plot output (generated above)
                 snap("simulation_plot.png", "/media/sim_plots/attempt_1.html")
@@ -188,9 +211,12 @@ def main() -> int:
     expected = [
         "public_docs_home.png",
         "public_simulator_list.png",
+        "public_chemtools_home.png",
         "clinic_patient_list.png",
         "clinic_dashboard.png",
         "simulation_plot.png",
+        "chemtools_home.png",
+        "chemtools_binding_job.png",
     ]
     missing = [p for p in expected if not (out_dir / p).exists()]
     if missing:

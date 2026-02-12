@@ -38,6 +38,22 @@
     </div>
 </div>
 
+{% if not request.user.is_authenticated %}
+<div class="alert alert-warning border-warning mb-4" role="alert">
+    <div class="d-flex align-items-start gap-2">
+        <span style="font-size: 1.5rem;">🔒</span>
+        <div>
+            <div class="t-en"><strong>Demo mode:</strong> You can browse ChemTools, but running analyses and viewing job results requires login.</div>
+            <div class="t-it"><strong>Modalità demo:</strong> Puoi esplorare ChemTools, ma per lanciare analisi e vedere risultati serve il login.</div>
+            <a class="btn btn-sm btn-outline-dark mt-2" href="{% url 'admin:login' %}">
+                <span class="t-en">Log in</span>
+                <span class="t-it">Accedi</span>
+            </a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <!-- MM Treatment Algorithm 2025 -->
 <div class="card shadow-sm mb-4">
     <div class="card-header bg-gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
@@ -628,14 +644,21 @@
                 <span class="t-it">Non hai ancora inviato job di analisi. Inizia scegliendo uno strumento sopra!</span>
             </p>
             <div class="d-flex gap-2 justify-content-center">
-                <a href="{% url 'chemtools:drug_params' %}" class="btn btn-primary">
-                    <span class="t-en">Try Drug Parameters</span>
-                    <span class="t-it">Prova Parametri Farmaci</span>
-                </a>
-                <a href="{% url 'chemtools:similarity' %}" class="btn btn-info">
-                    <span class="t-en">Try Similarity Search</span>
-                    <span class="t-it">Prova Ricerca Similarità</span>
-                </a>
+                {% if request.user.is_authenticated %}
+                    <a href="{% url 'chemtools:drug_params' %}" class="btn btn-primary">
+                        <span class="t-en">Try Drug Parameters</span>
+                        <span class="t-it">Prova Parametri Farmaci</span>
+                    </a>
+                    <a href="{% url 'chemtools:similarity' %}" class="btn btn-info">
+                        <span class="t-en">Try Similarity Search</span>
+                        <span class="t-it">Prova Ricerca Similarità</span>
+                    </a>
+                {% else %}
+                    <a href="{% url 'admin:login' %}" class="btn btn-dark">
+                        <span class="t-en">Log in to run tools</span>
+                        <span class="t-it">Accedi per usare gli strumenti</span>
+                    </a>
+                {% endif %}
             </div>
         </div>
     </div>

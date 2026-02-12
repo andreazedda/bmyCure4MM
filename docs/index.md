@@ -81,6 +81,15 @@ $$
 
   ![Clinic (patient list)](assets/images/screenshots/clinic_patient_list.png)
 
+  ### 4) Ricercatore (molecole e struttura — ChemTools)
+  - Apro **Drug Discovery (ChemTools)**.
+  - Uso **Binding visualization** (PDB + ligando) e/o **Similarity search** (SMILES).
+  - Leggo la pagina Job (viewer + sezioni evidence-based).
+
+  ![ChemTools (tools home)](assets/images/screenshots/public_chemtools_home.png)
+
+  ![ChemTools (binding viewer example)](assets/images/screenshots/chemtools_binding_job.png)
+
   !!! tip "Come vengono prodotti gli screenshot"
     Gli screenshot sono generati con uno script automatico basato su Playwright.
     Vedi: `docs/assets/scripts/generate_ui_screenshots.py`.

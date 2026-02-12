@@ -32,10 +32,24 @@ def _enqueue(task, job: models.ChemJob, *params) -> tuple[bool, bool]:
         return False, failed
 
 
-@login_required
 def tools_home(request: HttpRequest) -> HttpResponse:
-    # Filter jobs by current user for privacy
-    jobs = models.ChemJob.objects.filter(user=request.user).select_related("user").order_by('-created')[:50]
+    """ChemTools landing page.
+
+    Public demo note: the page is viewable without login so the platform clearly
+    exposes the "Drug Discovery" area. Running jobs and viewing job details
+    remains authenticated (and jobs stay private).
+    """
+
+    # Filter jobs by current user for privacy.
+    # Anonymous visitors see an empty job list + a login prompt in the template.
+    if getattr(request.user, "is_authenticated", False):
+        jobs = (
+            models.ChemJob.objects.filter(user=request.user)
+            .select_related("user")
+            .order_by("-created")[:50]
+        )
+    else:
+        jobs = models.ChemJob.objects.none()
     return render(
         request,
         "chemtools/tools_home.html",
