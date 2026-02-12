@@ -1,0 +1,17 @@
+name: carfilzomib
+display_name: Carfilzomib
+unit: mg/m2
+schema: BIW
+pk:
+  half_life: 30.0
+  Vd: 30.0
+pd:
+  Emax: 0.92
+  EC50: 0.25
+dose_range:
+  min: 10.0
+  max: 56.0
+schedule:
+  type: weekly
+  days: [1, 2]
+  administration_window_days: 0.5

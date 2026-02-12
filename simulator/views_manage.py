@@ -330,6 +330,7 @@ def simulate_scenario(request: HttpRequest, pk: int) -> HttpResponse:
         "lenalidomide": _profile_with_ranges("lenalidomide"),
         "bortezomib": _profile_with_ranges("bortezomib"),
         "daratumumab": _profile_with_ranges("daratumumab"),
+        "carfilzomib": _profile_with_ranges("carfilzomib"),
     }
     if not form.is_valid():
         html = render_to_string(

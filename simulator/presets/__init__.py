@@ -43,6 +43,7 @@ PRESETS: dict[str, dict[str, object]] = {
             "lenalidomide_dose": 25.0,
             "bortezomib_dose": 1.3,
             "daratumumab_dose": 0.0,
+            "carfilzomib_dose": 0.0,
             "time_horizon": 168.0,
             "tumor_growth_rate": 0.023,
             "healthy_growth_rate": 0.015,
@@ -52,6 +53,7 @@ PRESETS: dict[str, dict[str, object]] = {
             "lenalidomide_dose": {"type": "days_on_off", "on": 21, "off": 7},
             "bortezomib_dose": {"type": "days_list", "days": [1, 4, 8, 11]},
             "daratumumab_dose": {"type": "days_list", "days": []},
+            "carfilzomib_dose": {"type": "days_list", "days": []},
         },
     },
     "Dara-Rd": {
@@ -94,6 +96,7 @@ PRESETS: dict[str, dict[str, object]] = {
             "lenalidomide_dose": 25.0,
             "bortezomib_dose": 0.0,
             "daratumumab_dose": 16.0,
+            "carfilzomib_dose": 0.0,
             "time_horizon": 196.0,
             "tumor_growth_rate": 0.02,
             "healthy_growth_rate": 0.016,
@@ -103,6 +106,7 @@ PRESETS: dict[str, dict[str, object]] = {
             "lenalidomide_dose": {"type": "days_on_off", "on": 21, "off": 7},
             "bortezomib_dose": {"type": "days_list", "days": []},
             "daratumumab_dose": {"type": "qweekly", "weeks": [1, 2, 3, 4], "day": 1},
+            "carfilzomib_dose": {"type": "days_list", "days": []},
         },
     },
     "KRd": {
@@ -143,8 +147,9 @@ PRESETS: dict[str, dict[str, object]] = {
             "baseline_tumor_cells": 1.0e9,
             "baseline_healthy_cells": 4.8e11,
             "lenalidomide_dose": 25.0,
-            "bortezomib_dose": 1.1,
+            "bortezomib_dose": 0.0,
             "daratumumab_dose": 0.0,
+            "carfilzomib_dose": 27.0,
             "time_horizon": 168.0,
             "tumor_growth_rate": 0.024,
             "healthy_growth_rate": 0.014,
@@ -152,8 +157,9 @@ PRESETS: dict[str, dict[str, object]] = {
         },
         "schedule": {
             "lenalidomide_dose": {"type": "days_on_off", "on": 21, "off": 7},
-            "bortezomib_dose": {"type": "days_list", "days": [1, 2, 8, 9, 15, 16]},
+            "bortezomib_dose": {"type": "days_list", "days": []},
             "daratumumab_dose": {"type": "days_list", "days": []},
+            "carfilzomib_dose": {"type": "days_list", "days": [1, 2, 8, 9, 15, 16]},
         },
     },
 }

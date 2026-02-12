@@ -187,6 +187,7 @@ def scenario_detail(request, pk: int):
         "lenalidomide": _profile_with_ranges("lenalidomide"),
         "bortezomib": _profile_with_ranges("bortezomib"),
         "daratumumab": _profile_with_ranges("daratumumab"),
+        "carfilzomib": _profile_with_ranges("carfilzomib"),
     }
     guide_slugs = ["quickstart", "optimization_lab"]
     guides: dict[str, dict[str, dict[str, str]]] = {}

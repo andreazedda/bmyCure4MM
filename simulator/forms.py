@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from mmportal.forms_mixins import BootstrapValidationMixin
 
 from clinic.models import Assessment, Regimen
+from django.utils.text import slugify
 
 from . import models
 from .presets import PRESETS
@@ -22,6 +23,7 @@ SIMULATION_FORM_HELP_TEXT_EN = {
     "lenalidomide_dose": "Standard induction dose: 25 mg/day (21 days on, 7 off). Adjustments are limited to preset bounds.",
     "bortezomib_dose": "Typical SC dosing 1.3 mg/m² on scheduled days; stay within ±20% to avoid toxicity.",
     "daratumumab_dose": "Loading dose 16 mg/kg; higher exposure raises immunosuppression risk.",
+    "carfilzomib_dose": "Second-generation proteasome inhibitor (often 20–56 mg/m²). Dose changes impact cardiovascular/renal toxicity risk.",
     "time_horizon": "Length of the virtual treatment window (days). Longer horizons increase numerical stiffness.",
     "tumor_growth_rate": "Logistic growth rate of malignant plasma cells. Values >0.05 day⁻¹ are rare.",
     "healthy_growth_rate": "Marrow recovery kinetics for healthy plasma cells (≈0.01–0.02 day⁻¹).",
@@ -29,6 +31,13 @@ SIMULATION_FORM_HELP_TEXT_EN = {
     "cohort_size": "Number of virtual subjects sampled for uncertainty bands.",
     "use_twin": "Enable the Patient Twin to auto-derive biology from the latest labs.",
     "seed": "Optional seed for reproducible virtual cohorts and solver noise.",
+    "custom_drug_enabled": "Enable an experimental custom agent using manual PK/PD parameters (editor-only).",
+    "custom_drug_name": "Display name for the experimental agent. Used only for labeling outputs.",
+    "custom_drug_dose": "Total dose amount (arbitrary units). The simulator spreads exposure over the horizon unless a preset schedule exists.",
+    "custom_pk_half_life": "PK half-life in hours. Used to compute elimination rate.",
+    "custom_pk_vd": "Volume of distribution (arbitrary units). Used to scale initial concentration.",
+    "custom_pd_emax": "Maximum effect (0–1). Higher values imply stronger tumor kill and toxicity coupling.",
+    "custom_pd_ec50": "Concentration giving half-maximal effect (must be >0).",
 }
 
 SIMULATION_FORM_HELP_TEXT_IT = {
@@ -43,6 +52,7 @@ SIMULATION_FORM_HELP_TEXT_IT = {
     "lenalidomide_dose": "Dose standard: 25 mg/die (21 giorni su 28). Il preset limita l’aggiustamento controllato.",
     "bortezomib_dose": "Dose SC tipica 1.3 mg/m² nei giorni programmati; restare entro ±20% evita tossicità.",
     "daratumumab_dose": "Dose di carico 16 mg/kg; variazioni maggiori aumentano il rischio d’immunosoppressione.",
+    "carfilzomib_dose": "Inibitore del proteasoma di 2ª generazione (spesso 20–56 mg/m²). Aumenti di dose possono aumentare rischio cardio-renale.",
     "time_horizon": "Durata della finestra terapeutica virtuale (giorni). Orizzonti lunghi aumentano l’incertezza.",
     "tumor_growth_rate": "Velocità logistica di crescita del tumore. Valori >0.05 day⁻¹ sono rari.",
     "healthy_growth_rate": "Cinetica di recupero per le cellule sane. Tipicamente 0.01–0.02 day⁻¹.",
@@ -50,6 +60,13 @@ SIMULATION_FORM_HELP_TEXT_IT = {
     "cohort_size": "Numero di pazienti virtuali campionati per stimare le bande di incertezza.",
     "use_twin": "Attiva il Gemello Paziente per riempire automaticamente i parametri biologici dai laboratori disponibili.",
     "seed": "Seed opzionale per rendere ripetibili coorti virtuali e solver.",
+    "custom_drug_enabled": "Abilita un agente sperimentale personalizzato con parametri PK/PD manuali (solo editor).",
+    "custom_drug_name": "Nome mostrato per l’agente sperimentale. Usato solo per etichettare gli output.",
+    "custom_drug_dose": "Dose totale (unità arbitrarie). Il simulatore distribuisce l’esposizione sull’orizzonte salvo schedula preset.",
+    "custom_pk_half_life": "Emivita PK in ore. Usata per calcolare la velocità di eliminazione.",
+    "custom_pk_vd": "Volume di distribuzione (unità arbitrarie). Serve a scalare la concentrazione iniziale.",
+    "custom_pd_emax": "Effetto massimo (0–1). Valori più alti implicano maggiore efficacia e coupling di tossicità.",
+    "custom_pd_ec50": "Concentrazione a metà effetto massimo (deve essere >0).",
 }
 
 
@@ -814,6 +831,23 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
         label="Daratumumab dose (mg/kg)",
         help_text="Anti-CD38 monoclonal antibody loading dose 16 mg/kg; slider extends within investigational bounds.",
     )
+    carfilzomib_dose = forms.FloatField(
+        required=False,
+        min_value=0.0,
+        initial=0.0,
+        widget=forms.NumberInput(
+            attrs={
+                "class": "form-control",
+                "step": "0.1",
+                "min": "0",
+                "max": "70",
+                "inputmode": "decimal",
+                "readonly": "readonly",
+            }
+        ),
+        label="Carfilzomib dose (mg/m²)",
+        help_text="Second-generation proteasome inhibitor dosing often 20–56 mg/m²; slider keeps within modeled bounds.",
+    )
     time_horizon = forms.FloatField(
         min_value=7.0,
         widget=forms.NumberInput(
@@ -883,6 +917,107 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
         ),
         label="Drug interaction strength",
         help_text="Synergy/toxicity coupling between agents (dimensionless). Values >0.2 are unsupported.",
+    )
+
+    custom_drug_enabled = forms.BooleanField(
+        required=False,
+        initial=False,
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        label="Enable custom drug (experimental)",
+        help_text="Editor-only: simulate an experimental agent via manual PK/PD parameters.",
+    )
+    custom_drug_name = forms.CharField(
+        required=False,
+        max_length=40,
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "e.g., ExperimentalAgent",
+            }
+        ),
+        label="Custom drug name",
+        help_text="Used for labeling; does not create a preset.",
+    )
+    custom_drug_dose = forms.FloatField(
+        required=False,
+        min_value=0.0,
+        initial=0.0,
+        widget=forms.NumberInput(
+            attrs={
+                "class": "form-control",
+                "step": "0.1",
+                "min": "0",
+                "max": "1000",
+                "inputmode": "decimal",
+            }
+        ),
+        label="Custom drug dose (total)",
+        help_text="Total administered amount across the horizon (arbitrary units).",
+    )
+    custom_pk_half_life = forms.FloatField(
+        required=False,
+        min_value=0.1,
+        initial=24.0,
+        widget=forms.NumberInput(
+            attrs={
+                "class": "form-control",
+                "step": "0.1",
+                "min": "0.1",
+                "max": "2000",
+                "inputmode": "decimal",
+            }
+        ),
+        label="Custom PK: half-life (hours)",
+        help_text="PK elimination half-life (hours).",
+    )
+    custom_pk_vd = forms.FloatField(
+        required=False,
+        min_value=0.1,
+        initial=30.0,
+        widget=forms.NumberInput(
+            attrs={
+                "class": "form-control",
+                "step": "0.1",
+                "min": "0.1",
+                "max": "10000",
+                "inputmode": "decimal",
+            }
+        ),
+        label="Custom PK: Vd",
+        help_text="Volume of distribution (arbitrary units).",
+    )
+    custom_pd_emax = forms.FloatField(
+        required=False,
+        min_value=0.0,
+        max_value=1.0,
+        initial=0.5,
+        widget=forms.NumberInput(
+            attrs={
+                "class": "form-control",
+                "step": "0.01",
+                "min": "0",
+                "max": "1",
+                "inputmode": "decimal",
+            }
+        ),
+        label="Custom PD: Emax (0–1)",
+        help_text="Max effect (0–1).",
+    )
+    custom_pd_ec50 = forms.FloatField(
+        required=False,
+        min_value=1e-6,
+        initial=1.0,
+        widget=forms.NumberInput(
+            attrs={
+                "class": "form-control",
+                "step": "0.01",
+                "min": "0",
+                "max": "10000",
+                "inputmode": "decimal",
+            }
+        ),
+        label="Custom PD: EC50",
+        help_text="Half-maximal concentration (must be >0).",
     )
 
     twin_assessment_id = forms.TypedChoiceField(
@@ -1010,6 +1145,7 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
             "lenalidomide_dose",
             "bortezomib_dose",
             "daratumumab_dose",
+            "carfilzomib_dose",
             "time_horizon",
             "tumor_growth_rate",
             "healthy_growth_rate",
@@ -1159,6 +1295,7 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
         len_dose = self._clean_numeric(cleaned, "lenalidomide_dose")
         bor_dose = self._clean_numeric(cleaned, "bortezomib_dose")
         dara_dose = self._clean_numeric(cleaned, "daratumumab_dose")
+        carf_dose = self._clean_numeric(cleaned, "carfilzomib_dose")
         time_horizon = self._clean_numeric(cleaned, "time_horizon")
         tumor_growth = self._clean_numeric(cleaned, "tumor_growth_rate")
         healthy_growth = self._clean_numeric(cleaned, "healthy_growth_rate")
@@ -1202,6 +1339,12 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
                 "Daratumumab dose must be ≤ 20 mg/kg. "
                 "💡 Why? Doses beyond 20mg/kg don't improve outcomes but increase infusion reactions. "
                 "Clinical trials use 16 mg/kg loading dose."
+            )
+        if carf_dose > 70:
+            errors["carfilzomib_dose"] = ValidationError(
+                "Carfilzomib dose must be ≤ 70 mg/m². "
+                "💡 Why? Higher doses increase cardiovascular and renal toxicity risk. "
+                "Typical modeled dosing is ≤56 mg/m²."
             )
         if time_horizon > 365:
             errors["time_horizon"] = ValidationError(
@@ -1277,8 +1420,59 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
             self.warnings.append("Bortezomib dose exceeds standard 1.3 mg/m²—evaluate neuropathy risk.")
         if 16 < dara_dose <= 20:
             self.warnings.append("Daratumumab dose beyond typical loading (16 mg/kg) may increase immunosuppression.")
+        if 56 < carf_dose <= 70:
+            self.warnings.append("Carfilzomib dose above 56 mg/m² is high-intensity—monitor cardio-renal toxicity closely.")
         if time_horizon >= 300:
             self.warnings.append("Long simulation horizon (>300 days) may magnify numerical stiffness; consider shorter intervals.")
+
+        if errors:
+            raise ValidationError(errors)
+
+        # Optional experimental custom drug support (editor-only).
+        custom_enabled = bool(cleaned.get("custom_drug_enabled"))
+        if custom_enabled:
+            from simulator.permissions import is_editor
+
+            privileged = bool(
+                self.user
+                and getattr(self.user, "is_authenticated", False)
+                and (getattr(self.user, "is_staff", False) or is_editor(self.user))
+            )
+            if not privileged:
+                cleaned["custom_drug_enabled"] = False
+                self.warnings.append(
+                    "Custom drug disabled: editor permissions required for experimental agents."
+                )
+            else:
+                name = (cleaned.get("custom_drug_name") or "").strip()
+                if not name:
+                    errors["custom_drug_name"] = ValidationError(
+                        "Custom drug name is required when enabled."
+                    )
+                dose = float(cleaned.get("custom_drug_dose") or 0.0)
+                if dose <= 0.0:
+                    errors["custom_drug_dose"] = ValidationError(
+                        "Custom drug dose must be > 0 when enabled."
+                    )
+                # Sanitize a stable key used in outputs/columns.
+                key = slugify(name).replace("-", "_")
+                key = "".join(ch for ch in key if ch.isalnum() or ch == "_")
+                key = (key or "custom_drug")[:24]
+                cleaned["custom_drug_key"] = f"custom_{key}" if not key.startswith("custom_") else key
+
+                # Keep hard bounds conservative.
+                half_life = float(cleaned.get("custom_pk_half_life") or 0.0)
+                vd = float(cleaned.get("custom_pk_vd") or 0.0)
+                emax = float(cleaned.get("custom_pd_emax") or 0.0)
+                ec50 = float(cleaned.get("custom_pd_ec50") or 0.0)
+                if half_life <= 0:
+                    errors["custom_pk_half_life"] = ValidationError("Half-life must be > 0.")
+                if vd <= 0:
+                    errors["custom_pk_vd"] = ValidationError("Vd must be > 0.")
+                if not (0.0 <= emax <= 1.0):
+                    errors["custom_pd_emax"] = ValidationError("Emax must be within 0–1.")
+                if ec50 <= 0:
+                    errors["custom_pd_ec50"] = ValidationError("EC50 must be > 0.")
 
         if errors:
             raise ValidationError(errors)

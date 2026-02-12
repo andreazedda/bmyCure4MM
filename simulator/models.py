@@ -35,11 +35,13 @@ DEFAULT_PK_PARAMS = {
     "lenalidomide": {"half_life": 3.0, "Vd": 50.0},
     "bortezomib": {"half_life": 40.0, "Vd": 20.0},
     "daratumumab": {"half_life": 480.0, "Vd": 60.0},
+    "carfilzomib": {"half_life": 30.0, "Vd": 30.0},
 }
 DEFAULT_PD_PARAMS = {
     "lenalidomide": {"Emax": 0.8, "EC50": 10.0},
     "bortezomib": {"Emax": 0.9, "EC50": 0.2},
     "daratumumab": {"Emax": 0.95, "EC50": 50.0},
+    "carfilzomib": {"Emax": 0.92, "EC50": 0.25},
 }
 
 
@@ -380,6 +382,26 @@ class SimulationAttempt(models.Model):
         drug_doses = solver_inputs["drug_doses"]
         default_pk = {drug: values.copy() for drug, values in DEFAULT_PK_PARAMS.items()}
         default_pd = {drug: values.copy() for drug, values in DEFAULT_PD_PARAMS.items()}
+
+        custom_profile = solver_inputs.get("custom_drug_profile")
+        if isinstance(custom_profile, dict):
+            custom_key = custom_profile.get("key")
+            custom_pk = custom_profile.get("pk")
+            custom_pd = custom_profile.get("pd")
+            if (
+                isinstance(custom_key, str)
+                and isinstance(custom_pk, dict)
+                and isinstance(custom_pd, dict)
+                and custom_key
+            ):
+                default_pk[custom_key] = {
+                    "half_life": float(custom_pk.get("half_life")),
+                    "Vd": float(custom_pk.get("Vd")),
+                }
+                default_pd[custom_key] = {
+                    "Emax": float(custom_pd.get("Emax")),
+                    "EC50": float(custom_pd.get("EC50")),
+                }
         if use_predlab:
             pk_params, pd_params, dose_functions = pharmaco_registry.resolve(
                 drug_doses,
@@ -748,7 +770,50 @@ class SimulationAttempt(models.Model):
             "daratumumab": cls._float_or_strict(
                 resolved_params.get("daratumumab_dose"), 16.0, "drug_doses.daratumumab"
             ),
+            "carfilzomib": cls._float_or_strict(
+                resolved_params.get("carfilzomib_dose"), 0.0, "drug_doses.carfilzomib"
+            ),
         }
+
+        custom_profile = None
+        if bool(resolved_params.get("custom_drug_enabled")):
+            custom_key = (resolved_params.get("custom_drug_key") or "custom_drug").strip()
+            if not custom_key:
+                custom_key = "custom_drug"
+            custom_dose = cls._float_or_strict(
+                resolved_params.get("custom_drug_dose"),
+                0.0,
+                f"drug_doses.{custom_key}",
+            )
+            if custom_dose > 0.0:
+                drug_doses[custom_key] = float(custom_dose)
+                custom_profile = {
+                    "key": custom_key,
+                    "pk": {
+                        "half_life": cls._float_or_strict(
+                            resolved_params.get("custom_pk_half_life"),
+                            24.0,
+                            f"pk.{custom_key}.half_life",
+                        ),
+                        "Vd": cls._float_or_strict(
+                            resolved_params.get("custom_pk_vd"),
+                            30.0,
+                            f"pk.{custom_key}.Vd",
+                        ),
+                    },
+                    "pd": {
+                        "Emax": cls._float_or_strict(
+                            resolved_params.get("custom_pd_emax"),
+                            0.5,
+                            f"pd.{custom_key}.Emax",
+                        ),
+                        "EC50": cls._float_or_strict(
+                            resolved_params.get("custom_pd_ec50"),
+                            1.0,
+                            f"pd.{custom_key}.EC50",
+                        ),
+                    },
+                }
         interaction_strength = cls._float_or_strict(
             resolved_params.get("interaction_strength"), 0.05, "interaction_strength"
         )
@@ -772,6 +837,7 @@ class SimulationAttempt(models.Model):
             "immune_compromise_index": immune_index,
             "carrying_capacity_tumor": carrying_t_override,
             "carrying_capacity_healthy": carrying_h_override,
+            "custom_drug_profile": custom_profile,
         }
 
     @staticmethod
