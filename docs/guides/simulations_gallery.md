@@ -75,6 +75,10 @@
       Se vuoi collegare **strutture molecolari / binding + profili evidence-based** (ChemTools) con i **KPI della simulazione** (Simulator), vedi la guida ponte:
       `Guides → Docs → Molecule → Simulation (Bridge)`.
 
+    !!! tip "Farmaco non in preset (Custom drug)"
+      Per simulare un agente non presente nei preset YAML (modalità sperimentale editor-only), vedi:
+      `Guides → Docs → Custom drug (experimental)`.
+
     Questo è un esempio di **output reale** generato automaticamente (vedi script screenshots).
 
     ![Esempio output simulazione (plot)](../assets/images/screenshots/simulation_plot.png)
@@ -167,6 +171,10 @@
     !!! tip "Molecular structures + evidence (ChemTools) vs simulated KPIs"
       To connect **molecular structures / binding + evidence-based profiles** (ChemTools) with **simulation KPIs** (Simulator), see:
       `Guides → Docs → Molecule → Simulation (Bridge)`.
+
+    !!! tip "Non-preset agent (Custom drug)"
+      To simulate an agent not present in YAML presets (experimental editor-only mode), see:
+      `Guides → Docs → Custom drug (experimental)`.
 
     This is a **real output** example generated automatically (see screenshots script).
 

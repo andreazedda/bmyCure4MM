@@ -119,6 +119,25 @@ def main() -> int:
             env=env,
         )
 
+        # Create a second attempt with the experimental custom drug enabled.
+        _run(
+            [
+                sys.executable,
+                "manage.py",
+                "shell",
+                "-c",
+                "from django.contrib.auth import get_user_model; "
+                "from simulator import models; "
+                "User=get_user_model(); u=User.objects.get(username='admin'); "
+                "s=models.Scenario.objects.order_by('pk').last(); "
+                "params={'baseline_tumor_cells':1e9,'baseline_healthy_cells':5e11,'lenalidomide_dose':25.0,'bortezomib_dose':1.3,'daratumumab_dose':16.0,'carfilzomib_dose':0.0,'time_horizon':60.0,'tumor_growth_rate':0.023,'healthy_growth_rate':0.015,'interaction_strength':0.05,'immune_compromise_index':1.0,"
+                "'custom_drug_enabled':True,'custom_drug_name':'NeverGivenX','custom_drug_dose':100.0,'custom_pk_half_life':48.0,'custom_pk_vd':40.0,'custom_pd_emax':0.6,'custom_pd_ec50':2.0,'custom_drug_key':'custom_nevergivenx'}; "
+                "a=models.SimulationAttempt.objects.create(scenario=s, user=u, parameters=params); "
+                "a.run_model(); print(a.pk)",
+            ],
+            env=env,
+        )
+
         # Create a ChemTools binding job so we can screenshot a real molecule viewer inside Job detail.
         _run(
             [
@@ -188,6 +207,9 @@ def main() -> int:
                 # Real simulation plot output (generated above)
                 snap("simulation_plot.png", "/media/sim_plots/attempt_1.html")
 
+                # Custom drug simulation plot (generated above)
+                snap("custom_drug_plot.png", "/media/sim_plots/attempt_2.html")
+
                 context.close()
                 browser.close()
 
@@ -215,6 +237,7 @@ def main() -> int:
         "clinic_patient_list.png",
         "clinic_dashboard.png",
         "simulation_plot.png",
+        "custom_drug_plot.png",
         "chemtools_home.png",
         "chemtools_binding_job.png",
     ]

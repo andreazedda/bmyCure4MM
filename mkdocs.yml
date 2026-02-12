@@ -32,6 +32,7 @@ nav:
           - Glossary: guides/glossary.md
           - Simulations Gallery: guides/simulations_gallery.md
           - Molecule → Simulation (Bridge): guides/molecule_to_simulation_bridge.md
+          - Custom drug (experimental): guides/custom_drug_experimental.md
           - Doc Coverage (Gaps): guides/gaps.md
           - Documentation Standard: guides/documentation_standard.md
           - Documentation Roadmap: guides/documentation_roadmap.md

@@ -13,6 +13,12 @@ Questa documentazione è pensata per:
     - Setup dev: `Guides → Development`
     - Percorso guidato: `Learning Path`
 
+!!! info "Percorsi (cosa / dove / perché)"
+  - **Clinico** (Twin + KPI): [Gemello Paziente (IT)](it/gemello_paziente.md) → [Simulatore (IT)](it/simulatore.md)
+  - **Ricercatore** (molecole/evidence): [ChemTools (Reference)](reference/apps/chemtools.md) → [Bridge Molecule→Simulation](guides/molecule_to_simulation_bridge.md)
+  - **Sperimentale** (farmaco non in preset): [Custom drug (experimental)](guides/custom_drug_experimental.md)
+  - **DevOps/Deploy**: [Operations](guides/operations.md) → [Configuration](reference/configuration.md)
+
 ## Struttura del sito
 
 - **Start Here**: tutorial “primo avvio” (EN/IT)
