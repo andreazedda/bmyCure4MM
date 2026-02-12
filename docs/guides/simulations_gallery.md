@@ -71,6 +71,10 @@
 
     ## 7b) Output simulazione — esempio reale (da test automatici)
 
+    !!! tip "Strutture molecolari + efficacia (ChemTools) vs KPI simulati"
+      Se vuoi collegare **strutture molecolari / binding + profili evidence-based** (ChemTools) con i **KPI della simulazione** (Simulator), vedi la guida ponte:
+      `Guides → Docs → Molecule → Simulation (Bridge)`.
+
     Questo è un esempio di **output reale** generato automaticamente (vedi script screenshots).
 
     ![Esempio output simulazione (plot)](../assets/images/screenshots/simulation_plot.png)
@@ -159,6 +163,10 @@
     ```
 
     ## 7b) Simulation output — real example (from automated tests)
+
+    !!! tip "Molecular structures + evidence (ChemTools) vs simulated KPIs"
+      To connect **molecular structures / binding + evidence-based profiles** (ChemTools) with **simulation KPIs** (Simulator), see:
+      `Guides → Docs → Molecule → Simulation (Bridge)`.
 
     This is a **real output** example generated automatically (see screenshots script).
 
