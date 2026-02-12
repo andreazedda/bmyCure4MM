@@ -450,9 +450,23 @@ class SimulationAttempt(models.Model):
             if end_snap:
                 milestones_local["end"] = end_snap
 
+            def _integrate_trapezoid(y: np.ndarray, x: np.ndarray) -> float:
+                """Compatibility wrapper.
+
+                NumPy 2.x may not expose `np.trapz`, so prefer `np.trapezoid` when present.
+                """
+
+                trapezoid_fn = getattr(np, "trapezoid", None)
+                if callable(trapezoid_fn):
+                    return float(trapezoid_fn(y, x))
+                return float(np.trapz(y, x))
+
             # Durability: fraction of time tumor stays below baseline.
             durability_index_local = float(
-                np.trapz((tumor_arr_local < float(tumor_start_local)).astype(float), time_arr_local)
+                _integrate_trapezoid(
+                    (tumor_arr_local < float(tumor_start_local)).astype(float),
+                    time_arr_local,
+                )
                 / max(float(time_horizon_days), 1e-9)
             )
 
@@ -468,7 +482,10 @@ class SimulationAttempt(models.Model):
             auc_local: dict[str, float] = {}
             for drug in drug_doses.keys():
                 series = df[f"{drug}_concentration"]
-                auc_local[drug] = float(np.trapz(np.asarray(series, dtype=float), time_arr_local))
+                auc_local[drug] = _integrate_trapezoid(
+                    np.asarray(series, dtype=float),
+                    time_arr_local,
+                )
 
             return {
                 "tumor_reduction": tumor_reduction_local,
