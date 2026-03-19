@@ -297,6 +297,7 @@ def job_detail(request: HttpRequest, pk: int) -> HttpResponse:
     )
 
 
+@login_required
 def job_enriched_data(request: HttpRequest, pk: int) -> HttpResponse:
     """AJAX endpoint to load enriched API data asynchronously."""
     import logging

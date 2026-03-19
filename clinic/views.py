@@ -291,6 +291,7 @@ class PatientFilter(django_filters.FilterSet):
         return queryset
 
 
+@login_required
 def patient_list(request: HttpRequest) -> HttpResponse:
     query = request.GET.get("q", "").strip()
     qs = models.Patient.objects.all().prefetch_related("assessments")
@@ -376,29 +377,36 @@ def patient_detail(request: HttpRequest, pk: int) -> HttpResponse:
     therapy_spans_json = json.dumps(therapy_spans)
 
     # Observed effects: compare last assessment before therapy start vs last assessment during/after.
+    # Use the already-prefetched assessments list to avoid N+1 queries.
     therapy_effects: dict[int, dict[str, object]] = {}
     try:
         from simulator.twin import build_patient_twin  # local import to avoid hard dependency at import time
     except Exception:  # pragma: no cover
         build_patient_twin = None
 
-    for t in patient.therapies.all():
-        baseline = (
-            models.Assessment.objects.filter(patient=patient, date__lte=t.start_date)
-            .order_by("-date")
-            .first()
-        )
-        follow_until = t.end_date or None
-        follow_qs = models.Assessment.objects.filter(patient=patient)
-        if follow_until:
-            follow_qs = follow_qs.filter(date__lte=follow_until)
-        follow = follow_qs.order_by("-date").first()
+    # assessments is already ordered by -date (from prefetch); sort ascending for boundary lookups
+    all_assessments_asc = sorted(assessments, key=lambda a: a.date)
 
-        def maybe_float(v):
-            try:
-                return float(v) if v is not None else None
-            except Exception:
-                return None
+    def maybe_float(v):
+        try:
+            return float(v) if v is not None else None
+        except Exception:
+            return None
+
+    for t in patient.therapies.all():
+        # baseline: latest assessment on or before therapy start
+        baseline = None
+        for a in reversed(all_assessments_asc):
+            if a.date <= t.start_date:
+                baseline = a
+                break
+        # follow: latest assessment on or before therapy end (or latest overall)
+        follow_until = t.end_date
+        follow = None
+        for a in reversed(all_assessments_asc):
+            if follow_until is None or a.date <= follow_until:
+                follow = a
+                break
 
         baseline_m = maybe_float(getattr(baseline, "m_protein_g_dl", None)) if baseline else None
         follow_m = maybe_float(getattr(follow, "m_protein_g_dl", None)) if follow else None
@@ -755,6 +763,8 @@ def prognosis_api(request: HttpRequest, patient_id: int) -> JsonResponse:
     from simulator.prognosis import estimate_prognosis
     
     patient = get_object_or_404(models.Patient, pk=patient_id)
+    if not can_edit_patient(request.user, patient):
+        return JsonResponse({"error": "forbidden"}, status=403)
     
     # Get parameters from request or patient data
     latest_assessment = patient.assessments.first()
@@ -857,6 +867,8 @@ def regimen_suggestions_api(request: HttpRequest, patient_id: int) -> JsonRespon
     from simulator.regimen_suggester import suggest_regimens
     
     patient = get_object_or_404(models.Patient, pk=patient_id)
+    if not can_edit_patient(request.user, patient):
+        return JsonResponse({"error": "forbidden"}, status=403)
     
     # Parse parameters from request
     age = int(request.GET.get("age", patient.age))

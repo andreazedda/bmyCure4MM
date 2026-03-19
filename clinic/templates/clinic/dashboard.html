@@ -163,7 +163,7 @@
 <!-- Statistics -->
 <div class="row g-3 mb-4">
     <div class="col-md-3">
-        <div class="card shadow-sm h-100 border-start border-primary border-4">
+        <div class="card shadow-sm h-100 border-start border-primary border-4 stat-card stat-primary">
             <div class="card-body">
                 <div class="d-flex align-items-center gap-2 mb-2">
                     <span style="font-size: 1.5rem;">👥</span>
@@ -182,7 +182,7 @@
     </div>
 
     <div class="col-md-3">
-        <div class="card shadow-sm h-100 border-start border-success border-4">
+        <div class="card shadow-sm h-100 border-start border-success border-4 stat-card stat-success">
             <div class="card-body">
                 <div class="d-flex align-items-center gap-2 mb-2">
                     <span style="font-size: 1.5rem;">💊</span>
@@ -201,7 +201,7 @@
     </div>
 
     <div class="col-md-3">
-        <div class="card shadow-sm h-100 border-start border-warning border-4">
+        <div class="card shadow-sm h-100 border-start border-warning border-4 stat-card stat-warning">
             <div class="card-body">
                 <div class="d-flex align-items-center gap-2 mb-2">
                     <span style="font-size: 1.5rem;">⚠️</span>
@@ -220,7 +220,7 @@
     </div>
 
     <div class="col-md-3">
-        <div class="card shadow-sm h-100 border-start border-danger border-4">
+        <div class="card shadow-sm h-100 border-start border-danger border-4 stat-card stat-danger">
             <div class="card-body">
                 <div class="d-flex align-items-center gap-2 mb-2">
                     <span style="font-size: 1.5rem;">🧬</span>
@@ -470,21 +470,23 @@
                 </table>
             </div>
         {% else %}
-            <p class="m-3 text-muted">
-                <span class="t-en">No assessments recorded yet.</span>
-                <span class="t-it">Nessuna valutazione registrata ancora.</span>
-            </p>
+            <div class="empty-state">
+                <div class="empty-state-icon">📋</div>
+                <h3>
+                    <span class="t-en">No assessments yet</span>
+                    <span class="t-it">Nessuna valutazione ancora</span>
+                </h3>
+                <p>
+                    <span class="t-en">Create your first patient and add lab values to get started.</span>
+                    <span class="t-it">Crea il tuo primo paziente e aggiungi valori di laboratorio per iniziare.</span>
+                </p>
+                <a href="{% url 'clinic:patient_new' %}" class="btn btn-primary">
+                    <span class="t-en">+ New Patient</span>
+                    <span class="t-it">+ Nuovo Paziente</span>
+                </a>
+            </div>
         {% endif %}
     </div>
 </div>
 
-<style>
-.hover-card {
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-.hover-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.2) !important;
-}
-</style>
 {% endblock %}

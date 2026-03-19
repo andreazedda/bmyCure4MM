@@ -199,7 +199,7 @@ class AssessmentForm(BootstrapValidationMixin, forms.ModelForm):
         required=False,
         decimal_places=1,
         min_value=0,
-        max_value=25,
+        max_value=20,
         help_text="Normal: M:13-17, F:12-15 g/dL. Low indicates anemia.",
         widget=forms.NumberInput(attrs={
             "placeholder": "e.g., 12.5",

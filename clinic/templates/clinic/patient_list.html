@@ -204,33 +204,25 @@
         </div>
     </div>
 {% else %}
-    <div class="alert alert-info border-0 shadow-sm" role="alert">
-        <div class="d-flex align-items-center mb-2">
-            <i class="bi bi-info-circle fs-4 me-2"></i>
-            <h5 class="mb-0">No Patients Found / Nessun Paziente Trovato</h5>
-        </div>
-        <p class="mb-2">
-            <strong>EN:</strong> No patients match your search criteria. Try adjusting your filters or create a new patient.
-            <br>
-            <strong>IT:</strong> Nessun paziente corrisponde ai criteri di ricerca. Prova a modificare i filtri o crea un nuovo paziente.
+    <div class="empty-state">
+        <div class="empty-state-icon">🏥</div>
+        <h3>
+            <span class="t-en">No Patients Found</span>
+            <span class="t-it">Nessun Paziente Trovato</span>
+        </h3>
+        <p>
+            <span class="t-en">No patients match your search criteria. Try adjusting your filters or create a new patient.</span>
+            <span class="t-it">Nessun paziente corrisponde ai criteri di ricerca. Prova a modificare i filtri o crea un nuovo paziente.</span>
         </p>
-        {% if user.is_staff %}
-        <a href="{% url 'clinic:patient_new' %}" class="btn btn-primary btn-sm mt-2">
-            <i class="bi bi-plus-circle"></i> Create First Patient / Crea Primo Paziente
+        <a href="{% url 'clinic:patient_new' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i>
+            <span class="t-en">Create First Patient</span>
+            <span class="t-it">Crea Primo Paziente</span>
         </a>
-        {% endif %}
     </div>
 {% endif %}
 
 <style>
-.hover-card {
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-.hover-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
-}
 .hover-row {
     transition: background-color 0.2s ease;
 }

@@ -4,45 +4,85 @@
 <nav aria-label="breadcrumb" class="mb-3">
   <ol class="breadcrumb mb-0">
     <li class="breadcrumb-item"><a href="{% url 'clinic:dashboard' %}">Dashboard</a></li>
-    <li class="breadcrumb-item active" aria-current="page">Regimens</li>
+    <li class="breadcrumb-item active" aria-current="page">
+      <span class="t-en">Regimens</span>
+      <span class="t-it">Regimi</span>
+    </li>
   </ol>
 </nav>
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-  <h1 class="h4 mb-0">Regimens</h1>
-  <a class="btn btn-sm btn-primary" href="{% url 'clinic:regimen_new' %}">Add Regimen</a>
+  <h1 class="h4 mb-0">
+    💊 <span class="t-en">Therapy Regimens</span>
+    <span class="t-it">Regimi Terapeutici</span>
+  </h1>
+  <a class="btn btn-primary" href="{% url 'clinic:regimen_new' %}">
+    <i class="bi bi-plus-circle"></i>
+    <span class="t-en">Add Regimen</span>
+    <span class="t-it">Aggiungi Regime</span>
+  </a>
 </div>
 
-<div class="alert alert-secondary" role="alert">
+<div class="alert alert-secondary border-0 shadow-sm" role="alert">
   <span class="t-en">A regimen is a reusable therapy template (name + components). You create it once, then assign it to a patient with start/end dates.</span>
-  <span class="t-it">Un regimen è un template riutilizzabile (nome + componenti). Lo crei una volta, poi lo assegni al paziente con date inizio/fine.</span>
+  <span class="t-it">Un regime è un template riutilizzabile (nome + componenti). Lo crei una volta, poi lo assegni al paziente con date inizio/fine.</span>
 </div>
 
 {% if regimens %}
-  <div class="table-responsive">
-    <table class="table table-sm table-striped align-middle">
-      <thead class="table-light">
-        <tr>
-          <th>Name</th>
-          <th>Line</th>
-          <th>Components</th>
-          <th>Notes</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for r in regimens %}
-          <tr>
-            <td class="fw-semibold">{{ r.name }}</td>
-            <td>{{ r.line|default:"–" }}</td>
-            <td>{{ r.components }}</td>
-            <td>{{ r.notes|default:"–" }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <div class="card shadow-sm">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-sm table-striped table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>
+                <span class="t-en">Name</span>
+                <span class="t-it">Nome</span>
+              </th>
+              <th>
+                <span class="t-en">Line</span>
+                <span class="t-it">Linea</span>
+              </th>
+              <th>
+                <span class="t-en">Components</span>
+                <span class="t-it">Componenti</span>
+              </th>
+              <th>
+                <span class="t-en">Notes</span>
+                <span class="t-it">Note</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in regimens %}
+              <tr>
+                <td class="fw-semibold">{{ r.name }}</td>
+                <td><span class="badge bg-info bg-opacity-75">{{ r.line|default:"–" }}</span></td>
+                <td><code class="text-dark">{{ r.components }}</code></td>
+                <td class="text-muted small">{{ r.notes|default:"–" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 {% else %}
-  <p class="text-muted">No regimens yet.</p>
+  <div class="empty-state">
+    <div class="empty-state-icon">💊</div>
+    <h3>
+      <span class="t-en">No regimens defined yet</span>
+      <span class="t-it">Nessun regime definito ancora</span>
+    </h3>
+    <p>
+      <span class="t-en">Create your first regimen to start tracking patient therapies.</span>
+      <span class="t-it">Crea il tuo primo regime per iniziare a tracciare le terapie dei pazienti.</span>
+    </p>
+    <a href="{% url 'clinic:regimen_new' %}" class="btn btn-primary">
+      <span class="t-en">+ New Regimen</span>
+      <span class="t-it">+ Nuovo Regime</span>
+    </a>
+  </div>
 {% endif %}
 
 {% endblock %}

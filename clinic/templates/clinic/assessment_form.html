@@ -1,31 +1,185 @@
 {% extends "base.html" %}
 
 {% block content %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'clinic:patient_list' %}"><span class="t-en">Patients</span><span class="t-it">Pazienti</span></a></li>
+        <li class="breadcrumb-item"><a href="{% url 'clinic:patient_detail' patient.id %}">{{ patient.last_name }}, {{ patient.first_name }}</a></li>
+        <li class="breadcrumb-item active"><span class="t-en">New Assessment</span><span class="t-it">Nuova Valutazione</span></li>
+    </ol>
+</nav>
+
 <div class="row justify-content-center">
-    <div class="col-lg-6">
+    <div class="col-lg-8">
         <div class="card shadow-sm">
+            <div class="card-header">
+                <h1 class="h4 mb-0">
+                    <span class="t-en">📋 New Assessment for {{ patient.first_name }} {{ patient.last_name }}</span>
+                    <span class="t-it">📋 Nuova Valutazione per {{ patient.first_name }} {{ patient.last_name }}</span>
+                </h1>
+            </div>
             <div class="card-body">
-                <h1 class="h4 mb-3">New Assessment for {{ patient.first_name }} {{ patient.last_name }}</h1>
                 <form method="post" novalidate>
                     {% csrf_token %}
                     {% if form.non_field_errors %}
                         <div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>
                     {% endif %}
-                    {% for field in form %}
-                        <div class="mb-3">
-                            <label class="form-label" for="id_{{ field.name }}">{{ field.label }}</label>
-                            {{ field }}
-                            {% if field.help_text %}
-                                <div class="form-text">{{ field.help_text }}</div>
+
+                    <!-- Date -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            📅 <span class="t-en">Assessment Date</span><span class="t-it">Data Valutazione</span>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label" for="id_date">{{ form.date.label }}</label>
+                                {{ form.date }}
+                                {% if form.date.help_text %}<div class="form-text">{{ form.date.help_text }}</div>{% endif %}
+                                {% if form.date.errors %}<div class="invalid-feedback d-block">{{ form.date.errors|striptags }}</div>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Myeloma Markers -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            🧬 <span class="t-en">Myeloma Markers</span><span class="t-it">Marcatori Mieloma</span>
+                        </div>
+                        <p class="text-muted small mb-3">
+                            <span class="t-en">Key indicators of disease burden. M-Protein and FLC ratio directly measure myeloma activity.</span>
+                            <span class="t-it">Indicatori chiave del carico di malattia. M-Proteina e rapporto FLC misurano direttamente l'attività del mieloma.</span>
+                        </p>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label" for="id_m_protein_g_dl">{{ form.m_protein_g_dl.label }}</label>
+                                {{ form.m_protein_g_dl }}
+                                {% if form.m_protein_g_dl.help_text %}<div class="form-text">{{ form.m_protein_g_dl.help_text }}</div>{% endif %}
+                                {% if form.m_protein_g_dl.errors %}<div class="invalid-feedback d-block">{{ form.m_protein_g_dl.errors|striptags }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="id_flc_ratio">{{ form.flc_ratio.label }}</label>
+                                {{ form.flc_ratio }}
+                                {% if form.flc_ratio.help_text %}<div class="form-text">{{ form.flc_ratio.help_text }}</div>{% endif %}
+                                {% if form.flc_ratio.errors %}<div class="invalid-feedback d-block">{{ form.flc_ratio.errors|striptags }}</div>{% endif %}
+                            </div>
+                            {% if form.kappa_mg_l %}
+                            <div class="col-md-6">
+                                <label class="form-label" for="id_kappa_mg_l">{{ form.kappa_mg_l.label }}</label>
+                                {{ form.kappa_mg_l }}
+                                {% if form.kappa_mg_l.help_text %}<div class="form-text">{{ form.kappa_mg_l.help_text }}</div>{% endif %}
+                                {% if form.kappa_mg_l.errors %}<div class="invalid-feedback d-block">{{ form.kappa_mg_l.errors|striptags }}</div>{% endif %}
+                            </div>
                             {% endif %}
-                            {% if field.errors %}
-                                <div class="invalid-feedback d-block">{{ field.errors|striptags }}</div>
+                            {% if form.lambda_mg_l %}
+                            <div class="col-md-6">
+                                <label class="form-label" for="id_lambda_mg_l">{{ form.lambda_mg_l.label }}</label>
+                                {{ form.lambda_mg_l }}
+                                {% if form.lambda_mg_l.help_text %}<div class="form-text">{{ form.lambda_mg_l.help_text }}</div>{% endif %}
+                                {% if form.lambda_mg_l.errors %}<div class="invalid-feedback d-block">{{ form.lambda_mg_l.errors|striptags }}</div>{% endif %}
+                            </div>
                             {% endif %}
                         </div>
-                    {% endfor %}
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">Save Assessment</button>
-                        <a href="{% url 'clinic:patient_detail' patient.id %}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+
+                    <!-- Blood Chemistry & Organ Function -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            🩸 <span class="t-en">Blood Chemistry &amp; Organ Function</span><span class="t-it">Chimica del Sangue &amp; Funzione Organi</span>
+                        </div>
+                        <p class="text-muted small mb-3">
+                            <span class="t-en">CRAB criteria markers: Calcium, Renal function, Anemia, Bone lesions.</span>
+                            <span class="t-it">Marcatori criteri CRAB: Calcio, funzione Renale, Anemia, lesioni ossee.</span>
+                        </p>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label" for="id_hemoglobin_g_dl">{{ form.hemoglobin_g_dl.label }}</label>
+                                {{ form.hemoglobin_g_dl }}
+                                {% if form.hemoglobin_g_dl.help_text %}<div class="form-text">{{ form.hemoglobin_g_dl.help_text }}</div>{% endif %}
+                                {% if form.hemoglobin_g_dl.errors %}<div class="invalid-feedback d-block">{{ form.hemoglobin_g_dl.errors|striptags }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" for="id_calcium_mg_dl">{{ form.calcium_mg_dl.label }}</label>
+                                {{ form.calcium_mg_dl }}
+                                {% if form.calcium_mg_dl.help_text %}<div class="form-text">{{ form.calcium_mg_dl.help_text }}</div>{% endif %}
+                                {% if form.calcium_mg_dl.errors %}<div class="invalid-feedback d-block">{{ form.calcium_mg_dl.errors|striptags }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" for="id_creatinine_mg_dl">{{ form.creatinine_mg_dl.label }}</label>
+                                {{ form.creatinine_mg_dl }}
+                                {% if form.creatinine_mg_dl.help_text %}<div class="form-text">{{ form.creatinine_mg_dl.help_text }}</div>{% endif %}
+                                {% if form.creatinine_mg_dl.errors %}<div class="invalid-feedback d-block">{{ form.creatinine_mg_dl.errors|striptags }}</div>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Staging Parameters -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            📊 <span class="t-en">R-ISS Staging Parameters</span><span class="t-it">Parametri di Stadiazione R-ISS</span>
+                        </div>
+                        <p class="text-muted small mb-3">
+                            <span class="t-en">Used to compute the Revised International Staging System score (I-III).</span>
+                            <span class="t-it">Usati per calcolare il punteggio del Revised International Staging System (I-III).</span>
+                        </p>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label" for="id_beta2m_mg_l">{{ form.beta2m_mg_l.label }}</label>
+                                {{ form.beta2m_mg_l }}
+                                {% if form.beta2m_mg_l.help_text %}<div class="form-text">{{ form.beta2m_mg_l.help_text }}</div>{% endif %}
+                                {% if form.beta2m_mg_l.errors %}<div class="invalid-feedback d-block">{{ form.beta2m_mg_l.errors|striptags }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" for="id_albumin_g_dl">{{ form.albumin_g_dl.label }}</label>
+                                {{ form.albumin_g_dl }}
+                                {% if form.albumin_g_dl.help_text %}<div class="form-text">{{ form.albumin_g_dl.help_text }}</div>{% endif %}
+                                {% if form.albumin_g_dl.errors %}<div class="invalid-feedback d-block">{{ form.albumin_g_dl.errors|striptags }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" for="id_ldH_u_l">{{ form.ldH_u_l.label }}</label>
+                                {{ form.ldH_u_l }}
+                                {% if form.ldH_u_l.help_text %}<div class="form-text">{{ form.ldH_u_l.help_text }}</div>{% endif %}
+                                {% if form.ldH_u_l.errors %}<div class="invalid-feedback d-block">{{ form.ldH_u_l.errors|striptags }}</div>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Clinical Assessment -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            🏥 <span class="t-en">Clinical Assessment</span><span class="t-it">Valutazione Clinica</span>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label" for="id_r_iss">{{ form.r_iss.label }}</label>
+                                {{ form.r_iss }}
+                                {% if form.r_iss.help_text %}<div class="form-text">{{ form.r_iss.help_text }}</div>{% endif %}
+                                {% if form.r_iss.errors %}<div class="invalid-feedback d-block">{{ form.r_iss.errors|striptags }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" for="id_response">{{ form.response.label }}</label>
+                                {{ form.response }}
+                                {% if form.response.help_text %}<div class="form-text">{{ form.response.help_text }}</div>{% endif %}
+                                {% if form.response.errors %}<div class="invalid-feedback d-block">{{ form.response.errors|striptags }}</div>{% endif %}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label" for="id_notes">{{ form.notes.label }}</label>
+                                {{ form.notes }}
+                                {% if form.notes.help_text %}<div class="form-text">{{ form.notes.help_text }}</div>{% endif %}
+                                {% if form.notes.errors %}<div class="invalid-feedback d-block">{{ form.notes.errors|striptags }}</div>{% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg"></i>
+                            <span class="t-en">Save Assessment</span>
+                            <span class="t-it">Salva Valutazione</span>
+                        </button>
+                        <a href="{% url 'clinic:patient_detail' patient.id %}" class="btn btn-outline-secondary">
+                            <span class="t-en">Cancel</span>
+                            <span class="t-it">Annulla</span>
+                        </a>
                     </div>
                 </form>
             </div>

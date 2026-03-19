@@ -182,11 +182,11 @@
 <div class="container py-4">
     <nav aria-label="breadcrumb" class="mb-3">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'patient_list' %}">
+            <li class="breadcrumb-item"><a href="{% url 'clinic:patient_list' %}">
                 <span class="t-en">Patients</span>
                 <span class="t-it">Pazienti</span>
             </a></li>
-            <li class="breadcrumb-item"><a href="{% url 'patient_detail' patient.pk %}">{{ patient }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'clinic:patient_detail' patient.pk %}">{{ patient }}</a></li>
             <li class="breadcrumb-item active">
                 <span class="t-en">Treatment Suggestions</span>
                 <span class="t-it">Suggerimenti Terapie</span>
@@ -402,10 +402,10 @@
 
     <!-- Actions -->
     <div class="d-flex gap-2 justify-content-end mt-4">
-        <a href="{% url 'patient_detail' patient.pk %}" class="btn btn-outline-secondary">
+        <a href="{% url 'clinic:patient_detail' patient.pk %}" class="btn btn-outline-secondary">
             ← <span class="t-en">Back to Patient</span><span class="t-it">Torna al Paziente</span>
         </a>
-        <a href="{% url 'prognosis_timeline' patient.pk %}" class="btn btn-outline-primary">
+        <a href="{% url 'clinic:prognosis_timeline' patient.pk %}" class="btn btn-outline-primary">
             📊 <span class="t-en">View Prognosis</span><span class="t-it">Vedi Prognosi</span>
         </a>
     </div>
