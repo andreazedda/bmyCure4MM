@@ -1,12 +1,16 @@
-# Deploy su k3s (cluster) via Caddy (duckdns-demo)
+# Deploy su k3s (cluster) via Cloudflare Tunnel
 
-Questo cluster non ha IngressClass/cert-manager; l'esposizione HTTP attuale passa da `duckdns-demo/caddy` (NodePort 31080) con routing per host.
+Questo cluster espone bmyCure4MM tramite Cloudflare Tunnel sul dominio pubblico `bmycure4mm.clusterlab.uk`.
+Il tunnel deve inoltrare le richieste HTTP al service `web` del namespace `bmycure4mm` sulla porta `8001`.
 
 ## Prerequisiti
 
 - Hai accesso a `sudo kubectl` (in questo nodo sembra ok)
 - L'immagine container è pubblicata su GHCR: `ghcr.io/andreazedda/bmycure4mm:latest`
 - Un token GHCR (PAT GitHub) con permesso `read:packages` per permettere al cluster di fare pull (se l'immagine non è pubblica)
+- Esiste un tunnel Cloudflare configurato per `bmycure4mm.clusterlab.uk`
+- Il tunnel inoltra l'header `Host: bmycure4mm.clusterlab.uk`
+- Cloudflare inoltra `X-Forwarded-Proto: https` se vuoi attivare redirect SSL e cookie sicuri in Django
 
 ## 1) Pubblicare l'immagine su GHCR
 
@@ -47,14 +51,53 @@ unset GHCR_PAT
 sudo kubectl apply -f deploy/k8s/bmycure4mm.yaml
 ```
 
-## 4) Switch routing su bmycure4mm.duckdns.org
+Il manifest imposta già:
 
-Aggiorna `duckdns-demo/caddy-config` per far puntare `bmycure4mm.duckdns.org` al service `web` del namespace `bmycure4mm`.
+- `ALLOWED_HOSTS=bmycure4mm.clusterlab.uk`
+- `CSRF_TRUSTED_ORIGINS=https://bmycure4mm.clusterlab.uk`
+- probe HTTP con header `Host: bmycure4mm.clusterlab.uk`
+
+## 4) Configurare Cloudflare Tunnel
+
+Nel pannello Cloudflare Zero Trust, oppure nella config locale del tunnel, crea una route pubblica:
+
+- Hostname: `bmycure4mm.clusterlab.uk`
+- Service: `http://web.bmycure4mm.svc.cluster.local:8001`
+
+Se il tunnel gira fuori dal cluster e non risolve il DNS Kubernetes interno, punta invece a un endpoint raggiungibile dal processo `cloudflared` (ad esempio IP del nodo + porta esposta internamente).
+
+## 5) Verifiche dopo il deploy
+
+Controlli cluster:
+
+```bash
+sudo kubectl -n bmycure4mm get pods -o wide
+sudo kubectl -n bmycure4mm rollout status deploy/web
+sudo kubectl -n bmycure4mm logs deploy/web --tail=200
+```
+
+Controlli applicativi:
+
+```bash
+curl -I https://bmycure4mm.clusterlab.uk/
+curl https://bmycure4mm.clusterlab.uk/healthz/
+```
+
+Verifica anche un login o un form POST reale per escludere errori CSRF dopo il cambio host.
+
+## 6) Hardening HTTPS in Django
+
+Quando il tunnel conferma sempre `X-Forwarded-Proto: https`, puoi attivare in `deploy/k8s/bmycure4mm.yaml`:
+
+- `DJANGO_SECURE_SSL_REDIRECT: "1"`
+- `DJANGO_SESSION_COOKIE_SECURE: "1"`
+- `DJANGO_CSRF_COOKIE_SECURE: "1"`
+
+Dopo l'attivazione, ricontrolla che non ci siano redirect loop.
 
 ## Debug
 
 ```bash
 sudo kubectl -n bmycure4mm get pods -o wide
 sudo kubectl -n bmycure4mm logs deploy/web --tail=200
-sudo kubectl -n duckdns-demo logs deploy/caddy --tail=200
 ```

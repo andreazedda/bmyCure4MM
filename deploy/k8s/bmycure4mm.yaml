@@ -10,8 +10,8 @@ metadata:
   namespace: bmycure4mm
 data:
   DJANGO_DEBUG: "0"
-  ALLOWED_HOSTS: "bmycure4mm.duckdns.org"
-  CSRF_TRUSTED_ORIGINS: "http://bmycure4mm.duckdns.org,https://bmycure4mm.duckdns.org"
+  ALLOWED_HOSTS: "bmycure4mm.clusterlab.uk"
+  CSRF_TRUSTED_ORIGINS: "https://bmycure4mm.clusterlab.uk"
   DJANGO_SQLITE_PATH: "/data/db.sqlite3"
   CELERY_BROKER_URL: "redis://redis:6379/0"
   CELERY_RESULT_BACKEND: "redis://redis:6379/0"
@@ -159,7 +159,7 @@ spec:
               port: 8001
               httpHeaders:
                 - name: Host
-                  value: bmycure4mm.duckdns.org
+                  value: bmycure4mm.clusterlab.uk
             initialDelaySeconds: 20
             periodSeconds: 10
           livenessProbe:
@@ -168,7 +168,7 @@ spec:
               port: 8001
               httpHeaders:
                 - name: Host
-                  value: bmycure4mm.duckdns.org
+                  value: bmycure4mm.clusterlab.uk
             initialDelaySeconds: 60
             periodSeconds: 20
       volumes:
