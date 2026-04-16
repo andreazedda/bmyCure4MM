@@ -20,7 +20,7 @@ COPY . .
 RUN mkdir -p logs media static
 
 # Collect static files (for production)
-# RUN python manage.py collectstatic --noinput
+RUN python manage.py collectstatic --noinput
 
 EXPOSE 8001
 

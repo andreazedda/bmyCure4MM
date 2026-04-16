@@ -4,7 +4,7 @@ This script is meant to be run locally or in CI. It will:
 
 - Create an isolated SQLite DB via DJANGO_SQLITE_PATH
 - Run migrations + load demo fixtures
-- Create a demo admin user (admin/admin123)
+- Create a demo admin user with a generated password
 - Start Django dev server
 - Use Playwright (Chromium) to capture screenshots
 
@@ -15,8 +15,10 @@ from __future__ import annotations
 
 import argparse
 import os
+import secrets
 import shutil
 import signal
+import string
 import subprocess
 import sys
 import tempfile
@@ -59,6 +61,7 @@ def main() -> int:
 
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
+    admin_password = "".join(secrets.choice(string.ascii_letters + string.digits) for _ in range(20))
 
     with tempfile.TemporaryDirectory(prefix="bmycure4mm-screens-") as tmp:
         tmp_path = Path(tmp)
@@ -94,12 +97,15 @@ def main() -> int:
                 "manage.py",
                 "shell",
                 "-c",
+                (
+                "import os; "
                 "from django.contrib.auth import get_user_model; "
                 "User=get_user_model(); "
                 "User.objects.filter(username='admin').exists() or "
-                "User.objects.create_superuser('admin','admin@example.com','admin123')",
+                "User.objects.create_superuser('admin','admin@example.com',os.environ['SCREENSHOT_ADMIN_PASSWORD'])"
+                ),
             ],
-            env=env,
+            env={**env, "SCREENSHOT_ADMIN_PASSWORD": admin_password},
         )
 
         # Create a minimal scenario + run one attempt so we can screenshot a real output plot.
@@ -193,7 +199,7 @@ def main() -> int:
                 # Authenticated clinician view (via Django admin login)
                 page.goto(f"{args.base_url}/admin/login/", wait_until="domcontentloaded")
                 page.fill("#id_username", "admin")
-                page.fill("#id_password", "admin123")
+                page.fill("#id_password", admin_password)
                 page.click("input[type=submit]")
                 page.wait_for_load_state("networkidle")
 

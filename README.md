@@ -94,7 +94,7 @@ python manage.py runserver
 **✅ You now have:**
 - ✓ 3 demo patients (high/medium/low risk)
 - ✓ 4 pre-filled clinical assessments
-- ✓ Admin user (username: `admin`, password: `admin123`)
+- ✓ Admin user `admin` with a random password printed by `./quick_start.sh`
 - ✓ Ready to simulate treatments immediately!
 
 **📖 Next Step:** Visit `http://127.0.0.1:8000` and look for the blue **"🚀 New to the Platform?"** card on the dashboard. It will guide you through your first simulation step-by-step.
@@ -446,5 +446,4 @@ SOFTWARE.
 ---
 
 **⭐ If you find this project useful, please consider giving it a star on GitHub!**
-
 

@@ -3,6 +3,17 @@
 
 set -e  # Exit on error
 
+ADMIN_USERNAME="admin"
+ADMIN_EMAIL="admin@example.com"
+ADMIN_PASSWORD="$(python3 - <<'PY'
+import secrets
+import string
+
+alphabet = string.ascii_letters + string.digits
+print(''.join(secrets.choice(alphabet) for _ in range(20)))
+PY
+)"
+
 echo "🚀 bmyCure4MM Quick Start Setup"
 echo "================================"
 echo ""
@@ -35,15 +46,21 @@ echo ""
 
 # Create superuser if not exists (non-interactive)
 echo "👤 Checking for superuser..."
+export ADMIN_USERNAME ADMIN_EMAIL ADMIN_PASSWORD
 python manage.py shell << EOF
+import os
 from django.contrib.auth import get_user_model
 User = get_user_model()
-if not User.objects.filter(username='admin').exists():
-    User.objects.create_superuser('admin', 'admin@example.com', 'admin123')
-    print('✓ Superuser created: username=admin, password=admin123')
+username = os.environ['ADMIN_USERNAME']
+email = os.environ['ADMIN_EMAIL']
+password = os.environ['ADMIN_PASSWORD']
+if not User.objects.filter(username=username).exists():
+    User.objects.create_superuser(username, email, password)
+    print(f'✓ Superuser created: username={username}, password={password}')
 else:
     print('✓ Superuser already exists')
 EOF
+unset ADMIN_USERNAME ADMIN_EMAIL ADMIN_PASSWORD
 echo ""
 
 echo "🎉 Setup Complete!"
@@ -63,7 +80,7 @@ echo "   - Giuseppe Verdi (R-ISS I, low risk)"
 echo ""
 echo "🔐 Admin login:"
 echo "   Username: admin"
-echo "   Password: admin123"
+echo "   Password: the generated password printed above during setup"
 echo "   URL: http://127.0.0.1:8000/admin/"
 echo ""
 echo "✨ Ready to simulate treatments and see Patient Twin in action!"
