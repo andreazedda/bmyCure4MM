@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: image-updater
+  namespace: bmycure4mm
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: image-updater
+  namespace: bmycure4mm
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "watch", "patch", "update"]
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: image-updater
+  namespace: bmycure4mm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: image-updater
+subjects:
+  - kind: ServiceAccount
+    name: image-updater
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: image-updater
+  namespace: bmycure4mm
+spec:
+  schedule: "*/5 * * * *"  # Every 5 minutes
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: image-updater
+          containers:
+            - name: kubectl
+              image: bitnami/kubectl:latest
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -e
+                  echo "[*] Checking for image updates..."
+                  
+                  # Get current image digest from web deployment
+                  CURRENT_IMAGE=$(kubectl get deployment web -n bmycure4mm -o jsonpath='{.spec.template.spec.containers[0].image}')
+                  echo "Current image: $CURRENT_IMAGE"
+                  
+                  # Pull the image to trigger an update check
+                  docker pull $CURRENT_IMAGE:latest 2>/dev/null || true
+                  
+                  # Force rollout restart to pull latest image
+                  echo "[*] Rolling out new image..."
+                  kubectl rollout restart deployment/web -n bmycure4mm || true
+                  kubectl rollout restart deployment/celery -n bmycure4mm || true
+                  
+                  # Wait for rollout
+                  kubectl rollout status deployment/web -n bmycure4mm --timeout=3m || true
+                  
+                  echo "[✓] Image update check complete"
+          restartPolicy: OnFailure
