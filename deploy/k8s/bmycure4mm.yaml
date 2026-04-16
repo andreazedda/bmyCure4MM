@@ -235,3 +235,107 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: bmycure4mm-data
+  ---
+  apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: nginx-config
+    namespace: bmycure4mm
+  data:
+    default.conf: |
+      upstream django {
+        server web:8001;
+      }
+
+      server {
+        listen 8080;
+        server_name _;
+
+        client_max_body_size 100M;
+
+        location /static/ {
+          alias /staticfiles/;
+          expires 30d;
+          add_header Cache-Control "public, immutable";
+        }
+
+        location /media/ {
+          alias /app/media/;
+          expires 7d;
+          add_header Cache-Control "public";
+        }
+
+        location / {
+          proxy_pass http://django;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+          proxy_redirect off;
+        }
+      }
+  ---
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: nginx
+    namespace: bmycure4mm
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: nginx
+    template:
+      metadata:
+        labels:
+          app: nginx
+      spec:
+        containers:
+          - name: nginx
+            image: nginx:1.25-alpine
+            ports:
+              - containerPort: 8080
+                name: http
+            volumeMounts:
+              - name: nginx-config
+                mountPath: /etc/nginx/conf.d
+              - name: static
+                mountPath: /staticfiles
+              - name: media
+                mountPath: /app/media
+            readinessProbe:
+              httpGet:
+                path: /
+                port: 8080
+              initialDelaySeconds: 5
+              periodSeconds: 10
+            livenessProbe:
+              httpGet:
+                path: /
+                port: 8080
+              initialDelaySeconds: 10
+              periodSeconds: 10
+        volumes:
+          - name: nginx-config
+            configMap:
+              name: nginx-config
+          - name: static
+            persistentVolumeClaim:
+              claimName: bmycure4mm-static
+          - name: media
+            persistentVolumeClaim:
+              claimName: bmycure4mm-media
+  ---
+  apiVersion: v1
+  kind: Service
+  metadata:
+    name: nginx
+    namespace: bmycure4mm
+  spec:
+    selector:
+      app: nginx
+    ports:
+      - name: http
+        port: 80
+        targetPort: 8080
+    type: ClusterIP
