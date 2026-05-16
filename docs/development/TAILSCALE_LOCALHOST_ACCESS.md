@@ -1,131 +1,138 @@
 # Tailscale Localhost Access
 
-## 1. Purpose
+## Concept
 
-This guide adds a tailnet-local developer access mode for the Django development server so a local instance can be reached from another Tailscale-connected device.
+`0.0.0.0` is a server bind address. It tells Django to listen on all local network interfaces.
 
-This is for local research and development only. It does not change the clinical, twin, or what-if logic.
+It is not a browser URL. From a phone or another device on the same Tailscale tailnet, use the host machine's Tailscale IP or MagicDNS hostname:
 
-## 2. Security boundary
+```text
+http://<TAILSCALE_IP>:8001/
+http://<TAILSCALE_MAGICDNS_NAME>:8001/
+```
 
-- This mode is for tailnet-local access only.
-- Do not expose the Django development server with public port forwarding.
-- Do not use `runserver 0.0.0.0:8000` as a production deployment method.
-- Do not share access URLs outside the tailnet.
-- Keep PHI out of Git, public artifacts, and copied logs.
+Never open `http://0.0.0.0:8001/` in the browser.
 
-## 3. Required preconditions
+## Preconditions
 
-- The host machine is signed in to Tailscale.
-- The client device is connected to the same tailnet.
-- The repository virtual environment exists at `./venv/bin/python`.
-- Django host and CSRF allowlists include the Tailscale IP or MagicDNS hostname.
+- Both devices are connected to the same Tailscale tailnet.
+- You are logged into a Django account that is allowed to view the target page.
+- The local Django development server is running.
+- The firewall allows inbound TCP on the selected port through the Tailscale interface.
+- `DJANGO_ALLOWED_HOSTS` includes the Tailscale IP or MagicDNS hostname.
+- `DJANGO_CSRF_TRUSTED_ORIGINS` includes the full origin with scheme and port.
 
-Verify Tailscale and Django basics:
+This mode is for local development and research validation only. It does not change production, Kubernetes, mathematical model, clinical model, counterfactual, calibration, or patient-data behavior.
+
+## Commands
+
+Get the Tailscale IP:
 
 ```bash
 tailscale status
 tailscale ip -4
+```
 
+Start the default port `8001`:
+
+```bash
+scripts/run_tailscale_dev.sh
+```
+
+Start port `8000` when it is free:
+
+```bash
+PORT=8000 scripts/run_tailscale_dev.sh
+```
+
+Manual fallback:
+
+```bash
+TAILSCALE_IP="$(tailscale ip -4 | head -n1)"
+export DJANGO_ALLOWED_HOSTS="localhost,127.0.0.1,0.0.0.0,${TAILSCALE_IP}"
+export DJANGO_CSRF_TRUSTED_ORIGINS="http://localhost:8001,http://127.0.0.1:8001,http://${TAILSCALE_IP}:8001"
 ./venv/bin/python manage.py check
-./venv/bin/python manage.py runserver 0.0.0.0:8000
+./venv/bin/python manage.py runserver 0.0.0.0:8001
 ```
 
-## 4. How to get the Tailscale IP
-
-Run:
+For MagicDNS, add the hostname as a local extra when using the helper:
 
 ```bash
-tailscale status
-tailscale ip -4
+DJANGO_EXTRA_ALLOWED_HOSTS="<TAILSCALE_MAGICDNS_NAME>" \
+DJANGO_EXTRA_CSRF_ORIGINS="http://<TAILSCALE_MAGICDNS_NAME>:8001" \
+scripts/run_tailscale_dev.sh
 ```
 
-Use the IPv4 address from `tailscale ip -4` as `<TAILSCALE_IP>`.
+Use placeholders in committed docs and examples. Do not commit real tailnet names or real private host details.
 
-If MagicDNS is enabled for your tailnet, you can also use the device hostname such as `<TAILSCALE_MAGICDNS_HOST>`.
+## URLs
 
-## 5. Required .env variables
-
-The repository supports the preferred environment variables below and still accepts the legacy aliases `ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS`.
-
-Example local shell exports:
-
-```bash
-export DJANGO_ALLOWED_HOSTS="localhost,127.0.0.1,0.0.0.0,<TAILSCALE_IP>,<TAILSCALE_MAGICDNS_HOST>"
-export DJANGO_CSRF_TRUSTED_ORIGINS="http://localhost:8000,http://127.0.0.1:8000,http://<TAILSCALE_IP>:8000,http://<TAILSCALE_MAGICDNS_HOST>:8000"
-```
-
-Example local `.env` entries:
-
-```dotenv
-DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0,100.x.y.z,my-machine.tailnet-name.ts.net
-DJANGO_CSRF_TRUSTED_ORIGINS=http://localhost:8000,http://127.0.0.1:8000,http://100.x.y.z:8000,http://my-machine.tailnet-name.ts.net:8000
-```
-
-Notes:
-
-- `DJANGO_ALLOWED_HOSTS` and `DJANGO_CSRF_TRUSTED_ORIGINS` are comma-separated.
-- Whitespace is stripped and empty entries are ignored.
-- `localhost` and `127.0.0.1` stay allowed by default.
-- The repository does not auto-load `.env` during direct `manage.py` commands. Either export the variables in your shell or use `./scripts/run_tailscale_dev.sh`, which sources `.env` if present.
-
-## 6. Run command
-
-Direct command:
-
-```bash
-./venv/bin/python manage.py runserver 0.0.0.0:8000
-```
-
-Helper script:
-
-```bash
-./scripts/run_tailscale_dev.sh
-```
-
-The helper script:
-
-- checks for `./venv/bin/python`
-- sources `.env` if present
-- prints the detected Tailscale IPv4 address when the `tailscale` CLI is installed
-- runs `./venv/bin/python manage.py check`
-- starts Django on `0.0.0.0:8000`
-
-## 7. Access URL from another device
-
-Do not use `http://0.0.0.0:8000/` in the browser.
-
-Use one of these instead:
+Desktop:
 
 ```text
-http://<TAILSCALE_IP>:8000/
-http://<TAILSCALE_MAGICDNS_HOST>:8000/
+http://127.0.0.1:8001/
 ```
 
-Example access pattern:
+Phone:
 
 ```text
-http://<TAILSCALE_IP>:8000/
+http://<TAILSCALE_IP>:8001/
 ```
 
-## 8. Troubleshooting
+Research cockpit:
 
-If the browser cannot connect:
+```text
+http://<TAILSCALE_IP>:8001/research/patient/4/cockpit/
+```
 
-- verify both devices are connected to the same tailnet
-- verify `tailscale status`
-- verify the host command is binding to `0.0.0.0:8000`
-- verify `DJANGO_ALLOWED_HOSTS` contains the Tailscale IP or MagicDNS name
-- verify `DJANGO_CSRF_TRUSTED_ORIGINS` contains the full origin including scheme and port
-- verify the OS firewall allows inbound TCP/8000 on the Tailscale interface
+Developer console:
 
-Firewall notes:
+```text
+http://<TAILSCALE_IP>:8001/research/developer/
+```
 
-- Linux with ufw:
+The same patterns work with a MagicDNS hostname:
+
+```text
+http://<TAILSCALE_MAGICDNS_NAME>:8001/
+```
+
+## Status Helper
+
+For a read-only local summary:
 
 ```bash
-sudo ufw allow in on tailscale0 to any port 8000 proto tcp
+scripts/print_tailscale_access_info.sh
 ```
 
-- macOS: allow incoming connections for Python or Django if prompted by the firewall
-- Windows: allow Python through Windows Defender Firewall for private networks
+It prints the host name, detected Tailscale IP if available, whether ports `8000` and `8001` are already listening, and the suggested command/URL.
+
+## Troubleshooting
+
+If the phone cannot connect:
+
+- Verify `tailscale status` on both devices.
+- Verify `tailscale ip -4` on the host machine.
+- Verify the server is bound to `0.0.0.0`, not only `127.0.0.1`.
+- Verify the phone URL uses the Tailscale IP or MagicDNS hostname, not `0.0.0.0`.
+- Verify `DJANGO_ALLOWED_HOSTS` includes the Tailscale IP or MagicDNS hostname.
+- Verify `DJANGO_CSRF_TRUSTED_ORIGINS` includes the full origin with scheme and port.
+- Verify the macOS firewall allows incoming Python/Django connections.
+- Verify no other server occupies the selected port.
+- Try `PORT=8001 scripts/run_tailscale_dev.sh` if `8000` is busy.
+
+On Linux with `ufw`, the equivalent tailnet-local firewall rule is:
+
+```bash
+sudo ufw allow in on tailscale0 to any port 8001 proto tcp
+```
+
+## Security Boundary
+
+- Tailnet-local development only.
+- No public port forwarding.
+- No public tunnel.
+- No production use of Django `runserver`.
+- No `ALLOWED_HOSTS=*` default.
+- No PHI, raw clinical documents, media artifacts, SQLite databases, screenshots, or generated reports in Git.
+- Do not share the access URL outside the tailnet.

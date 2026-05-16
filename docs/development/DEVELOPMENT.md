@@ -85,6 +85,7 @@ For local tailnet access from another device, use the dedicated helper and setup
 
 ```bash
 ./scripts/run_tailscale_dev.sh
+PORT=8000 ./scripts/run_tailscale_dev.sh
 ```
 
 Guide: [TAILSCALE_LOCALHOST_ACCESS.md](TAILSCALE_LOCALHOST_ACCESS.md)

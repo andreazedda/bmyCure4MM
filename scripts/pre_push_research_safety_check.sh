@@ -69,6 +69,7 @@ fi
 
 echo "Running Django checks and tests..."
 "$python_bin" manage.py check
+"$python_bin" manage.py test mmportal.tests.test_settings_hosts
 "$python_bin" manage.py test twin_engine.tests
 "$python_bin" manage.py test clinic.tests.test_patient_crud clinic.tests.test_security_and_ux simulator.tests.test_twin_pr1_integration simulator.tests.test_simulation
 

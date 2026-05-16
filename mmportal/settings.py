@@ -60,14 +60,23 @@ def _parse_csv_env(*names: str) -> list[str]:
     return values
 
 
-ALLOWED_HOSTS: list[str] = _parse_csv_env("DJANGO_ALLOWED_HOSTS", "ALLOWED_HOSTS")
-for host in ("localhost", "127.0.0.1"):
-    if host not in ALLOWED_HOSTS:
-        ALLOWED_HOSTS.append(host)
-if DEBUG and "testserver" not in ALLOWED_HOSTS:
-    ALLOWED_HOSTS.append("testserver")
+def _build_allowed_hosts() -> list[str]:
+    allowed_hosts = _parse_csv_env("DJANGO_ALLOWED_HOSTS", "ALLOWED_HOSTS")
+    for host in ("localhost", "127.0.0.1"):
+        if host not in allowed_hosts:
+            allowed_hosts.append(host)
+    if DEBUG and "testserver" not in allowed_hosts:
+        allowed_hosts.append("testserver")
+    return allowed_hosts
 
-CSRF_TRUSTED_ORIGINS = _parse_csv_env("DJANGO_CSRF_TRUSTED_ORIGINS", "CSRF_TRUSTED_ORIGINS")
+
+def _build_csrf_trusted_origins() -> list[str]:
+    return _parse_csv_env("DJANGO_CSRF_TRUSTED_ORIGINS", "CSRF_TRUSTED_ORIGINS")
+
+
+ALLOWED_HOSTS: list[str] = _build_allowed_hosts()
+
+CSRF_TRUSTED_ORIGINS = _build_csrf_trusted_origins()
 
 PREDLAB_V2 = os.environ.get("PREDLAB_V2", "0") == "1"
 

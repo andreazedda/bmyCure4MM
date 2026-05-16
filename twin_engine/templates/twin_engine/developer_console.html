@@ -18,6 +18,12 @@
     </div>
   </div>
 
+  <section class="border-top pt-3 mt-3">
+    <h2 class="h6">Access context</h2>
+    <div class="small text-muted">Current request host: {{ request.get_host }}</div>
+    <div class="small text-muted">If accessing from a phone, use the Tailscale IP or MagicDNS hostname, not 0.0.0.0.</div>
+  </section>
+
   {% for group_name, checks in check_summary.groups.items %}
     <section class="border-top pt-3 mt-3">
       <h2 class="h6 text-capitalize">{{ group_name }} checks</h2>
