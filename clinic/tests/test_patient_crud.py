@@ -199,6 +199,22 @@ class PatientCRUDViewTests(TestCase):
         self.assertContains(response, "Detail View")
         self.assertContains(response, "MM-DETAIL-TEST")
 
+    def test_patient_detail_research_cockpit_and_tools_labels(self) -> None:
+        patient = Patient.objects.create(
+            mrn="MM-DETAIL-COCKPIT",
+            first_name="Detail",
+            last_name="Cockpit",
+            birth_date=date(1970, 1, 1),
+            sex="M",
+            diagnosis_date=date(2022, 1, 1),
+        )
+        response = self.client.get(reverse("clinic:patient_detail", args=[patient.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Patient Journey Tools")
+        self.assertContains(response, "patient-journey-tools-header")
+        self.assertContains(response, "Research What-if Cockpit")
+        self.assertContains(response, "Twin Inputs (over time)")
+
 
 class DemoEditPermissionsTests(TestCase):
     def setUp(self) -> None:

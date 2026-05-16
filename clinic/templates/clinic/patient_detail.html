@@ -320,6 +320,64 @@
                     </div>
                 </div>
 
+                <div class="card shadow-sm mb-3 border-info">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div class="fw-semibold">Research What-if Cockpit</div>
+                        <div class="small text-muted">Research Twin / What-if Simulation</div>
+                        <a href="{{ research_twin_url }}" class="btn btn-sm btn-outline-info">Open research workspace</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning small" role="alert">
+                            Research simulation only. Mechanistic counterfactuals and causal assumption sets are exploratory and must not be interpreted as validated medical recommendation.
+                        </div>
+                        <div class="row g-3 small">
+                            <div class="col-md-4">
+                                <div class="text-muted">Current twin state</div>
+                                {% if research_twin_state %}
+                                    <div class="fw-semibold">{{ research_twin_state.state_date }}</div>
+                                    <div>{{ research_twin_state.get_method_display }}</div>
+                                    <div>Risk score: {{ research_twin_state.risk_score|default:"n/a" }}</div>
+                                {% else %}
+                                    <div class="text-muted">Not initialized</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-muted">Residual summary</div>
+                                {% if research_latest_residual %}
+                                    <div class="fw-semibold">RMSE {{ research_latest_residual.rmse|default:"n/a" }}</div>
+                                    <div>MAE {{ research_latest_residual.mae|default:"n/a" }}</div>
+                                    <div>Assessment {{ research_latest_residual.assessment.date|default:"n/a" }}</div>
+                                {% else %}
+                                    <div class="text-muted">No persisted residuals</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-muted">Research readiness</div>
+                                <div>Calibration: {{ research_last_calibration_status }}</div>
+                                <div>Counterfactual runs: {{ research_counterfactual_count }}</div>
+                                <div>Provenance records: {{ research_provenance_count }}</div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="small text-muted mb-2">Missing required data</div>
+                        {% if research_missing_required_data %}
+                            <ul class="small mb-3">
+                                {% for item in research_missing_required_data %}
+                                    <li>{{ item }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <div class="text-success small mb-3">Latest assessment satisfies the minimum research input fields.</div>
+                        {% endif %}
+                        <div class="d-flex flex-wrap gap-2">
+                            <a href="{{ research_twin_url }}#twin-state" class="btn btn-sm btn-outline-info">Initialize twin</a>
+                            <a href="{{ research_twin_url }}#what-if-scenarios" class="btn btn-sm btn-outline-info">Review what-if scenarios</a>
+                            <a href="{{ research_twin_url }}#trajectory-comparison" class="btn btn-sm btn-outline-info">Compare trajectories</a>
+                            <a href="{{ research_twin_url }}#provenance" class="btn btn-sm btn-outline-info">View provenance</a>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="row row-cols-1 row-cols-md-2 g-3">
                     <div class="col">
                         <div class="card border-0 bg-light h-100">
@@ -408,10 +466,10 @@
     </div>
     <div class="col-lg-4">
         <!-- NEW: Patient Journey Quick Actions -->
-        <div class="card shadow-sm mb-3 border-primary">
-            <div class="card-header bg-primary text-white">
+        <div class="card shadow-sm mb-3 border-primary patient-journey-tools-card">
+            <div class="card-header patient-journey-tools-header">
                 <h2 class="h6 mb-0">
-                    🩺 <span class="t-en">Patient Journey Tools</span>
+                    <i class="bi bi-compass me-1" aria-hidden="true"></i><span class="t-en">Patient Journey Tools</span>
                     <span class="t-it">Strumenti Percorso Paziente</span>
                 </h2>
             </div>
@@ -426,7 +484,7 @@
                         <span class="t-it">Vedi Prognosi e Timeline</span>
                     </a>
                     <a href="{% url 'clinic:regimen_suggestions' patient.id %}" class="btn btn-outline-info btn-sm">
-                        💊 <span class="t-en">Get Treatment Suggestions</span>
+                        💊 <span class="t-en">Explore Regimen Suggestions</span>
                         <span class="t-it">Suggerimenti Terapie</span>
                     </a>
                     <a href="{% url 'simulator:algorithm_transparency' %}" class="btn btn-outline-secondary btn-sm">
@@ -436,8 +494,8 @@
                 </div>
                 <hr class="my-2">
                 <p class="small text-muted mb-0">
-                    <span class="t-en">These tools provide transparent decision support with full algorithm visibility.</span>
-                    <span class="t-it">Questi strumenti forniscono supporto decisionale trasparente con visibilità completa dell'algoritmo.</span>
+                    <span class="t-en">These tools are transparent research/prototype aids with algorithm visibility.</span>
+                    <span class="t-it">Questi strumenti sono ausili trasparenti di ricerca/prototipo con visibilità dell'algoritmo.</span>
                 </p>
             </div>
         </div>
@@ -453,8 +511,11 @@
         </div>
         <div class="card shadow-sm">
             <div class="card-body">
-                <h2 class="h5">Twin Inputs (over time)</h2>
-                <div class="text-muted small mb-2">R-ISS (1–3), LDH, β2M</div>
+                <h2 class="h5">Twin Inputs over time <span class="visually-hidden">Twin Inputs (over time)</span></h2>
+                <div class="text-muted small mb-2">R-ISS (1-3), LDH, Beta-2M</div>
+                {% if not twin_chart_has_data %}
+                    <div class="alert alert-light border py-2 small mb-2">Structured LDH, Beta-2M, or R-ISS values are unavailable for the current chart window.</div>
+                {% endif %}
                 <div class="chart-wrapper" style="height:220px;">
                     <canvas id="twinChart"></canvas>
                 </div>
@@ -811,6 +872,18 @@
 {% endblock %}
 
 {% block extra_js %}
+<style>
+    .patient-journey-tools-card .patient-journey-tools-header {
+        background: #1d4ed8 !important;
+        color: #ffffff !important;
+        border-bottom-color: #1e40af !important;
+    }
+    .patient-journey-tools-card .patient-journey-tools-header h2,
+    .patient-journey-tools-card .patient-journey-tools-header span,
+    .patient-journey-tools-card .patient-journey-tools-header i {
+        color: #ffffff !important;
+    }
+</style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 const points = {{ chart_points_json|default:"[]"|safe }};

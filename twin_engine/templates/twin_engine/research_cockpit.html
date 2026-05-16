@@ -1,0 +1,429 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Research What-if Cockpit{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<style>
+  .research-cockpit { color: #172033; }
+  .research-hero {
+    background: linear-gradient(135deg, #f7fbff 0%, #eef7f2 52%, #fff8ec 100%);
+    border: 1px solid #dce8f2;
+    border-radius: 8px;
+    padding: 1.25rem;
+  }
+  .research-section {
+    background: #fff;
+    border: 1px solid #dfe7ef;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+  .research-section h2 { font-size: 1.05rem; margin-bottom: 0.75rem; }
+  .metric-tile {
+    border: 1px solid #dfe7ef;
+    border-left: 4px solid #2563eb;
+    border-radius: 8px;
+    padding: 0.75rem;
+    min-height: 92px;
+    background: #fff;
+  }
+  .metric-tile.available { border-left-color: #059669; }
+  .metric-tile.missing { border-left-color: #d97706; }
+  .metric-number { font-size: 1.35rem; font-weight: 700; line-height: 1; }
+  .chart-box { min-height: 340px; width: 100%; }
+  .compact-table th, .compact-table td { font-size: 0.88rem; vertical-align: middle; }
+  .status-dot { width: 0.65rem; height: 0.65rem; display: inline-block; border-radius: 50%; margin-right: 0.35rem; }
+  .status-pass { background: #059669; }
+  .status-warn { background: #d97706; }
+  .status-fail { background: #dc2626; }
+  .developer-details pre {
+    max-height: 360px;
+    overflow: auto;
+    background: #0f172a;
+    color: #e2e8f0;
+    border-radius: 8px;
+    padding: 0.75rem;
+  }
+  .scenario-row { border-top: 1px solid #e5edf5; padding-top: 0.85rem; margin-top: 0.85rem; }
+  .scenario-row:first-child { border-top: 0; margin-top: 0; padding-top: 0; }
+  @media (max-width: 768px) { .chart-box { min-height: 280px; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="research-cockpit">
+  <div class="research-hero d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3">
+    <div>
+      <p class="text-uppercase small text-muted fw-semibold mb-1">Research simulation only</p>
+      <h1 class="h3 mb-2">Research What-if Cockpit</h1>
+      <div class="text-muted">Pseudonymized case: Research Patient {{ patient.id }}</div>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+      <a class="btn btn-primary" href="{% url 'twin_engine:initialize_twin_from_assessment' patient.id %}">
+        <i class="bi bi-sliders me-1"></i> Initialize Twin
+      </a>
+      <a class="btn btn-outline-primary" href="{% url 'twin_engine:developer_console' %}">
+        <i class="bi bi-terminal me-1"></i> Developer Console
+      </a>
+      <a class="btn btn-outline-secondary" href="{% url 'clinic:patient_detail' patient.id %}">
+        <i class="bi bi-arrow-left me-1"></i> Patient record
+      </a>
+    </div>
+  </div>
+
+  <div class="alert alert-warning mt-3 mb-0" role="alert">
+    Mechanistic exploratory simulation, not validated medical guidance, not a treatment recommendation, and not a causal effect estimate.
+  </div>
+
+  <section class="research-section" id="data-availability">
+    <div class="d-flex flex-column flex-md-row justify-content-between gap-2">
+      <h2><i class="bi bi-database-check me-1"></i> Data availability</h2>
+      {% if assessment_recommendation.recommended %}
+        <span class="badge text-bg-light border">Recommended initialization date: {{ assessment_recommendation.recommended.assessment.date }}</span>
+      {% endif %}
+    </div>
+    <div class="row g-3">
+      {% for item in data_availability %}
+        <div class="col-sm-6 col-lg-3">
+          <div class="metric-tile {{ item.status }}">
+            <div class="metric-number">{{ item.count }}</div>
+            <div class="fw-semibold">{{ item.label }}</div>
+            <div class="small text-muted">{{ item.detail }}</div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="research-section" id="twin-state">
+    <h2><i class="bi bi-diagram-3 me-1"></i> Twin state / Initialize Twin</h2>
+    <div class="row g-3">
+      <div class="col-lg-5">
+        {% if current_twin_state %}
+          <dl class="row mb-0 small">
+            <dt class="col-5">State</dt><dd class="col-7">#{{ current_twin_state.id }} on {{ current_twin_state.state_date }}</dd>
+            <dt class="col-5">Method</dt><dd class="col-7">{{ current_twin_state.get_method_display }}</dd>
+            <dt class="col-5">Model</dt><dd class="col-7">{{ current_twin_state.model_version }}</dd>
+            <dt class="col-5">Risk score</dt><dd class="col-7">{{ current_twin_state.risk_score|default:"Unavailable" }}</dd>
+          </dl>
+        {% else %}
+          <p class="text-muted mb-2">No current research twin state is active.</p>
+        {% endif %}
+      </div>
+      <div class="col-lg-7">
+        <form method="post" action="{% url 'twin_engine:initialize_twin_from_assessment' patient.id %}" class="row g-2 align-items-end">
+          {% csrf_token %}
+          <div class="col-md-8">
+            <label class="form-label" for="assessment_id">Initialization assessment</label>
+            <select class="form-select" name="assessment_id" id="assessment_id">
+              {% for row in assessment_options %}
+                <option value="{{ row.assessment.id }}" {% if assessment_recommendation.recommended and row.assessment.id == assessment_recommendation.recommended.assessment.id %}selected{% endif %}>
+                  {{ row.assessment.date }} - {{ row.score }} modeled fields
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-4">
+            <button class="btn btn-primary w-100" type="submit"><i class="bi bi-play-circle me-1"></i> Initialize</button>
+          </div>
+        </form>
+        {% if assessment_recommendation.recommended %}
+          <p class="small text-muted mt-2 mb-0">{{ assessment_recommendation.recommended.reason }}</p>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <section class="research-section" id="calibration-quality">
+    <h2><i class="bi bi-bullseye me-1"></i> Calibration quality</h2>
+    <div class="row g-3">
+      <div class="col-lg-4">
+        <div class="metric-tile">
+          <div class="fw-semibold">{{ calibration_panel.headline }}</div>
+          <div class="small text-muted mb-2">{{ calibration_panel.detail }}</div>
+          <div class="small">RMSE before: {{ calibration_panel.rmse_before|default:"Unavailable" }}</div>
+          <div class="small">RMSE after: {{ calibration_panel.rmse_after|default:"Unavailable" }}</div>
+          <div class="small">RMSE change: {{ calibration_panel.rmse_delta|default:"Unavailable" }}</div>
+        </div>
+      </div>
+      <div class="col-lg-8">
+        <div class="table-responsive">
+          <table class="table table-sm compact-table mb-0">
+            <thead><tr><th>Date</th><th>Stage</th><th>RMSE</th><th>MAE</th></tr></thead>
+            <tbody>
+              {% for residual in calibration_panel.residual_rows|slice:":8" %}
+                <tr><td>{{ residual.date }}</td><td>{{ residual.stage }}</td><td>{{ residual.rmse|default:"-" }}</td><td>{{ residual.mae|default:"-" }}</td></tr>
+              {% empty %}
+                <tr><td colspan="4" class="text-muted">Residual rows unavailable.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="research-section" id="longitudinal-charts">
+    <h2><i class="bi bi-graph-up-arrow me-1"></i> Twin Inputs over time</h2>
+    <div class="small text-muted mb-2">Longitudinal markers used to inspect model inputs and toxicity context over time.</div>
+    <div class="row g-3">
+      <div class="col-lg-4"><div id="lab-chart-disease" class="chart-box"></div></div>
+      <div class="col-lg-4"><div id="lab-chart-hematology" class="chart-box"></div></div>
+      <div class="col-lg-4"><div id="lab-chart-toxicity" class="chart-box"></div></div>
+    </div>
+    <div class="small text-muted mt-2">Structured labs are primary; assessment values are used only as fallback points when a matching structured analyte is absent for the same date.</div>
+  </section>
+
+  <section class="research-section" id="what-if-scenarios">
+    <h2><i class="bi bi-columns-gap me-1"></i> What-if scenarios</h2>
+    <div class="table-responsive mb-3">
+      <table class="table table-sm compact-table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Scenario label</th>
+            <th>Run id</th>
+            <th>Tumor reduction</th>
+            <th>Healthy loss</th>
+            <th>Durability</th>
+            <th>Predicted biomarkers</th>
+            <th>Toxicity penalty</th>
+            <th>Research utility</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in scenario_rows %}
+            <tr>
+              <td>{{ row.label }}</td>
+              <td>#{{ row.run.id }}</td>
+              <td>{{ row.tumor_reduction_delta|default:"Unavailable" }}</td>
+              <td>{{ row.healthy_loss_delta|default:"Unavailable" }}</td>
+              <td>{{ row.durability_delta|default:"Unavailable" }}</td>
+              <td>{{ row.predicted_biomarker_summary }}</td>
+              <td>{{ row.toxicity_penalty|default:"0" }}</td>
+              <td>{{ row.utility|default:"Unavailable" }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="8" class="text-muted">No completed what-if scenarios are available for this pseudonymized case.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% for row in scenario_rows %}
+      <div class="scenario-row">
+        <div class="d-flex flex-column flex-lg-row justify-content-between gap-2">
+          <div>
+            <h3 class="h6 mb-1">{{ row.label }}</h3>
+            <div class="small text-muted">Run #{{ row.run.id }} - {{ row.run.created_at }}</div>
+          </div>
+          <div class="d-flex flex-wrap gap-2 align-items-start">
+            <span class="badge text-bg-light border">Utility {{ row.utility|default:"Unavailable" }}</span>
+            <span class="badge text-bg-light border">Toxicity penalty {{ row.toxicity_penalty|default:"0" }}</span>
+            <a class="btn btn-outline-primary btn-sm" href="{{ row.report_url }}"><i class="bi bi-file-earmark-text me-1"></i> Report</a>
+          </div>
+        </div>
+        <p class="small mt-2 mb-2">{{ row.interpretation }}</p>
+        {% if row.issues %}
+          <div class="alert alert-warning py-2 small mb-2">{{ row.issues|join:" " }}</div>
+        {% endif %}
+        <div class="table-responsive">
+          <table class="table table-sm compact-table mb-0">
+            <thead><tr><th>Metric</th><th>Delta vs baseline</th></tr></thead>
+            <tbody>
+              <tr><td>Tumor reduction</td><td>{{ row.tumor_reduction_delta|default:"Unavailable" }}</td></tr>
+              <tr><td>Healthy-cell loss</td><td>{{ row.healthy_loss_delta|default:"Unavailable" }}</td></tr>
+              <tr><td>Durability index</td><td>{{ row.durability_delta|default:"Unavailable" }}</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <details class="developer-details mt-2">
+          <summary class="small fw-semibold">Developer details</summary>
+          {% if row.report_payload %}
+            <pre>{{ row.report_payload|pprint }}</pre>
+          {% else %}
+            <pre>{{ row.run.simulation_summary|pprint }}</pre>
+          {% endif %}
+        </details>
+      </div>
+    {% empty %}
+      <p class="text-muted mb-0">No completed what-if scenarios are available for this pseudonymized case.</p>
+    {% endfor %}
+  </section>
+
+  <section class="research-section" id="trajectory-comparison">
+    <h2><i class="bi bi-activity me-1"></i> Trajectory comparison</h2>
+    <div id="trajectory-chart" class="chart-box"></div>
+    <div class="small text-muted">Near-identical scenario lines indicate current schedule/exposure resolution may be collapsing distinct schedules into similar solver inputs.</div>
+  </section>
+
+  <section class="research-section" id="toxicity-constraints">
+    <h2><i class="bi bi-shield-exclamation me-1"></i> Toxicity constraints</h2>
+    <div class="row g-3">
+      <div class="col-lg-5">
+        <p class="mb-2">{{ toxicity_panel.disclaimer }}</p>
+        <ul class="small mb-0">
+          {% for interruption in toxicity_panel.interruptions %}
+            <li>{{ interruption.start_date }} {{ interruption.drug }}: {{ interruption.get_reason_display }}</li>
+          {% empty %}
+            <li>No therapy interruption rows available.</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="col-lg-7">
+        <details class="developer-details">
+          <summary class="small fw-semibold">Constraint payload</summary>
+          <pre>{{ toxicity_panel.summary|pprint }}</pre>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="research-section" id="causality-status">
+    <h2><i class="bi bi-signpost-split me-1"></i> Causality status</h2>
+    <p class="mb-2"><strong>{{ causal_panel.headline }}</strong> {{ causal_panel.detail }}</p>
+    <div class="table-responsive">
+      <table class="table table-sm compact-table mb-0">
+        <thead><tr><th>Name</th><th>Identification status</th><th>Created</th></tr></thead>
+        <tbody>
+          {% for assumption_set in causal_panel.sets %}
+            <tr><td>{{ assumption_set.name }}</td><td>{{ assumption_set.get_identification_status_display }}</td><td>{{ assumption_set.created_at }}</td></tr>
+          {% empty %}
+            <tr><td colspan="3" class="text-muted">No causal assumption set saved for this case.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="research-section" id="scientific-basis">
+    <h2><i class="bi bi-journal-text me-1"></i> Scientific and mathematical basis</h2>
+    <div class="row g-3">
+      {% for reference in scientific_references %}
+        <div class="col-md-6 col-xl-4">
+          <div class="metric-tile {% if reference.status == 'placeholder' %}missing{% else %}available{% endif %}">
+            <div class="fw-semibold">{{ reference.title }}</div>
+            <div class="small text-muted">{{ reference.notes }}</div>
+            <div class="small mt-2"><span class="badge text-bg-light border">{{ reference.source_type }}</span> <span class="badge text-bg-light border">{{ reference.status }}</span></div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="research-section" id="provenance">
+    <h2><i class="bi bi-fingerprint me-1"></i> Provenance</h2>
+    <div class="table-responsive">
+      <table class="table table-sm compact-table mb-0">
+        <thead><tr><th>Created</th><th>Model</th><th>Solver</th><th>Input hash</th><th>Output hash</th></tr></thead>
+        <tbody>
+          {% for record in provenance_records %}
+            <tr>
+              <td>{{ record.created_at }}</td>
+              <td>{{ record.model_version }}</td>
+              <td>{{ record.solver_name }}</td>
+              <td><code>{{ record.input_hash|slice:":12" }}</code></td>
+              <td><code>{{ record.output_hash|slice:":12" }}</code></td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="5" class="text-muted">No provenance records available.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="research-section" id="developer-checks">
+    <h2><i class="bi bi-tools me-1"></i> Developer checks</h2>
+    {% if developer_check_summary %}
+      <div class="d-flex flex-wrap gap-2 mb-2">
+        <span class="badge text-bg-success">Pass {{ developer_check_summary.summary.pass }}</span>
+        <span class="badge text-bg-warning">Warn {{ developer_check_summary.summary.warn }}</span>
+        <span class="badge text-bg-danger">Fail {{ developer_check_summary.summary.fail }}</span>
+      </div>
+      <a class="btn btn-outline-primary btn-sm" href="{% url 'twin_engine:developer_console' %}"><i class="bi bi-terminal me-1"></i> Open Developer Console</a>
+    {% else %}
+      <p class="text-muted mb-0">Developer checks are visible to staff users in the Developer Console.</p>
+    {% endif %}
+  </section>
+
+  <section class="research-section" id="next-actions">
+    <h2><i class="bi bi-list-check me-1"></i> Next actions</h2>
+    <div class="list-group list-group-flush">
+      {% for action in next_actions %}
+        <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-start" href="{{ action.href }}">
+          <span><strong>{{ action.label }}</strong><br><span class="small text-muted">{{ action.detail }}</span></span>
+          <i class="bi bi-arrow-right"></i>
+        </a>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+
+{{ lab_chart_data|json_script:"lab-chart-data" }}
+{{ trajectory_chart_data|json_script:"trajectory-chart-data" }}
+{{ raw_developer_payload|json_script:"raw-developer-payload" }}
+
+<script>
+  (function () {
+    const plotConfig = {responsive: true, displayModeBar: false};
+    const baseLayout = {
+      margin: {t: 36, r: 16, b: 42, l: 54},
+      paper_bgcolor: 'rgba(0,0,0,0)',
+      plot_bgcolor: '#ffffff',
+      font: {family: 'system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif', size: 12, color: '#172033'},
+      hovermode: 'x unified'
+    };
+
+    function parseJson(id) {
+      const node = document.getElementById(id);
+      return node ? JSON.parse(node.textContent) : {};
+    }
+
+    function drawLabChart(groupKey, elementId, data) {
+      const element = document.getElementById(elementId);
+      if (!element) return;
+      const group = data[groupKey] || {series: [], title: groupKey};
+      const traces = (group.series || []).map(function (serie) {
+        return {
+          x: serie.points.map(function (point) { return point.x; }),
+          y: serie.points.map(function (point) { return point.y; }),
+          mode: 'lines+markers',
+          type: 'scatter',
+          name: serie.label + (serie.unit ? ' (' + serie.unit + ')' : ''),
+          customdata: serie.points.map(function (point) { return point.source; }),
+          hovertemplate: '%{x}<br>%{y}<br>%{customdata}<extra>%{fullData.name}</extra>'
+        };
+      });
+      const layout = Object.assign({}, baseLayout, {title: {text: group.title, font: {size: 15}}, legend: {orientation: 'h'}});
+      if (traces.length === 0) {
+        layout.annotations = [{text: 'No structured values available', x: 0.5, y: 0.5, xref: 'paper', yref: 'paper', showarrow: false, font: {color: '#64748b'}}];
+      }
+      Plotly.newPlot(element, traces, layout, plotConfig);
+    }
+
+    function drawTrajectory(data) {
+      const element = document.getElementById('trajectory-chart');
+      if (!element) return;
+      const traces = [];
+      (data.series || []).forEach(function (serie) {
+        traces.push({x: serie.x, y: serie.tumor, mode: 'lines', type: 'scatter', name: serie.label + ' tumor'});
+        traces.push({x: serie.x, y: serie.healthy, mode: 'lines', type: 'scatter', name: serie.label + ' healthy', line: {dash: 'dot'}});
+      });
+      const layout = Object.assign({}, baseLayout, {title: {text: 'Modeled cells over horizon', font: {size: 15}}, yaxis: {type: 'log', title: 'Cell count'}, xaxis: {title: 'Simulation day'}});
+      if (traces.length === 0) {
+        layout.annotations = [{text: 'No trajectory artifacts available', x: 0.5, y: 0.5, xref: 'paper', yref: 'paper', showarrow: false, font: {color: '#64748b'}}];
+      }
+      Plotly.newPlot(element, traces, layout, plotConfig);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const labData = parseJson('lab-chart-data');
+      drawLabChart('disease', 'lab-chart-disease', labData);
+      drawLabChart('hematology', 'lab-chart-hematology', labData);
+      drawLabChart('toxicity', 'lab-chart-toxicity', labData);
+      drawTrajectory(parseJson('trajectory-chart-data'));
+    });
+  })();
+</script>
+{% endblock %}

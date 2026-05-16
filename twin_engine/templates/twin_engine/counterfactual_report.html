@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="h3 mb-1">Counterfactual report</h1>
+            <p class="text-muted mb-0">Mechanistic model counterfactual. Causal interpretation remains exploratory and unvalidated.</p>
+        </div>
+        <a href="{% url 'twin_engine:research_cockpit' patient.id %}" class="btn btn-outline-secondary btn-sm">Back to cockpit</a>
+    </div>
+
+    <div class="alert alert-warning">
+        <strong>Research simulation only.</strong>
+        {% if report_payload.warnings %}
+            <ul class="small mb-0 mt-2">
+                {% for warning in report_payload.warnings %}
+                    {% if warning %}<li>{{ warning }}</li>{% endif %}
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="small mt-2">Legacy report payload without explicit warning block. Interpret as mechanistic-only and not clinically validated.</div>
+        {% endif %}
+    </div>
+
+    <div class="card shadow-sm mb-3">
+        <div class="card-header">Run summary</div>
+        <div class="card-body">
+            <p class="mb-1"><strong>Status:</strong> {{ counterfactual_run.status }}</p>
+            <p class="mb-1"><strong>Alternative regimen:</strong> {{ counterfactual_run.alternative_regimen|default:"custom" }}</p>
+            <p class="mb-0"><strong>Report artifact:</strong> <a href="{{ counterfactual_run.report_artifact }}" target="_blank" rel="noopener">Open JSON report</a></p>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header">Predicted biomarkers</div>
+                <div class="card-body small">
+                    <p class="mb-1"><strong>Alternative horizon prediction:</strong></p>
+                    {% if report_payload.predicted_biomarkers %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <tbody>
+                                    {% for key, value in report_payload.predicted_biomarkers.items %}
+                                        <tr><th>{{ key }}</th><td>{{ value }}</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Unavailable for legacy run.</p>
+                    {% endif %}
+                    <p class="mb-1 mt-3"><strong>Baseline horizon prediction:</strong></p>
+                    {% if report_payload.baseline_predicted_biomarkers %}
+                        <div class="table-responsive">
+                            <table class="table table-sm mb-0">
+                                <tbody>
+                                    {% for key, value in report_payload.baseline_predicted_biomarkers.items %}
+                                        <tr><th>{{ key }}</th><td>{{ value }}</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">Unavailable for legacy run.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header">Toxicity constraints</div>
+                <div class="card-body small">
+                    {% if toxicity_constraints %}
+                        <p class="mb-1"><strong>Max AST:</strong> {{ toxicity_constraints.liver.max_ast|default:"unknown" }}</p>
+                        <p class="mb-1"><strong>Max ALT:</strong> {{ toxicity_constraints.liver.max_alt|default:"unknown" }}</p>
+                        <p class="mb-1"><strong>Peak date:</strong> {{ toxicity_constraints.liver.peak_date|default:"unknown" }}</p>
+                        <p class="mb-1"><strong>Hepatic steatosis:</strong> {{ toxicity_constraints.liver.hepatic_steatosis|default:"unknown" }}</p>
+                        <p class="mb-1"><strong>Neutropenia event:</strong> {{ toxicity_constraints.neutropenia.absolute_neutropenia_event|default:"unknown" }}</p>
+                        <p class="mb-1"><strong>Infection event:</strong> {{ toxicity_constraints.infection.pneumonia_event|default:"unknown" }}</p>
+                        <p class="mb-0"><strong>Constraint note:</strong> {{ toxicity_constraints.reason }}</p>
+                    {% else %}
+                        <p class="text-muted mb-0">Unavailable for legacy run.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <details class="mt-3">
+        <summary class="fw-semibold small">Developer details</summary>
+        <pre class="small bg-dark text-light p-3 rounded mt-2">{{ report_payload|pprint }}</pre>
+    </details>
+</div>
+{% endblock %}

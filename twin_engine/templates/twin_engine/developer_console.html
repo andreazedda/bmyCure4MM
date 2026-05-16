@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Developer Console{% endblock %}
+
+{% block content %}
+<div class="bg-white border rounded p-3">
+  <div class="d-flex flex-column flex-lg-row justify-content-between gap-2 mb-3">
+    <div>
+      <p class="text-uppercase small text-muted fw-semibold mb-1">Internal research validation</p>
+      <h1 class="h4 mb-1">Developer Console</h1>
+      <div class="text-muted">Offline checks for data, model, causal, artifact, privacy, and safety status.</div>
+      <div class="small text-muted mt-1">Includes data consistency, model consistency, causal checks, scientific/reference checks, artifact checks, privacy/security checks, and feedback/developer details.</div>
+    </div>
+    <div class="d-flex flex-wrap gap-2 align-self-start">
+      <span class="badge text-bg-success">Pass {{ check_summary.summary.pass }}</span>
+      <span class="badge text-bg-warning">Warn {{ check_summary.summary.warn }}</span>
+      <span class="badge text-bg-danger">Fail {{ check_summary.summary.fail }}</span>
+    </div>
+  </div>
+
+  {% for group_name, checks in check_summary.groups.items %}
+    <section class="border-top pt-3 mt-3">
+      <h2 class="h6 text-capitalize">{{ group_name }} checks</h2>
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead><tr><th>Status</th><th>Check</th><th>Detail</th><th>Objects</th><th>Next action</th></tr></thead>
+          <tbody>
+            {% for check in checks %}
+              <tr>
+                <td>
+                  {% if check.status == 'pass' %}<span class="badge text-bg-success">pass</span>{% elif check.status == 'fail' %}<span class="badge text-bg-danger">fail</span>{% else %}<span class="badge text-bg-warning">warn</span>{% endif %}
+                </td>
+                <td>{{ check.label }}</td>
+                <td>{{ check.detail }}</td>
+                <td class="small text-muted">{{ check.object_ids|join:", " }}</td>
+                <td class="small">{{ check.next_action }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  {% endfor %}
+
+  <section class="border-top pt-3 mt-3">
+    <h2 class="h6">Local feedback</h2>
+    <form method="post" class="row g-2">
+      {% csrf_token %}
+      <div class="col-md-3">
+        <label class="form-label" for="patient_id">Patient id</label>
+        <input class="form-control" id="patient_id" name="patient_id" inputmode="numeric">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label" for="category">Category</label>
+        <select class="form-select" id="category" name="category">
+          <option value="data">Data</option>
+          <option value="model">Model</option>
+          <option value="causal">Causal</option>
+          <option value="privacy">Privacy</option>
+          <option value="artifact">Artifact</option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="message">Message</label>
+        <input class="form-control" id="message" name="message" maxlength="500">
+      </div>
+      <div class="col-12">
+        <button class="btn btn-primary" type="submit"><i class="bi bi-save me-1"></i> Save local feedback</button>
+      </div>
+    </form>
+    <p class="small text-muted mt-2 mb-0">Feedback is stored under local_private and ignored by git.</p>
+  </section>
+</div>
+{% endblock %}

@@ -117,6 +117,7 @@ celerybeat.pid
 
 # Data files (keep out of repo)
 data/
+local_private/
 outputs/
 pipelines/data/outputs/
 pipelines/data/logs/

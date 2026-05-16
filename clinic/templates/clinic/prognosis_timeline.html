@@ -141,6 +141,22 @@
     padding: 1rem;
     font-size: 0.9rem;
 }
+.prognosis-header-primary {
+    background: #1d4ed8 !important;
+    color: #ffffff !important;
+    border-bottom-color: #1e40af !important;
+}
+.prognosis-header-secondary {
+    background: #475569 !important;
+    color: #ffffff !important;
+    border-bottom-color: #334155 !important;
+}
+.prognosis-header-primary h5,
+.prognosis-header-primary span,
+.prognosis-header-secondary h5,
+.prognosis-header-secondary span {
+    color: #ffffff !important;
+}
 </style>
 {% endblock %}
 
@@ -176,7 +192,7 @@
         <!-- Main Prognosis Card -->
         <div class="col-lg-8">
             <div class="card prognosis-card mb-4">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header prognosis-header-primary">
                     <h5 class="mb-0">
                         <span class="t-en">Survival Estimates</span>
                         <span class="t-it">Stime di Sopravvivenza</span>
@@ -401,7 +417,7 @@
     {% if scenarios %}
     <!-- Scenario Comparison -->
     <div class="card prognosis-card mt-4">
-        <div class="card-header bg-secondary text-white">
+        <div class="card-header prognosis-header-secondary">
             <h5 class="mb-0">
                 🔄 <span class="t-en">Scenario Comparison</span>
                 <span class="t-it">Confronto Scenari</span>

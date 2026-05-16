@@ -350,17 +350,11 @@ def patient_detail(request: HttpRequest, pk: int) -> HttpResponse:
                 therapy.patient = patient
                 therapy.save()
                 return redirect(reverse("clinic:patient_detail", args=[patient.id]))
-    chart_points = [
-        {
-            "date": assessment.date.isoformat(),
-            "m": float(assessment.m_protein_g_dl) if assessment.m_protein_g_dl is not None else None,
-            "flc": float(assessment.flc_ratio) if assessment.flc_ratio is not None else None,
-            "ldh": float(assessment.ldH_u_l) if assessment.ldH_u_l is not None else None,
-            "beta2m": float(assessment.beta2m_mg_l) if assessment.beta2m_mg_l is not None else None,
-            "riss": (1 if assessment.r_iss == "I" else 2 if assessment.r_iss == "II" else 3 if assessment.r_iss == "III" else None),
-        }
-        for assessment in reversed(assessments)
-    ]
+    chart_points = _build_patient_detail_chart_points(patient, assessments)
+    twin_chart_has_data = any(
+        point.get("ldh") is not None or point.get("beta2m") is not None or point.get("riss") is not None
+        for point in chart_points
+    )
 
     # IMPORTANT: serialize as real JSON for safe embedding into JS (null instead of Python None).
     chart_points_json = json.dumps(chart_points)
@@ -520,6 +514,37 @@ def patient_detail(request: HttpRequest, pk: int) -> HttpResponse:
         except Exception:
             latest_simulation_attempt = None
 
+    research_twin_state = None
+    research_latest_residual = None
+    research_last_calibration_status = "Not initialized"
+    research_missing_required_data: list[str] = ["assessment"] if latest_assessment is None else []
+    research_counterfactual_count = 0
+    research_provenance_count = 0
+    research_twin_url = reverse("twin_engine:research_cockpit", args=[patient.id])
+    try:
+        from twin_engine.models import ObservationResidual, SimulationRunMetadata
+        from twin_engine.state_model import get_current_twin_state
+        from twin_engine.validators import validate_assessment_minimum_fields
+
+        research_twin_state = get_current_twin_state(patient)
+        if latest_assessment is not None:
+            try:
+                research_missing_required_data = validate_assessment_minimum_fields(latest_assessment)["missing"]
+            except Exception as exc:
+                research_missing_required_data = [str(exc)]
+        if research_twin_state is not None:
+            research_latest_residual = (
+                ObservationResidual.objects.filter(twin_state=research_twin_state)
+                .select_related("assessment")
+                .order_by("-created_at")
+                .first()
+            )
+            research_last_calibration_status = research_twin_state.get_method_display()
+            research_provenance_count = SimulationRunMetadata.objects.filter(twin_state=research_twin_state).count()
+        research_counterfactual_count = patient.counterfactual_runs.count()
+    except Exception:
+        research_twin_state = None
+
     context = {
         "patient": patient,
         "assessments": assessments,
@@ -530,6 +555,7 @@ def patient_detail(request: HttpRequest, pk: int) -> HttpResponse:
         "assessment_form": forms.AssessmentForm(),
         "therapy_form": therapy_form,
         "chart_points": chart_points,
+        "twin_chart_has_data": twin_chart_has_data,
         "therapy_spans": therapy_spans,
         "chart_points_json": chart_points_json,
         "therapy_spans_json": therapy_spans_json,
@@ -544,8 +570,51 @@ def patient_detail(request: HttpRequest, pk: int) -> HttpResponse:
         "latest_simulation_artifacts": latest_simulation_artifacts,
         "latest_simulation_scenario_url": latest_simulation_scenario_url,
         "latest_simulation_interpretation": latest_simulation_interpretation,
+        "research_twin_state": research_twin_state,
+        "research_latest_residual": research_latest_residual,
+        "research_last_calibration_status": research_last_calibration_status,
+        "research_missing_required_data": research_missing_required_data,
+        "research_counterfactual_count": research_counterfactual_count,
+        "research_provenance_count": research_provenance_count,
+        "research_twin_url": research_twin_url,
     }
     return render(request, "clinic/patient_detail.html", context)
+
+
+def _build_patient_detail_chart_points(patient: models.Patient, assessments) -> list[dict[str, object]]:
+    points_by_date: dict[str, dict[str, object]] = {}
+    for assessment in reversed(assessments):
+        date_key = assessment.date.isoformat()
+        points_by_date[date_key] = {
+            "date": date_key,
+            "m": float(assessment.m_protein_g_dl) if assessment.m_protein_g_dl is not None else None,
+            "flc": float(assessment.flc_ratio) if assessment.flc_ratio is not None else None,
+            "ldh": float(assessment.ldH_u_l) if assessment.ldH_u_l is not None else None,
+            "beta2m": float(assessment.beta2m_mg_l) if assessment.beta2m_mg_l is not None else None,
+            "riss": (1 if assessment.r_iss == "I" else 2 if assessment.r_iss == "II" else 3 if assessment.r_iss == "III" else None),
+        }
+    try:
+        from twin_engine.models import LongitudinalLabResult
+    except Exception:
+        return list(points_by_date.values())
+
+    analyte_to_key = {
+        LongitudinalLabResult.ANALYTE_M_PROTEIN: "m",
+        LongitudinalLabResult.ANALYTE_FLC_RATIO: "flc",
+        LongitudinalLabResult.ANALYTE_LDH: "ldh",
+        LongitudinalLabResult.ANALYTE_BETA2M: "beta2m",
+    }
+    labs = LongitudinalLabResult.objects.filter(patient=patient, analyte__in=analyte_to_key).order_by("date", "id")
+    for lab in labs:
+        if lab.value is None:
+            continue
+        date_key = lab.date.isoformat()
+        points_by_date.setdefault(
+            date_key,
+            {"date": date_key, "m": None, "flc": None, "ldh": None, "beta2m": None, "riss": None},
+        )
+        points_by_date[date_key][analyte_to_key[lab.analyte]] = float(lab.value)
+    return [points_by_date[key] for key in sorted(points_by_date)]
 
 
 @login_required

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Initialize Research Twin{% endblock %}
+
+{% block content %}
+<div class="research-section bg-white border rounded p-3">
+  <div class="d-flex flex-column flex-md-row justify-content-between gap-2 mb-3">
+    <div>
+      <p class="text-uppercase small text-muted fw-semibold mb-1">Research simulation only</p>
+      <h1 class="h4 mb-1">Initialize Twin</h1>
+      <div class="text-muted">Pseudonymized case: Research Patient {{ patient.id }}</div>
+    </div>
+    <a class="btn btn-outline-secondary align-self-start" href="{% url 'twin_engine:research_cockpit' patient.id %}">
+      <i class="bi bi-arrow-left me-1"></i> Research What-if Cockpit
+    </a>
+  </div>
+
+  <p class="text-muted">
+    Initialization creates a research twin state from one assessment by mapping available disease and blood markers into the mechanistic model state. This is a reproducible research starting point, not a clinical validation step.
+  </p>
+
+  {% if initialize_guidance.recommended %}
+    <div class="alert alert-info">
+      Recommended assessment: {{ initialize_guidance.recommended.date }}. {{ initialize_guidance.recommended.reason }}
+    </div>
+  {% else %}
+    <div class="alert alert-warning">No assessment currently has enough modeled markers for initialization.</div>
+  {% endif %}
+
+  <form method="post" class="mb-3">
+    {% csrf_token %}
+    <label class="form-label" for="assessment_id">Assessment</label>
+    <select class="form-select mb-3" name="assessment_id" id="assessment_id">
+      {% for row in initialize_guidance.assessment_rows %}
+        <option value="{{ row.assessment.id }}" {% if initialize_guidance.recommended and row.assessment.id == initialize_guidance.recommended.assessment.id %}selected{% endif %}>
+          {{ row.date }} - {{ row.score }} modeled fields - {{ row.reason }}
+        </option>
+      {% endfor %}
+    </select>
+    <button class="btn btn-primary" type="submit"><i class="bi bi-play-circle me-1"></i> Initialize Twin</button>
+  </form>
+
+  <div class="table-responsive">
+    <table class="table table-sm">
+      <thead><tr><th>Date</th><th>Available markers</th><th>Missing markers</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for row in initialize_guidance.assessment_rows %}
+          <tr>
+            <td>{{ row.date }}</td>
+            <td>{{ row.available_labels|join:", "|default:"None" }}</td>
+            <td>{{ row.missing_labels|join:", "|default:"None" }}</td>
+            <td>{% if row.is_usable %}<span class="badge text-bg-success">Usable</span>{% else %}<span class="badge text-bg-warning">Incomplete</span>{% endif %}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="4" class="text-muted">No assessments available.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="h3 mb-1">Research Twin / What-if Simulation</h1>
+            <p class="text-muted mb-0">Patient {{ patient.id }}. Research simulation only. Not a clinical prescription.</p>
+        </div>
+        <a href="{% url 'clinic:patient_detail' patient.id %}" class="btn btn-outline-secondary btn-sm">Back to patient</a>
+    </div>
+
+    <div class="alert alert-warning">
+        Mechanistic model counterfactuals, causal estimand structures, and exploratory hypotheses are shown separately below. None of these views imply validated medical recommendation.
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header">Current twin state</div>
+                <div class="card-body">
+                    {% if current_twin_state %}
+                        <p class="mb-1"><strong>State date:</strong> {{ current_twin_state.state_date }}</p>
+                        <p class="mb-1"><strong>Method:</strong> {{ current_twin_state.get_method_display }}</p>
+                        <p class="mb-1"><strong>Model version:</strong> {{ current_twin_state.model_version }}</p>
+                        <p class="mb-3"><strong>Risk score:</strong> {{ current_twin_state.risk_score|default:"n/a" }}</p>
+                        <details>
+                            <summary class="small fw-semibold">Developer details</summary>
+                            <pre class="small bg-light p-2 rounded mb-0 mt-2">{{ current_twin_state.parameters|pprint }}</pre>
+                        </details>
+                    {% else %}
+                        <p class="text-muted mb-0">No research twin state initialized yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header">Readiness and residuals</div>
+                <div class="card-body">
+                    <p class="mb-1"><strong>Calibration status:</strong> {{ last_calibration_status }}</p>
+                    <p class="mb-1"><strong>Missing required data:</strong></p>
+                    {% if missing_required_data %}
+                        <ul class="small mb-2">
+                            {% for item in missing_required_data %}
+                                <li>{{ item }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-success">No missing minimum fields on the latest assessment.</p>
+                    {% endif %}
+                    {% if latest_residual %}
+                        <p class="mb-1"><strong>Latest residual assessment:</strong> {{ latest_residual.assessment.date|default:"n/a" }}</p>
+                        <p class="mb-1"><strong>RMSE:</strong> {{ latest_residual.rmse|default:"n/a" }}</p>
+                        <p class="mb-1"><strong>MAE:</strong> {{ latest_residual.mae|default:"n/a" }}</p>
+                    {% else %}
+                        <p class="text-muted">No persisted observation residuals yet.</p>
+                    {% endif %}
+                    {% if schedule_validation %}
+                        <p class="mb-1"><strong>Therapy schedule valid:</strong> {{ schedule_validation.is_valid|yesno:"yes,no" }}</p>
+                        {% if schedule_validation.missing_doses %}
+                            <ul class="small mb-0">
+                                {% for item in schedule_validation.missing_doses %}
+                                    <li>{{ item.drug|default:item.reason }}{% if item.reason %}: {{ item.reason }}{% endif %}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    {% endif %}
+                    {% if toxicity_constraints %}
+                        <hr>
+                        <p class="mb-1"><strong>Toxicity constraints:</strong> descriptive only</p>
+                        <ul class="small mb-0">
+                            <li>Max AST: {{ toxicity_constraints.liver.max_ast|default:"unknown" }}</li>
+                            <li>Max ALT: {{ toxicity_constraints.liver.max_alt|default:"unknown" }}</li>
+                            <li>Neutropenia event: {{ toxicity_constraints.neutropenia.absolute_neutropenia_event|default:"unknown" }}</li>
+                            <li>Pneumonia event: {{ toxicity_constraints.infection.pneumonia_event|default:"unknown" }}</li>
+                            <li>Lenalidomide toxicity-limited: {{ toxicity_constraints.lenalidomide_toxicity_limited|yesno:"yes,no" }}</li>
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-lg-4">
+            <div class="card shadow-sm h-100" id="initialize">
+                <div class="card-header">Initialize from assessment</div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'twin_engine:initialize_twin_from_assessment' patient.id %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Assessment</label>
+                            <select class="form-select" name="assessment_id">
+                                {% for assessment in patient.assessments.all %}
+                                    <option value="{{ assessment.id }}">{{ assessment.date }}{% if assessment.m_protein_g_dl %} · M {{ assessment.m_protein_g_dl }}{% endif %}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm">Initialize research twin</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card shadow-sm h-100" id="simulate">
+                <div class="card-header">Run research simulation</div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'twin_engine:run_patient_simulation' patient.id %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Horizon (days)</label>
+                            <input type="number" class="form-control" name="horizon_days" value="90" min="1">
+                        </div>
+                        <button type="submit" class="btn btn-outline-primary btn-sm">Run research simulation</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card shadow-sm h-100" id="counterfactual">
+                <div class="card-header">Run counterfactual</div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'twin_engine:run_counterfactual' patient.id %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Horizon (days)</label>
+                            <input type="number" class="form-control" name="horizon_days" value="90" min="1">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Intervention JSON</label>
+                            <textarea class="form-control" name="intervention_json" rows="8">{
+  "drug_doses": {"lenalidomide": 25.0, "bortezomib": 1.3},
+  "start_day": 1,
+  "duration_days": 84,
+  "schedule": {},
+  "parameter_overrides": {},
+  "random_seed": 42
+}</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-outline-danger btn-sm">Run counterfactual</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100" id="provenance">
+                <div class="card-header">Provenance</div>
+                <div class="card-body">
+                    {% if provenance_records %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Created</th>
+                                        <th>Model</th>
+                                        <th>Solver</th>
+                                        <th>Input hash</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for record in provenance_records %}
+                                        <tr>
+                                            <td>{{ record.created_at }}</td>
+                                            <td>{{ record.model_version }}</td>
+                                            <td>{{ record.solver_name }}</td>
+                                            <td><code>{{ record.input_hash|slice:":12" }}</code></td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">No provenance records yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header">Causal assumption sets</div>
+                <div class="card-body">
+                    <a href="{% url 'twin_engine:causal_assumption_set' patient.id %}" class="btn btn-outline-secondary btn-sm mb-3">View / edit causal assumption sets</a>
+                    {% if causal_assumption_sets %}
+                        <ul class="small mb-0">
+                            {% for assumption_set in causal_assumption_sets %}
+                                <li>{{ assumption_set.name }} · {{ assumption_set.identification_status }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted mb-0">No causal assumption sets saved yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header">Recent counterfactual runs</div>
+        <div class="card-body">
+            {% if counterfactual_runs %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Created</th>
+                                <th>Status</th>
+                                <th>Alternative regimen</th>
+                                <th>Report</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for run in counterfactual_runs %}
+                                <tr>
+                                    <td>{{ run.created_at }}</td>
+                                    <td>{{ run.status }}</td>
+                                    <td>{{ run.alternative_regimen|default:"custom" }}</td>
+                                    <td><a href="{% url 'twin_engine:counterfactual_report' patient.id run.id %}">Open report</a></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted mb-0">No counterfactual runs yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

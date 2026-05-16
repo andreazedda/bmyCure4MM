@@ -24,6 +24,7 @@ urlpatterns = [
     path("chem/", include("chemtools.urls")),
     path("sim/", include(("simulator.urls", "simulator"), namespace="simulator")),
     path("simulator/", include(("simulator.urls", "simulator"), namespace="simulator_alias")),
+    path("research/", include(("twin_engine.urls", "twin_engine"), namespace="twin_engine")),
     path("docs/", include(("docs_viewer.urls", "docs_viewer"), namespace="docs_viewer")),
     path("api/", include("clinic.api")),
     path("api/glossary/", glossary, name="api_glossary"),

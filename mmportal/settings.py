@@ -47,16 +47,27 @@ else:  # Development mode - allow default for convenience
         SECRET_KEY = "dev-key-not-for-production"
         print("⚠️  Using default SECRET_KEY for development. Set DJANGO_SECRET_KEY in production!")
 
-_hosts = os.environ.get("ALLOWED_HOSTS")
-ALLOWED_HOSTS: list[str] = [host.strip() for host in _hosts.split(",") if host.strip()] if _hosts else []
+def _parse_csv_env(*names: str) -> list[str]:
+    values: list[str] = []
+    for name in names:
+        raw_value = os.environ.get(name, "")
+        if not raw_value:
+            continue
+        for item in raw_value.split(","):
+            cleaned = item.strip()
+            if cleaned and cleaned not in values:
+                values.append(cleaned)
+    return values
 
-_trusted = os.environ.get("CSRF_TRUSTED_ORIGINS")
-CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in _trusted.split(",") if origin.strip()] if _trusted else []
 
-if DEBUG:
-    for host in ("localhost", "127.0.0.1", "testserver"):
-        if host not in ALLOWED_HOSTS:
-            ALLOWED_HOSTS.append(host)
+ALLOWED_HOSTS: list[str] = _parse_csv_env("DJANGO_ALLOWED_HOSTS", "ALLOWED_HOSTS")
+for host in ("localhost", "127.0.0.1"):
+    if host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(host)
+if DEBUG and "testserver" not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append("testserver")
+
+CSRF_TRUSTED_ORIGINS = _parse_csv_env("DJANGO_CSRF_TRUSTED_ORIGINS", "CSRF_TRUSTED_ORIGINS")
 
 PREDLAB_V2 = os.environ.get("PREDLAB_V2", "0") == "1"
 
@@ -74,6 +85,7 @@ INSTALLED_APPS = [
     "clinic",
     "chemtools",
     "simulator",
+    "twin_engine",
     "docs_viewer",
     "rest_framework",
 ]

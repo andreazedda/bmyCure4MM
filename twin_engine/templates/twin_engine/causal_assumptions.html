@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="h3 mb-1">Causal assumption sets</h1>
+            <p class="text-muted mb-0">These structures document assumptions and estimands. They do not establish causal proof by themselves.</p>
+        </div>
+        <a href="{% url 'twin_engine:research_cockpit' patient.id %}" class="btn btn-outline-secondary btn-sm">Back to cockpit</a>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-5">
+            <div class="card shadow-sm h-100">
+                <div class="card-header">New assumption set</div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Name</label>
+                            <input type="text" class="form-control" name="name" value="Patient {{ patient.id }} research assumptions">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Graph definition JSON</label>
+                            <textarea class="form-control" name="graph_definition" rows="5">{"nodes": ["therapy", "tumor_burden", "response"], "edges": [["therapy", "tumor_burden"], ["tumor_burden", "response"]]}</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Intervention JSON</label>
+                            <textarea class="form-control" name="intervention" rows="3">{"treatment": "alternative_regimen"}</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Outcome JSON</label>
+                            <textarea class="form-control" name="outcome" rows="3">{"outcome": "tumor_reduction"}</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Adjustment set JSON</label>
+                            <textarea class="form-control" name="adjustment_set" rows="2">[]</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Assumptions JSON</label>
+                            <textarea class="form-control" name="assumptions" rows="3">{"exchangeability": false, "note": "research planning only"}</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Identification status</label>
+                            <select class="form-select" name="identification_status">
+                                <option value="mechanistic_only">mechanistic_only</option>
+                                <option value="not_identified">not_identified</option>
+                                <option value="partially_identified">partially_identified</option>
+                                <option value="identified_under_assumptions">identified_under_assumptions</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Notes</label>
+                            <textarea class="form-control" name="notes" rows="2"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm">Save assumption set</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-7">
+            <div class="card shadow-sm h-100">
+                <div class="card-header">Saved assumption sets</div>
+                <div class="card-body">
+                    {% if assumption_rows %}
+                        {% for row in assumption_rows %}
+                            {% with assumption_set=row.assumption_set %}
+                            <div class="border rounded p-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <strong>{{ assumption_set.name }}</strong>
+                                    <span class="badge bg-light text-dark">{{ row.classification }}</span>
+                                </div>
+                                <p class="small mb-1"><strong>Identification:</strong> {{ assumption_set.identification_status }}</p>
+                                <details>
+                                    <summary class="small fw-semibold">Developer details</summary>
+                                    <pre class="small bg-light p-2 rounded mb-1 mt-2">{{ assumption_set.graph_definition|pprint }}</pre>
+                                </details>
+                            </div>
+                            {% endwith %}
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted mb-0">No causal assumption sets recorded yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

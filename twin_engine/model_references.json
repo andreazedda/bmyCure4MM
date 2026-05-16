@@ -1,0 +1,56 @@
+[
+  {
+    "component": "disease_model",
+    "title": "Tumor and healthy compartment model",
+    "source_type": "internal_model",
+    "citation": "No peer-reviewed source is currently attached to this model component in the repository.",
+    "url": "",
+    "notes": "State variables include tumor burden and healthy plasma-cell compartment; growth, carrying capacity, immune compromise, and drug effects are implemented through the simulator mathematical model.",
+    "status": "implemented"
+  },
+  {
+    "component": "pk_pd_model",
+    "title": "Drug concentration and effect mapping",
+    "source_type": "internal_model",
+    "citation": "No peer-reviewed source is currently attached to this model component in the repository.",
+    "url": "",
+    "notes": "Drug presets and PK/PD mappings are resolved through simulator pharmaco presets. Schedule resolution remains limited for some dose patterns.",
+    "status": "implemented"
+  },
+  {
+    "component": "observation_model",
+    "title": "Latent state to biomarker observation model",
+    "source_type": "internal_model",
+    "citation": "No peer-reviewed source is currently attached to this model component in the repository.",
+    "url": "",
+    "notes": "Maps latent tumor and healthy compartments to M-protein, FLC ratio, and hemoglobin using configurable observation parameters.",
+    "status": "implemented"
+  },
+  {
+    "component": "calibration",
+    "title": "Residual-minimization calibration",
+    "source_type": "internal_model",
+    "citation": "No peer-reviewed source is currently attached to this model component in the repository.",
+    "url": "",
+    "notes": "Fits selected model and observation parameters to longitudinal observed biomarkers using residual diagnostics and optimizer fallbacks.",
+    "status": "implemented"
+  },
+  {
+    "component": "counterfactual_semantics",
+    "title": "Mechanistic what-if branch",
+    "source_type": "internal_model",
+    "citation": "No peer-reviewed source is currently attached to this model component in the repository.",
+    "url": "",
+    "notes": "Counterfactual means model-simulated alternative trajectory. It is not an empirically identified causal effect estimate.",
+    "status": "implemented"
+  },
+  {
+    "component": "toxicity_layer",
+    "title": "Descriptive toxicity constraints",
+    "source_type": "placeholder",
+    "citation": "No peer-reviewed source is currently attached to this model component in the repository.",
+    "url": "",
+    "notes": "AST, ALT, neutropenia, infection, and interruption history are summarized descriptively. Predictive toxicity dynamics are not yet implemented.",
+    "status": "placeholder"
+  }
+]

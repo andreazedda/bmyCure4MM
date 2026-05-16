@@ -139,12 +139,36 @@ class Regimen(models.Model):
 class PatientTherapy(models.Model):
     """Therapy timeline for each patient."""
 
+    SOURCE_QUALITY_UNKNOWN = "unknown"
+    SOURCE_QUALITY_INFERRED = "inferred"
+    SOURCE_QUALITY_PATIENT_REPORTED = "patient_reported"
+    SOURCE_QUALITY_CLINICAL_RECORD = "clinical_record"
+    SOURCE_QUALITY_CURATED_RESEARCH = "curated_research"
+
+    SOURCE_QUALITY_CHOICES = [
+        (SOURCE_QUALITY_UNKNOWN, "Unknown"),
+        (SOURCE_QUALITY_INFERRED, "Inferred"),
+        (SOURCE_QUALITY_PATIENT_REPORTED, "Patient reported"),
+        (SOURCE_QUALITY_CLINICAL_RECORD, "Clinical record"),
+        (SOURCE_QUALITY_CURATED_RESEARCH, "Curated research"),
+    ]
+
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name="therapies")
     regimen = models.ForeignKey(Regimen, on_delete=models.CASCADE, related_name="patient_courses")
     start_date = models.DateField()
     end_date = models.DateField(null=True, blank=True)
     outcome = models.CharField(max_length=128, blank=True)
     adverse_events = models.TextField(blank=True)
+    doses = models.JSONField(default=dict, blank=True)
+    cycle_length_days = models.IntegerField(null=True, blank=True)
+    days_on = models.JSONField(default=list, blank=True)
+    schedule_notes = models.TextField(blank=True)
+    source_quality = models.CharField(
+        max_length=32,
+        choices=SOURCE_QUALITY_CHOICES,
+        default=SOURCE_QUALITY_UNKNOWN,
+    )
+    provenance = models.JSONField(default=dict, blank=True)
 
     class Meta:
         ordering = ["-start_date"]

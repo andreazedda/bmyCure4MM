@@ -79,6 +79,23 @@ docker-compose logs -f web    # View logs
 docker-compose down           # Stop all
 ```
 
+### Method 5: Tailscale-local Django access
+
+For local tailnet access from another device, use the dedicated helper and setup guide:
+
+```bash
+./scripts/run_tailscale_dev.sh
+```
+
+Guide: [TAILSCALE_LOCALHOST_ACCESS.md](TAILSCALE_LOCALHOST_ACCESS.md)
+
+## Research Cockpit Development
+
+- Research cockpit guide: [../research/RESEARCH_COCKPIT_USER_GUIDE.md](../research/RESEARCH_COCKPIT_USER_GUIDE.md)
+- Developer console: [DEVELOPER_CONSOLE.md](DEVELOPER_CONSOLE.md)
+- Pre-push safety gate: [PRE_PUSH_SAFETY.md](PRE_PUSH_SAFETY.md)
+- Test strategy: [TEST_STRATEGY_RESEARCH_COCKPIT.md](TEST_STRATEGY_RESEARCH_COCKPIT.md)
+
 ## Accessing the Portal
 
 Open your browser to: **http://127.0.0.1:8001**
