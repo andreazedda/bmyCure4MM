@@ -20,6 +20,7 @@ from .causal import build_causal_assumption_set, classify_estimand
 from .cockpit import (
     build_assessment_recommendations,
     build_research_cockpit_context,
+    build_research_glossary,
     run_developer_checks,
     summarize_checks,
     write_local_feedback,
@@ -45,6 +46,11 @@ def research_cockpit_view(request: HttpRequest, patient_id: int) -> HttpResponse
     patient = _get_research_patient(request, patient_id)
     context = build_research_cockpit_context(patient, include_developer_checks=request.user.is_staff)
     return render(request, "twin_engine/research_cockpit.html", context)
+
+
+@login_required
+def research_glossary_view(request: HttpRequest) -> HttpResponse:
+    return render(request, "twin_engine/research_glossary.html", {"terms": build_research_glossary()})
 
 
 @login_required

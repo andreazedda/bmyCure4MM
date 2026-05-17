@@ -19,12 +19,49 @@
     Initialization creates a research twin state from one assessment by mapping available disease and blood markers into the mechanistic model state. This is a reproducible research starting point, not a clinical validation step.
   </p>
 
+  <div class="alert alert-warning small" role="alert">
+    Research simulation only. Initialization is not calibration, not a what-if simulation, not a causal effect estimate, and not clinically validated.
+  </div>
+
+  <div class="row g-3 mb-3">
+    <div class="col-md-6">
+      <div class="border rounded p-3 h-100">
+        <h2 class="h6">What initialization is</h2>
+        <p class="small mb-2">A deterministic conversion from one dated assessment into a PatientTwinState that can be audited and reused.</p>
+        <div class="small font-monospace bg-light border rounded p-2">Assessment(t0) -> risk mapping -> tumor/healthy/immune parameters -> PatientTwinState</div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="border rounded p-3 h-100">
+        <h2 class="h6">What initialization is not</h2>
+        <ul class="small mb-0">
+          <li>Not a fitted calibration result.</li>
+          <li>Not a treatment comparison.</li>
+          <li>Not a clinical diagnosis.</li>
+          <li>Not proof that future simulations are accurate.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="border rounded p-3 mb-3 small">
+    <h2 class="h6">Field meanings</h2>
+    <div class="row g-2">
+      <div class="col-md-4"><strong>M-protein</strong><br><span class="text-muted">Disease-marker signal when available.</span></div>
+      <div class="col-md-4"><strong>FLC ratio</strong><br><span class="text-muted">Light-chain imbalance signal when available.</span></div>
+      <div class="col-md-4"><strong>Hemoglobin</strong><br><span class="text-muted">Blood/healthy-compartment context.</span></div>
+      <div class="col-md-4"><strong>LDH</strong><br><span class="text-muted">Disease/aggressiveness context.</span></div>
+      <div class="col-md-4"><strong>Beta-2M</strong><br><span class="text-muted">Disease burden/risk context.</span></div>
+      <div class="col-md-4"><strong>R-ISS</strong><br><span class="text-muted">Risk/staging context.</span></div>
+    </div>
+  </div>
+
   {% if initialize_guidance.recommended %}
     <div class="alert alert-info">
-      Recommended assessment: {{ initialize_guidance.recommended.date }}. {{ initialize_guidance.recommended.reason }}
+      Recommended assessment: {{ initialize_guidance.recommended.date }}. Recommended because it has the strongest modeled-field completeness among available assessments. {{ initialize_guidance.recommended.reason }}
     </div>
   {% else %}
-    <div class="alert alert-warning">No assessment currently has enough modeled markers for initialization.</div>
+    <div class="alert alert-warning">No assessment currently has enough modeled markers for initialization. Add or backfill minimum disease/blood markers, then return to this page.</div>
   {% endif %}
 
   <form method="post" class="mb-3">
@@ -52,10 +89,13 @@
             <td>{% if row.is_usable %}<span class="badge text-bg-success">Usable</span>{% else %}<span class="badge text-bg-warning">Incomplete</span>{% endif %}</td>
           </tr>
         {% empty %}
-          <tr><td colspan="4" class="text-muted">No assessments available.</td></tr>
+          <tr><td colspan="4" class="text-muted">No assessments available. Create a dated Assessment before initialization.</td></tr>
         {% endfor %}
       </tbody>
     </table>
+  </div>
+  <div class="alert alert-light border small mb-0" role="alert">
+    Missing fields reduce model interpretability and may prevent initialization. If a marker is clinically known but absent here, it must be entered as a structured Assessment or LongitudinalLabResult row before the twin can use it.
   </div>
 </div>
 {% endblock %}

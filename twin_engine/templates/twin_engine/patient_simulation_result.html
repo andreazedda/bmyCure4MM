@@ -5,16 +5,26 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
             <h1 class="h3 mb-1">Research simulation result</h1>
-            <p class="text-muted mb-0">Research simulation only. Mechanistic model output, not a treatment recommendation.</p>
+            <p class="text-muted mb-0">Research simulation only. Mechanistic model output, not clinically validated and not a treatment recommendation.</p>
         </div>
         <a href="{% url 'twin_engine:research_cockpit' patient.id %}" class="btn btn-outline-secondary btn-sm">Back to cockpit</a>
     </div>
 
-    <div class="alert alert-warning">Mechanistic exploratory simulation; no clinical validity or causal identification is implied.</div>
+    <div class="alert alert-warning">Mechanistic exploratory simulation; no clinical validity or causal identification is implied. Causal effect not identified.</div>
+
+    <div class="row g-3 mb-3 small">
+        <div class="col-md-4"><div class="border rounded p-3 h-100"><strong>Question answered</strong><br><span class="text-muted">What did the mechanistic simulator output for this patient snapshot and schedule?</span></div></div>
+        <div class="col-md-4"><div class="border rounded p-3 h-100"><strong>Inputs used</strong><br><span class="text-muted">Patient twin state, schedule inputs, solver parameters, toxicity constraints, and metadata hashes.</span></div></div>
+        <div class="col-md-4"><div class="border rounded p-3 h-100"><strong>Method / computation</strong><br><span class="text-muted font-monospace">research_utility = tumor_reduction + (1 - healthy_loss) + durability_index - toxicity_constraint_penalty</span></div></div>
+        <div class="col-md-4"><div class="border rounded p-3 h-100"><strong>Output meaning</strong><br><span class="text-muted">Summary metrics are model projections and heuristic research scores, not observed outcomes.</span></div></div>
+        <div class="col-md-4"><div class="border rounded p-3 h-100"><strong>What you can do next</strong><br><span class="text-muted">Review the cockpit, compare trajectories, inspect provenance, and keep raw details collapsed until auditing.</span></div></div>
+        <div class="col-md-4"><div class="border rounded p-3 h-100"><strong>Limitations</strong><br><span class="text-muted">No clinical validity, toxicity prediction, or causal identification is implied.</span></div></div>
+    </div>
 
     <div class="card shadow-sm mb-3">
         <div class="card-header">Summary</div>
         <div class="card-body">
+            <p class="small text-muted">Metric definitions: tumor reduction is modeled disease-burden reduction; healthy-cell loss is modeled healthy-compartment loss; time to recurrence is model-estimated horizon timing if available; durability index is a model-derived persistence term.</p>
             <div class="table-responsive">
                 <table class="table table-sm mb-0">
                     <tbody>
@@ -53,6 +63,7 @@
             <div class="card shadow-sm h-100">
                 <div class="card-header">Toxicity constraints</div>
                 <div class="card-body">
+                    <p class="small text-muted">Descriptive constraint only. This layer does not yet simulate AST/ALT or NEU trajectories under alternative schedules.</p>
                     {% if toxicity_constraints %}
                         <p class="mb-1"><strong>Constraint note:</strong> {{ toxicity_constraints.reason|default:"Unavailable" }}</p>
                         <p class="mb-1"><strong>Max AST:</strong> {{ toxicity_constraints.liver.max_ast|default:"unknown" }}</p>
@@ -71,6 +82,7 @@
             <div class="card shadow-sm h-100">
                 <div class="card-header">Provenance</div>
                 <div class="card-body">
+                    <p class="small text-muted"><strong>Traceability chain:</strong> patient pseudonym -> structured inputs -> twin state -> simulation schedule -> solver output -> artifact -> metadata record.</p>
                     <p class="mb-1"><strong>Metadata record:</strong> {{ simulation_metadata.id }}</p>
                     <p class="mb-1"><strong>Model version:</strong> {{ simulation_metadata.model_version }}</p>
                     <p class="mb-1"><strong>Solver:</strong> {{ simulation_metadata.solver_name }}</p>

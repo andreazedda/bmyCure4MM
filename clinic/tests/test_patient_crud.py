@@ -214,6 +214,10 @@ class PatientCRUDViewTests(TestCase):
         self.assertContains(response, "patient-journey-tools-header")
         self.assertContains(response, "Research What-if Cockpit")
         self.assertContains(response, "Twin Inputs (over time)")
+        self.assertContains(response, "Patient workspace overview")
+        self.assertContains(response, "Recommended next step")
+        self.assertContains(response, "observed inputs, not model predictions")
+        self.assertContains(response, "Missing chart lines mean missing structured records")
 
 
 class DemoEditPermissionsTests(TestCase):

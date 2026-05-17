@@ -78,6 +78,135 @@ ASSESSMENT_TO_ANALYTE = {
 
 ANALYTE_LABELS = dict(LongitudinalLabResult.ANALYTE_CHOICES)
 
+GLOSSARY_TERMS = [
+    {
+        "term": "Twin",
+        "plain": "A patient-specific research model state.",
+        "technical": "A PatientTwinState containing mechanistic model parameters initialized or calibrated from structured observations.",
+        "where": "Twin state, Initialize Twin, calibration, what-if scenarios.",
+        "misinterpretation": "It is not a validated digital copy of the patient and not a diagnosis.",
+    },
+    {
+        "term": "Initialization",
+        "plain": "Creating the first mathematical starting point from one assessment.",
+        "technical": "Assessment(t0) -> risk mapping -> tumor/healthy/immune parameters -> PatientTwinState.",
+        "where": "Initialize Twin section and initialize page.",
+        "misinterpretation": "Initialization is not calibration, simulation, or treatment comparison.",
+    },
+    {
+        "term": "Calibration",
+        "plain": "Fitting model parameters to observed data.",
+        "technical": "Residual minimization over observed biomarkers with diagnostics such as RMSE and MAE.",
+        "where": "Calibration quality section and developer checks.",
+        "misinterpretation": "A better fit does not prove clinical validity.",
+    },
+    {
+        "term": "Residual",
+        "plain": "The gap between observed and model-predicted values.",
+        "technical": "residual = observed value - predicted value.",
+        "where": "Calibration quality and residual tables.",
+        "misinterpretation": "A residual is a model-fit diagnostic, not a patient outcome by itself.",
+    },
+    {
+        "term": "RMSE",
+        "plain": "A residual-size summary that gives larger errors more weight.",
+        "technical": "Root mean square error across available observed-vs-predicted values.",
+        "where": "Calibration quality and developer console.",
+        "misinterpretation": "Low RMSE does not prove future predictive accuracy.",
+    },
+    {
+        "term": "MAE",
+        "plain": "Average absolute residual size.",
+        "technical": "Mean absolute error across available observed-vs-predicted values.",
+        "where": "Calibration quality and residual rows.",
+        "misinterpretation": "MAE summarizes fit to available markers only.",
+    },
+    {
+        "term": "Counterfactual",
+        "plain": "A model branch that asks what the mechanistic model outputs under an alternative intervention input.",
+        "technical": "A rerun of the mechanistic model with a changed intervention definition a'.",
+        "where": "What-if scenarios and counterfactual reports.",
+        "misinterpretation": "Here it is not an identified causal effect estimate.",
+    },
+    {
+        "term": "Mechanistic simulation",
+        "plain": "A model-generated trajectory from equations and assumptions.",
+        "technical": "Y_model(a') = f(x_t, theta_hat, a').",
+        "where": "What-if, trajectory comparison, causality status.",
+        "misinterpretation": "It is not clinical proof.",
+    },
+    {
+        "term": "Causal effect",
+        "plain": "A formally identified effect of an intervention under causal assumptions and data design.",
+        "technical": "E[Y | do(A=a')] - E[Y | do(A=a)].",
+        "where": "Causality status and glossary.",
+        "misinterpretation": "The current single-patient model branch does not identify it.",
+    },
+    {
+        "term": "do-operator",
+        "plain": "Notation for setting an intervention in a causal estimand.",
+        "technical": "do(A=a) represents an intervention, not merely observing A=a.",
+        "where": "Causality status.",
+        "misinterpretation": "Using do-notation requires identification assumptions and data design.",
+    },
+    {
+        "term": "Toxicity constraint",
+        "plain": "Observed safety context that constrains interpretation.",
+        "technical": "A descriptive summary of AST/ALT, neutropenia, infections, and interruptions used in heuristic penalties.",
+        "where": "Toxicity constraints and what-if utility.",
+        "misinterpretation": "It does not yet simulate future AST/ALT or NEU trajectories.",
+    },
+    {
+        "term": "Research utility",
+        "plain": "A heuristic score for ranking model branches during research review.",
+        "technical": "tumor_reduction + (1 - healthy_loss) + durability_index - toxicity_constraint_penalty.",
+        "where": "What-if scenario table.",
+        "misinterpretation": "It is not a treatment recommendation.",
+    },
+    {
+        "term": "Provenance",
+        "plain": "Traceability for how an output was produced.",
+        "technical": "Links patient pseudonym, structured observations, twin state, intervention, run, artifact, hashes, and metadata.",
+        "where": "Provenance section and result pages.",
+        "misinterpretation": "Traceability does not prove clinical validity.",
+    },
+    {
+        "term": "Schedule collapse",
+        "plain": "Different schedules look identical to the current solver bridge.",
+        "technical": "Distinct dose schedules produce indistinguishable trajectory fingerprints under current exposure resolution.",
+        "where": "Trajectory comparison and developer checks.",
+        "misinterpretation": "It is not evidence that schedules are biologically equivalent.",
+    },
+    {
+        "term": "Exposure bridge",
+        "plain": "The layer translating therapy schedules into model inputs.",
+        "technical": "Maps PatientTherapy dose schedules and intervention definitions into solver exposure parameters.",
+        "where": "What-if and trajectory sections.",
+        "misinterpretation": "Current bridge resolution may hide timing differences.",
+    },
+    {
+        "term": "Longitudinal lab",
+        "plain": "A dated structured lab value.",
+        "technical": "LongitudinalLabResult rows grouped by analyte and date.",
+        "where": "Data availability and Twin Inputs over time.",
+        "misinterpretation": "Missing rows mean unavailable structured records, not necessarily absent disease.",
+    },
+    {
+        "term": "Adverse event",
+        "plain": "A dated safety-relevant event.",
+        "technical": "AdverseEvent rows used for descriptive toxicity context and event overlays.",
+        "where": "Data availability and toxicity constraints.",
+        "misinterpretation": "Observed adverse events are not simulated toxicity predictions.",
+    },
+    {
+        "term": "Therapy interruption",
+        "plain": "A recorded pause or change in therapy exposure.",
+        "technical": "TherapyInterruption rows linked to therapy when possible.",
+        "where": "Toxicity constraints and event overlays.",
+        "misinterpretation": "An interruption is context for interpretation, not proof of model causality.",
+    },
+]
+
 
 def build_research_cockpit_context(patient: Patient, *, include_developer_checks: bool = False) -> dict[str, Any]:
     current_state = get_current_twin_state(patient)
@@ -92,6 +221,7 @@ def build_research_cockpit_context(patient: Patient, *, include_developer_checks
         "patient": patient,
         "current_twin_state": current_state,
         "data_availability": build_data_availability(patient),
+        "workflow_steps": build_workflow_steps(patient, current_state, recommendation, scenario_rows, toxicity_constraints, causal_sets, collapse_warnings),
         "lab_chart_data": build_lab_chart_data(patient),
         "event_overlay_data": build_event_overlay_data(patient),
         "assessment_recommendation": recommendation,
@@ -103,6 +233,8 @@ def build_research_cockpit_context(patient: Patient, *, include_developer_checks
         "causal_panel": build_causal_panel(causal_sets),
         "scientific_references": load_model_references(),
         "provenance_records": metadata_records,
+        "schedule_collapse_warnings": collapse_warnings,
+        "concept_glossary": GLOSSARY_TERMS,
         "developer_check_summary": summarize_checks(run_developer_checks(patient)) if include_developer_checks else None,
         "next_actions": build_next_actions(patient, current_state, recommendation, scenario_rows),
         "raw_developer_payload": {
@@ -371,6 +503,80 @@ def build_toxicity_panel(patient: Patient, toxicity_constraints: dict[str, Any])
     }
 
 
+def build_workflow_steps(
+    patient: Patient,
+    current_state,
+    recommendation: dict[str, Any],
+    scenario_rows: list[dict[str, Any]],
+    toxicity_constraints: dict[str, Any],
+    causal_sets: list[CausalAssumptionSet],
+    collapse_warnings: list[dict[str, Any]],
+) -> list[dict[str, str]]:
+    has_labs = patient.longitudinal_lab_results.exists() or patient.assessments.exists()
+    has_residuals = patient.observation_residuals.exists()
+    has_toxicity_context = bool(toxicity_constraints) and any(
+        toxicity_constraints.get(key) for key in ("liver", "neutropenia", "infection")
+    )
+    return [
+        {
+            "step": "1. Data",
+            "status": "ready" if has_labs else "missing",
+            "meaning": "Structured observations exist for review." if has_labs else "Structured observations are missing.",
+            "next": "Review data availability and missing analytes.",
+            "href": "#data-availability",
+        },
+        {
+            "step": "2. Twin",
+            "status": "ready" if current_state else "missing",
+            "meaning": "A current PatientTwinState exists." if current_state else "No current model starting state exists.",
+            "next": "Initialize from the recommended assessment." if not current_state else "Review state date and model version.",
+            "href": "#twin-state",
+        },
+        {
+            "step": "3. Calibration",
+            "status": "ready" if has_residuals else "partial",
+            "meaning": "Residual diagnostics are available." if has_residuals else "Residual diagnostics are not yet available.",
+            "next": "Run or review calibration before interpreting scenario fit.",
+            "href": "#calibration-quality",
+        },
+        {
+            "step": "4. What-if",
+            "status": "ready" if scenario_rows else "missing",
+            "meaning": "Completed mechanistic scenario runs are available." if scenario_rows else "No completed what-if runs are available.",
+            "next": "Compare rows and open reports." if scenario_rows else "Run predefined scenarios.",
+            "href": "#what-if-scenarios",
+        },
+        {
+            "step": "5. Toxicity",
+            "status": "partial" if has_toxicity_context else "missing",
+            "meaning": "Observed toxicity context is descriptive." if has_toxicity_context else "No structured toxicity context is available.",
+            "next": "Interpret penalties as descriptive constraints.",
+            "href": "#toxicity-constraints",
+        },
+        {
+            "step": "6. Causality",
+            "status": "partial" if causal_sets else "missing",
+            "meaning": "Assumptions are documented; causal effect not identified." if causal_sets else "No causal assumption set is saved.",
+            "next": "Read mechanistic-vs-causal status.",
+            "href": "#causality-status",
+        },
+        {
+            "step": "7. Scientific basis",
+            "status": "partial",
+            "meaning": "Component assumptions and evidence status are listed.",
+            "next": "Review limitations and missing citations.",
+            "href": "#scientific-basis",
+        },
+        {
+            "step": "8. Developer checks",
+            "status": "partial" if collapse_warnings else "ready",
+            "meaning": "Schedule-resolution limitation detected." if collapse_warnings else "Internal checks can be reviewed before commit or demo.",
+            "next": "Open the developer console for audit/debug.",
+            "href": "#developer-checks",
+        },
+    ]
+
+
 def build_causal_panel(causal_sets: list[CausalAssumptionSet]) -> dict[str, Any]:
     if not causal_sets:
         return {
@@ -412,6 +618,10 @@ def build_next_actions(patient: Patient, current_state, recommendation: dict[str
         actions.append({"label": "Add modeled markers", "detail": "M-protein, FLC ratio, and hemoglobin improve initialization and calibration interpretability.", "href": "#data-availability"})
     actions.append({"label": "Open developer console", "detail": "Run internal checks before sharing artifacts or pushing code.", "href": reverse("twin_engine:developer_console")})
     return actions
+
+
+def build_research_glossary() -> list[dict[str, str]]:
+    return GLOSSARY_TERMS
 
 
 def write_local_feedback(user, payload: dict[str, Any]) -> Path:

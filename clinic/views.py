@@ -545,6 +545,43 @@ def patient_detail(request: HttpRequest, pk: int) -> HttpResponse:
     except Exception:
         research_twin_state = None
 
+    if research_missing_required_data:
+        research_recommended_next_step = {
+            "label": "Complete minimum research input fields",
+            "detail": "The latest assessment is missing fields required for a reproducible twin initialization.",
+            "href": reverse("clinic:assessment_new", args=[patient.id]) if editable else research_twin_url,
+        }
+    elif research_twin_state is None:
+        research_recommended_next_step = {
+            "label": "Initialize research twin",
+            "detail": "Create a PatientTwinState from a dated assessment before calibration or what-if simulation.",
+            "href": research_twin_url + "#twin-state",
+        }
+    elif research_latest_residual is None:
+        research_recommended_next_step = {
+            "label": "Run or review calibration",
+            "detail": "Calibration residuals are needed to understand how well the model reproduces observed biomarkers.",
+            "href": research_twin_url + "#calibration-quality",
+        }
+    elif research_counterfactual_count == 0:
+        research_recommended_next_step = {
+            "label": "Run predefined what-if scenarios",
+            "detail": "Completed mechanistic runs are needed before trajectory and utility comparisons are meaningful.",
+            "href": research_twin_url + "#what-if-scenarios",
+        }
+    elif research_provenance_count == 0:
+        research_recommended_next_step = {
+            "label": "Regenerate provenance metadata",
+            "detail": "Traceability is incomplete until simulation metadata records exist for the current twin state.",
+            "href": research_twin_url + "#provenance",
+        }
+    else:
+        research_recommended_next_step = {
+            "label": "Review full research cockpit",
+            "detail": "Data, twin state, calibration, scenarios, and provenance are present; review limitations before interpreting outputs.",
+            "href": research_twin_url,
+        }
+
     context = {
         "patient": patient,
         "assessments": assessments,
@@ -577,6 +614,7 @@ def patient_detail(request: HttpRequest, pk: int) -> HttpResponse:
         "research_counterfactual_count": research_counterfactual_count,
         "research_provenance_count": research_provenance_count,
         "research_twin_url": research_twin_url,
+        "research_recommended_next_step": research_recommended_next_step,
     }
     return render(request, "clinic/patient_detail.html", context)
 

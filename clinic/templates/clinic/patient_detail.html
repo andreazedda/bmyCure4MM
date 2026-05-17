@@ -320,6 +320,29 @@
                     </div>
                 </div>
 
+                <div class="card shadow-sm mb-3 border-secondary">
+                    <div class="card-header">
+                        <div class="fw-semibold">Patient workspace overview</div>
+                    </div>
+                    <div class="card-body small">
+                        <p class="mb-2">This page is the source-data workspace. It shows recorded assessments, therapies, notes, and observed trends. The Research What-if Cockpit is the interpretation workspace for mechanistic simulation, calibration, toxicity constraints, causality status, scientific basis, and provenance.</p>
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <div class="border rounded p-2 h-100">
+                                    <strong>What this page answers</strong>
+                                    <div class="text-muted">What was recorded for this pseudonymized patient, and what structured fields are available?</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="border rounded p-2 h-100">
+                                    <strong>What the cockpit answers</strong>
+                                    <div class="text-muted">How model state, calibration, what-if runs, toxicity constraints, causality caveats, and provenance should be interpreted.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="card shadow-sm mb-3 border-info">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <div class="fw-semibold">Research What-if Cockpit</div>
@@ -328,7 +351,12 @@
                     </div>
                     <div class="card-body">
                         <div class="alert alert-warning small" role="alert">
-                            Research simulation only. Mechanistic counterfactuals and causal assumption sets are exploratory and must not be interpreted as validated medical recommendation.
+                            Research simulation only. Mechanistic counterfactuals and causal assumption sets are exploratory, not clinically validated, not treatment recommendations, and causal effect not identified.
+                        </div>
+                        <div class="alert alert-light border small" role="alert">
+                            <strong>Recommended next step:</strong> {{ research_recommended_next_step.label }}<br>
+                            {{ research_recommended_next_step.detail }}
+                            <div class="mt-2"><a href="{{ research_recommended_next_step.href }}" class="btn btn-sm btn-info">Open next step</a></div>
                         </div>
                         <div class="row g-3 small">
                             <div class="col-md-4">
@@ -374,6 +402,9 @@
                             <a href="{{ research_twin_url }}#what-if-scenarios" class="btn btn-sm btn-outline-info">Review what-if scenarios</a>
                             <a href="{{ research_twin_url }}#trajectory-comparison" class="btn btn-sm btn-outline-info">Compare trajectories</a>
                             <a href="{{ research_twin_url }}#provenance" class="btn btn-sm btn-outline-info">View provenance</a>
+                        </div>
+                        <div class="small text-muted mt-2">
+                            Initialize twin creates a reproducible model starting state. What-if scenarios compare mechanistic branches. Trajectories plot solver outputs. Provenance shows the audit chain from structured data to artifacts.
                         </div>
                     </div>
                 </div>
@@ -476,21 +507,25 @@
             <div class="card-body">
                 <div class="d-grid gap-2">
                     <a href="{% url 'clinic:symptom_assessment_new' patient.id %}" class="btn btn-outline-primary btn-sm">
-                        📋 <span class="t-en">Record Symptoms</span>
+                        <i class="bi bi-clipboard-pulse me-1"></i><span class="t-en">Record Symptoms</span>
                         <span class="t-it">Registra Sintomi</span>
                     </a>
+                    <div class="small text-muted">Structured symptom capture for longitudinal patient context; it does not automatically recalibrate the research twin.</div>
                     <a href="{% url 'clinic:prognosis_timeline' patient.id %}" class="btn btn-outline-success btn-sm">
-                        📊 <span class="t-en">View Prognosis & Timeline</span>
+                        <i class="bi bi-bar-chart-line me-1"></i><span class="t-en">View Prognosis & Timeline</span>
                         <span class="t-it">Vedi Prognosi e Timeline</span>
                     </a>
+                    <div class="small text-muted">Human-readable timeline view for recorded events and prototype prognostic context.</div>
                     <a href="{% url 'clinic:regimen_suggestions' patient.id %}" class="btn btn-outline-info btn-sm">
-                        💊 <span class="t-en">Explore Regimen Suggestions</span>
+                        <i class="bi bi-capsule me-1"></i><span class="t-en">Explore Regimen Suggestions</span>
                         <span class="t-it">Suggerimenti Terapie</span>
                     </a>
+                    <div class="small text-muted">Prototype regimen exploration with transparency; not a prescribing tool.</div>
                     <a href="{% url 'simulator:algorithm_transparency' %}" class="btn btn-outline-secondary btn-sm">
-                        🔍 <span class="t-en">View Algorithm</span>
+                        <i class="bi bi-search me-1"></i><span class="t-en">View Algorithm</span>
                         <span class="t-it">Vedi Algoritmo</span>
                     </a>
+                    <div class="small text-muted">Model and algorithm transparency for audit and reproducibility review.</div>
                 </div>
                 <hr class="my-2">
                 <p class="small text-muted mb-0">
@@ -512,9 +547,10 @@
         <div class="card shadow-sm">
             <div class="card-body">
                 <h2 class="h5">Twin Inputs over time <span class="visually-hidden">Twin Inputs (over time)</span></h2>
-                <div class="text-muted small mb-2">R-ISS (1-3), LDH, Beta-2M</div>
+                <div class="text-muted small mb-2">R-ISS (1-3), LDH, Beta-2M. These are observed inputs, not model predictions.</div>
+                <div class="small mb-2"><strong>How to read it:</strong> R-ISS is a staging input, LDH and Beta-2M are disease-context markers. If a line is missing, the structured value is unavailable for the current chart window; add an Assessment or structured lab record to make it visible.</div>
                 {% if not twin_chart_has_data %}
-                    <div class="alert alert-light border py-2 small mb-2">Structured LDH, Beta-2M, or R-ISS values are unavailable for the current chart window.</div>
+                    <div class="alert alert-light border py-2 small mb-2">Structured LDH, Beta-2M, or R-ISS values are unavailable for the current chart window. Missing chart lines mean missing structured records, not absence of disease.</div>
                 {% endif %}
                 <div class="chart-wrapper" style="height:220px;">
                     <canvas id="twinChart"></canvas>

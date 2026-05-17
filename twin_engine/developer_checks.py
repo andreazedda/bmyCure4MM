@@ -189,9 +189,11 @@ def run_causal_checks(patient: Patient | None = None) -> list[dict[str, Any]]:
 def run_scientific_reference_checks() -> list[dict[str, Any]]:
     references = load_model_references()
     checks = []
+    pass_statuses = {"implemented_internal_model", "guideline_reference", "peer_reviewed_reference"}
     for reference in references:
-        status = "pass" if reference.get("status") == "implemented" else "warn"
-        checks.append(build_check(status, f"reference: {reference.get('component')}", reference.get("title", ""), next_action="Attach reviewed citation before claiming external validity.", raw_details=reference))
+        status = "pass" if reference.get("status") in pass_statuses else "warn"
+        detail = f"{reference.get('title', '')}: {reference.get('citation', '')}"
+        checks.append(build_check(status, f"reference: {reference.get('component')}", detail, next_action=reference.get("next_review_action") or "Attach reviewed citation before claiming external validity.", raw_details=reference))
     return checks
 
 

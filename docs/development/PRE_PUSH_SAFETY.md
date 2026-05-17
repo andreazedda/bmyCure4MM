@@ -14,6 +14,7 @@ The script is offline and performs these checks:
 - Scans staged text for obvious direct identifiers and PHI-like markers.
 - Runs `./venv/bin/python manage.py check`.
 - Runs `./venv/bin/python manage.py test twin_engine.tests`.
+- Includes cockpit content-clarity tests for section explanations, formulas, glossary, provenance, developer-console guidance, and forbidden claim language.
 - Runs `./venv/bin/python manage.py test clinic.tests.test_patient_crud clinic.tests.test_security_and_ux simulator.tests.test_twin_pr1_integration simulator.tests.test_simulation`.
 
 Use `PYTHON_BIN=/path/to/python scripts/pre_push_research_safety_check.sh` if the local virtual environment lives somewhere else.

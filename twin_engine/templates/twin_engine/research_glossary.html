@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Research Glossary{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex flex-column flex-lg-row justify-content-between gap-2 mb-3">
+    <div>
+      <p class="text-uppercase small text-muted fw-semibold mb-1">Research simulation only</p>
+      <h1 class="h3 mb-1">Research Glossary</h1>
+      <p class="text-muted mb-0">Plain-language and technical meanings for cockpit concepts. This page supports a future decision-copilot prototype and is not clinically validated.</p>
+    </div>
+    <a class="btn btn-outline-secondary align-self-start" href="{% url 'twin_engine:developer_console' %}">
+      <i class="bi bi-terminal me-1"></i> Developer Console
+    </a>
+  </div>
+
+  <div class="alert alert-warning" role="alert">
+    Research simulation only. A mechanistic simulation is distinct from a causal effect estimate; causal effect not identified unless a separate causal design supports it.
+  </div>
+
+  <div class="row g-3">
+    {% for term in terms %}
+      <div class="col-md-6 col-xl-4">
+        <article class="card h-100 shadow-sm">
+          <div class="card-body">
+            <h2 class="h6">{{ term.term }}</h2>
+            <p class="small mb-2"><strong>Plain meaning:</strong> {{ term.plain }}</p>
+            <p class="small mb-2"><strong>Technical meaning:</strong> {{ term.technical }}</p>
+            <p class="small mb-2"><strong>Where it appears:</strong> {{ term.where }}</p>
+            <p class="small text-muted mb-0"><strong>Common misinterpretation:</strong> {{ term.misinterpretation }}</p>
+          </div>
+        </article>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

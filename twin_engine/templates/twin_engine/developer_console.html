@@ -18,6 +18,22 @@
     </div>
   </div>
 
+  <div class="alert alert-warning small" role="alert">
+    Internal research validation only. These checks improve traceability and implementation quality; they do not provide clinical validation.
+  </div>
+
+  <section class="border rounded p-3 bg-light mb-3">
+    <h2 class="h6">How to use this console</h2>
+    <div class="row g-3 small">
+      <div class="col-md-4"><strong>Question answered</strong><br><span class="text-muted">Are the data, model, causal assumptions, scientific registry, artifacts, privacy controls, and developer outputs coherent enough for research review?</span></div>
+      <div class="col-md-4"><strong>Inputs used</strong><br><span class="text-muted">Database records, model outputs, model_references.json, artifact metadata, staged git paths, and local feedback.</span></div>
+      <div class="col-md-4"><strong>Method / computation</strong><br><span class="text-muted">Offline checks return pass/warn/fail with object ids, details, and a suggested fix.</span></div>
+      <div class="col-md-4"><strong>Output meaning</strong><br><span class="text-muted">Pass means no issue detected, warn means review required, fail means do not share or push until resolved.</span></div>
+      <div class="col-md-4"><strong>What you can do next</strong><br><span class="text-muted">Use each next action, rerun this console, then run the pre-push safety check.</span></div>
+      <div class="col-md-4"><strong>Limitations</strong><br><span class="text-muted">A passing console is an audit signal, not proof of external validity.</span></div>
+    </div>
+  </section>
+
   <section class="border-top pt-3 mt-3">
     <h2 class="h6">Access context</h2>
     <div class="small text-muted">Current request host: {{ request.get_host }}</div>
@@ -27,9 +43,26 @@
   {% for group_name, checks in check_summary.groups.items %}
     <section class="border-top pt-3 mt-3">
       <h2 class="h6 text-capitalize">{{ group_name }} checks</h2>
+      <p class="small text-muted">
+        {% if group_name == 'data' %}
+          Data checks inspect structured assessments, longitudinal labs, therapies, adverse events, and readiness for reproducible research simulation.
+        {% elif group_name == 'model' %}
+          Model checks inspect twin state, calibration residuals, scenario runs, schedule resolution, and solver artifacts.
+        {% elif group_name == 'causal' %}
+          Causal checks inspect assumption-set documentation and confirm that mechanistic branches are not being treated as identified causal effects.
+        {% elif group_name == 'scientific' %}
+          Scientific checks inspect model component metadata, source type, citation status, assumptions, limitations, and review actions.
+        {% elif group_name == 'artifact' %}
+          Artifact checks inspect reports, trajectories, metadata, hashes, and reproducibility traceability.
+        {% elif group_name == 'privacy' %}
+          Privacy checks inspect tracked/staged paths and local-only storage boundaries for pseudonymized research work.
+        {% else %}
+          Developer checks inspect local diagnostics and feedback that help audit the platform state.
+        {% endif %}
+      </p>
       <div class="table-responsive">
         <table class="table table-sm align-middle">
-          <thead><tr><th>Status</th><th>Check</th><th>Detail</th><th>Objects</th><th>Next action</th></tr></thead>
+          <thead><tr><th>Status</th><th>Check</th><th>Detail</th><th>Objects</th><th>Next action</th><th>Developer details</th></tr></thead>
           <tbody>
             {% for check in checks %}
               <tr>
@@ -40,6 +73,12 @@
                 <td>{{ check.detail }}</td>
                 <td class="small text-muted">{{ check.object_ids|join:", " }}</td>
                 <td class="small">{{ check.next_action }}</td>
+                <td class="small">
+                  <details>
+                    <summary>raw details</summary>
+                    <pre class="small bg-light border rounded p-2 mt-1 mb-0">{{ check.raw_details|pprint }}</pre>
+                  </details>
+                </td>
               </tr>
             {% endfor %}
           </tbody>

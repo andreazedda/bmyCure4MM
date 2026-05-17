@@ -48,6 +48,21 @@
   }
   .scenario-row { border-top: 1px solid #e5edf5; padding-top: 0.85rem; margin-top: 0.85rem; }
   .scenario-row:first-child { border-top: 0; margin-top: 0; padding-top: 0; }
+  .section-guide {
+    background: #f8fafc;
+    border: 1px solid #dfe7ef;
+    border-radius: 8px;
+    padding: 0.85rem;
+    margin-bottom: 0.85rem;
+  }
+  .guide-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.65rem; }
+  .guide-item { border-left: 3px solid #64748b; padding-left: 0.65rem; font-size: 0.875rem; }
+  .guide-label { display: block; color: #475569; font-weight: 700; font-size: 0.73rem; text-transform: uppercase; }
+  .workflow-step { border: 1px solid #dfe7ef; border-radius: 8px; padding: 0.75rem; background: #fff; height: 100%; }
+  .workflow-step.ready { border-left: 4px solid #059669; }
+  .workflow-step.partial { border-left: 4px solid #d97706; }
+  .workflow-step.missing { border-left: 4px solid #dc2626; }
+  .formula-box { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: #f1f5f9; border-radius: 6px; padding: 0.6rem; font-size: 0.86rem; }
   @media (max-width: 768px) { .chart-box { min-height: 280px; } }
 </style>
 {% endblock %}
@@ -74,8 +89,43 @@
   </div>
 
   <div class="alert alert-warning mt-3 mb-0" role="alert">
-    Mechanistic exploratory simulation, not validated medical guidance, not a treatment recommendation, and not a causal effect estimate.
+    Research simulation only. Mechanistic exploratory simulation, not clinically validated, not a treatment recommendation, and causal effect not identified.
   </div>
+
+  <section class="research-section" id="workflow-map">
+    <div class="d-flex flex-column flex-lg-row justify-content-between gap-2 mb-3">
+      <div>
+        <h2><i class="bi bi-map me-1"></i> Workflow map</h2>
+        <p class="text-muted small mb-0">A guided analytical protocol: Data -> Twin -> Calibration -> What-if -> Toxicity -> Causality -> Scientific basis -> Developer checks.</p>
+      </div>
+      <a class="btn btn-outline-secondary btn-sm align-self-start" href="{% url 'twin_engine:research_glossary' %}"><i class="bi bi-question-circle me-1"></i> Glossary</a>
+    </div>
+    <div class="row g-3">
+      {% for step in workflow_steps %}
+        <div class="col-sm-6 col-xl-3">
+          <a class="workflow-step {{ step.status }} d-block text-decoration-none text-reset" href="{{ step.href }}">
+            <div class="d-flex justify-content-between gap-2 mb-1">
+              <strong>{{ step.step }}</strong>
+              <span class="badge text-bg-light border text-uppercase">{{ step.status }}</span>
+            </div>
+            <div class="small text-muted">{{ step.meaning }}</div>
+            <div class="small mt-2"><strong>Next:</strong> {{ step.next }}</div>
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="research-section" id="how-to-use">
+    <h2><i class="bi bi-compass me-1"></i> How to use this page</h2>
+    <ol class="small mb-0">
+      <li>First check <strong>Data availability</strong> to see whether structured inputs exist.</li>
+      <li>Then verify <strong>Twin</strong> initialization and <strong>Calibration quality</strong>.</li>
+      <li>Compare <strong>What-if scenarios</strong> only after reading trajectory, toxicity, and causality caveats.</li>
+      <li>Read <strong>Scientific and mathematical basis</strong> before interpreting any score.</li>
+      <li>Use <strong>Developer details</strong> only for audit/debug; raw JSON remains collapsed by default.</li>
+    </ol>
+  </section>
 
   <section class="research-section" id="data-availability">
     <div class="d-flex flex-column flex-md-row justify-content-between gap-2">
@@ -84,21 +134,47 @@
         <span class="badge text-bg-light border">Recommended initialization date: {{ assessment_recommendation.recommended.assessment.date }}</span>
       {% endif %}
     </div>
+    <div class="section-guide">
+      <div class="guide-grid">
+        <div class="guide-item"><span class="guide-label">Question answered</span>Do we have enough structured longitudinal information to run and interpret simulations?</div>
+        <div class="guide-item"><span class="guide-label">Inputs used</span>Assessment, LongitudinalLabResult, PatientTherapy, TherapyInterruption, AdverseEvent, PatientTwinState, ObservationResidual, CounterfactualRun, CausalAssumptionSet.</div>
+        <div class="guide-item"><span class="guide-label">Method / computation</span>Counts and date ranges are computed from the database for this pseudonymized patient.</div>
+        <div class="guide-item"><span class="guide-label">Output meaning</span>READY = sufficient for current workflow; PARTIAL = usable but missing relevant fields; MISSING = no usable records.</div>
+        <div class="guide-item"><span class="guide-label">What you can do next</span>Add labs/backfill disease markers, add PatientTherapy dose schedules, add interruptions/adverse events, or initialize twin.</div>
+        <div class="guide-item"><span class="guide-label">Limitations</span>Completeness does not imply clinical validity.</div>
+      </div>
+      <div class="small mt-3"><strong>Data lineage summary:</strong> Clinical documents -> structured records -> twin state -> calibration -> what-if runs -> reports.</div>
+    </div>
     <div class="row g-3">
       {% for item in data_availability %}
         <div class="col-sm-6 col-lg-3">
           <div class="metric-tile {{ item.status }}">
             <div class="metric-number">{{ item.count }}</div>
             <div class="fw-semibold">{{ item.label }}</div>
+            <div class="small mb-1"><span class="badge text-bg-light border">{% if item.status == 'available' %}READY{% else %}MISSING{% endif %}</span></div>
             <div class="small text-muted">{{ item.detail }}</div>
           </div>
         </div>
       {% endfor %}
     </div>
+    <details class="developer-details mt-3">
+      <summary class="small fw-semibold">Developer details</summary>
+      <pre>{{ data_availability|pprint }}</pre>
+    </details>
   </section>
 
   <section class="research-section" id="twin-state">
     <h2><i class="bi bi-diagram-3 me-1"></i> Twin state / Initialize Twin</h2>
+    <div class="section-guide">
+      <div class="guide-grid">
+        <div class="guide-item"><span class="guide-label">Question answered</span>What mathematical starting state is created from one clinical assessment?</div>
+        <div class="guide-item"><span class="guide-label">Inputs used</span>One Assessment plus available M-protein, FLC ratio, hemoglobin, and risk/context fields.</div>
+        <div class="guide-item"><span class="guide-label">Method / computation</span>Assessment(t0) -> risk mapping -> initial tumor/healthy/immune parameters -> PatientTwinState.</div>
+        <div class="guide-item"><span class="guide-label">Output meaning</span>The twin state is a reproducible mechanistic starting state for research simulation.</div>
+        <div class="guide-item"><span class="guide-label">What you can do next</span>Initialize from the recommended assessment, then run calibration.</div>
+        <div class="guide-item"><span class="guide-label">Limitations</span>Not a treatment simulation, not calibration, not a counterfactual, and not a clinical diagnosis.</div>
+      </div>
+    </div>
     <div class="row g-3">
       <div class="col-lg-5">
         {% if current_twin_state %}
@@ -130,14 +206,29 @@
           </div>
         </form>
         {% if assessment_recommendation.recommended %}
-          <p class="small text-muted mt-2 mb-0">{{ assessment_recommendation.recommended.reason }}</p>
+          <p class="small text-muted mt-2 mb-0">Recommended because it maximizes available modeled markers among available assessments. {{ assessment_recommendation.recommended.reason }}</p>
         {% endif %}
       </div>
     </div>
+    <details class="developer-details mt-3">
+      <summary class="small fw-semibold">Developer details</summary>
+      <div class="small text-muted mt-2">Assessment rows are shown in the table above. Raw Assessment object representations are omitted because their string form may contain direct identifiers.</div>
+    </details>
   </section>
 
   <section class="research-section" id="calibration-quality">
     <h2><i class="bi bi-bullseye me-1"></i> Calibration quality</h2>
+    <div class="section-guide">
+      <div class="guide-grid">
+        <div class="guide-item"><span class="guide-label">Question answered</span>After initialization, how well does the model reproduce observed biomarker data?</div>
+        <div class="guide-item"><span class="guide-label">Inputs used</span>PatientTwinState, ObservationResidual rows, calibration diagnostics, observed biomarkers.</div>
+        <div class="guide-item"><span class="guide-label">Method / computation</span><span class="formula-box d-block">residual = observed value - predicted value</span></div>
+        <div class="guide-item"><span class="guide-label">Output meaning</span>RMSE = root mean square error; MAE = mean absolute error. Lower residual after calibration means better fit to available observations.</div>
+        <div class="guide-item"><span class="guide-label">What you can do next</span>Add observations, rerun calibration, or inspect optimizer status and residual rows.</div>
+        <div class="guide-item"><span class="guide-label">Limitations</span>Better fit does not prove clinical validity or future prediction accuracy.</div>
+      </div>
+      <div class="small mt-3"><strong>Traffic-light labels:</strong> usable, partial, failed, or insufficient observations describe research fit readiness only.</div>
+    </div>
     <div class="row g-3">
       <div class="col-lg-4">
         <div class="metric-tile">
@@ -146,6 +237,9 @@
           <div class="small">RMSE before: {{ calibration_panel.rmse_before|default:"Unavailable" }}</div>
           <div class="small">RMSE after: {{ calibration_panel.rmse_after|default:"Unavailable" }}</div>
           <div class="small">RMSE change: {{ calibration_panel.rmse_delta|default:"Unavailable" }}</div>
+          <div class="small">n_observations: {{ calibration_panel.diagnostics.n_observations|default:"Unavailable" }}</div>
+          <div class="small">n_parameters: {{ calibration_panel.diagnostics.n_parameters|default:"Unavailable" }}</div>
+          <div class="small">optimizer status: {{ calibration_panel.diagnostics.optimizer_status|default:calibration_panel.status }}</div>
         </div>
       </div>
       <div class="col-lg-8">
@@ -163,21 +257,51 @@
         </div>
       </div>
     </div>
+    <details class="developer-details mt-3">
+      <summary class="small fw-semibold">Developer details</summary>
+      <pre>{{ calibration_panel.diagnostics|pprint }}</pre>
+    </details>
   </section>
 
   <section class="research-section" id="longitudinal-charts">
     <h2><i class="bi bi-graph-up-arrow me-1"></i> Twin Inputs over time</h2>
-    <div class="small text-muted mb-2">Longitudinal markers used to inspect model inputs and toxicity context over time.</div>
+    <div class="section-guide">
+      <div class="guide-grid">
+        <div class="guide-item"><span class="guide-label">Question answered</span>What observed values were available over time before the model generated simulations?</div>
+        <div class="guide-item"><span class="guide-label">Inputs used</span>Structured labs, assessment fallback values, therapy exposure periods, interruptions, and adverse events.</div>
+        <div class="guide-item"><span class="guide-label">Method / computation</span>Values are grouped into disease markers, hematology markers, and AST/ALT toxicity/liver signals.</div>
+        <div class="guide-item"><span class="guide-label">Output meaning</span>Disease markers approximate disease burden signals; hematology markers approximate blood/healthy compartment signals.</div>
+        <div class="guide-item"><span class="guide-label">What you can do next</span>If lines are missing, add LongitudinalLabResult rows, verify Assessment fields, or run structured backfill.</div>
+        <div class="guide-item"><span class="guide-label">Limitations</span>These are observations, not predictions.</div>
+      </div>
+      <div class="small mt-3"><strong>Interpretation guide:</strong> Rising FLC ratio or M-protein can indicate increasing disease-marker signal; falling NEU can indicate neutropenia signal; AST/ALT spikes indicate liver toxicity signal. Missing lines mean unavailable structured records, not necessarily absent disease. Legend colors distinguish the plotted analytes within each chart.</div>
+    </div>
     <div class="row g-3">
       <div class="col-lg-4"><div id="lab-chart-disease" class="chart-box"></div></div>
       <div class="col-lg-4"><div id="lab-chart-hematology" class="chart-box"></div></div>
       <div class="col-lg-4"><div id="lab-chart-toxicity" class="chart-box"></div></div>
     </div>
     <div class="small text-muted mt-2">Structured labs are primary; assessment values are used only as fallback points when a matching structured analyte is absent for the same date.</div>
+    <details class="developer-details mt-3">
+      <summary class="small fw-semibold">Developer details</summary>
+      <pre>{{ lab_chart_data|pprint }}</pre>
+    </details>
   </section>
 
   <section class="research-section" id="what-if-scenarios">
     <h2><i class="bi bi-columns-gap me-1"></i> What-if scenarios</h2>
+    <div class="section-guide">
+      <div class="guide-grid">
+        <div class="guide-item"><span class="guide-label">Question answered</span>What simulated outcomes change when the intervention schedule changes?</div>
+        <div class="guide-item"><span class="guide-label">Inputs used</span>Baseline/current recorded therapy, current twin state, simulated alternative intervention, toxicity constraints, solver outputs.</div>
+        <div class="guide-item"><span class="guide-label">Method / computation</span>A what-if scenario changes the intervention input and reruns the mechanistic model.</div>
+        <div class="guide-item"><span class="guide-label">Output meaning</span>Rows compare model-estimated disease-control, healthy-compartment, durability, projected biomarker, and heuristic penalty terms.</div>
+        <div class="guide-item"><span class="guide-label">What you can do next</span>Open a report, compare trajectory curves, then read toxicity and causality panels before interpreting utility.</div>
+        <div class="guide-item"><span class="guide-label">Limitations</span>Utility is a research ranking heuristic, not a treatment recommendation.</div>
+      </div>
+      <div class="formula-box mt-3">research_utility = tumor_reduction + (1 - healthy_loss) + durability_index - toxicity_constraint_penalty</div>
+      <div class="small mt-3"><strong>Metric definitions:</strong> Tumor reduction = model-estimated tumor burden reduction. Healthy loss = model-estimated loss in healthy compartment. Durability index = model-estimated persistence of response over horizon. Predicted biomarkers = model-projected endpoint values if available. Toxicity penalty = heuristic exposure penalty, not toxicity prediction. Research utility = heuristic utility combining disease-control and toxicity-constraint terms.</div>
+    </div>
     <div class="table-responsive mb-3">
       <table class="table table-sm compact-table align-middle mb-0">
         <thead>
@@ -253,15 +377,53 @@
 
   <section class="research-section" id="trajectory-comparison">
     <h2><i class="bi bi-activity me-1"></i> Trajectory comparison</h2>
+    <div class="section-guide">
+      <div class="guide-grid">
+        <div class="guide-item"><span class="guide-label">Question answered</span>How do simulated trajectories evolve over the prediction horizon?</div>
+        <div class="guide-item"><span class="guide-label">Inputs used</span>Trajectory artifacts from completed baseline and alternative mechanistic runs.</div>
+        <div class="guide-item"><span class="guide-label">Method / computation</span>A table gives endpoint metrics; trajectory plots show time evolution of tumor and healthy compartments.</div>
+        <div class="guide-item"><span class="guide-label">Output meaning</span>Curves show modeled solver state over time under each intervention input.</div>
+        <div class="guide-item"><span class="guide-label">What you can do next</span>Improve exposure bridge resolution to distinguish dose timing from average dose when schedules collapse.</div>
+        <div class="guide-item"><span class="guide-label">Limitations</span>If two different dose schedules produce identical trajectories, this is a model-resolution limitation, not evidence that the schedules are biologically equivalent.</div>
+      </div>
+    </div>
     <div id="trajectory-chart" class="chart-box"></div>
-    <div class="small text-muted">Near-identical scenario lines indicate current schedule/exposure resolution may be collapsing distinct schedules into similar solver inputs.</div>
+    {% if not trajectory_chart_data.has_data %}
+      <div class="alert alert-light border small mt-2 mb-2">Trajectory unavailable: no trajectory artifact is available for plotting yet.</div>
+    {% endif %}
+    <div class="small text-muted">Schedule-resolution limitation: near-identical scenario lines indicate current schedule/exposure resolution may be collapsing distinct schedules into similar solver inputs; this is not evidence that schedules are biologically equivalent.</div>
+    <details class="developer-details mt-3">
+      <summary class="small fw-semibold">Developer details</summary>
+      <pre>{{ schedule_collapse_warnings|pprint }}</pre>
+    </details>
   </section>
 
   <section class="research-section" id="toxicity-constraints">
     <h2><i class="bi bi-shield-exclamation me-1"></i> Toxicity constraints</h2>
+    <div class="section-guide">
+      <div class="guide-grid">
+        <div class="guide-item"><span class="guide-label">Question answered</span>What safety-related constraints affect interpretation of the simulated schedules?</div>
+        <div class="guide-item"><span class="guide-label">Inputs used</span>Observed AST/ALT, neutropenia, infection, therapy interruptions, and adverse events.</div>
+        <div class="guide-item"><span class="guide-label">Method / computation</span>The current toxicity layer summarizes observed events and applies descriptive constraint penalties.</div>
+        <div class="guide-item"><span class="guide-label">Output meaning</span>descriptive_only means toxicity penalty is heuristic and based on observed context.</div>
+        <div class="guide-item"><span class="guide-label">What you can do next</span>Add missing toxicity observations or review interruptions before interpreting scenario utility.</div>
+        <div class="guide-item"><span class="guide-label">Limitations</span>It does not yet simulate AST/ALT or NEU trajectories under alternative schedules; lower exposure penalty does not prove lower toxicity.</div>
+      </div>
+    </div>
     <div class="row g-3">
       <div class="col-lg-5">
         <p class="mb-2">{{ toxicity_panel.disclaimer }}</p>
+        <ul class="small mb-2">
+          <li>Max AST: {{ toxicity_panel.summary.liver.max_ast|default:"unknown" }}</li>
+          <li>Max ALT: {{ toxicity_panel.summary.liver.max_alt|default:"unknown" }}</li>
+          <li>Peak date: {{ toxicity_panel.summary.liver.peak_date|default:"unknown" }}</li>
+          <li>Hepatic steatosis: {{ toxicity_panel.summary.liver.hepatic_steatosis|default:"unknown" }}</li>
+          <li>Neutropenia event: {{ toxicity_panel.summary.neutropenia.absolute_neutropenia_event|default:"unknown" }}</li>
+          <li>Infection event: {{ toxicity_panel.summary.infection.pneumonia_event|default:"unknown" }}</li>
+          <li>Therapy interruption count: {{ toxicity_panel.interruptions|length }}</li>
+          <li>Toxicity-limited flag: {{ toxicity_panel.summary.lenalidomide_toxicity_limited|yesno:"yes,no,unknown" }}</li>
+          <li>Toxicity model status: {{ toxicity_panel.summary.toxicity_model_status|default:"descriptive_only" }}</li>
+        </ul>
         <ul class="small mb-0">
           {% for interruption in toxicity_panel.interruptions %}
             <li>{{ interruption.start_date }} {{ interruption.drug }}: {{ interruption.get_reason_display }}</li>
@@ -281,7 +443,18 @@
 
   <section class="research-section" id="causality-status">
     <h2><i class="bi bi-signpost-split me-1"></i> Causality status</h2>
+    <div class="section-guide">
+      <div class="guide-grid">
+        <div class="guide-item"><span class="guide-label">Question answered</span>Is this a causal effect estimate or a mechanistic model branch?</div>
+        <div class="guide-item"><span class="guide-label">Inputs used</span>CausalAssumptionSet rows, run classifications, graph definitions, intervention/outcome labels.</div>
+        <div class="guide-item"><span class="guide-label">Method / computation</span><span class="formula-box d-block">Mechanistic simulation: Y_model(a') = f(x_t, theta_hat, a')</span><span class="formula-box d-block mt-1">Causal effect: E[Y | do(A=a')] - E[Y | do(A=a)]</span></div>
+        <div class="guide-item"><span class="guide-label">Output meaning</span>Current platform status: mechanistic simulation = yes; causal effect estimation = no.</div>
+        <div class="guide-item"><span class="guide-label">What you can do next</span>Define estimand, identification assumptions, external or multi-patient data, adjustment strategy, and sensitivity analysis.</div>
+        <div class="guide-item"><span class="guide-label">Limitations</span>A single-patient model branch does not identify population causal effect; causal graph stores assumptions but does not prove identification.</div>
+      </div>
+    </div>
     <p class="mb-2"><strong>{{ causal_panel.headline }}</strong> {{ causal_panel.detail }}</p>
+    <p class="small text-muted">Causal effect not identified: no external cohort, design, randomization, instrument, adjustment strategy, or sensitivity analysis is currently used for causal estimation.</p>
     <div class="table-responsive">
       <table class="table table-sm compact-table mb-0">
         <thead><tr><th>Name</th><th>Identification status</th><th>Created</th></tr></thead>
@@ -298,43 +471,91 @@
 
   <section class="research-section" id="scientific-basis">
     <h2><i class="bi bi-journal-text me-1"></i> Scientific and mathematical basis</h2>
+    <div class="section-guide">
+      <div class="guide-grid">
+        <div class="guide-item"><span class="guide-label">Question answered</span>Which implemented components, assumptions, and references support the displayed outputs?</div>
+        <div class="guide-item"><span class="guide-label">Inputs used</span>Repository model component registry from model_references.json.</div>
+        <div class="guide-item"><span class="guide-label">Method / computation</span>Component metadata is displayed with evidence status, assumptions, variables, validity domain, limitations, and review action.</div>
+        <div class="guide-item"><span class="guide-label">Output meaning</span>Evidence status labels include implemented_internal_model, placeholder, needs_peer_review, guideline_reference, and peer_reviewed_reference.</div>
+        <div class="guide-item"><span class="guide-label">What you can do next</span>Attach reviewed sources, update assumptions, or mark components for peer review.</div>
+        <div class="guide-item"><span class="guide-label">Limitations</span>Documented assumptions do not prove external validity.</div>
+      </div>
+    </div>
     <div class="row g-3">
       {% for reference in scientific_references %}
         <div class="col-md-6 col-xl-4">
           <div class="metric-tile {% if reference.status == 'placeholder' %}missing{% else %}available{% endif %}">
             <div class="fw-semibold">{{ reference.title }}</div>
-            <div class="small text-muted">{{ reference.notes }}</div>
+            <div class="small text-muted mb-2">{{ reference.notes }}</div>
+            <div class="small mb-1"><strong>Assumptions:</strong> {{ reference.assumptions }}</div>
+            <div class="small mb-1"><strong>Variables:</strong> {{ reference.variables }}</div>
+            <div class="small mb-1"><strong>Validity domain:</strong> {{ reference.validity_domain }}</div>
+            <div class="small mb-1"><strong>Limitations:</strong> {{ reference.limitations }}</div>
+            <div class="small mb-1"><strong>Next review action:</strong> {{ reference.next_review_action }}</div>
+            <div class="small mb-1"><strong>Citation/status:</strong> {{ reference.citation|default:"No peer-reviewed source is attached in the repository for this component." }}</div>
             <div class="small mt-2"><span class="badge text-bg-light border">{{ reference.source_type }}</span> <span class="badge text-bg-light border">{{ reference.status }}</span></div>
           </div>
         </div>
       {% endfor %}
     </div>
+    <details class="developer-details mt-3">
+      <summary class="small fw-semibold">Developer details</summary>
+      <pre>{{ scientific_references|pprint }}</pre>
+    </details>
   </section>
 
   <section class="research-section" id="provenance">
     <h2><i class="bi bi-fingerprint me-1"></i> Provenance</h2>
+    <div class="section-guide">
+      <div class="guide-grid">
+        <div class="guide-item"><span class="guide-label">Question answered</span>Which data, model state, intervention file, parameters, and artifacts produced this result?</div>
+        <div class="guide-item"><span class="guide-label">Inputs used</span>Patient pseudonym, structured observations, twin state, calibration diagnostics, intervention definition, simulation metadata, artifacts.</div>
+        <div class="guide-item"><span class="guide-label">Method / computation</span>Metadata links runs to model version, solver, state ID, hashes, report artifacts, and trajectory artifacts when available.</div>
+        <div class="guide-item"><span class="guide-label">Output meaning</span>Provenance proves traceability, not clinical validity.</div>
+        <div class="guide-item"><span class="guide-label">What you can do next</span>Verify artifacts, inspect hashes, or regenerate missing reports/trajectories.</div>
+        <div class="guide-item"><span class="guide-label">Limitations</span>A traceable run can still be scientifically limited or not clinically validated.</div>
+      </div>
+      <div class="small mt-3"><strong>Traceability chain:</strong> Patient pseudonym -> structured observations -> twin state -> calibration diagnostics -> intervention definition -> simulation run -> trajectory artifact -> report artifact -> metadata/provenance id.</div>
+    </div>
     <div class="table-responsive">
       <table class="table table-sm compact-table mb-0">
-        <thead><tr><th>Created</th><th>Model</th><th>Solver</th><th>Input hash</th><th>Output hash</th></tr></thead>
+        <thead><tr><th>Run id</th><th>State id</th><th>Intervention label</th><th>Artifact path</th><th>Metadata id</th><th>Input hash</th><th>Output hash</th><th>Created</th></tr></thead>
         <tbody>
           {% for record in provenance_records %}
             <tr>
-              <td>{{ record.created_at }}</td>
-              <td>{{ record.model_version }}</td>
-              <td>{{ record.solver_name }}</td>
+              <td>{% if record.counterfactual_run %}#{{ record.counterfactual_run.id }}{% else %}-{% endif %}</td>
+              <td>{% if record.twin_state %}#{{ record.twin_state.id }}{% else %}-{% endif %}</td>
+              <td>{% if record.counterfactual_run %}{{ record.counterfactual_run.intervention_definition.label|default:record.counterfactual_run.alternative_regimen|default:"custom" }}{% else %}recorded simulation{% endif %}</td>
+              <td>{% if record.counterfactual_run.report_artifact %}<code>{{ record.counterfactual_run.report_artifact }}</code>{% elif record.counterfactual_run.trajectory_artifact %}<code>{{ record.counterfactual_run.trajectory_artifact }}</code>{% else %}-{% endif %}</td>
+              <td>#{{ record.id }}</td>
               <td><code>{{ record.input_hash|slice:":12" }}</code></td>
               <td><code>{{ record.output_hash|slice:":12" }}</code></td>
+              <td>{{ record.created_at }}</td>
             </tr>
           {% empty %}
-            <tr><td colspan="5" class="text-muted">No provenance records available.</td></tr>
+            <tr><td colspan="8" class="text-muted">No provenance records available. Provenance chain cannot be audited until a simulation run writes metadata.</td></tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
+    <details class="developer-details mt-3">
+      <summary class="small fw-semibold">Developer details</summary>
+      <pre>{{ provenance_records|pprint }}</pre>
+    </details>
   </section>
 
   <section class="research-section" id="developer-checks">
     <h2><i class="bi bi-tools me-1"></i> Developer checks</h2>
+    <div class="section-guide">
+      <div class="guide-grid">
+        <div class="guide-item"><span class="guide-label">Question answered</span>Are data, model, causal, scientific, privacy, and artifact checks coherent before commit, demo, or audit?</div>
+        <div class="guide-item"><span class="guide-label">Inputs used</span>Database records, model outputs, assumptions, references, staged git files, local artifact metadata.</div>
+        <div class="guide-item"><span class="guide-label">Method / computation</span>Offline pass/warn/fail checks summarize internal consistency and safety gates.</div>
+        <div class="guide-item"><span class="guide-label">Output meaning</span>Pass = no issue detected; Warn = review task; Fail = blocker before sharing or pushing.</div>
+        <div class="guide-item"><span class="guide-label">What you can do next</span>Open Developer Console, apply suggested fixes, then rerun the pre-push safety gate.</div>
+        <div class="guide-item"><span class="guide-label">Limitations</span>Developer checks are audit aids, not clinical validation.</div>
+      </div>
+    </div>
     {% if developer_check_summary %}
       <div class="d-flex flex-wrap gap-2 mb-2">
         <span class="badge text-bg-success">Pass {{ developer_check_summary.summary.pass }}</span>
@@ -349,6 +570,19 @@
 
   <section class="research-section" id="next-actions">
     <h2><i class="bi bi-list-check me-1"></i> Next actions</h2>
+    <div class="section-guide">
+      <div class="guide-grid">
+        <div class="guide-item"><span class="guide-label">Question answered</span>What should I do next?</div>
+        <div class="guide-item"><span class="guide-label">Inputs used</span>Data readiness, current twin state, calibration residuals, completed runs, toxicity and causality state.</div>
+        <div class="guide-item"><span class="guide-label">Method / computation</span>State-specific next actions are selected from missing data, twin, calibration, what-if, toxicity, causality, and schedule-resolution conditions.</div>
+        <div class="guide-item"><span class="guide-label">Output meaning</span>Each row is a workflow action, not a clinical recommendation.</div>
+        <div class="guide-item"><span class="guide-label">What you can do next</span>Follow the first incomplete research-workflow step.</div>
+        <div class="guide-item"><span class="guide-label">Limitations</span>Action guidance improves audit workflow only.</div>
+      </div>
+    </div>
+    <div class="alert alert-light border small" role="alert">
+      Missing data: add structured labs or run backfill. Twin missing: initialize from recommended assessment. Calibration missing: run calibration. What-if missing: run predefined scenarios. Toxicity descriptive only: interpret toxicity penalty as heuristic. Causal effect not identified: do not interpret scenario difference as proven causality. Schedule collapse detected: improve exposure bridge resolution.
+    </div>
     <div class="list-group list-group-flush">
       {% for action in next_actions %}
         <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-start" href="{{ action.href }}">
@@ -397,7 +631,7 @@
       });
       const layout = Object.assign({}, baseLayout, {title: {text: group.title, font: {size: 15}}, legend: {orientation: 'h'}});
       if (traces.length === 0) {
-        layout.annotations = [{text: 'No structured values available', x: 0.5, y: 0.5, xref: 'paper', yref: 'paper', showarrow: false, font: {color: '#64748b'}}];
+        layout.annotations = [{text: 'No structured values available; missing lines mean unavailable structured records', x: 0.5, y: 0.5, xref: 'paper', yref: 'paper', showarrow: false, font: {color: '#64748b'}}];
       }
       Plotly.newPlot(element, traces, layout, plotConfig);
     }
@@ -412,7 +646,7 @@
       });
       const layout = Object.assign({}, baseLayout, {title: {text: 'Modeled cells over horizon', font: {size: 15}}, yaxis: {type: 'log', title: 'Cell count'}, xaxis: {title: 'Simulation day'}});
       if (traces.length === 0) {
-        layout.annotations = [{text: 'No trajectory artifacts available', x: 0.5, y: 0.5, xref: 'paper', yref: 'paper', showarrow: false, font: {color: '#64748b'}}];
+        layout.annotations = [{text: 'No trajectory artifacts available; rerun scenarios to generate comparison artifacts', x: 0.5, y: 0.5, xref: 'paper', yref: 'paper', showarrow: false, font: {color: '#64748b'}}];
       }
       Plotly.newPlot(element, traces, layout, plotConfig);
     }
