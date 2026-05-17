@@ -29,14 +29,22 @@ This mode is for local development and research validation only. It does not cha
 Get the Tailscale IP:
 
 ```bash
-tailscale status
-tailscale ip -4
+/Applications/Tailscale.app/Contents/MacOS/tailscale status
+/Applications/Tailscale.app/Contents/MacOS/tailscale ip -4
 ```
+
+If `tailscale` is already on your shell `PATH`, the shorter `tailscale status` and `tailscale ip -4` forms still work.
 
 Start the default port `8001`:
 
 ```bash
 scripts/run_tailscale_dev.sh
+```
+
+Disable Django autoreload when you want a single, easy-to-inspect process:
+
+```bash
+NORELOAD=1 PORT=8001 scripts/run_tailscale_dev.sh
 ```
 
 Start port `8000` when it is free:
@@ -48,7 +56,7 @@ PORT=8000 scripts/run_tailscale_dev.sh
 Manual fallback:
 
 ```bash
-TAILSCALE_IP="$(tailscale ip -4 | head -n1)"
+TAILSCALE_IP="$(/Applications/Tailscale.app/Contents/MacOS/tailscale ip -4 | head -n1)"
 export DJANGO_ALLOWED_HOSTS="localhost,127.0.0.1,0.0.0.0,${TAILSCALE_IP}"
 export DJANGO_CSRF_TRUSTED_ORIGINS="http://localhost:8001,http://127.0.0.1:8001,http://${TAILSCALE_IP}:8001"
 ./venv/bin/python manage.py check
@@ -107,19 +115,41 @@ scripts/print_tailscale_access_info.sh
 
 It prints the host name, detected Tailscale IP if available, whether ports `8000` and `8001` are already listening, and the suggested command/URL.
 
+For a read-only connectivity diagnostic on a specific port:
+
+```bash
+PORT=8001 scripts/check_tailscale_django_access.sh
+```
+
+It prints the detected Tailscale IP, current listener details, whether the listener is loopback-only, curl status for `127.0.0.1` and the Tailscale IP, environment suggestions, and the exact phone URL.
+
 ## Troubleshooting
 
-If the phone cannot connect:
+If the phone cannot open `http://<TAILSCALE_IP>:8001/`, use this decision tree:
 
-- Verify `tailscale status` on both devices.
-- Verify `tailscale ip -4` on the host machine.
-- Verify the server is bound to `0.0.0.0`, not only `127.0.0.1`.
-- Verify the phone URL uses the Tailscale IP or MagicDNS hostname, not `0.0.0.0`.
-- Verify `DJANGO_ALLOWED_HOSTS` includes the Tailscale IP or MagicDNS hostname.
-- Verify `DJANGO_CSRF_TRUSTED_ORIGINS` includes the full origin with scheme and port.
-- Verify the macOS firewall allows incoming Python/Django connections.
-- Verify no other server occupies the selected port.
-- Try `PORT=8001 scripts/run_tailscale_dev.sh` if `8000` is busy.
+1. Is the server running?
+
+	```bash
+	lsof -nP -iTCP:8001 -sTCP:LISTEN
+	```
+
+2. Is it bound to `0.0.0.0` or `*`?
+
+	If the listener shows `127.0.0.1:8001`, the phone cannot reach it. Stop that process and restart with `PORT=8001 scripts/run_tailscale_dev.sh`.
+
+3. Does the Mac itself reach the Tailscale IP?
+
+	```bash
+	curl -I http://<TAILSCALE_IP>:8001/
+	```
+
+4. If `curl` returns `400`, fix `DJANGO_ALLOWED_HOSTS`.
+
+5. If `curl` times out, check the macOS firewall and Tailscale status.
+
+6. If Mac `curl` works but the phone still fails, check the phone Tailscale app, same tailnet membership, ACLs, and mobile network or VPN behavior.
+
+Do not ask the phone user to retry until Mac-local `curl -I http://<TAILSCALE_IP>:8001/` succeeds.
 
 On Linux with `ufw`, the equivalent tailnet-local firewall rule is:
 
