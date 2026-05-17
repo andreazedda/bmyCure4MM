@@ -23,7 +23,16 @@ from .validators import validate_research_run_inputs
 logger = logging.getLogger("twin_engine.research")
 
 
-def run_counterfactual(patient, base_twin_state, intervention_definition, horizon_days, user=None):
+def run_counterfactual(
+    patient,
+    base_twin_state,
+    intervention_definition,
+    horizon_days,
+    user=None,
+    *,
+    uncertainty_config=None,
+    include_sensitivity: bool = False,
+):
     execution_definition = _normalize_intervention_definition(
         intervention_definition,
         base_twin_state.state_date,
@@ -91,6 +100,25 @@ def run_counterfactual(patient, base_twin_state, intervention_definition, horizo
             baseline_toxicity_dynamics=baseline_toxicity_dynamics,
             alternative_toxicity_dynamics=alternative_toxicity_dynamics,
         )
+        if uncertainty_config is not None:
+            from .uncertainty import run_counterfactual_uncertainty
+
+            comparison_metrics["uncertainty"] = run_counterfactual_uncertainty(
+                patient,
+                base_twin_state,
+                intervention_definition,
+                horizon_days,
+                uncertainty_config,
+            )
+        if include_sensitivity:
+            from .sensitivity import run_counterfactual_sensitivity
+
+            comparison_metrics["sensitivity"] = run_counterfactual_sensitivity(
+                patient,
+                base_twin_state,
+                intervention_definition,
+                horizon_days,
+            )
         classification = distinguish_mechanistic_counterfactual_vs_causal_estimand(
             graph_definition=execution_definition.get("causal_graph"),
             intervention=intervention_definition,

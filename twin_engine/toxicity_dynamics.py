@@ -26,7 +26,12 @@ HEURISTIC_DAILY_DOSE_REFERENCE_MG = 10.0
 HEURISTIC_CUMULATIVE_DOSE_REFERENCE_MG = 100.0
 
 
-def compute_toxicity_dynamics(patient, exposure_profile_payload: dict[str, Any] | None) -> dict[str, Any]:
+def compute_toxicity_dynamics(
+    patient,
+    exposure_profile_payload: dict[str, Any] | None,
+    *,
+    coefficient_overrides: dict[str, float] | None = None,
+) -> dict[str, Any]:
     profile = _resolve_exposure_profile(exposure_profile_payload)
     if profile is None or not profile.daily_administered_dose_mg:
         return {
@@ -69,7 +74,16 @@ def compute_toxicity_dynamics(patient, exposure_profile_payload: dict[str, Any] 
         alt_values=alt_entries,
         neu_values=neu_entries,
     )
-    coeffs = diagnostics["coefficient_values"]
+    coeffs = dict(diagnostics["coefficient_values"])
+    if coefficient_overrides:
+        for key, value in coefficient_overrides.items():
+            if key in coeffs and value is not None:
+                coeffs[key] = float(value)
+        diagnostics = {
+            **diagnostics,
+            "coefficient_values": coeffs,
+            "coefficient_override_source": "uncertainty_sampling",
+        }
 
     liver_summary = summarize_liver_toxicity(patient)
     neut_summary = summarize_neutropenia_history(patient)

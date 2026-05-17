@@ -71,6 +71,8 @@ class ResearchContentClarityTests(TestCase):
             "Prototype toxicity signals do not claim clinical validity",
             "Schedule classification",
             "Utility v2",
+            "Validation, uncertainty, and robustness",
+            "probability-best ranking under aligned uncertainty samples",
             "No peer-reviewed source is attached in the repository for this component",
             "Traceability chain",
         ]:
@@ -97,8 +99,9 @@ class ResearchContentClarityTests(TestCase):
         self.assertEqual(response.status_code, 200)
         for text in [
             "Patient workspace overview",
-            "source-data workspace",
-            "interpretation workspace",
+            "This page is for data navigation.",
+            "Use Simple Research View to understand the data and model.",
+            "Use Scientific Cockpit for technical details.",
             "Recommended next step",
             "Research simulation only",
             "not clinically validated",
@@ -114,6 +117,9 @@ class ResearchContentClarityTests(TestCase):
         self.assertEqual(console.status_code, 200)
         for text in [
             "How to use this console",
+            "Research navigation layers",
+            "Simple Research View",
+            "Scientific Cockpit",
             "Question answered",
             "Data checks inspect structured assessments",
             "Model checks inspect twin state",

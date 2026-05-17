@@ -217,6 +217,7 @@ def build_research_cockpit_context(patient: Patient, *, include_developer_checks
     toxicity_constraints = compute_toxicity_constraints(patient)
     metadata_records = _metadata_records_for_patient(patient, current_state)
     causal_sets = list(patient.causal_assumption_sets.order_by("-created_at")[:10])
+    validation_panel = build_validation_panel(patient, current_state, scenario_rows)
     context = {
         "patient": patient,
         "current_twin_state": current_state,
@@ -228,6 +229,7 @@ def build_research_cockpit_context(patient: Patient, *, include_developer_checks
         "assessment_options": recommendation["assessment_rows"],
         "calibration_panel": build_calibration_panel(patient, current_state),
         "scenario_rows": scenario_rows,
+        "validation_panel": validation_panel,
         "trajectory_chart_data": build_trajectory_chart_data(scenario_rows),
         "toxicity_panel": build_toxicity_panel(patient, toxicity_constraints, scenario_rows),
         "causal_panel": build_causal_panel(causal_sets),
@@ -448,6 +450,8 @@ def build_scenario_rows(patient: Patient, latest_runs_by_label: dict[str, Counte
     for label, run in latest_runs_by_label.items():
         metrics = run.comparison_metrics or {}
         summary = run.simulation_summary or {}
+        uncertainty = metrics.get("uncertainty") or {}
+        sensitivity = metrics.get("sensitivity") or {}
         predicted = summary.get("predicted_biomarkers") or {}
         baseline_predicted = summary.get("baseline_predicted_biomarkers") or {}
         trajectory_payload = load_json_artifact(run.trajectory_artifact)
@@ -499,6 +503,8 @@ def build_scenario_rows(patient: Patient, latest_runs_by_label: dict[str, Counte
                 "interpretation": interpret_scenario(metrics, predicted, issues, exposure_comparison, alternative_toxicity_dynamics),
                 "trajectory_payload": trajectory_payload,
                 "report_payload": report_payload,
+                "uncertainty": uncertainty,
+                "sensitivity": sensitivity,
                 "exposure_comparison": exposure_comparison,
                 "alternative_toxicity_dynamics": alternative_toxicity_dynamics,
                 "alternative_primary_exposure_profile": alternative_primary_profile,
@@ -688,6 +694,74 @@ def build_next_actions(patient: Patient, current_state, recommendation: dict[str
     return actions
 
 
+def build_validation_panel(patient: Patient, current_state, scenario_rows: list[dict[str, Any]]) -> dict[str, Any]:
+    backtest = _latest_diagnostic_summary(patient, current_state, "rolling_origin_backtest")
+    robustness = _latest_diagnostic_summary(patient, current_state, "robust_scenario_ranking")
+    robustness_rows = list((robustness.get("summary") or {}).get("rows") or [])
+    robustness_by_label = {item.get("scenario_label"): item for item in robustness_rows}
+
+    uncertainty_rows = []
+    sensitivity_rows = []
+    validity_rows = []
+    for row in scenario_rows:
+        uncertainty = row.get("uncertainty") or {}
+        metric_summaries = dict(uncertainty.get("metric_summaries") or {})
+        utility_summary = metric_summaries.get("research_utility_v2") or {}
+        robustness_row = robustness_by_label.get(row["label"]) or {}
+        trust_label = _validation_trust_label(
+            backtest_summary=backtest.get("summary") or {},
+            utility_summary=utility_summary,
+            robustness_row=robustness_row,
+        )
+        uncertainty_rows.append(
+            {
+                "label": row["label"],
+                "status": uncertainty.get("status") or "unavailable",
+                "uncertainty_source": uncertainty.get("parameter_uncertainty_source") or "unavailable",
+                "tumor_reduction": metric_summaries.get("tumor_reduction") or {},
+                "healthy_loss": metric_summaries.get("healthy_loss") or {},
+                "durability_index": metric_summaries.get("durability_index") or {},
+                "liver_toxicity_signal_0_1": metric_summaries.get("liver_toxicity_signal_0_1") or {},
+                "neutropenia_signal_0_1": metric_summaries.get("neutropenia_signal_0_1") or {},
+                "research_utility_v2": utility_summary,
+                "trust_label": trust_label,
+            }
+        )
+        sensitivity = row.get("sensitivity") or {}
+        top_drivers = list(sensitivity.get("top_drivers") or [])
+        sensitivity_rows.append(
+            {
+                "label": row["label"],
+                "status": sensitivity.get("status") or "unavailable",
+                "top_drivers": top_drivers,
+                "unstable_parameters": list(sensitivity.get("unstable_parameters") or []),
+            }
+        )
+        validity_rows.append(
+            {
+                "label": row["label"],
+                "trust_label": trust_label,
+                "why": _validation_reason(
+                    backtest_summary=backtest.get("summary") or {},
+                    utility_summary=utility_summary,
+                    robustness_row=robustness_row,
+                ),
+            }
+        )
+
+    return {
+        "backtest": backtest,
+        "robustness": robustness,
+        "uncertainty_rows": uncertainty_rows,
+        "sensitivity_rows": sensitivity_rows,
+        "validity_rows": validity_rows,
+        "limitations": [
+            "Uncertainty intervals, backtests, sensitivity summaries, and robust ranks remain internal research diagnostics.",
+            "None of these diagnostics establish clinical validity, treatment recommendation status, or causal effect estimation.",
+        ],
+    }
+
+
 def build_research_glossary() -> list[dict[str, str]]:
     return GLOSSARY_TERMS
 
@@ -768,6 +842,43 @@ def _metadata_records_for_patient(patient: Patient, current_state) -> list[Simul
     if current_state is not None:
         queryset = queryset | SimulationRunMetadata.objects.filter(twin_state=current_state)
     return list(queryset.distinct().order_by("-created_at")[:12])
+
+
+def _latest_diagnostic_summary(patient: Patient, current_state, solver_name: str) -> dict[str, Any]:
+    queryset = SimulationRunMetadata.objects.filter(solver_name=solver_name)
+    if current_state is not None:
+        queryset = queryset.filter(twin_state=current_state)
+    else:
+        queryset = queryset.filter(counterfactual_run__patient=patient)
+    record = queryset.order_by("-created_at").first()
+    summary = dict((record.solver_parameters or {}).get("diagnostic_summary") or {}) if record is not None else {}
+    return {"record": record, "summary": summary}
+
+
+def _validation_trust_label(*, backtest_summary: dict[str, Any], utility_summary: dict[str, Any], robustness_row: dict[str, Any]) -> str:
+    if utility_summary.get("status") != "completed":
+        return "exploratory_only"
+    if utility_summary.get("uncertainty_classification") == "wide":
+        return "exploratory_only"
+    if robustness_row.get("robustness_classification") == "robust" and backtest_summary.get("status") == "completed":
+        return "internally_checked_research_signal"
+    if robustness_row.get("robustness_classification") in {"contested", "fragile"}:
+        return "fragile_research_signal"
+    return "research_signal_pending_validation"
+
+
+def _validation_reason(*, backtest_summary: dict[str, Any], utility_summary: dict[str, Any], robustness_row: dict[str, Any]) -> str:
+    if utility_summary.get("status") != "completed":
+        return "No scenario-specific uncertainty summary is stored for this run yet."
+    if utility_summary.get("uncertainty_classification") == "wide":
+        return "The utility_v2 interval is wide, so treat the ranking as exploratory only."
+    if backtest_summary.get("status") != "completed":
+        return "Held-out backtesting has not been recorded yet, so predictive trust remains limited."
+    if robustness_row.get("robustness_classification") == "robust":
+        return "Held-out backtesting is available and the uncertainty-ranked leader remains stable across sampled perturbations."
+    if robustness_row.get("robustness_classification") == "contested":
+        return "The scenario remains competitive, but overlap with nearby alternatives keeps the rank fragile."
+    return "The current diagnostics do not justify more than exploratory interpretation."
 
 
 def _trajectory_series(label: str, trajectory: dict[str, Any], kind: str) -> dict[str, Any]:

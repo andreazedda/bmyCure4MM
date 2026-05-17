@@ -1,0 +1,448 @@
+{% extends "base.html" %}
+
+{% block title %}Simple Research View{% endblock %}
+
+{% block extra_head %}
+<style>
+  .simple-story {
+    color: #1f2937;
+  }
+  .simple-hero {
+    background: linear-gradient(135deg, #f6fbf8 0%, #fffaf1 52%, #f8fbff 100%);
+    border: 1px solid #dbe8e0;
+    border-radius: 14px;
+    padding: 1.4rem;
+  }
+  .simple-banner {
+    border-left: 4px solid #b45309;
+    background: #fff7ed;
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+  }
+  .story-section {
+    margin-top: 1rem;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 1rem;
+  }
+  .summary-grid,
+  .data-grid,
+  .lineage-grid,
+  .nav-grid,
+  .conclusion-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.85rem;
+  }
+  .summary-card,
+  .data-card,
+  .lineage-card,
+  .nav-card,
+  .conclusion-card,
+  .step-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 0.9rem;
+    background: #fff;
+  }
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border: 1px solid transparent;
+  }
+  .status-pill.enough {
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+    color: #065f46;
+  }
+  .status-pill.partial {
+    background: #fff7ed;
+    border-color: #fdba74;
+    color: #9a3412;
+  }
+  .status-pill.missing {
+    background: #fef2f2;
+    border-color: #fca5a5;
+    color: #991b1b;
+  }
+  .story-table th,
+  .story-table td {
+    vertical-align: top;
+    font-size: 0.92rem;
+  }
+  .scenario-card {
+    border-top: 1px solid #e5e7eb;
+    padding-top: 0.95rem;
+    margin-top: 0.95rem;
+  }
+  .scenario-card:first-child {
+    border-top: 0;
+    margin-top: 0;
+    padding-top: 0;
+  }
+  .muted-label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #6b7280;
+  }
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 0.85rem;
+  }
+  @media (max-width: 768px) {
+    .simple-hero {
+      padding: 1rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="simple-story">
+  <section class="simple-hero">
+    <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
+      <div>
+        <p class="text-uppercase small text-muted fw-semibold mb-1">Simple Research View</p>
+        <h1 class="h3 mb-2">Patient Research Summary</h1>
+        <p class="text-muted mb-2">A simplified explanation of the patient data, model inputs, simulated scenarios, and current limitations.</p>
+        <div class="small text-muted">{{ story.patient_summary.pseudonym }}</div>
+      </div>
+      <div class="nav-grid align-self-start">
+        <a class="nav-card text-decoration-none text-reset" href="{{ story.navigation.patient_page_url }}">
+          <div class="fw-semibold">Patient Page</div>
+          <div class="small text-muted">Use this page for data navigation.</div>
+        </a>
+        <div class="nav-card border-success">
+          <div class="fw-semibold">Simple Research View</div>
+          <div class="small text-muted">Use this page to understand data, model inputs, results, and limits.</div>
+        </div>
+        <a class="nav-card text-decoration-none text-reset" href="{{ story.navigation.cockpit_url }}">
+          <div class="fw-semibold">Scientific Cockpit</div>
+          <div class="small text-muted">Use this page for technical model interpretation.</div>
+        </a>
+        {% if user.is_staff %}
+          <a class="nav-card text-decoration-none text-reset" href="{{ story.navigation.developer_console_url }}">
+            <div class="fw-semibold">Developer Console</div>
+            <div class="small text-muted">Use this page for validation and debugging.</div>
+          </a>
+        {% else %}
+          <div class="nav-card">
+            <div class="fw-semibold">Developer Console</div>
+            <div class="small text-muted">Staff-only validation and debugging workspace.</div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="simple-banner mt-3">
+      <strong>{{ story.global_banner }}</strong>
+    </div>
+    <div class="d-flex flex-wrap gap-2 mt-3">
+      <a class="btn btn-primary" href="{{ story.patient_summary.next_action.href }}">{{ story.patient_summary.next_action.title }}</a>
+      <a class="btn btn-outline-secondary" href="{{ story.navigation.glossary_url }}">Open Glossary</a>
+      <a class="btn btn-outline-secondary" href="{{ story.navigation.cockpit_url }}">Open Scientific Cockpit</a>
+      {% if user.is_staff %}
+        <a class="btn btn-outline-secondary" href="{{ story.navigation.developer_console_url }}">Open Developer Console</a>
+      {% endif %}
+    </div>
+  </section>
+
+  <section class="story-section" id="one-minute-summary">
+    <div class="d-flex flex-column flex-lg-row justify-content-between gap-2 mb-3">
+      <div>
+        <h2 class="h5 mb-1">One-minute summary</h2>
+        <div class="text-muted small">What data exist, what the model uses, what has been simulated, and the main current limitation.</div>
+      </div>
+      <div class="small text-muted">{{ story.patient_summary.record_count_summary }}</div>
+    </div>
+    <div class="summary-grid">
+      {% for card in story.one_minute_summary %}
+        <div class="summary-card">
+          <div class="d-flex justify-content-between gap-2 align-items-start mb-2">
+            <strong>{{ card.title }}</strong>
+            <span class="status-pill {{ card.status }}">{{ card.status }}</span>
+          </div>
+          <div class="small text-muted">{{ card.detail }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="story-section" id="data-lineage">
+    <h2 class="h5 mb-3">Data lineage</h2>
+    <div class="text-muted small mb-3">Clinical documents → structured patient records → model inputs → twin state → simulated scenarios → uncertainty / ranking stability checks → interpretation cards</div>
+    <div class="lineage-grid">
+      {% for node in story.lineage_nodes %}
+        <a class="lineage-card text-decoration-none text-reset" href="{{ node.href }}">
+          <div class="d-flex justify-content-between gap-2 align-items-start mb-2">
+            <strong>{{ node.label }}</strong>
+            <span class="status-pill {{ node.status }}">{{ node.status }}</span>
+          </div>
+          <div class="small text-muted">{{ node.detail }}</div>
+        </a>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="story-section" id="step-by-step">
+    <h2 class="h5 mb-3">Step-by-step explanation</h2>
+    <div class="steps-grid">
+      {% for step in story.steps %}
+        <a class="step-card text-decoration-none text-reset" href="{{ step.link }}">
+          <div class="d-flex justify-content-between gap-2 align-items-start mb-2">
+            <strong>{{ step.step }}</strong>
+            <span class="status-pill {{ step.status }}">{{ step.status }}</span>
+          </div>
+          <div class="small text-muted">{{ step.plain_explanation }}</div>
+        </a>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="story-section" id="data-blocks">
+    <h2 class="h5 mb-1">1. What data do we have?</h2>
+    <div class="text-muted small mb-3">Each block explains what is available, what is missing, why it matters, and the next visible action.</div>
+    <div class="data-grid">
+      {% for block in story.data_blocks %}
+        <div class="data-card">
+          <div class="d-flex justify-content-between gap-2 align-items-start mb-2">
+            <strong>{{ block.title }}</strong>
+            <span class="status-pill {{ block.status }}">{{ block.status }}</span>
+          </div>
+          <div class="small mb-2">{{ block.plain_meaning }}</div>
+          <div class="small text-muted mb-2"><strong>Fields:</strong> {{ block.fields_used|join:", " }}</div>
+          <div class="small text-muted mb-1"><strong>Available count:</strong> {{ block.available_count }}</div>
+          <div class="small text-muted mb-1"><strong>Date range:</strong> {{ block.date_range }}</div>
+          <div class="small text-muted mb-1"><strong>Used by model:</strong> {% if block.used_by_model %}Yes{% else %}No{% endif %}</div>
+          <div class="small mb-1"><strong>Why it matters:</strong> {{ block.why_it_matters }}</div>
+          <div class="small mb-1"><strong>Missing data:</strong> {{ block.missing_data_message }}</div>
+          <div class="small mb-2"><strong>Limit:</strong> {{ block.limit }}</div>
+          <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-sm btn-outline-primary" href="{{ block.next_action.href }}">{{ block.next_action.title }}</a>
+            {% if block.developer_link %}
+              <a class="btn btn-sm btn-outline-secondary" href="{{ block.developer_link }}">Technical detail</a>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="story-section" id="missing-data">
+    <h2 class="h5 mb-2">2. What is missing?</h2>
+    <div class="text-muted small mb-3">This section lists the blocks that are still partial or missing so the next action stays visible.</div>
+    <div class="conclusion-grid">
+      {% for block in story.data_blocks %}
+        {% if block.status != 'enough' %}
+          <div class="conclusion-card">
+            <strong>{{ block.title }}</strong>
+            <div class="small text-muted mt-2">{{ block.missing_data_message }}</div>
+            <div class="mt-2"><a class="btn btn-sm btn-outline-primary" href="{{ block.next_action.href }}">{{ block.next_action.title }}</a></div>
+          </div>
+        {% endif %}
+      {% empty %}
+        <div class="conclusion-card">
+          <strong>No major gap is flagged right now</strong>
+          <div class="small text-muted mt-2">Current gaps are more about interpretation limits than a missing block.</div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="story-section" id="model-status">
+    <h2 class="h5 mb-3">3. What the model actually uses</h2>
+    <div class="summary-grid mb-3">
+      <div class="summary-card">
+        <div class="muted-label mb-1">Mathematical starting state</div>
+        <div class="fw-semibold">{{ story.model_story.twin_initialized|title }}</div>
+      </div>
+      <div class="summary-card">
+        <div class="muted-label mb-1">Observed-vs-predicted fit check</div>
+        <div class="fw-semibold">{{ story.model_story.backtesting_available|title }}</div>
+      </div>
+      <div class="summary-card">
+        <div class="muted-label mb-1">Stored uncertainty range</div>
+        <div class="fw-semibold">{{ story.model_story.uncertainty_available|title }}</div>
+      </div>
+      <div class="summary-card">
+        <div class="muted-label mb-1">Toxicity layer</div>
+        <div class="fw-semibold">{{ story.model_story.toxicity_model_status }}</div>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="table story-table">
+        <thead>
+          <tr>
+            <th>Input group</th>
+            <th>Used fields</th>
+            <th>Model role</th>
+            <th>Available?</th>
+            <th>Missing?</th>
+            <th>Interpretation risk</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in story.input_table %}
+            <tr>
+              <td>{{ row.input_group }}</td>
+              <td>{{ row.used_fields }}</td>
+              <td>{{ row.model_role }}</td>
+              <td>{{ row.available }}</td>
+              <td>{{ row.missing }}</td>
+              <td>{{ row.interpretation_risk }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="story-section" id="scenario-comparison">
+    <h2 class="h5 mb-1">4. What has been simulated?</h2>
+    <div class="text-muted small mb-3">The simplified comparison shows schedule meaning, exposure pattern, disease-control signal, toxicity signal, uncertainty, and interpretation. Technical metrics stay hidden until you ask for them.</div>
+    <div class="row g-3 mb-3 small">
+      <div class="col-lg-6">
+        <div class="summary-card h-100">
+          <div class="fw-semibold mb-2">5. What changed across scenarios?</div>
+          <div class="text-muted">The page focuses on differences in schedule wording, exposure pattern, disease-control signal, healthy-tissue strain, and the plain-language interpretation for each simulated schedule.</div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="summary-card h-100">
+          <div class="fw-semibold mb-2">6. What is uncertain?</div>
+          <div class="text-muted">The uncertainty range means the output moves when stored parameter perturbations are applied. A narrow range is more stable than a wide range, but this is still a research diagnostic.</div>
+        </div>
+      </div>
+    </div>
+    {% if story.scenario_story %}
+      {% for scenario in story.scenario_story %}
+        <div class="scenario-card">
+          <div class="d-flex flex-column flex-lg-row justify-content-between gap-2 mb-2">
+            <div>
+              <h3 class="h6 mb-1">{{ scenario.scenario_label }}</h3>
+              <div class="small text-muted">{{ scenario.plain_schedule }}</div>
+            </div>
+            <div class="small text-muted">{{ scenario.robustness_label }}</div>
+          </div>
+          <div class="row g-3 small">
+            <div class="col-md-4">
+              <div class="muted-label">Exposure pattern</div>
+              <div>{{ scenario.exposure_pattern }}</div>
+            </div>
+            <div class="col-md-4">
+              <div class="muted-label">Disease-control signal</div>
+              <div>{{ scenario.tumor_signal_change }}</div>
+            </div>
+            <div class="col-md-4">
+              <div class="muted-label">Healthy-tissue signal</div>
+              <div>{{ scenario.healthy_signal_change }}</div>
+            </div>
+            <div class="col-md-4">
+              <div class="muted-label">Toxicity signal</div>
+              <div>{{ scenario.toxicity_signal }}</div>
+            </div>
+            <div class="col-md-4">
+              <div class="muted-label">Uncertainty</div>
+              <div>{{ scenario.uncertainty_summary }}</div>
+            </div>
+            <div class="col-md-4">
+              <div class="muted-label">Interpretation</div>
+              <div>{{ scenario.plain_interpretation }}</div>
+            </div>
+          </div>
+          <div class="alert alert-light border small mt-3 mb-2">
+            <strong>Allowed conclusion:</strong> {{ scenario.allowed_conclusion }}<br>
+            <strong>Forbidden conclusion:</strong> {{ scenario.forbidden_conclusion }}
+          </div>
+          <details class="small">
+            <summary>Show technical metrics, including the heuristic research score called utility_v2</summary>
+            <div class="text-muted mt-2">These are technical metric names from the Scientific Cockpit. The percentile columns show the stored 5th, 50th, and 95th percentile values when they are available.</div>
+            <div class="table-responsive mt-2">
+              <table class="table table-sm story-table mb-0">
+                <thead>
+                  <tr>
+                    <th>tumor_reduction</th>
+                    <th>healthy_loss</th>
+                    <th>durability</th>
+                    <th>utility_v2</th>
+                    <th>p05 (5th percentile)</th>
+                    <th>p50 (median)</th>
+                    <th>p95 (95th percentile)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{{ scenario.technical_metrics.tumor_reduction|default:"Not available" }}</td>
+                    <td>{{ scenario.technical_metrics.healthy_loss|default:"Not available" }}</td>
+                    <td>{{ scenario.technical_metrics.durability|default:"Not available" }}</td>
+                    <td>{{ scenario.technical_metrics.utility_v2|default:"Not available" }}</td>
+                    <td>{{ scenario.technical_metrics.p05|default:"Not available" }}</td>
+                    <td>{{ scenario.technical_metrics.median|default:"Not available" }}</td>
+                    <td>{{ scenario.technical_metrics.p95|default:"Not available" }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="alert alert-warning small mb-0">No completed simulated scenarios are currently available. The next action is to run scenarios from the Scientific Cockpit.</div>
+    {% endif %}
+  </section>
+
+  <section class="story-section" id="conclusion-limits">
+    <div class="row g-4">
+      <div class="col-lg-6">
+        <h2 class="h5">7. What can I conclude?</h2>
+        <ul class="small mb-0">
+          {% for item in story.allowed_conclusions %}
+            <li>{{ item }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="col-lg-6">
+        <h2 class="h5">8. What can I NOT conclude?</h2>
+        <ul class="small mb-0">
+          {% for item in story.forbidden_conclusions %}
+            <li>{{ item }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    <div class="conclusion-grid mt-3">
+      {% for card in story.conclusion_cards %}
+        <div class="conclusion-card">
+          <strong>{{ card.title }}</strong>
+          <div class="small text-muted mt-2">{{ card.detail }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="story-section" id="next-actions">
+    <h2 class="h5 mb-2">9. What should I do next?</h2>
+    <div class="alert alert-light border small mb-3">
+      <strong>{{ story.patient_summary.next_action.title }}</strong><br>
+      {{ story.patient_summary.next_action.detail }}
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+      <a class="btn btn-primary" href="{{ story.patient_summary.next_action.href }}">Take next action</a>
+      <a class="btn btn-outline-secondary" href="{{ story.navigation.cockpit_url }}">Open Scientific Cockpit</a>
+      {% if user.is_staff %}
+        <a class="btn btn-outline-secondary" href="{{ story.navigation.developer_console_url }}">Open Developer Console</a>
+      {% endif %}
+      <a class="btn btn-outline-secondary" href="{{ story.navigation.glossary_url }}">Open Glossary</a>
+      <a class="btn btn-outline-secondary" href="{{ story.navigation.patient_page_url }}">Open Patient Page</a>
+    </div>
+  </section>
+</div>
+{% endblock %}

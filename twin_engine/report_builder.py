@@ -38,6 +38,8 @@ def build_counterfactual_report_payload(
         "baseline_predicted_biomarkers": (baseline_summary or {}).get("predicted_biomarkers"),
         "predicted_biomarkers": (alternative_summary or {}).get("predicted_biomarkers"),
         "comparison_metrics": comparison_metrics,
+        "uncertainty": (comparison_metrics or {}).get("uncertainty") or {},
+        "sensitivity": (comparison_metrics or {}).get("sensitivity") or {},
         "schedule_comparison": (comparison_metrics or {}).get("schedule_comparison") or {},
         "toxicity_constraints": toxicity_constraints or {},
         "warnings": list(warnings or []),

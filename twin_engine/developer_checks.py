@@ -40,6 +40,7 @@ def run_developer_checks(patient: Patient | None = None) -> dict[str, list[dict[
     return {
         "data": run_data_consistency_checks(patient),
         "model": run_model_consistency_checks(patient),
+        "validation": run_validation_checks(patient),
         "causal": run_causal_checks(patient),
         "scientific": run_scientific_reference_checks(),
         "privacy": run_privacy_security_checks(),
@@ -234,6 +235,56 @@ def run_artifact_checks(patient: Patient | None = None) -> list[dict[str, Any]]:
         build_check("pass" if not missing_metadata else "warn", "provenance metadata exists", "Completed runs should have provenance metadata.", object_ids=missing_metadata, next_action="Re-run affected scenarios."),
         build_check("pass" if not missing_hash else "warn", "output hashes exist", "Metadata should include output hashes where implemented.", object_ids=missing_hash, next_action="Backfill or regenerate metadata."),
     ]
+
+
+def run_validation_checks(patient: Patient | None = None) -> list[dict[str, Any]]:
+    patients = [patient] if patient is not None else list(Patient.objects.all())
+    checks: list[dict[str, Any]] = []
+    missing_backtest = []
+    missing_robustness = []
+    missing_uncertainty = []
+    missing_sensitivity = []
+    wide_uncertainty = []
+
+    for item in patients:
+        assessments_count = item.assessments.count()
+        if assessments_count >= 3:
+            current_state = PatientTwinState.objects.filter(patient=item, is_current=True).first()
+            backtest_record = SimulationRunMetadata.objects.filter(
+                twin_state=current_state,
+                solver_name="rolling_origin_backtest",
+            ).order_by("-created_at").first() if current_state is not None else None
+            if backtest_record is None:
+                missing_backtest.append(item.id)
+
+        latest_runs = _latest_completed_runs(item)
+        if len(latest_runs) >= 2:
+            current_state = PatientTwinState.objects.filter(patient=item, is_current=True).first()
+            robustness_record = SimulationRunMetadata.objects.filter(
+                twin_state=current_state,
+                solver_name="robust_scenario_ranking",
+            ).order_by("-created_at").first() if current_state is not None else None
+            if robustness_record is None:
+                missing_robustness.append(item.id)
+
+        for run in latest_runs.values():
+            uncertainty = ((run.comparison_metrics or {}).get("uncertainty") or {})
+            sensitivity = ((run.comparison_metrics or {}).get("sensitivity") or {})
+            if uncertainty.get("status") != "completed":
+                missing_uncertainty.append(run.id)
+            else:
+                utility_summary = ((uncertainty.get("metric_summaries") or {}).get("research_utility_v2") or {})
+                if utility_summary.get("uncertainty_classification") == "wide":
+                    wide_uncertainty.append(run.id)
+            if sensitivity.get("status") != "completed":
+                missing_sensitivity.append(run.id)
+
+    checks.append(build_check("pass" if not missing_backtest else "warn", "rolling backtest summary exists", "Patients with enough historical assessments should have a stored rolling-origin backtest summary.", object_ids=missing_backtest, next_action="Run the backtest command and store the diagnostic summary."))
+    checks.append(build_check("pass" if not missing_uncertainty else "warn", "scenario uncertainty summary exists", "Completed scenarios should expose uncertainty intervals before robust ranking is interpreted.", object_ids=missing_uncertainty, next_action="Run scenario uncertainty diagnostics."))
+    checks.append(build_check("pass" if not missing_sensitivity else "warn", "scenario sensitivity summary exists", "Completed scenarios should expose ranked driver summaries.", object_ids=missing_sensitivity, next_action="Run scenario sensitivity diagnostics."))
+    checks.append(build_check("pass" if not missing_robustness else "warn", "robust ranking summary exists", "Patients with multiple completed scenarios should have a stored robust ranking summary.", object_ids=missing_robustness, next_action="Run robust ranking after uncertainty diagnostics."))
+    checks.append(build_check("pass" if not wide_uncertainty else "warn", "utility_v2 uncertainty is not wide", "Wide utility_v2 intervals mean scenario ranking should be treated as exploratory only.", object_ids=wide_uncertainty, next_action="Label wide-interval scenarios as exploratory and inspect sensitivity drivers."))
+    return checks
 
 
 def load_model_references() -> list[dict[str, Any]]:

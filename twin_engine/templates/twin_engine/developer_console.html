@@ -23,6 +23,40 @@
   </div>
 
   <section class="border rounded p-3 bg-light mb-3">
+    <h2 class="h6">Research navigation layers</h2>
+    <div class="row g-3 small">
+      <div class="col-md-3">
+        <strong>Patient page</strong><br>
+        <span class="text-muted">Navigate recorded data and structured fields.</span>
+        <div class="mt-2"><a class="btn btn-sm btn-outline-secondary" href="{{ navigation_links.patient_page_url }}">Open Patient Page</a></div>
+      </div>
+      <div class="col-md-3">
+        <strong>Simple Research View</strong><br>
+        <span class="text-muted">Understand data, model inputs, results, and limits.</span>
+        {% if navigation_links.simple_view_url %}
+          <div class="mt-2"><a class="btn btn-sm btn-outline-secondary" href="{{ navigation_links.simple_view_url }}">Open Simple Research View</a></div>
+        {% else %}
+          <div class="mt-2 text-muted">Open from a patient page or add <code>?patient_id=</code> to focus this console.</div>
+        {% endif %}
+      </div>
+      <div class="col-md-3">
+        <strong>Scientific Cockpit</strong><br>
+        <span class="text-muted">Inspect technical model outputs and diagnostics.</span>
+        {% if navigation_links.cockpit_url %}
+          <div class="mt-2"><a class="btn btn-sm btn-outline-secondary" href="{{ navigation_links.cockpit_url }}">Open Scientific Cockpit</a></div>
+        {% else %}
+          <div class="mt-2 text-muted">Open from a patient page or add <code>?patient_id=</code> to focus this console.</div>
+        {% endif %}
+      </div>
+      <div class="col-md-3">
+        <strong>Developer Console</strong><br>
+        <span class="text-muted">Validate internals, privacy, artifacts, and safety checks.</span>
+        <div class="mt-2"><a class="btn btn-sm btn-outline-secondary" href="{{ navigation_links.glossary_url }}">Open Glossary</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="border rounded p-3 bg-light mb-3">
     <h2 class="h6">How to use this console</h2>
     <div class="row g-3 small">
       <div class="col-md-4"><strong>Question answered</strong><br><span class="text-muted">Are the data, model, causal assumptions, scientific registry, artifacts, privacy controls, and developer outputs coherent enough for research review?</span></div>
@@ -38,6 +72,9 @@
     <h2 class="h6">Access context</h2>
     <div class="small text-muted">Current request host: {{ request.get_host }}</div>
     <div class="small text-muted">If accessing from a phone, use the Tailscale IP or MagicDNS hostname, not 0.0.0.0.</div>
+    {% if focus_patient %}
+      <div class="small text-muted">Focused patient context: Research Patient {{ focus_patient.id }}</div>
+    {% endif %}
   </section>
 
   {% for group_name, checks in check_summary.groups.items %}

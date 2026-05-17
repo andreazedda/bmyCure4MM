@@ -325,7 +325,17 @@
                         <div class="fw-semibold">Patient workspace overview</div>
                     </div>
                     <div class="card-body small">
-                        <p class="mb-2">This page is the source-data workspace. It shows recorded assessments, therapies, notes, and observed trends. The Research What-if Cockpit is the interpretation workspace for mechanistic simulation, calibration, toxicity constraints, causality status, scientific basis, and provenance.</p>
+                        <p class="mb-2">This page is for data navigation. Use Simple Research View to understand the data and model. Use Scientific Cockpit for technical details. Use Developer Console for validation and debugging.</p>
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <a href="{{ research_simple_url }}" class="btn btn-sm btn-primary">Open Simple Research View</a>
+                            <a href="{{ research_cockpit_url }}" class="btn btn-sm btn-outline-info">Open Scientific Cockpit</a>
+                            {% if user.is_staff %}
+                                <a href="{{ research_developer_url }}" class="btn btn-sm btn-outline-secondary">Open Developer Console</a>
+                            {% else %}
+                                <span class="btn btn-sm btn-outline-secondary disabled">Developer Console (staff only)</span>
+                            {% endif %}
+                            <a href="{{ research_glossary_url }}" class="btn btn-sm btn-outline-secondary">Open Glossary</a>
+                        </div>
                         <div class="row g-2">
                             <div class="col-md-6">
                                 <div class="border rounded p-2 h-100">
@@ -335,8 +345,8 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="border rounded p-2 h-100">
-                                    <strong>What the cockpit answers</strong>
-                                    <div class="text-muted">How model state, calibration, what-if runs, toxicity constraints, causality caveats, and provenance should be interpreted.</div>
+                                    <strong>What Simple Research View answers</strong>
+                                    <div class="text-muted">What data exist, what is missing, what the model actually uses, what has been simulated, and what cannot be concluded.</div>
                                 </div>
                             </div>
                         </div>
@@ -345,11 +355,17 @@
 
                 <div class="card shadow-sm mb-3 border-info">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <div class="fw-semibold">Research What-if Cockpit</div>
-                        <div class="small text-muted">Research Twin / What-if Simulation</div>
-                        <a href="{{ research_twin_url }}" class="btn btn-sm btn-outline-info">Open research workspace</a>
+                        <div>
+                            <div class="fw-semibold">Scientific Cockpit</div>
+                            <div class="small text-muted">Research What-if Cockpit</div>
+                        </div>
+                        <div class="small text-muted">Technical model interpretation · Research Twin / What-if Simulation</div>
+                        <a href="{{ research_cockpit_url }}" class="btn btn-sm btn-outline-info">Open Scientific Cockpit</a>
                     </div>
                     <div class="card-body">
+                        <div class="alert alert-info small" role="alert">
+                            Start with <strong>Simple Research View</strong> if you want the guided explanation first. Use the Scientific Cockpit only when you need formulas, diagnostics, and technical provenance.
+                        </div>
                         <div class="alert alert-warning small" role="alert">
                             Research simulation only. Mechanistic counterfactuals and causal assumption sets are exploratory, not clinically validated, not treatment recommendations, and causal effect not identified.
                         </div>
@@ -398,6 +414,7 @@
                             <div class="text-success small mb-3">Latest assessment satisfies the minimum research input fields.</div>
                         {% endif %}
                         <div class="d-flex flex-wrap gap-2">
+                            <a href="{{ research_simple_url }}" class="btn btn-sm btn-primary">Open Simple Research View</a>
                             <a href="{{ research_twin_url }}#twin-state" class="btn btn-sm btn-outline-info">Initialize twin</a>
                             <a href="{{ research_twin_url }}#what-if-scenarios" class="btn btn-sm btn-outline-info">Review what-if scenarios</a>
                             <a href="{{ research_twin_url }}#trajectory-comparison" class="btn btn-sm btn-outline-info">Compare trajectories</a>

@@ -1,0 +1,70 @@
+# Simple Research View Guide
+
+## Purpose
+
+Simple Research View is the guided, plain-language page for understanding what structured patient data exist, what the current model actually uses, what has been simulated, and what conclusions remain out of scope.
+
+It is a research simulation view only. It is not a treatment recommendation, not clinically validated, and causal effect not identified.
+
+## What Each Card Means
+
+- Data status: whether structured longitudinal records exist across the main input blocks.
+- Model status: whether a mathematical starting state exists and whether deeper diagnostics are available.
+- Scenario status: whether completed simulated schedules exist for comparison.
+- Main limitation: the most important current reason to stay cautious when reading the outputs.
+
+## How To Read Data Status
+
+- `enough` means the block has enough structured records to be informative for the current workflow.
+- `partial` means some useful records exist, but the block is incomplete.
+- `missing` means the block does not yet provide structured information for the current workflow.
+
+Each data block also explains:
+
+- what the block means in plain language,
+- which fields are used,
+- whether the model uses it,
+- why it matters,
+- what is missing,
+- the next visible action.
+
+## How To Read Scenario Comparison
+
+The scenario section simplifies each run into:
+
+- schedule meaning in plain English,
+- exposure pattern,
+- disease-control signal,
+- healthy-tissue strain,
+- toxicity signal,
+- uncertainty range,
+- plain-language interpretation.
+
+Use the hidden technical-metrics toggle only when you need the field names used in the Scientific Cockpit.
+
+## How To Read Uncertainty
+
+The simple page uses the phrase **uncertainty range** instead of dense diagnostics.
+
+- A narrow range means the stored output changes less under the current perturbation checks.
+- A wide range means the stored output changes more under those checks.
+- This is still a research diagnostic, not a clinical confidence interval.
+
+## What Conclusions Are Allowed
+
+- The model can compare simulated trajectories under different schedules.
+- Some schedules produce different exposure profiles.
+- Some outputs are more uncertain than others.
+
+## What Conclusions Are Forbidden
+
+- This is the best treatment.
+- This proves clinical superiority.
+- This estimates a causal effect.
+
+## How To Escalate To Cockpit Or Developer Console
+
+- Stay in Simple Research View when you need the guided story.
+- Open Scientific Cockpit when you need formulas, uncertainty details, backtesting, sensitivity, robustness, or provenance.
+- Open Developer Console when you need internal validation, privacy checks, artifact checks, or debugging.
+- Open Glossary when a technical term needs decoding.

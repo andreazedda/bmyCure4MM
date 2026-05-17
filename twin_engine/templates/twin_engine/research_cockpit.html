@@ -76,10 +76,13 @@
       <div class="text-muted">Pseudonymized case: Research Patient {{ patient.id }}</div>
     </div>
     <div class="d-flex flex-wrap gap-2">
+      <a class="btn btn-success" href="{% url 'twin_engine:simple_research_view' patient.id %}">
+        <i class="bi bi-signpost-split me-1"></i> Simple Research View
+      </a>
       <a class="btn btn-primary" href="{% url 'twin_engine:initialize_twin_from_assessment' patient.id %}">
         <i class="bi bi-sliders me-1"></i> Initialize Twin
       </a>
-      <a class="btn btn-outline-primary" href="{% url 'twin_engine:developer_console' %}">
+      <a class="btn btn-outline-primary" href="{% url 'twin_engine:developer_console' %}?patient_id={{ patient.id }}">
         <i class="bi bi-terminal me-1"></i> Developer Console
       </a>
       <a class="btn btn-outline-secondary" href="{% url 'clinic:patient_detail' patient.id %}">
@@ -90,6 +93,10 @@
 
   <div class="alert alert-warning mt-3 mb-0" role="alert">
     Research simulation only. Mechanistic exploratory simulation, not clinically validated, not a treatment recommendation, and causal effect not identified.
+  </div>
+
+  <div class="alert alert-info mt-3 mb-0" role="alert">
+    This is the scientific cockpit. For a simpler explanation, open <a href="{% url 'twin_engine:simple_research_view' patient.id %}" class="alert-link">Simple Research View</a>.
   </div>
 
   <section class="research-section" id="workflow-map">
@@ -425,6 +432,148 @@
       <summary class="small fw-semibold">Developer details</summary>
       <pre>{{ schedule_collapse_warnings|pprint }}</pre>
     </details>
+  </section>
+
+  <section class="research-section" id="validation-uncertainty-robustness">
+    <h2><i class="bi bi-clipboard-data me-1"></i> Validation, uncertainty, and robustness</h2>
+    <div class="section-guide">
+      <div class="guide-grid">
+        <div class="guide-item"><span class="guide-label">Question answered</span>How stable are scenario outputs under parameter uncertainty, how well do held-out observations agree, and which scenario ranks remain robust versus fragile?</div>
+        <div class="guide-item"><span class="guide-label">Inputs used</span>Stored scenario uncertainty samples, rolling backtest summaries, one-at-a-time sensitivity perturbations, and robust ranking diagnostics.</div>
+        <div class="guide-item"><span class="guide-label">Method / computation</span>Monte Carlo parameter perturbation, rolling-origin held-out prediction checks, one-at-a-time perturbation sweeps, and probability-best ranking under aligned uncertainty samples.</div>
+        <div class="guide-item"><span class="guide-label">Output meaning</span>These are internal research diagnostics for stability, fit, and ranking fragility. They are not clinical validation and not treatment recommendations.</div>
+        <div class="guide-item"><span class="guide-label">What you can do next</span>Trust narrower and more robust signals first, inspect unstable drivers, and treat wide-interval outputs as exploratory only.</div>
+        <div class="guide-item"><span class="guide-label">Limitations</span>Backtesting is limited to recorded biomarker points, uncertainty is heuristic unless calibrated distributions are later added, and robust ranking does not identify causal effects.</div>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-lg-4">
+        <div class="metric-tile {% if validation_panel.backtest.summary.status == 'completed' %}available{% else %}missing{% endif %}">
+          <div class="fw-semibold mb-1">Rolling backtest</div>
+          <div class="small text-muted mb-2">Held-out observed biomarker agreement only.</div>
+          <div class="small">Status: {{ validation_panel.backtest.summary.status|default:"unavailable" }}</div>
+          <div class="small">Folds: {{ validation_panel.backtest.summary.n_folds|default:"0" }}</div>
+          <div class="small">Overall RMSE: {{ validation_panel.backtest.summary.overall_rmse|default:"Unavailable" }}</div>
+          <div class="small">Overall MAE: {{ validation_panel.backtest.summary.overall_mae|default:"Unavailable" }}</div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="metric-tile {% if validation_panel.robustness.summary.status == 'completed' %}available{% else %}missing{% endif %}">
+          <div class="fw-semibold mb-1">Robust ranking</div>
+          <div class="small text-muted mb-2">Probability-best under aligned uncertainty samples.</div>
+          <div class="small">Status: {{ validation_panel.robustness.summary.status|default:"unavailable" }}</div>
+          <div class="small">Scenarios: {{ validation_panel.robustness.summary.n_scenarios|default:"0" }}</div>
+          <div class="small">Aligned samples: {{ validation_panel.robustness.summary.n_aligned_samples|default:"0" }}</div>
+          <div class="small">Unstable top rank: {{ validation_panel.robustness.summary.unstable_rank_flag|yesno:"yes,no,unknown" }}</div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="metric-tile available">
+          <div class="fw-semibold mb-1">Validity labels</div>
+          <div class="small text-muted mb-2">Scenario trust labels are internal research labels only.</div>
+          <div class="small">`internally_checked_research_signal` = backtest present plus robust interval behavior.</div>
+          <div class="small">`fragile_research_signal` = rank depends materially on uncertainty overlap or instability.</div>
+          <div class="small">`exploratory_only` = wide interval or missing uncertainty.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-responsive mb-3">
+      <table class="table table-sm compact-table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Scenario</th>
+            <th>Source</th>
+            <th>Tumor reduction p05 / p50 / p95</th>
+            <th>Healthy loss p05 / p50 / p95</th>
+            <th>Durability p05 / p50 / p95</th>
+            <th>Liver p05 / p50 / p95</th>
+            <th>Neutropenia p05 / p50 / p95</th>
+            <th>Utility v2 p05 / p50 / p95</th>
+            <th>Trust label</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in validation_panel.uncertainty_rows %}
+            <tr>
+              <td>{{ row.label }}</td>
+              <td>{{ row.uncertainty_source }}</td>
+              <td>{{ row.tumor_reduction.p05|default:"-" }} / {{ row.tumor_reduction.median|default:"-" }} / {{ row.tumor_reduction.p95|default:"-" }}</td>
+              <td>{{ row.healthy_loss.p05|default:"-" }} / {{ row.healthy_loss.median|default:"-" }} / {{ row.healthy_loss.p95|default:"-" }}</td>
+              <td>{{ row.durability_index.p05|default:"-" }} / {{ row.durability_index.median|default:"-" }} / {{ row.durability_index.p95|default:"-" }}</td>
+              <td>{{ row.liver_toxicity_signal_0_1.p05|default:"-" }} / {{ row.liver_toxicity_signal_0_1.median|default:"-" }} / {{ row.liver_toxicity_signal_0_1.p95|default:"-" }}</td>
+              <td>{{ row.neutropenia_signal_0_1.p05|default:"-" }} / {{ row.neutropenia_signal_0_1.median|default:"-" }} / {{ row.neutropenia_signal_0_1.p95|default:"-" }}</td>
+              <td>{{ row.research_utility_v2.p05|default:"-" }} / {{ row.research_utility_v2.median|default:"-" }} / {{ row.research_utility_v2.p95|default:"-" }}</td>
+              <td>{{ row.trust_label }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="9" class="text-muted">No stored uncertainty diagnostics are available yet for completed scenarios.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-lg-6">
+        <div class="table-responsive">
+          <table class="table table-sm compact-table mb-0">
+            <thead><tr><th>Scenario</th><th>Point rank</th><th>Robust rank</th><th>Probability best</th><th>p05 / p95</th><th>Classification</th></tr></thead>
+            <tbody>
+              {% for row in validation_panel.robustness.summary.rows %}
+                <tr>
+                  <td>{{ row.scenario_label }}</td>
+                  <td>{{ row.point_rank }}</td>
+                  <td>{{ row.robust_rank }}</td>
+                  <td>{{ row.probability_best|default:"-" }}</td>
+                  <td>{{ row.p05|default:"-" }} / {{ row.p95|default:"-" }}</td>
+                  <td>{{ row.robustness_classification }}</td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="6" class="text-muted">Robust ranking is unavailable until at least two scenarios have stored uncertainty samples.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="table-responsive">
+          <table class="table table-sm compact-table mb-0">
+            <thead><tr><th>Scenario</th><th>Sensitivity status</th><th>Top drivers</th><th>Unstable parameters</th></tr></thead>
+            <tbody>
+              {% for row in validation_panel.sensitivity_rows %}
+                <tr>
+                  <td>{{ row.label }}</td>
+                  <td>{{ row.status }}</td>
+                  <td>{% if row.top_drivers %}{% for driver in row.top_drivers|slice:":3" %}{{ driver.parameter }}{% if not forloop.last %}; {% endif %}{% endfor %}{% else %}Unavailable{% endif %}</td>
+                  <td>{% if row.unstable_parameters %}{{ row.unstable_parameters|join:", " }}{% else %}-{% endif %}</td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="4" class="text-muted">Sensitivity diagnostics are unavailable until stored per scenario.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-responsive mb-2">
+      <table class="table table-sm compact-table mb-0">
+        <thead><tr><th>Scenario</th><th>Trust label</th><th>Why</th></tr></thead>
+        <tbody>
+          {% for row in validation_panel.validity_rows %}
+            <tr><td>{{ row.label }}</td><td>{{ row.trust_label }}</td><td>{{ row.why }}</td></tr>
+          {% empty %}
+            <tr><td colspan="3" class="text-muted">No validity labels are available because scenario diagnostics have not been stored yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <ul class="small mb-0">
+      {% for limitation in validation_panel.limitations %}
+        <li>{{ limitation }}</li>
+      {% endfor %}
+    </ul>
   </section>
 
   <section class="research-section" id="toxicity-constraints">

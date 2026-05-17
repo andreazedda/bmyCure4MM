@@ -30,6 +30,7 @@ from .models import CausalAssumptionSet, CounterfactualRun, ObservationResidual,
 from .provenance import CURRENT_MODEL_VERSION, hash_json, record_simulation_metadata
 from .report_builder import write_json_artifact
 from .simulation_bridge import run_patient_simulation
+from .simple_view import build_simple_patient_story
 from .state_model import get_current_twin_state, initialize_from_assessment, serialize_state
 from .therapy_schedule import build_therapy_schedule
 from .toxicity_model import compute_toxicity_constraints
@@ -38,7 +39,18 @@ from .validators import validate_assessment_minimum_fields, validate_patient_acc
 
 @login_required
 def patient_twin_detail(request: HttpRequest, patient_id: int) -> HttpResponse:
-    return research_cockpit_view(request, patient_id)
+    return simple_research_view(request, patient_id)
+
+
+@login_required
+def simple_research_view(request: HttpRequest, patient_id: int) -> HttpResponse:
+    patient = _get_research_patient(request, patient_id)
+    story = build_simple_patient_story(patient, include_developer_links=request.user.is_staff)
+    context = {
+        "patient": patient,
+        "story": story,
+    }
+    return render(request, "twin_engine/simple_research_view.html", context)
 
 
 @login_required
@@ -302,9 +314,32 @@ def developer_console_view(request: HttpRequest) -> HttpResponse:
             messages.warning(request, "Feedback message was empty.")
         return redirect(reverse("twin_engine:developer_console"))
     check_groups = run_developer_checks()
+    focus_patient = None
+    focus_patient_id = request.GET.get("patient_id") or ""
+    if focus_patient_id.isdigit():
+        focus_patient = Patient.objects.filter(pk=int(focus_patient_id)).first()
+
+    navigation_links = {
+        "patient_page_url": reverse("clinic:patient_list"),
+        "simple_view_url": "",
+        "cockpit_url": "",
+        "developer_console_url": reverse("twin_engine:developer_console"),
+        "glossary_url": reverse("twin_engine:research_glossary"),
+    }
+    if focus_patient is not None:
+        navigation_links.update(
+            {
+                "patient_page_url": reverse("clinic:patient_detail", args=[focus_patient.id]),
+                "simple_view_url": reverse("twin_engine:simple_research_view", args=[focus_patient.id]),
+                "cockpit_url": reverse("twin_engine:research_cockpit", args=[focus_patient.id]),
+                "developer_console_url": reverse("twin_engine:developer_console") + f"?patient_id={focus_patient.id}",
+            }
+        )
     context = {
         "check_summary": summarize_checks(check_groups),
         "patients_with_twins": Patient.objects.filter(twin_states__isnull=False).distinct().order_by("id")[:50],
+        "focus_patient": focus_patient,
+        "navigation_links": navigation_links,
     }
     return render(request, "twin_engine/developer_console.html", context)
 

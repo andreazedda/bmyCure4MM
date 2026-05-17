@@ -169,6 +169,42 @@
         </div>
     </div>
 
+    <div class="row g-3 mb-3">
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header">Uncertainty summary</div>
+                <div class="card-body small">
+                    {% if report_payload.uncertainty and report_payload.uncertainty.status == 'completed' %}
+                        <p class="text-muted">Parameter uncertainty is currently propagated as a research simulation diagnostic. If the source is heuristic, interpret intervals as exploratory stress tests rather than calibrated posterior intervals.</p>
+                        <p class="mb-1"><strong>Source:</strong> {{ report_payload.uncertainty.parameter_uncertainty_source }}</p>
+                        <p class="mb-1"><strong>Utility v2 p05 / p50 / p95:</strong> {{ report_payload.uncertainty.metric_summaries.research_utility_v2.p05|default:"unknown" }} / {{ report_payload.uncertainty.metric_summaries.research_utility_v2.median|default:"unknown" }} / {{ report_payload.uncertainty.metric_summaries.research_utility_v2.p95|default:"unknown" }}</p>
+                        <p class="mb-1"><strong>Utility v2 interval width:</strong> {{ report_payload.uncertainty.metric_summaries.research_utility_v2.interval_width|default:"unknown" }}</p>
+                        <p class="mb-0"><strong>Uncertainty classification:</strong> {{ report_payload.uncertainty.metric_summaries.research_utility_v2.uncertainty_classification|default:"unknown" }}</p>
+                    {% else %}
+                        <p class="text-muted mb-0">Uncertainty diagnostics are unavailable for this run. Interpret point metrics as exploratory only.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header">Sensitivity summary</div>
+                <div class="card-body small">
+                    {% if report_payload.sensitivity and report_payload.sensitivity.status == 'completed' %}
+                        <p class="text-muted">One-at-a-time perturbation sensitivity highlights which parameters or schedule knobs drive utility changes most strongly.</p>
+                        <ul class="mb-0">
+                            {% for row in report_payload.sensitivity.top_drivers|slice:":5" %}
+                                <li>{{ row.parameter }}: max |delta utility_v2| {{ row.max_abs_utility_v2_delta|default:"unknown" }} ({{ row.sensitivity_classification }})</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted mb-0">Sensitivity diagnostics are unavailable for this run.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
     <details class="mt-3">
         <summary class="fw-semibold small">Developer details</summary>
         <pre class="small bg-dark text-light p-3 rounded mt-2">{{ report_payload|pprint }}</pre>

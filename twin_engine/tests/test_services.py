@@ -19,6 +19,7 @@ from twin_engine.provenance import hash_json
 from twin_engine.simulation_bridge import build_solver_inputs_from_twin_state, run_patient_simulation
 from twin_engine.state_model import initialize_from_assessment
 from twin_engine.therapy_schedule import build_therapy_schedule, convert_patient_therapies_to_drug_doses
+from twin_engine.uncertainty import UncertaintyConfig
 
 
 class TwinEngineServiceTests(TestCase):
@@ -308,6 +309,34 @@ class TwinEngineServiceTests(TestCase):
         self.assertIn("alternative_toxicity_dynamics", run.simulation_summary)
         self.assertNotIn('"notes"', content)
         self.assertNotIn(self.patient.notes, content)
+
+    def test_counterfactual_can_optionally_persist_uncertainty_and_sensitivity(self) -> None:
+        state = initialize_from_assessment(self.assessment, user=self.user)
+        intervention = {
+            "label": "LEN_DIAGNOSTIC_DAILY_14D",
+            "classification": "mechanistic_simulation_only",
+            "intervention": {
+                "drug": "lenalidomide",
+                "dose_mg": 5.0,
+                "schedule": {"type": "daily"},
+                "duration_days": 14,
+                "start_day": 0,
+            },
+        }
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with override_settings(MEDIA_ROOT=tmpdir, MEDIA_URL="/media/"):
+                run = run_counterfactual(
+                    self.patient,
+                    state,
+                    intervention,
+                    14,
+                    user=self.user,
+                    uncertainty_config=UncertaintyConfig(n_samples=3, random_seed=11),
+                    include_sensitivity=True,
+                )
+
+        self.assertEqual(run.comparison_metrics["uncertainty"]["status"], "completed")
+        self.assertEqual(run.comparison_metrics["sensitivity"]["status"], "completed")
 
     def test_counterfactual_same_average_different_timing_is_visible(self) -> None:
         state = initialize_from_assessment(self.assessment, user=self.user)

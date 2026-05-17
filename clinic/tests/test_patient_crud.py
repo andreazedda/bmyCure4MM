@@ -213,6 +213,8 @@ class PatientCRUDViewTests(TestCase):
         self.assertContains(response, "Patient Journey Tools")
         self.assertContains(response, "patient-journey-tools-header")
         self.assertContains(response, "Research What-if Cockpit")
+        self.assertContains(response, "Open Simple Research View")
+        self.assertContains(response, "Open Scientific Cockpit")
         self.assertContains(response, "Twin Inputs (over time)")
         self.assertContains(response, "Patient workspace overview")
         self.assertContains(response, "Recommended next step")

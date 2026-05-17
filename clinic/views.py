@@ -520,7 +520,11 @@ def patient_detail(request: HttpRequest, pk: int) -> HttpResponse:
     research_missing_required_data: list[str] = ["assessment"] if latest_assessment is None else []
     research_counterfactual_count = 0
     research_provenance_count = 0
-    research_twin_url = reverse("twin_engine:research_cockpit", args=[patient.id])
+    research_simple_url = reverse("twin_engine:simple_research_view", args=[patient.id])
+    research_cockpit_url = reverse("twin_engine:research_cockpit", args=[patient.id])
+    research_developer_url = reverse("twin_engine:developer_console") + f"?patient_id={patient.id}"
+    research_glossary_url = reverse("twin_engine:research_glossary")
+    research_twin_url = research_cockpit_url
     try:
         from twin_engine.models import ObservationResidual, SimulationRunMetadata
         from twin_engine.state_model import get_current_twin_state
@@ -613,6 +617,10 @@ def patient_detail(request: HttpRequest, pk: int) -> HttpResponse:
         "research_missing_required_data": research_missing_required_data,
         "research_counterfactual_count": research_counterfactual_count,
         "research_provenance_count": research_provenance_count,
+        "research_simple_url": research_simple_url,
+        "research_cockpit_url": research_cockpit_url,
+        "research_developer_url": research_developer_url,
+        "research_glossary_url": research_glossary_url,
         "research_twin_url": research_twin_url,
         "research_recommended_next_step": research_recommended_next_step,
     }

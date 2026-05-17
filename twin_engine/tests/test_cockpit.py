@@ -21,7 +21,7 @@ from twin_engine.cockpit import (
 )
 from twin_engine.developer_checks import detect_schedule_collapse, run_developer_checks
 from twin_engine.exposure_bridge import build_exposure_profile
-from twin_engine.models import CounterfactualRun, LongitudinalLabResult
+from twin_engine.models import CounterfactualRun, LongitudinalLabResult, SimulationRunMetadata
 from twin_engine.privacy import scan_text_for_sensitive_markers
 from twin_engine.state_model import initialize_from_assessment
 
@@ -150,6 +150,58 @@ class ResearchCockpitTests(TestCase):
                 self.assertIn("status", check)
                 self.assertIn("detail", check)
                 self.assertIn("next_action", check)
+
+    def test_cockpit_renders_validation_uncertainty_and_robustness_section(self) -> None:
+        run = self._create_run(
+            "VALIDATED_SCENARIO",
+            utility=1.2,
+            simulation_summary={
+                "label": "research simulation",
+                "predicted_biomarkers": {"m_protein_g_dl": 1.0},
+                "classification": {"counterfactual_class": "mechanistic"},
+            },
+        )
+        metrics = dict(run.comparison_metrics or {})
+        metrics["uncertainty"] = {
+            "status": "completed",
+            "parameter_uncertainty_source": "heuristic_perturbation_not_calibrated_distribution",
+            "metric_summaries": {
+                "research_utility_v2": {"status": "completed", "p05": 0.9, "median": 1.1, "p95": 1.2, "uncertainty_classification": "moderate"},
+                "tumor_reduction": {"p05": 0.3, "median": 0.4, "p95": 0.5},
+                "healthy_loss": {"p05": 0.1, "median": 0.2, "p95": 0.3},
+                "durability_index": {"p05": 0.2, "median": 0.3, "p95": 0.4},
+                "liver_toxicity_signal_0_1": {"p05": 0.1, "median": 0.2, "p95": 0.3},
+                "neutropenia_signal_0_1": {"p05": 0.1, "median": 0.2, "p95": 0.3},
+            },
+        }
+        metrics["sensitivity"] = {
+            "status": "completed",
+            "top_drivers": [{"parameter": "tumor_growth_rate", "max_abs_utility_v2_delta": 0.12, "sensitivity_classification": "moderate"}],
+            "unstable_parameters": ["tumor_growth_rate"],
+        }
+        run.comparison_metrics = metrics
+        run.save(update_fields=["comparison_metrics"])
+        SimulationRunMetadata.objects.create(
+            twin_state=self.state,
+            model_version="research-twin-v1",
+            solver_name="rolling_origin_backtest",
+            solver_parameters={"diagnostic_summary": {"status": "completed", "n_folds": 2, "overall_rmse": 0.2, "overall_mae": 0.15}},
+            input_hash="x",
+        )
+        SimulationRunMetadata.objects.create(
+            twin_state=self.state,
+            model_version="research-twin-v1",
+            solver_name="robust_scenario_ranking",
+            solver_parameters={"diagnostic_summary": {"status": "completed", "n_scenarios": 1, "n_aligned_samples": 3, "rows": [{"scenario_label": "VALIDATED_SCENARIO", "point_rank": 1, "robust_rank": 1, "probability_best": 1.0, "p05": 0.9, "p95": 1.2, "robustness_classification": "robust"}], "unstable_rank_flag": False}},
+            input_hash="y",
+        )
+
+        self.client.login(username="cockpit-owner", password="pass1234")
+        response = self.client.get(reverse("twin_engine:research_cockpit", args=[self.patient.id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Validation, uncertainty, and robustness")
+        self.assertContains(response, "Rolling backtest")
+        self.assertContains(response, "VALIDATED_SCENARIO")
 
     def test_schedule_collapse_classifies_average_exposure_timing_difference(self) -> None:
         daily_profile = build_exposure_profile(
