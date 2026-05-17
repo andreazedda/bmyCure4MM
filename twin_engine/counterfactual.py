@@ -9,11 +9,13 @@ from django.db.models import Q
 from clinic.models import Regimen
 
 from .causal import distinguish_mechanistic_counterfactual_vs_causal_estimand
+from .exposure_bridge import compare_exposure_profiles
 from .models import CounterfactualRun
 from .provenance import CURRENT_MODEL_VERSION, record_simulation_metadata
 from .report_builder import build_counterfactual_report_payload, write_json_artifact
 from .simulation_bridge import run_patient_simulation
 from .therapy_schedule import SUPPORTED_DRUG_ALIASES, build_therapy_schedule
+from .toxicity_dynamics import DEFAULT_UTILITY_V2_WEIGHTS, compute_toxicity_dynamics
 from .toxicity_model import compute_toxicity_constraints
 from .validators import validate_research_run_inputs
 
@@ -48,7 +50,7 @@ def run_counterfactual(patient, base_twin_state, intervention_definition, horizo
     )
 
     try:
-        end_date = base_twin_state.state_date + timedelta(days=int(horizon_days))
+        end_date = base_twin_state.state_date + timedelta(days=max(int(horizon_days) - 1, 0))
         baseline_schedule = build_therapy_schedule(patient, base_twin_state.state_date, end_date)
         baseline_result = run_patient_simulation(
             base_twin_state,
@@ -70,12 +72,24 @@ def run_counterfactual(patient, base_twin_state, intervention_definition, horizo
         )
 
         toxicity_constraints = compute_toxicity_constraints(patient)
+        baseline_toxicity_dynamics = compute_toxicity_dynamics(
+            patient,
+            baseline_result["summary"].get("exposure_profiles") or {},
+        )
+        alternative_toxicity_dynamics = compute_toxicity_dynamics(
+            patient,
+            alternative_result["summary"].get("exposure_profiles") or {},
+        )
+        baseline_result["summary"]["toxicity_dynamics"] = baseline_toxicity_dynamics
+        alternative_result["summary"]["toxicity_dynamics"] = alternative_toxicity_dynamics
         comparison_metrics = compare_counterfactual_to_baseline(
             baseline_result["summary"],
             alternative_result["summary"],
             baseline_solver_inputs=baseline_result["solver_inputs"]["raw_parameters"],
             alternative_solver_inputs=alternative_result["solver_inputs"]["raw_parameters"],
             toxicity_constraints=toxicity_constraints,
+            baseline_toxicity_dynamics=baseline_toxicity_dynamics,
+            alternative_toxicity_dynamics=alternative_toxicity_dynamics,
         )
         classification = distinguish_mechanistic_counterfactual_vs_causal_estimand(
             graph_definition=execution_definition.get("causal_graph"),
@@ -88,6 +102,8 @@ def run_counterfactual(patient, base_twin_state, intervention_definition, horizo
             "Research simulation only.",
             classification.get("warning"),
             toxicity_constraints.get("reason"),
+            comparison_metrics.get("schedule_comparison", {}).get("limitation"),
+            alternative_toxicity_dynamics.get("limitation"),
         ]
 
         counterfactual_run.simulation_summary = {
@@ -100,6 +116,9 @@ def run_counterfactual(patient, base_twin_state, intervention_definition, horizo
             "baseline_predicted_biomarkers": baseline_result["summary"].get("predicted_biomarkers"),
             "predicted_biomarkers": alternative_result["summary"].get("predicted_biomarkers"),
             "toxicity_constraints": toxicity_constraints,
+            "baseline_toxicity_dynamics": baseline_toxicity_dynamics,
+            "alternative_toxicity_dynamics": alternative_toxicity_dynamics,
+            "schedule_comparison": comparison_metrics.get("schedule_comparison") or {},
             "warning_block": warning_block,
         }
         counterfactual_run.comparison_metrics = comparison_metrics
@@ -111,6 +130,8 @@ def run_counterfactual(patient, base_twin_state, intervention_definition, horizo
             "baseline_trajectory": baseline_result["trajectory"],
             "alternative_trajectory": alternative_result["trajectory"],
             "comparison_metrics": comparison_metrics,
+            "baseline_toxicity_dynamics": baseline_toxicity_dynamics,
+            "alternative_toxicity_dynamics": alternative_toxicity_dynamics,
         }
         trajectory_url, _ = write_json_artifact(
             "counterfactual_trajectory",
@@ -172,7 +193,11 @@ def run_counterfactual(patient, base_twin_state, intervention_definition, horizo
                 "intervention_definition": _sanitize_payload_for_artifact(intervention_definition),
                 "execution_definition": _sanitize_payload_for_artifact(execution_definition),
             },
-            solver_parameters=alternative_result["solver_inputs"]["raw_parameters"],
+            solver_parameters={
+                **alternative_result["solver_inputs"]["raw_parameters"],
+                "exposure_summary": alternative_result["summary"].get("exposure_summary") or {},
+                "toxicity_dynamics": alternative_toxicity_dynamics,
+            },
             output_payload=report_payload,
             random_seed=execution_definition.get("random_seed"),
         )
@@ -204,6 +229,8 @@ def compare_counterfactual_to_baseline(
     baseline_solver_inputs: dict[str, Any] | None = None,
     alternative_solver_inputs: dict[str, Any] | None = None,
     toxicity_constraints: dict[str, Any] | None = None,
+    baseline_toxicity_dynamics: dict[str, Any] | None = None,
+    alternative_toxicity_dynamics: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     comparison = {}
     for key in ("tumor_reduction", "healthy_loss", "time_to_recurrence", "durability_index"):
@@ -247,16 +274,34 @@ def compare_counterfactual_to_baseline(
         alternative_solver_inputs or {},
         toxicity_constraints or {},
     )
+    schedule_comparison = _build_schedule_comparison(
+        baseline_summary or {},
+        alternative_summary or {},
+    )
     disease_control_score = float(alternative_summary.get("tumor_reduction") or 0.0)
     healthy_preservation_score = 1.0 - float(alternative_summary.get("healthy_loss") or 0.0)
     durability_score = float(alternative_summary.get("durability_index") or 0.0)
     comparison["research_utility"] = disease_control_score + healthy_preservation_score + durability_score - penalty
     comparison["toxicity_constraint_penalty"] = penalty
+    comparison["schedule_comparison"] = schedule_comparison
     comparison["utility_formula"] = (
         "disease_control_score + healthy_preservation_score + durability_score - "
         "heuristic_exposure_penalty_based_on_documented_toxicity_history"
     )
     comparison["utility_validity"] = "heuristic research ranking only; not clinical recommendation"
+    prototype_penalty = _determine_toxicity_prototype_penalty(alternative_toxicity_dynamics or {})
+    comparison["research_utility_v2"] = comparison["research_utility"] - prototype_penalty
+    comparison["toxicity_prototype_penalty"] = prototype_penalty
+    comparison["toxicity_prototype_status"] = (alternative_toxicity_dynamics or {}).get("toxicity_model_status") or "unavailable"
+    comparison["utility_v2_formula"] = (
+        "tumor_reduction + (1 - healthy_loss) + durability_index - toxicity_constraint_penalty "
+        "- lambda_liver * liver_toxicity_signal_0_1 - lambda_neutropenia * neutropenia_signal_0_1"
+    )
+    comparison["utility_v2_weights"] = dict(DEFAULT_UTILITY_V2_WEIGHTS)
+    comparison["utility_v2_validity"] = (
+        "heuristic research ranking only; includes prototype toxicity signals and is not a clinical recommendation"
+    )
+    comparison["baseline_toxicity_model_status"] = (baseline_toxicity_dynamics or {}).get("toxicity_model_status") or "unavailable"
     return comparison
 
 
@@ -441,3 +486,78 @@ def _determine_toxicity_constraint_penalty(
     if abs(alternative_exposure - baseline_exposure) <= tolerance:
         return 0.5
     return 0.0
+
+
+def _build_schedule_comparison(baseline_summary: dict[str, Any], alternative_summary: dict[str, Any]) -> dict[str, Any]:
+    baseline_profiles = dict((baseline_summary or {}).get("exposure_profiles") or {})
+    alternative_profiles = dict((alternative_summary or {}).get("exposure_profiles") or {})
+    if not baseline_profiles or not alternative_profiles:
+        return {
+            "comparison_status": "profile_unavailable",
+            "classification": "EXPOSURE_METADATA_UNAVAILABLE",
+            "primary_drug": None,
+            "per_drug": {},
+            "limitation": "Exposure metadata unavailable; regenerate run to compute exposure profile.",
+        }
+
+    per_drug: dict[str, Any] = {}
+    primary_drug = None
+    primary_distance = -1.0
+    for drug in sorted(set(baseline_profiles) | set(alternative_profiles)):
+        comparison = compare_exposure_profiles(
+            baseline_profiles.get(drug),
+            alternative_profiles.get(drug),
+        )
+        baseline_payload = baseline_profiles.get(drug) or {}
+        alternative_payload = alternative_profiles.get(drug) or {}
+        comparison.update(
+            {
+                "baseline_average_daily_exposure_mg": float(baseline_payload.get("average_daily_dose_mg") or 0.0),
+                "alternative_average_daily_exposure_mg": float(alternative_payload.get("average_daily_dose_mg") or 0.0),
+                "baseline_peak_daily_dose_mg": float(baseline_payload.get("peak_administered_dose_mg") or 0.0),
+                "alternative_peak_daily_dose_mg": float(alternative_payload.get("peak_administered_dose_mg") or 0.0),
+                "baseline_schedule_type": baseline_payload.get("schedule_type") or "unavailable",
+                "alternative_schedule_type": alternative_payload.get("schedule_type") or "unavailable",
+                "baseline_temporal_profile_hash": baseline_payload.get("exposure_profile_hash") or "",
+                "alternative_temporal_profile_hash": alternative_payload.get("exposure_profile_hash") or "",
+            }
+        )
+        per_drug[drug] = comparison
+        distance = float(comparison.get("exposure_profile_distance") or 0.0)
+        if distance > primary_distance:
+            primary_distance = distance
+            primary_drug = drug
+
+    primary = per_drug.get(primary_drug) or {}
+    if primary.get("same_average_exposure") and primary.get("different_temporal_profile"):
+        classification = "SAME_AVERAGE_DIFFERENT_TEMPORAL_PROFILE"
+        limitation = "Average daily exposure matches baseline, but timing differs; this does not establish clinical equivalence."
+    elif primary.get("different_temporal_profile"):
+        classification = "TEMPORALLY_DISTINCT_EXPOSURE"
+        limitation = "Exposure timing or magnitude differs from baseline; mechanistic outputs remain exploratory only."
+    else:
+        classification = "MATCHED_EXPOSURE_PROFILE"
+        limitation = "Primary exposure profile does not differ materially from baseline at the available resolution."
+
+    return {
+        "comparison_status": "compared",
+        "classification": classification,
+        "primary_drug": primary_drug,
+        "same_average_exposure": bool(primary.get("same_average_exposure")),
+        "different_temporal_profile": bool(primary.get("different_temporal_profile")),
+        "exposure_profile_distance": primary.get("exposure_profile_distance"),
+        "max_daily_dose_difference": primary.get("max_daily_dose_difference"),
+        "per_drug": per_drug,
+        "limitation": limitation,
+    }
+
+
+def _determine_toxicity_prototype_penalty(toxicity_dynamics: dict[str, Any]) -> float:
+    if toxicity_dynamics.get("toxicity_model_status") != "semi_mechanistic_prototype":
+        return 0.0
+    liver_signal = float(toxicity_dynamics.get("liver_toxicity_signal_0_1") or 0.0)
+    neutropenia_signal = float(toxicity_dynamics.get("neutropenia_signal_0_1") or 0.0)
+    return (
+        float(DEFAULT_UTILITY_V2_WEIGHTS["lambda_liver"]) * liver_signal
+        + float(DEFAULT_UTILITY_V2_WEIGHTS["lambda_neutropenia"]) * neutropenia_signal
+    )

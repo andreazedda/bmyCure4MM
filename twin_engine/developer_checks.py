@@ -11,6 +11,7 @@ from django.db.models import Count
 
 from clinic.models import Assessment, Patient, PatientTherapy
 
+from .exposure_bridge import compare_exposure_profiles
 from .models import (
     AdverseEvent,
     CausalAssumptionSet,
@@ -104,6 +105,9 @@ def run_model_consistency_checks(patient: Patient | None = None) -> list[dict[st
     missing_trajectory = []
     missing_predicted = []
     missing_utility = []
+    missing_utility_v2 = []
+    missing_exposure_metadata = []
+    missing_toxicity_prototype = []
 
     for item in patients:
         current_count = PatientTwinState.objects.filter(patient=item, is_current=True).count()
@@ -130,6 +134,14 @@ def run_model_consistency_checks(patient: Patient | None = None) -> list[dict[st
                 missing_predicted.append(run.id)
             if (run.comparison_metrics or {}).get("research_utility") is None:
                 missing_utility.append(run.id)
+            if (run.comparison_metrics or {}).get("research_utility_v2") is None:
+                missing_utility_v2.append(run.id)
+            alternative_summary = ((run.simulation_summary or {}).get("alternative") or {})
+            if not (alternative_summary.get("exposure_profiles") or alternative_summary.get("exposure_summary")):
+                missing_exposure_metadata.append(run.id)
+            toxicity_payload = (run.simulation_summary or {}).get("alternative_toxicity_dynamics") or alternative_summary.get("toxicity_dynamics") or {}
+            if not toxicity_payload:
+                missing_toxicity_prototype.append(run.id)
 
     checks.append(build_check("pass" if not missing_current else "fail", "current twin state exists", "Each active research patient should have a current twin state.", object_ids=missing_current, next_action="Initialize or calibrate a twin state."))
     checks.append(build_check("pass" if not multi_current else "fail", "one current twin state", "A patient should have exactly one current twin state.", object_ids=multi_current, next_action="Repair current-state flags."))
@@ -139,35 +151,24 @@ def run_model_consistency_checks(patient: Patient | None = None) -> list[dict[st
     checks.append(build_check("pass" if not missing_trajectory else "warn", "trajectory artifacts exist", "Completed runs should have trajectory artifacts for comparison charts.", object_ids=missing_trajectory, next_action="Re-run affected scenarios."))
     checks.append(build_check("pass" if not missing_predicted else "warn", "predicted biomarkers exist", "Completed runs should expose predicted biomarker summaries.", object_ids=missing_predicted, next_action="Re-run affected scenarios with current bridge."))
     checks.append(build_check("pass" if not missing_utility else "warn", "utility computed", "Completed runs should include heuristic research utility.", object_ids=missing_utility, next_action="Re-run or backfill comparison metrics."))
+    checks.append(build_check("pass" if not missing_utility_v2 else "warn", "utility v2 computed", "Completed runs should include utility_v2 with prototype toxicity penalties.", object_ids=missing_utility_v2, next_action="Re-run affected scenarios with the current counterfactual bridge."))
+    checks.append(build_check("pass" if not missing_exposure_metadata else "warn", "exposure metadata exists", "Completed runs should include exposure summaries and raw exposure profiles.", object_ids=missing_exposure_metadata, next_action="Exposure metadata unavailable; regenerate run to compute exposure profile."))
+    checks.append(build_check("pass" if not missing_toxicity_prototype else "warn", "toxicity prototype output exists", "Completed runs should include prototype toxicity risk signals and diagnostics.", object_ids=missing_toxicity_prototype, next_action="Re-run affected scenarios with toxicity dynamics enabled."))
     collapse = detect_schedule_collapse(patient)
-    checks.append(build_check("pass" if not collapse else "warn", "schedule-resolution collapse", "Some scenarios produce indistinguishable trajectories under current exposure resolution.", object_ids=[item["run_ids"] for item in collapse], next_action="Increase schedule resolution in the exposure bridge.", raw_details={"pairs": collapse}))
+    blocking_collapse = [
+        item for item in collapse if item.get("classification") in {"TRUE_NUMERICAL_COLLAPSE", "AVERAGE_EXPOSURE_COLLAPSE", "ARTIFACT_UNAVAILABLE"}
+    ]
+    checks.append(build_check("pass" if not blocking_collapse else "warn", "schedule-resolution classification", "Scenario pairs are classified as distinct output, average-exposure collapse, true numerical collapse, or artifact unavailable.", object_ids=[item["run_ids"] for item in blocking_collapse], next_action="Inspect classified pairs and regenerate runs with exposure metadata when unavailable.", raw_details={"pairs": collapse}))
     return checks
 
 
 def detect_schedule_collapse(patient: Patient | None = None, *, tolerance: float = 1.0e-8) -> list[dict[str, Any]]:
     runs = list(_latest_completed_runs(patient).values())
-    fingerprints: dict[str, list[CounterfactualRun]] = defaultdict(list)
-    for run in runs:
-        trajectory = _load_trajectory(run)
-        if not trajectory:
-            continue
-        alternative = trajectory.get("alternative_trajectory") or {}
-        tumor = alternative.get("tumor_cells") or []
-        healthy = alternative.get("healthy_cells") or []
-        if not tumor or not healthy:
-            continue
-        key = json.dumps({
-            "tumor_end": round(float(tumor[-1]), 6),
-            "healthy_end": round(float(healthy[-1]), 6),
-            "tumor_mid": round(float(tumor[len(tumor)//2]), 6),
-            "healthy_mid": round(float(healthy[len(healthy)//2]), 6),
-        }, sort_keys=True)
-        fingerprints[key].append(run)
-    collapsed = []
-    for group in fingerprints.values():
-        if len(group) > 1:
-            collapsed.append({"run_ids": [run.id for run in group], "labels": [_scenario_label(run) for run in group], "tolerance": tolerance})
-    return collapsed
+    comparisons = []
+    for index, run in enumerate(runs):
+        for other in runs[index + 1 :]:
+            comparisons.append(_classify_schedule_pair(run, other, tolerance=tolerance))
+    return comparisons
 
 
 def run_causal_checks(patient: Patient | None = None) -> list[dict[str, Any]]:
@@ -267,6 +268,91 @@ def _load_trajectory(run: CounterfactualRun) -> dict[str, Any] | None:
         return json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError:
         return None
+
+
+def _classify_schedule_pair(run_a: CounterfactualRun, run_b: CounterfactualRun, *, tolerance: float) -> dict[str, Any]:
+    trajectory_a = _load_trajectory(run_a)
+    trajectory_b = _load_trajectory(run_b)
+    if not trajectory_a or not trajectory_b:
+        return {
+            "run_ids": [run_a.id, run_b.id],
+            "labels": [_scenario_label(run_a), _scenario_label(run_b)],
+            "classification": "ARTIFACT_UNAVAILABLE",
+            "detail": "Trajectory artifact unavailable for one or both runs.",
+            "tolerance": tolerance,
+        }
+
+    alternative_a = trajectory_a.get("alternative_trajectory") or {}
+    alternative_b = trajectory_b.get("alternative_trajectory") or {}
+    if _trajectory_fingerprint(alternative_a) != _trajectory_fingerprint(alternative_b):
+        return {
+            "run_ids": [run_a.id, run_b.id],
+            "labels": [_scenario_label(run_a), _scenario_label(run_b)],
+            "classification": "BIOLOGICALLY_DISTINCT_OUTPUT",
+            "detail": "Alternative trajectories differ numerically at the current comparison resolution.",
+            "tolerance": tolerance,
+        }
+
+    drug, profile_a, profile_b = _resolve_pair_profiles(run_a, run_b)
+    if not profile_a or not profile_b:
+        return {
+            "run_ids": [run_a.id, run_b.id],
+            "labels": [_scenario_label(run_a), _scenario_label(run_b)],
+            "classification": "ARTIFACT_UNAVAILABLE",
+            "detail": "Exposure metadata unavailable; regenerate run to compute exposure profile.",
+            "tolerance": tolerance,
+        }
+
+    exposure_comparison = compare_exposure_profiles(profile_a, profile_b, tolerance=tolerance)
+    if exposure_comparison.get("same_average_exposure") and exposure_comparison.get("different_temporal_profile"):
+        classification = "AVERAGE_EXPOSURE_COLLAPSE"
+        detail = "Trajectories match while average exposure matches and temporal profile differs."
+    else:
+        classification = "TRUE_NUMERICAL_COLLAPSE"
+        detail = "Trajectories match numerically at the current comparison resolution."
+    return {
+        "run_ids": [run_a.id, run_b.id],
+        "labels": [_scenario_label(run_a), _scenario_label(run_b)],
+        "classification": classification,
+        "detail": detail,
+        "drug": drug,
+        "tolerance": tolerance,
+        "exposure_comparison": exposure_comparison,
+    }
+
+
+def _trajectory_fingerprint(trajectory: dict[str, Any]) -> str:
+    tumor = trajectory.get("tumor_cells") or []
+    healthy = trajectory.get("healthy_cells") or []
+    if not tumor or not healthy:
+        return ""
+    return json.dumps(
+        {
+            "tumor_end": round(float(tumor[-1]), 6),
+            "healthy_end": round(float(healthy[-1]), 6),
+            "tumor_mid": round(float(tumor[len(tumor) // 2]), 6),
+            "healthy_mid": round(float(healthy[len(healthy) // 2]), 6),
+        },
+        sort_keys=True,
+    )
+
+
+def _resolve_pair_profiles(run_a: CounterfactualRun, run_b: CounterfactualRun) -> tuple[str | None, dict[str, Any] | None, dict[str, Any] | None]:
+    summary_a = ((run_a.simulation_summary or {}).get("alternative") or {})
+    summary_b = ((run_b.simulation_summary or {}).get("alternative") or {})
+    profiles_a = dict(summary_a.get("exposure_profiles") or {})
+    profiles_b = dict(summary_b.get("exposure_profiles") or {})
+    shared = sorted(set(profiles_a) & set(profiles_b))
+    if not shared:
+        return None, None, None
+    drug = max(
+        shared,
+        key=lambda item: max(
+            float((profiles_a.get(item) or {}).get("total_cumulative_dose_mg") or 0.0),
+            float((profiles_b.get(item) or {}).get("total_cumulative_dose_mg") or 0.0),
+        ),
+    )
+    return drug, profiles_a.get(drug), profiles_b.get(drug)
 
 
 def _git_diff_name_only(repo_root: Path, *args: str) -> list[str]:

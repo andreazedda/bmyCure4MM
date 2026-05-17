@@ -4,6 +4,7 @@ import json
 import tempfile
 from datetime import date
 from pathlib import Path
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase, override_settings
@@ -18,7 +19,8 @@ from twin_engine.cockpit import (
     summarize_checks,
     write_local_feedback,
 )
-from twin_engine.developer_checks import run_developer_checks
+from twin_engine.developer_checks import detect_schedule_collapse, run_developer_checks
+from twin_engine.exposure_bridge import build_exposure_profile
 from twin_engine.models import CounterfactualRun, LongitudinalLabResult
 from twin_engine.privacy import scan_text_for_sensitive_markers
 from twin_engine.state_model import initialize_from_assessment
@@ -92,6 +94,7 @@ class ResearchCockpitTests(TestCase):
             "Toxicity constraints",
             "Causality status",
             "Developer Console",
+            "Utility v2",
         ]:
             self.assertContains(response, label)
         self.assertContains(response, f"Research Patient {self.patient.id}")
@@ -148,6 +151,53 @@ class ResearchCockpitTests(TestCase):
                 self.assertIn("detail", check)
                 self.assertIn("next_action", check)
 
+    def test_schedule_collapse_classifies_average_exposure_timing_difference(self) -> None:
+        daily_profile = build_exposure_profile(
+            drug="lenalidomide",
+            dose_mg=5,
+            horizon_days=10,
+            schedule={"type": "daily"},
+        ).to_dict()
+        alternate_day_profile = build_exposure_profile(
+            drug="lenalidomide",
+            dose_mg=10,
+            horizon_days=10,
+            schedule={"type": "interval", "every_days": 2},
+        ).to_dict()
+        run_a = self._create_run(
+            "LEN_5MG_DAILY",
+            utility=1.0,
+            simulation_summary={
+                "label": "research simulation",
+                "predicted_biomarkers": {"m_protein_g_dl": 1.0},
+                "classification": {"counterfactual_class": "mechanistic"},
+                "alternative": {"exposure_profiles": {"lenalidomide": daily_profile}},
+            },
+        )
+        run_b = self._create_run(
+            "LEN_10MG_ALT",
+            utility=1.0,
+            simulation_summary={
+                "label": "research simulation",
+                "predicted_biomarkers": {"m_protein_g_dl": 1.0},
+                "classification": {"counterfactual_class": "mechanistic"},
+                "alternative": {"exposure_profiles": {"lenalidomide": alternate_day_profile}},
+            },
+        )
+        shared_trajectory = {
+            "alternative_trajectory": {
+                "tumor_cells": [1.0, 0.8, 0.6],
+                "healthy_cells": [1.0, 1.0, 1.0],
+            }
+        }
+        with patch(
+            "twin_engine.developer_checks._load_trajectory",
+            side_effect=lambda run: shared_trajectory if run.id in {run_a.id, run_b.id} else None,
+        ):
+            classifications = detect_schedule_collapse(self.patient)
+        self.assertEqual(len(classifications), 1)
+        self.assertEqual(classifications[0]["classification"], "AVERAGE_EXPOSURE_COLLAPSE")
+
     def test_privacy_scanner_flags_direct_identifier_markers(self) -> None:
         sample_name = "Ros" + "sana " + "Agu" + "eci"
         sample_tax_code = "ABC" + "DEF" + "12" + "G34" + "H567" + "I"
@@ -170,12 +220,13 @@ class ResearchCockpitTests(TestCase):
         self.assertIn("manage.py test twin_engine.tests", script)
         self.assertIn("clinic.tests.test_patient_crud", script)
 
-    def _create_run(self, label: str, *, utility: float) -> CounterfactualRun:
+    def _create_run(self, label: str, *, utility: float, simulation_summary: dict | None = None) -> CounterfactualRun:
         return CounterfactualRun.objects.create(
             patient=self.patient,
             base_twin_state=self.state,
             intervention_definition={"label": label},
-            simulation_summary={
+            simulation_summary=simulation_summary
+            or {
                 "label": "research simulation",
                 "predicted_biomarkers": {"m_protein_g_dl": 1.0},
                 "classification": {"counterfactual_class": "mechanistic"},

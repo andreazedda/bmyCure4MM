@@ -37,6 +37,8 @@
         <div class="card-body">
             <p class="mb-1"><strong>Status:</strong> {{ counterfactual_run.status }}</p>
             <p class="mb-1"><strong>Alternative regimen:</strong> {{ counterfactual_run.alternative_regimen|default:"custom" }}</p>
+            <p class="mb-1"><strong>Research utility:</strong> {{ report_payload.comparison_metrics.research_utility|default:"unknown" }}</p>
+            <p class="mb-1"><strong>Research utility v2:</strong> {{ report_payload.comparison_metrics.research_utility_v2|default:"unknown" }}</p>
             <p class="mb-0"><strong>Report artifact:</strong> <a href="{{ counterfactual_run.report_artifact }}" target="_blank" rel="noopener">Open JSON report</a></p>
             <p class="small text-muted mt-2 mb-0"><strong>Provenance chain:</strong> patient pseudonym -> twin state -> intervention definition -> simulation run #{{ counterfactual_run.id }} -> report artifact -> metadata if available.</p>
         </div>
@@ -80,9 +82,29 @@
         </div>
         <div class="col-lg-6">
             <div class="card shadow-sm h-100">
-                <div class="card-header">Toxicity constraints</div>
+                <div class="card-header">Exposure and schedule comparison</div>
                 <div class="card-body small">
-                    <p class="text-muted">Descriptive constraint only. This layer summarizes observed AST/ALT, neutropenia, infection, and interruption context; it does not simulate future AST/ALT or NEU trajectories.</p>
+                    {% if report_payload.schedule_comparison and report_payload.schedule_comparison.comparison_status == 'compared' %}
+                        <p class="mb-1"><strong>Schedule classification:</strong> {{ report_payload.schedule_comparison.classification }}</p>
+                        <p class="mb-1"><strong>Primary drug:</strong> {{ report_payload.schedule_comparison.primary_drug|default:"unknown" }}</p>
+                        <p class="mb-1"><strong>Same average exposure:</strong> {{ report_payload.schedule_comparison.same_average_exposure|yesno:"yes,no,unknown" }}</p>
+                        <p class="mb-1"><strong>Different temporal profile:</strong> {{ report_payload.schedule_comparison.different_temporal_profile|yesno:"yes,no,unknown" }}</p>
+                        <p class="mb-1"><strong>Exposure profile distance:</strong> {{ report_payload.schedule_comparison.exposure_profile_distance|default:"unknown" }}</p>
+                        <p class="mb-0"><strong>Limitation:</strong> {{ report_payload.schedule_comparison.limitation }}</p>
+                    {% else %}
+                        <p class="text-muted mb-0">Exposure metadata unavailable; regenerate run to compute exposure profile.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header">Observed toxicity context</div>
+                <div class="card-body small">
+                    <p class="text-muted">Observed toxicity remains descriptive. It constrains interpretation but does not claim future toxicity prediction.</p>
                     {% if toxicity_constraints %}
                         <p class="mb-1"><strong>Max AST:</strong> {{ toxicity_constraints.liver.max_ast|default:"unknown" }}</p>
                         <p class="mb-1"><strong>Max ALT:</strong> {{ toxicity_constraints.liver.max_alt|default:"unknown" }}</p>
@@ -93,6 +115,54 @@
                         <p class="mb-0"><strong>Constraint note:</strong> {{ toxicity_constraints.reason }}</p>
                     {% else %}
                         <p class="text-muted mb-0">Unavailable for legacy run. Interpret any utility-like score without toxicity constraint evidence.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header">Prototype toxicity outputs</div>
+                <div class="card-body small">
+                    {% if report_payload.alternative_toxicity_dynamics and report_payload.alternative_toxicity_dynamics.toxicity_model_status == 'semi_mechanistic_prototype' %}
+                        <p class="text-muted">Prototype toxicity signals are normalized risk signals only. They are not AST/ALT or neutrophil predictions and do not identify causal effects.</p>
+                        <p class="mb-1"><strong>Liver signal:</strong> {{ report_payload.alternative_toxicity_dynamics.liver_toxicity_signal_0_1|default:"unknown" }}</p>
+                        <p class="mb-1"><strong>Neutropenia signal:</strong> {{ report_payload.alternative_toxicity_dynamics.neutropenia_signal_0_1|default:"unknown" }}</p>
+                        <p class="mb-1"><strong>Overall toxicity risk signal:</strong> {{ report_payload.alternative_toxicity_dynamics.toxicity_risk_signal|default:"unknown" }}</p>
+                        <p class="mb-1"><strong>Coefficient status:</strong> {{ report_payload.alternative_toxicity_dynamics.coefficient_diagnostics.fitted_or_default|default:"unknown" }}</p>
+                        <p class="mb-1"><strong>Uncertainty status:</strong> {{ report_payload.alternative_toxicity_dynamics.coefficient_diagnostics.uncertainty_status|default:"unknown" }}</p>
+                        <p class="mb-0"><strong>Limitation:</strong> {{ report_payload.alternative_toxicity_dynamics.limitation }}</p>
+                    {% else %}
+                        <p class="text-muted mb-0">Prototype toxicity outputs unavailable; regenerate run with current toxicity dynamics to populate this section.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-3">
+        <div class="card-header">Exposure summaries</div>
+        <div class="card-body small">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <strong>Baseline exposure summary</strong>
+                    {% if report_payload.baseline_exposure_summary and report_payload.baseline_exposure_summary.status == 'available' %}
+                        <p class="mb-1 mt-2"><strong>Primary drug:</strong> {{ report_payload.baseline_exposure_summary.primary_drug|default:"unknown" }}</p>
+                        <p class="mb-1"><strong>Average daily dose:</strong> {{ report_payload.baseline_exposure_summary.primary.average_daily_dose_mg|default:"unknown" }}</p>
+                        <p class="mb-1"><strong>Peak daily dose:</strong> {{ report_payload.baseline_exposure_summary.primary.peak_daily_dose_mg|default:"unknown" }}</p>
+                        <p class="mb-0"><strong>Schedule type:</strong> {{ report_payload.baseline_exposure_summary.primary.schedule_type|default:"unknown" }}</p>
+                    {% else %}
+                        <p class="text-muted mb-0 mt-2">Exposure metadata unavailable; regenerate run to compute exposure profile.</p>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <strong>Alternative exposure summary</strong>
+                    {% if report_payload.alternative_exposure_summary and report_payload.alternative_exposure_summary.status == 'available' %}
+                        <p class="mb-1 mt-2"><strong>Primary drug:</strong> {{ report_payload.alternative_exposure_summary.primary_drug|default:"unknown" }}</p>
+                        <p class="mb-1"><strong>Average daily dose:</strong> {{ report_payload.alternative_exposure_summary.primary.average_daily_dose_mg|default:"unknown" }}</p>
+                        <p class="mb-1"><strong>Peak daily dose:</strong> {{ report_payload.alternative_exposure_summary.primary.peak_daily_dose_mg|default:"unknown" }}</p>
+                        <p class="mb-0"><strong>Schedule type:</strong> {{ report_payload.alternative_exposure_summary.primary.schedule_type|default:"unknown" }}</p>
+                    {% else %}
+                        <p class="text-muted mb-0 mt-2">Exposure metadata unavailable; regenerate run to compute exposure profile.</p>
                     {% endif %}
                 </div>
             </div>

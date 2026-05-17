@@ -300,7 +300,8 @@
         <div class="guide-item"><span class="guide-label">Limitations</span>Utility is a research ranking heuristic, not a treatment recommendation.</div>
       </div>
       <div class="formula-box mt-3">research_utility = tumor_reduction + (1 - healthy_loss) + durability_index - toxicity_constraint_penalty</div>
-      <div class="small mt-3"><strong>Metric definitions:</strong> Tumor reduction = model-estimated tumor burden reduction. Healthy loss = model-estimated loss in healthy compartment. Durability index = model-estimated persistence of response over horizon. Predicted biomarkers = model-projected endpoint values if available. Toxicity penalty = heuristic exposure penalty, not toxicity prediction. Research utility = heuristic utility combining disease-control and toxicity-constraint terms.</div>
+      <div class="formula-box mt-2">research_utility_v2 = research_utility - 0.5 * liver_toxicity_signal_0_1 - 0.5 * neutropenia_signal_0_1</div>
+      <div class="small mt-3"><strong>Metric definitions:</strong> Tumor reduction = model-estimated tumor burden reduction. Healthy loss = model-estimated loss in healthy compartment. Durability index = model-estimated persistence of response over horizon. Exposure columns summarize modeled schedule inputs. Prototype liver and neutropenia signals are normalized risk signals only, not AST/ALT or neutrophil predictions. Toxicity penalty = heuristic exposure penalty, not toxicity prediction. Research utility and utility v2 are heuristic research ranking scores, not treatment recommendations.</div>
     </div>
     <div class="table-responsive mb-3">
       <table class="table table-sm compact-table align-middle mb-0">
@@ -311,9 +312,16 @@
             <th>Tumor reduction</th>
             <th>Healthy loss</th>
             <th>Durability</th>
+            <th>Avg daily exposure</th>
+            <th>Peak daily dose</th>
+            <th>Schedule type</th>
+            <th>Temporal profile</th>
+            <th>Liver signal</th>
+            <th>Neutropenia signal</th>
             <th>Predicted biomarkers</th>
             <th>Toxicity penalty</th>
             <th>Research utility</th>
+            <th>Utility v2</th>
           </tr>
         </thead>
         <tbody>
@@ -324,12 +332,19 @@
               <td>{{ row.tumor_reduction_delta|default:"Unavailable" }}</td>
               <td>{{ row.healthy_loss_delta|default:"Unavailable" }}</td>
               <td>{{ row.durability_delta|default:"Unavailable" }}</td>
+              <td>{% if row.average_daily_exposure_mg is not None %}{{ row.average_daily_exposure_mg }} mg{% else %}Unavailable{% endif %}</td>
+              <td>{% if row.peak_daily_dose_mg is not None %}{{ row.peak_daily_dose_mg }} mg{% else %}Unavailable{% endif %}</td>
+              <td>{{ row.schedule_type }}</td>
+              <td>{{ row.temporal_profile }}</td>
+              <td>{{ row.liver_signal|default:"Unavailable" }}</td>
+              <td>{{ row.neutropenia_signal|default:"Unavailable" }}</td>
               <td>{{ row.predicted_biomarker_summary }}</td>
               <td>{{ row.toxicity_penalty|default:"0" }}</td>
               <td>{{ row.utility|default:"Unavailable" }}</td>
+              <td>{{ row.utility_v2|default:"Unavailable" }}</td>
             </tr>
           {% empty %}
-            <tr><td colspan="8" class="text-muted">No completed what-if scenarios are available for this pseudonymized case.</td></tr>
+            <tr><td colspan="14" class="text-muted">No completed what-if scenarios are available for this pseudonymized case.</td></tr>
           {% endfor %}
         </tbody>
       </table>
@@ -343,7 +358,9 @@
           </div>
           <div class="d-flex flex-wrap gap-2 align-items-start">
             <span class="badge text-bg-light border">Utility {{ row.utility|default:"Unavailable" }}</span>
+            <span class="badge text-bg-light border">Utility v2 {{ row.utility_v2|default:"Unavailable" }}</span>
             <span class="badge text-bg-light border">Toxicity penalty {{ row.toxicity_penalty|default:"0" }}</span>
+            <span class="badge text-bg-light border">Schedule {{ row.schedule_classification }}</span>
             <a class="btn btn-outline-primary btn-sm" href="{{ row.report_url }}"><i class="bi bi-file-earmark-text me-1"></i> Report</a>
           </div>
         </div>
@@ -353,11 +370,19 @@
         {% endif %}
         <div class="table-responsive">
           <table class="table table-sm compact-table mb-0">
-            <thead><tr><th>Metric</th><th>Delta vs baseline</th></tr></thead>
+            <thead><tr><th>Metric</th><th>Value</th></tr></thead>
             <tbody>
               <tr><td>Tumor reduction</td><td>{{ row.tumor_reduction_delta|default:"Unavailable" }}</td></tr>
               <tr><td>Healthy-cell loss</td><td>{{ row.healthy_loss_delta|default:"Unavailable" }}</td></tr>
               <tr><td>Durability index</td><td>{{ row.durability_delta|default:"Unavailable" }}</td></tr>
+              <tr><td>Average daily exposure</td><td>{% if row.average_daily_exposure_mg is not None %}{{ row.average_daily_exposure_mg }} mg{% else %}Unavailable{% endif %}</td></tr>
+              <tr><td>Peak daily dose</td><td>{% if row.peak_daily_dose_mg is not None %}{{ row.peak_daily_dose_mg }} mg{% else %}Unavailable{% endif %}</td></tr>
+              <tr><td>Schedule type</td><td>{{ row.schedule_type }}</td></tr>
+              <tr><td>Temporal profile vs baseline</td><td>{{ row.temporal_profile }}</td></tr>
+              <tr><td>Liver prototype signal</td><td>{{ row.liver_signal|default:"Unavailable" }}</td></tr>
+              <tr><td>Neutropenia prototype signal</td><td>{{ row.neutropenia_signal|default:"Unavailable" }}</td></tr>
+              <tr><td>Toxicity model status</td><td>{{ row.toxicity_model_status }}</td></tr>
+              <tr><td>Utility v2</td><td>{{ row.utility_v2|default:"Unavailable" }}</td></tr>
             </tbody>
           </table>
         </div>
@@ -388,10 +413,14 @@
       </div>
     </div>
     <div id="trajectory-chart" class="chart-box"></div>
+    <div class="row g-3 mt-1">
+      <div class="col-lg-6"><div id="exposure-chart" class="chart-box"></div></div>
+      <div class="col-lg-6"><div id="toxicity-chart" class="chart-box"></div></div>
+    </div>
     {% if not trajectory_chart_data.has_data %}
       <div class="alert alert-light border small mt-2 mb-2">Trajectory unavailable: no trajectory artifact is available for plotting yet.</div>
     {% endif %}
-    <div class="small text-muted">Schedule-resolution limitation: near-identical scenario lines indicate current schedule/exposure resolution may be collapsing distinct schedules into similar solver inputs; this is not evidence that schedules are biologically equivalent.</div>
+    <div class="small text-muted">Schedule classification: BIOLOGICALLY_DISTINCT_OUTPUT means trajectories diverged numerically, AVERAGE_EXPOSURE_COLLAPSE means average exposure matched while timing differed, TRUE_NUMERICAL_COLLAPSE means trajectories matched numerically, and ARTIFACT_UNAVAILABLE means the run must be regenerated for exposure-aware comparison.</div>
     <details class="developer-details mt-3">
       <summary class="small fw-semibold">Developer details</summary>
       <pre>{{ schedule_collapse_warnings|pprint }}</pre>
@@ -404,10 +433,10 @@
       <div class="guide-grid">
         <div class="guide-item"><span class="guide-label">Question answered</span>What safety-related constraints affect interpretation of the simulated schedules?</div>
         <div class="guide-item"><span class="guide-label">Inputs used</span>Observed AST/ALT, neutropenia, infection, therapy interruptions, and adverse events.</div>
-        <div class="guide-item"><span class="guide-label">Method / computation</span>The current toxicity layer summarizes observed events and applies descriptive constraint penalties.</div>
-        <div class="guide-item"><span class="guide-label">Output meaning</span>descriptive_only means toxicity penalty is heuristic and based on observed context.</div>
+        <div class="guide-item"><span class="guide-label">Method / computation</span>Observed context remains descriptive; simulated toxicity adds normalized prototype liver and neutropenia risk signals driven by exposure and prior observations.</div>
+        <div class="guide-item"><span class="guide-label">Output meaning</span>descriptive_only means observed penalty only. semi_mechanistic_prototype means normalized risk signals are available, but not in AST/ALT or NEU units.</div>
         <div class="guide-item"><span class="guide-label">What you can do next</span>Add missing toxicity observations or review interruptions before interpreting scenario utility.</div>
-        <div class="guide-item"><span class="guide-label">Limitations</span>It does not yet simulate AST/ALT or NEU trajectories under alternative schedules; lower exposure penalty does not prove lower toxicity.</div>
+        <div class="guide-item"><span class="guide-label">Limitations</span>Prototype toxicity signals do not claim clinical validity, AST/ALT prediction, neutrophil prediction, or causal effect estimation.</div>
       </div>
     </div>
     <div class="row g-3">
@@ -422,7 +451,20 @@
           <li>Infection event: {{ toxicity_panel.summary.infection.pneumonia_event|default:"unknown" }}</li>
           <li>Therapy interruption count: {{ toxicity_panel.interruptions|length }}</li>
           <li>Toxicity-limited flag: {{ toxicity_panel.summary.lenalidomide_toxicity_limited|yesno:"yes,no,unknown" }}</li>
-          <li>Toxicity model status: {{ toxicity_panel.summary.toxicity_model_status|default:"descriptive_only" }}</li>
+          <li>Toxicity model status: {{ toxicity_panel.status|default:"prototype_unavailable" }}</li>
+        </ul>
+        <div class="small fw-semibold mt-3 mb-1">Prototype simulated signals</div>
+        <ul class="small mb-2">
+          {% for item in toxicity_panel.simulated_rows %}
+            <li>{{ item.label }}: liver {{ item.liver_signal|default:"Unavailable" }}, neutropenia {{ item.neutropenia_signal|default:"Unavailable" }}, utility_v2 {{ item.utility_v2|default:"Unavailable" }}</li>
+          {% empty %}
+            <li>No completed scenario rows available for prototype toxicity display.</li>
+          {% endfor %}
+        </ul>
+        <ul class="small mb-0">
+          {% for limitation in toxicity_panel.limitations %}
+            <li>{{ limitation }}</li>
+          {% endfor %}
         </ul>
         <ul class="small mb-0">
           {% for interruption in toxicity_panel.interruptions %}
@@ -432,10 +474,16 @@
           {% endfor %}
         </ul>
       </div>
-      <div class="col-lg-7">
+      <div class="col-lg-4">
         <details class="developer-details">
           <summary class="small fw-semibold">Constraint payload</summary>
           <pre>{{ toxicity_panel.summary|pprint }}</pre>
+        </details>
+      </div>
+      <div class="col-lg-3">
+        <details class="developer-details">
+          <summary class="small fw-semibold">Prototype payload</summary>
+          <pre>{{ toxicity_panel.simulated_rows|pprint }}</pre>
         </details>
       </div>
     </div>
@@ -651,12 +699,28 @@
       Plotly.newPlot(element, traces, layout, plotConfig);
     }
 
+    function drawSimpleSeriesChart(elementId, title, series, yTitle) {
+      const element = document.getElementById(elementId);
+      if (!element) return;
+      const traces = (series || []).map(function (serie) {
+        return {x: serie.x, y: serie.y, mode: 'lines', type: 'scatter', name: serie.label};
+      });
+      const layout = Object.assign({}, baseLayout, {title: {text: title, font: {size: 15}}, xaxis: {title: 'Simulation day'}, yaxis: {title: yTitle}});
+      if (traces.length === 0) {
+        layout.annotations = [{text: 'No series available for this panel yet', x: 0.5, y: 0.5, xref: 'paper', yref: 'paper', showarrow: false, font: {color: '#64748b'}}];
+      }
+      Plotly.newPlot(element, traces, layout, plotConfig);
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
       const labData = parseJson('lab-chart-data');
+      const trajectoryData = parseJson('trajectory-chart-data');
       drawLabChart('disease', 'lab-chart-disease', labData);
       drawLabChart('hematology', 'lab-chart-hematology', labData);
       drawLabChart('toxicity', 'lab-chart-toxicity', labData);
-      drawTrajectory(parseJson('trajectory-chart-data'));
+      drawTrajectory(trajectoryData);
+      drawSimpleSeriesChart('exposure-chart', 'Daily exposure by scenario', trajectoryData.exposure_series || [], 'Daily administered dose (mg)');
+      drawSimpleSeriesChart('toxicity-chart', 'Prototype toxicity risk by scenario', trajectoryData.toxicity_series || [], 'Normalized risk signal (0-1)');
     });
   })();
 </script>

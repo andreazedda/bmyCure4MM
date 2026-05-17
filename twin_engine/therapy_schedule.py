@@ -5,6 +5,8 @@ from typing import Any
 
 from django.db.models import Q
 
+from .exposure_bridge import build_exposure_profiles_from_schedule
+
 
 SUPPORTED_DRUG_ALIASES = {
     "len": "lenalidomide",
@@ -37,6 +39,13 @@ def build_therapy_schedule(patient, start_date, end_date) -> dict[str, Any]:
 
     items: list[dict[str, Any]] = []
     missing_doses: list[dict[str, Any]] = []
+    interruptions = list(
+        patient.therapy_interruptions.filter(
+            start_date__lte=end_date,
+        ).filter(
+            Q(end_date__isnull=True) | Q(end_date__gte=start_date)
+        ).order_by("start_date")
+    )
 
     for therapy in therapies:
         item_end = therapy.end_date or end_date
@@ -71,9 +80,21 @@ def build_therapy_schedule(patient, start_date, end_date) -> dict[str, Any]:
 
     schedule = {
         "patient_id": patient.id,
+        "horizon_start_date": start_date.isoformat(),
         "start_date": start_date.isoformat(),
         "end_date": end_date.isoformat(),
         "items": items,
+        "interruptions": [
+            {
+                "id": interruption.id,
+                "patient_therapy_id": interruption.patient_therapy_id,
+                "start_date": max(interruption.start_date, start_date).isoformat(),
+                "end_date": min(interruption.end_date or end_date, end_date).isoformat(),
+                "drug": interruption.drug,
+                "reason": interruption.reason,
+            }
+            for interruption in interruptions
+        ],
         "missing_doses": missing_doses,
     }
     schedule["validation"] = validate_schedule(schedule)
@@ -114,7 +135,9 @@ def convert_patient_therapies_to_drug_doses(schedule, strict: bool = True) -> di
                 )
                 continue
 
-            if not cycle_length or not days_on:
+            schedule_spec = dose_entry.get("schedule") if isinstance(dose_entry, dict) else None
+            has_structured_schedule = isinstance(schedule_spec, dict) and bool(schedule_spec)
+            if not has_structured_schedule and (not cycle_length or not days_on):
                 missing_doses.append(
                     {
                         "therapy_id": item.get("therapy_id"),
@@ -125,8 +148,21 @@ def convert_patient_therapies_to_drug_doses(schedule, strict: bool = True) -> di
                 )
                 continue
 
-            administrations = _count_administrations(start_date, end_date, cycle_length, days_on)
+            if has_structured_schedule and (not cycle_length or not days_on):
+                administrations = 0
+            else:
+                administrations = _count_administrations(start_date, end_date, cycle_length, days_on)
             aggregated[drug] += float(dose_value) * float(administrations)
+
+    exposure_profiles = {}
+    if isinstance(schedule, dict):
+        schedule_start = _parse_date(schedule.get("start_date"))
+        schedule_end = _parse_date(schedule.get("end_date"))
+        horizon_days = max((schedule_end - schedule_start).days + 1, 1)
+        exposure_profiles = build_exposure_profiles_from_schedule(schedule, horizon_days)
+        for drug in SIMULATOR_DRUGS:
+            if drug in exposure_profiles:
+                aggregated[drug] = float(exposure_profiles[drug].average_daily_dose_mg)
 
     if strict and missing_doses:
         details = ", ".join(
@@ -138,6 +174,7 @@ def convert_patient_therapies_to_drug_doses(schedule, strict: bool = True) -> di
     return {
         "drug_doses": aggregated,
         "missing_doses": missing_doses,
+        "exposure_profiles": {drug: profile.to_dict() for drug, profile in exposure_profiles.items()},
     }
 
 

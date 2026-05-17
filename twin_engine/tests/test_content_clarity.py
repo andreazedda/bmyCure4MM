@@ -63,11 +63,14 @@ class ResearchContentClarityTests(TestCase):
             "RMSE = root mean square error",
             "MAE = mean absolute error",
             "research_utility = tumor_reduction + (1 - healthy_loss) + durability_index - toxicity_constraint_penalty",
+            "research_utility_v2 = research_utility - 0.5 * liver_toxicity_signal_0_1 - 0.5 * neutropenia_signal_0_1",
             "Y_model(a') = f(x_t, theta_hat, a')",
             "E[Y | do(A=a')] - E[Y | do(A=a)]",
             "Causal effect not identified",
-            "descriptive_only means toxicity penalty is heuristic",
-            "model-resolution limitation",
+            "descriptive_only means observed penalty only",
+            "Prototype toxicity signals do not claim clinical validity",
+            "Schedule classification",
+            "Utility v2",
             "No peer-reviewed source is attached in the repository for this component",
             "Traceability chain",
         ]:
@@ -133,9 +136,9 @@ class ResearchContentClarityTests(TestCase):
             "Causal effect",
             "Toxicity constraint",
             "Research utility",
-            "Provenance",
-            "Schedule collapse",
             "Exposure bridge",
+            "Schedule collapse",
+            "Provenance",
         ]:
             self.assertContains(glossary, text)
 

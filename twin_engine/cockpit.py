@@ -229,7 +229,7 @@ def build_research_cockpit_context(patient: Patient, *, include_developer_checks
         "calibration_panel": build_calibration_panel(patient, current_state),
         "scenario_rows": scenario_rows,
         "trajectory_chart_data": build_trajectory_chart_data(scenario_rows),
-        "toxicity_panel": build_toxicity_panel(patient, toxicity_constraints),
+        "toxicity_panel": build_toxicity_panel(patient, toxicity_constraints, scenario_rows),
         "causal_panel": build_causal_panel(causal_sets),
         "scientific_references": load_model_references(),
         "provenance_records": metadata_records,
@@ -437,7 +437,13 @@ def list_latest_completed_runs_by_label(patient: Patient) -> dict[str, Counterfa
 
 
 def build_scenario_rows(patient: Patient, latest_runs_by_label: dict[str, CounterfactualRun], collapse_warnings: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    collapsed_run_ids = {run_id for warning in collapse_warnings for run_id in warning.get("run_ids", [])}
+    warning_classifications = {"TRUE_NUMERICAL_COLLAPSE", "AVERAGE_EXPOSURE_COLLAPSE", "ARTIFACT_UNAVAILABLE"}
+    collapsed_run_ids = {
+        run_id
+        for warning in collapse_warnings
+        if warning.get("classification") in warning_classifications
+        for run_id in warning.get("run_ids", [])
+    }
     rows = []
     for label, run in latest_runs_by_label.items():
         metrics = run.comparison_metrics or {}
@@ -446,19 +452,33 @@ def build_scenario_rows(patient: Patient, latest_runs_by_label: dict[str, Counte
         baseline_predicted = summary.get("baseline_predicted_biomarkers") or {}
         trajectory_payload = load_json_artifact(run.trajectory_artifact)
         report_payload = load_json_artifact(run.report_artifact)
+        alternative_summary = (summary.get("alternative") or {})
+        exposure_comparison = metrics.get("schedule_comparison") or summary.get("schedule_comparison") or {}
+        alternative_exposure_summary = alternative_summary.get("exposure_summary") or (report_payload or {}).get("alternative_exposure_summary") or {}
+        alternative_primary_exposure = alternative_exposure_summary.get("primary") or {}
+        primary_drug = alternative_exposure_summary.get("primary_drug")
+        alternative_exposure_profiles = alternative_summary.get("exposure_profiles") or {}
+        alternative_primary_profile = alternative_exposure_profiles.get(primary_drug) if primary_drug else None
+        alternative_toxicity_dynamics = summary.get("alternative_toxicity_dynamics") or alternative_summary.get("toxicity_dynamics") or (report_payload or {}).get("alternative_toxicity_dynamics") or {}
         issues = []
         if run.id in collapsed_run_ids:
-            issues.append("Trajectory matches another scenario at current schedule resolution.")
+            issues.append("Trajectory classification indicates collapse or missing exposure metadata at the current schedule resolution.")
         if not trajectory_payload:
             issues.append("Trajectory artifact unavailable.")
         if not predicted:
             issues.append("Predicted biomarker summary unavailable.")
+        if exposure_comparison.get("classification") == "EXPOSURE_METADATA_UNAVAILABLE":
+            issues.append("Exposure metadata unavailable; regenerate run to compute exposure profile.")
+        if alternative_toxicity_dynamics.get("toxicity_model_status") != "semi_mechanistic_prototype":
+            issues.append("Prototype toxicity signals unavailable for this run.")
         rows.append(
             {
                 "run": run,
                 "label": label,
                 "utility": _round_or_none(metrics.get("research_utility")),
+                "utility_v2": _round_or_none(metrics.get("research_utility_v2")),
                 "toxicity_penalty": _round_or_none(metrics.get("toxicity_constraint_penalty")),
+                "toxicity_prototype_penalty": _round_or_none(metrics.get("toxicity_prototype_penalty")),
                 "tumor_reduction_delta": _metric_delta(metrics, "tumor_reduction"),
                 "healthy_loss_delta": _metric_delta(metrics, "healthy_loss"),
                 "durability_delta": _metric_delta(metrics, "durability_index"),
@@ -466,10 +486,22 @@ def build_scenario_rows(patient: Patient, latest_runs_by_label: dict[str, Counte
                 "predicted_biomarker_summary": _format_predicted_biomarkers(predicted),
                 "baseline_predicted_biomarkers": baseline_predicted,
                 "classification": summary.get("classification") or {},
+                "schedule_classification": exposure_comparison.get("classification") or "EXPOSURE_METADATA_UNAVAILABLE",
+                "temporal_profile": "different vs baseline" if exposure_comparison.get("different_temporal_profile") else "matched or unavailable",
+                "average_daily_exposure_mg": _round_or_none(alternative_primary_exposure.get("average_daily_dose_mg")),
+                "peak_daily_dose_mg": _round_or_none(alternative_primary_exposure.get("peak_daily_dose_mg")),
+                "schedule_type": alternative_primary_exposure.get("schedule_type") or "unavailable",
+                "primary_drug": primary_drug,
+                "liver_signal": _round_or_none(alternative_toxicity_dynamics.get("liver_toxicity_signal_0_1")),
+                "neutropenia_signal": _round_or_none(alternative_toxicity_dynamics.get("neutropenia_signal_0_1")),
+                "toxicity_model_status": alternative_toxicity_dynamics.get("toxicity_model_status") or "unavailable",
                 "issues": issues,
-                "interpretation": interpret_scenario(metrics, predicted, issues),
+                "interpretation": interpret_scenario(metrics, predicted, issues, exposure_comparison, alternative_toxicity_dynamics),
                 "trajectory_payload": trajectory_payload,
                 "report_payload": report_payload,
+                "exposure_comparison": exposure_comparison,
+                "alternative_toxicity_dynamics": alternative_toxicity_dynamics,
+                "alternative_primary_exposure_profile": alternative_primary_profile,
                 "report_url": reverse("twin_engine:counterfactual_report", args=[patient.id, run.id]),
             }
         )
@@ -479,6 +511,8 @@ def build_scenario_rows(patient: Patient, latest_runs_by_label: dict[str, Counte
 
 def build_trajectory_chart_data(scenario_rows: list[dict[str, Any]]) -> dict[str, Any]:
     series = []
+    exposure_series = []
+    toxicity_series = []
     baseline_added = False
     for row in scenario_rows[:6]:
         payload = row.get("trajectory_payload") or {}
@@ -489,17 +523,46 @@ def build_trajectory_chart_data(scenario_rows: list[dict[str, Any]]) -> dict[str
             baseline_added = True
         if alternative:
             series.append(_trajectory_series(row["label"], alternative, "alternative"))
-    return {"series": [item for item in series if item.get("x")], "has_data": bool(series)}
+        if row.get("alternative_primary_exposure_profile"):
+            exposure_series.append(_exposure_series(row["label"], row["alternative_primary_exposure_profile"]))
+        toxicity_payload = row.get("alternative_toxicity_dynamics") or {}
+        if toxicity_payload.get("toxicity_risk_series"):
+            toxicity_series.append(_toxicity_series(row["label"], toxicity_payload.get("toxicity_risk_series") or []))
+    return {
+        "series": [item for item in series if item.get("x")],
+        "has_data": bool(series),
+        "exposure_series": [item for item in exposure_series if item.get("x")],
+        "has_exposure_data": bool(exposure_series),
+        "toxicity_series": [item for item in toxicity_series if item.get("x")],
+        "has_toxicity_data": bool(toxicity_series),
+    }
 
 
-def build_toxicity_panel(patient: Patient, toxicity_constraints: dict[str, Any]) -> dict[str, Any]:
+def build_toxicity_panel(patient: Patient, toxicity_constraints: dict[str, Any], scenario_rows: list[dict[str, Any]]) -> dict[str, Any]:
     labs = build_lab_chart_data(patient).get("toxicity", {})
+    simulated_rows = [
+        {
+            "label": row["label"],
+            "liver_signal": row.get("liver_signal"),
+            "neutropenia_signal": row.get("neutropenia_signal"),
+            "toxicity_model_status": row.get("toxicity_model_status"),
+            "utility_v2": row.get("utility_v2"),
+        }
+        for row in scenario_rows
+    ]
+    has_prototype = any(row.get("toxicity_model_status") == "semi_mechanistic_prototype" for row in scenario_rows)
     return {
         "summary": toxicity_constraints,
         "lab_series": labs.get("series", []),
+        "simulated_rows": simulated_rows,
+        "status": "semi_mechanistic_prototype" if has_prototype else "prototype_unavailable",
         "interruptions": list(patient.therapy_interruptions.order_by("-start_date")[:10]),
         "adverse_events": list(patient.adverse_events.order_by("-date")[:10]),
-        "disclaimer": "Descriptive toxicity constraints only; no predictive AST/ALT/neutrophil dynamics are implemented.",
+        "disclaimer": "Observed toxicity remains descriptive. Simulated toxicity outputs are normalized prototype risk signals, not predicted AST/ALT or neutrophil values.",
+        "limitations": [
+            "Do not interpret prototype toxicity signals as validated patient-specific toxicity forecasts.",
+            "Exposure timing and toxicity signals remain research-only and do not identify causal effects.",
+        ],
     }
 
 
@@ -516,6 +579,11 @@ def build_workflow_steps(
     has_residuals = patient.observation_residuals.exists()
     has_toxicity_context = bool(toxicity_constraints) and any(
         toxicity_constraints.get(key) for key in ("liver", "neutropenia", "infection")
+    )
+    has_toxicity_prototype = any(row.get("toxicity_model_status") == "semi_mechanistic_prototype" for row in scenario_rows)
+    collapse_warning_present = any(
+        item.get("classification") in {"TRUE_NUMERICAL_COLLAPSE", "AVERAGE_EXPOSURE_COLLAPSE", "ARTIFACT_UNAVAILABLE"}
+        for item in collapse_warnings
     )
     return [
         {
@@ -548,9 +616,9 @@ def build_workflow_steps(
         },
         {
             "step": "5. Toxicity",
-            "status": "partial" if has_toxicity_context else "missing",
-            "meaning": "Observed toxicity context is descriptive." if has_toxicity_context else "No structured toxicity context is available.",
-            "next": "Interpret penalties as descriptive constraints.",
+            "status": "ready" if has_toxicity_prototype else ("partial" if has_toxicity_context else "missing"),
+            "meaning": "Observed context and prototype toxicity signals are available." if has_toxicity_prototype else ("Observed toxicity context is descriptive." if has_toxicity_context else "No structured toxicity context is available."),
+            "next": "Interpret prototype signals as normalized research-only risk summaries, not lab predictions.",
             "href": "#toxicity-constraints",
         },
         {
@@ -569,8 +637,8 @@ def build_workflow_steps(
         },
         {
             "step": "8. Developer checks",
-            "status": "partial" if collapse_warnings else "ready",
-            "meaning": "Schedule-resolution limitation detected." if collapse_warnings else "Internal checks can be reviewed before commit or demo.",
+            "status": "partial" if collapse_warning_present else "ready",
+            "meaning": "Schedule-resolution limitation detected." if collapse_warning_present else "Internal checks can be reviewed before commit or demo.",
             "next": "Open the developer console for audit/debug.",
             "href": "#developer-checks",
         },
@@ -655,14 +723,27 @@ def scenario_label(run: CounterfactualRun) -> str:
     return str(definition.get("label") or definition.get("intervention", {}).get("label") or f"Run {run.id}")
 
 
-def interpret_scenario(metrics: dict[str, Any], predicted: dict[str, Any], issues: list[str]) -> str:
+def interpret_scenario(
+    metrics: dict[str, Any],
+    predicted: dict[str, Any],
+    issues: list[str],
+    exposure_comparison: dict[str, Any],
+    toxicity_dynamics: dict[str, Any],
+) -> str:
     utility = metrics.get("research_utility")
+    utility_v2 = metrics.get("research_utility_v2")
     penalty = metrics.get("toxicity_constraint_penalty")
     fragments = ["Research simulation only; heuristic ranking is for model exploration."]
     if utility is not None:
         fragments.append(f"Utility score {float(utility):.3f} combines modeled disease control, healthy-cell preservation, durability, and toxicity penalty.")
+    if utility_v2 is not None:
+        fragments.append(f"Utility v2 {float(utility_v2):.3f} additionally subtracts prototype liver and neutropenia risk signals.")
     if penalty:
         fragments.append(f"Toxicity history subtracts {float(penalty):.3f} from the exploratory utility score.")
+    if exposure_comparison.get("classification"):
+        fragments.append(f"Exposure classification: {exposure_comparison.get('classification')}.")
+    if toxicity_dynamics.get("toxicity_model_status") == "semi_mechanistic_prototype":
+        fragments.append("Prototype toxicity signals are available as normalized risk signals only.")
     if predicted:
         fragments.append("Predicted biomarker endpoints are available for inspection.")
     if issues:
@@ -699,6 +780,22 @@ def _trajectory_series(label: str, trajectory: dict[str, Any], kind: str) -> dic
         "x": [float(value) for value in time[: len(tumor)]],
         "tumor": [float(value) for value in tumor],
         "healthy": [float(value) for value in healthy],
+    }
+
+
+def _exposure_series(label: str, exposure_profile: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "label": label,
+        "x": [int(value) for value in (exposure_profile or {}).get("time_grid_days", [])],
+        "y": [float(value) for value in (exposure_profile or {}).get("daily_administered_dose_mg", [])],
+    }
+
+
+def _toxicity_series(label: str, toxicity_risk_series: list[dict[str, Any]]) -> dict[str, Any]:
+    return {
+        "label": label,
+        "x": [int(item.get("day") or 0) for item in toxicity_risk_series],
+        "y": [float(item.get("value") or 0.0) for item in toxicity_risk_series],
     }
 
 

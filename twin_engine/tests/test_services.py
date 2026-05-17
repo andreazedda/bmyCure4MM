@@ -12,6 +12,7 @@ from django.test import TestCase, override_settings
 from clinic.models import Assessment, Patient, PatientTherapy, Regimen
 from twin_engine.calibration import CALIBRATION_STATUS_FAILED_UNRELIABLE, calibrate_patient_parameters
 from twin_engine.counterfactual import run_counterfactual
+from twin_engine.exposure_bridge import compare_exposure_profiles
 from twin_engine.models import ObservationResidual, TherapyInterruption
 from twin_engine.observation_model import compute_residuals, predict_biomarkers
 from twin_engine.provenance import hash_json
@@ -140,6 +141,64 @@ class TwinEngineServiceTests(TestCase):
         self.assertIn("m_protein_g_dl", result["summary"]["predicted_biomarkers"])
         self.assertIn("predicted_biomarkers_milestones", result["summary"])
 
+    def test_time_resolved_schedule_profiles_reach_solver(self) -> None:
+        state = initialize_from_assessment(self.assessment, user=self.user)
+        daily_schedule = {
+            "horizon_start_date": "2025-01-01",
+            "start_date": "2025-01-01",
+            "end_date": "2025-01-10",
+            "items": [
+                {
+                    "therapy_id": None,
+                    "regimen_name": "len_5mg_daily",
+                    "start_date": "2025-01-01",
+                    "end_date": "2025-01-10",
+                    "components": [{"drug": "lenalidomide", "supported_by_solver": True}],
+                    "doses": {"lenalidomide": {"dose": 5.0, "unit": "mg", "schedule": {"type": "daily"}}},
+                }
+            ],
+            "interruptions": [],
+            "missing_doses": [],
+        }
+        alternate_day_schedule = {
+            "horizon_start_date": "2025-01-01",
+            "start_date": "2025-01-01",
+            "end_date": "2025-01-10",
+            "items": [
+                {
+                    "therapy_id": None,
+                    "regimen_name": "len_10mg_alt_day",
+                    "start_date": "2025-01-01",
+                    "end_date": "2025-01-10",
+                    "components": [{"drug": "lenalidomide", "supported_by_solver": True}],
+                    "doses": {"lenalidomide": {"dose": 10.0, "unit": "mg", "schedule": {"type": "interval", "every_days": 2}}},
+                }
+            ],
+            "interruptions": [],
+            "missing_doses": [],
+        }
+
+        daily_inputs = build_solver_inputs_from_twin_state(state, daily_schedule, horizon_days=10)
+        alt_inputs = build_solver_inputs_from_twin_state(state, alternate_day_schedule, horizon_days=10)
+        comparison = compare_exposure_profiles(
+            daily_inputs["exposure_profiles"]["lenalidomide"],
+            alt_inputs["exposure_profiles"]["lenalidomide"],
+        )
+
+        self.assertEqual(daily_inputs["dose_input_mode"], "time_resolved_profile")
+        self.assertEqual(alt_inputs["dose_input_mode"], "time_resolved_profile")
+        self.assertTrue(comparison["same_average_exposure"])
+        self.assertTrue(comparison["different_temporal_profile"])
+        self.assertGreater(comparison["exposure_profile_distance"], 0.0)
+
+        daily_result = run_patient_simulation(state, therapy_schedule=daily_schedule, horizon_days=10)
+        alt_result = run_patient_simulation(state, therapy_schedule=alternate_day_schedule, horizon_days=10)
+
+        self.assertNotEqual(
+            daily_result["trajectory"]["lenalidomide_concentration"],
+            alt_result["trajectory"]["lenalidomide_concentration"],
+        )
+
     def test_calibration_persists_pre_and_post_residuals_and_diagnostics(self) -> None:
         state = initialize_from_assessment(self.assessment, user=self.user)
 
@@ -242,10 +301,42 @@ class TwinEngineServiceTests(TestCase):
                 content = report_path.read_text(encoding="utf-8")
 
         self.assertIn("research_utility", run.comparison_metrics)
+        self.assertIn("research_utility_v2", run.comparison_metrics)
         self.assertIn("toxicity_constraint_penalty", run.comparison_metrics)
+        self.assertIn("schedule_comparison", run.comparison_metrics)
         self.assertIn("predicted_biomarkers", run.simulation_summary)
+        self.assertIn("alternative_toxicity_dynamics", run.simulation_summary)
         self.assertNotIn('"notes"', content)
         self.assertNotIn(self.patient.notes, content)
+
+    def test_counterfactual_same_average_different_timing_is_visible(self) -> None:
+        state = initialize_from_assessment(self.assessment, user=self.user)
+        intervention = {
+            "label": "LEN_5MG_DAILY_28D",
+            "classification": "mechanistic_simulation_only",
+            "intervention": {
+                "drug": "lenalidomide",
+                "dose_mg": 5.0,
+                "schedule": {"type": "daily"},
+                "duration_days": 28,
+                "start_day": 0,
+            },
+            "comparison": {"baseline": "current_recorded_therapy"},
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with override_settings(MEDIA_ROOT=tmpdir, MEDIA_URL="/media/"):
+                run = run_counterfactual(self.patient, state, intervention, 28, user=self.user)
+
+        schedule_comparison = run.comparison_metrics["schedule_comparison"]
+        self.assertEqual(schedule_comparison["classification"], "SAME_AVERAGE_DIFFERENT_TEMPORAL_PROFILE")
+        self.assertTrue(schedule_comparison["same_average_exposure"])
+        self.assertTrue(schedule_comparison["different_temporal_profile"])
+        self.assertGreater(run.comparison_metrics["research_utility"], run.comparison_metrics["research_utility_v2"])
+        self.assertEqual(
+            run.simulation_summary["alternative_toxicity_dynamics"]["toxicity_model_status"],
+            "semi_mechanistic_prototype",
+        )
 
     def test_counterfactual_run_persists_status_and_summary(self) -> None:
         state = initialize_from_assessment(self.assessment, user=self.user)

@@ -8,6 +8,7 @@ from simulator.models import DEFAULT_PD_PARAMS, DEFAULT_PK_PARAMS, SimulationAtt
 from simulator.models_simulation import MathematicalModel
 from simulator.pharmaco import registry as pharmaco_registry
 
+from .exposure_bridge import build_exposure_dose_function, build_legacy_scalar_exposure_profile
 from .observation_model import build_predicted_biomarker_projection
 from .therapy_schedule import convert_patient_therapies_to_drug_doses
 
@@ -39,14 +40,24 @@ def build_solver_inputs_from_twin_state(
     }
 
     missing_doses: list[dict[str, Any]] = []
+    exposure_profiles: dict[str, Any] = {}
     if therapy_schedule:
         schedule_payload = convert_patient_therapies_to_drug_doses(therapy_schedule, strict=False)
         missing_doses = list(schedule_payload.get("missing_doses", []))
+        exposure_profiles = dict(schedule_payload.get("exposure_profiles") or {})
         for drug, dose in schedule_payload.get("drug_doses", {}).items():
             raw_parameters[f"{drug}_dose"] = float(dose)
 
-    for drug, dose in (overrides.pop("drug_doses", {}) or {}).items():
-        raw_parameters[f"{drug}_dose"] = float(dose)
+    override_drug_doses = dict(overrides.pop("drug_doses", {}) or {})
+    for drug, dose in override_drug_doses.items():
+        if drug not in exposure_profiles:
+            exposure_profiles[drug] = build_legacy_scalar_exposure_profile(
+                drug=drug,
+                scalar_dose_mg=float(dose),
+                horizon_days=int(horizon_days),
+                schedule_label="legacy_override_scalar",
+            ).to_dict()
+        raw_parameters[f"{drug}_dose"] = float(exposure_profiles[drug].get("average_daily_dose_mg", dose))
 
     raw_parameters.update(overrides)
 
@@ -54,6 +65,11 @@ def build_solver_inputs_from_twin_state(
     solver_inputs["raw_parameters"] = raw_parameters
     solver_inputs["missing_doses"] = missing_doses
     solver_inputs["therapy_schedule"] = therapy_schedule
+    solver_inputs["exposure_profiles"] = exposure_profiles
+    solver_inputs["dose_input_mode"] = "time_resolved_profile" if exposure_profiles else "scalar_average_only"
+    solver_inputs["schedule_resolution_warning"] = (
+        "" if exposure_profiles else "Downstream solver currently consumes scalar dose only; temporal schedule differences are not available in this run."
+    )
     return solver_inputs
 
 
@@ -76,6 +92,9 @@ def run_patient_simulation(
         DEFAULT_PK_PARAMS,
         DEFAULT_PD_PARAMS,
     )
+    dose_functions = dict(dose_functions or {})
+    for drug, profile in (solver_inputs.get("exposure_profiles") or {}).items():
+        dose_functions[drug] = build_exposure_dose_function(profile)
     interaction_matrix = np.eye(len(solver_inputs["drug_doses"]), dtype=float) * float(
         solver_inputs["interaction_strength"]
     )
@@ -122,6 +141,10 @@ def run_patient_simulation(
     )
     summary["predicted_biomarkers"] = predicted_projection["end"]
     summary["predicted_biomarkers_milestones"] = predicted_projection["milestones"]
+    summary["dose_input_mode"] = solver_inputs.get("dose_input_mode")
+    summary["schedule_resolution_warning"] = solver_inputs.get("schedule_resolution_warning")
+    summary["exposure_profiles"] = solver_inputs.get("exposure_profiles") or {}
+    summary["exposure_summary"] = _summarize_exposure_profiles(summary["exposure_profiles"])
     return {
         "trajectory_frame": trajectory,
         "trajectory": trajectory.to_dict(orient="list"),
@@ -210,3 +233,38 @@ def _integrate_trapezoid(y_values, x_values) -> float:
     if callable(trapezoid_fn):
         return float(trapezoid_fn(y_values, x_values))
     return float(np.trapz(y_values, x_values))
+
+
+def _summarize_exposure_profiles(exposure_profiles: dict[str, Any]) -> dict[str, Any]:
+    if not exposure_profiles:
+        return {
+            "status": "unavailable",
+            "primary_drug": None,
+            "per_drug": {},
+            "limitation": "Exposure metadata unavailable; regenerate run to compute exposure profile.",
+        }
+
+    per_drug = {}
+    primary_drug = None
+    primary_total = -1.0
+    for drug, payload in sorted((exposure_profiles or {}).items()):
+        total = float((payload or {}).get("total_cumulative_dose_mg") or 0.0)
+        per_drug[drug] = {
+            "average_daily_dose_mg": float((payload or {}).get("average_daily_dose_mg") or 0.0),
+            "peak_daily_dose_mg": float((payload or {}).get("peak_administered_dose_mg") or 0.0),
+            "schedule_type": (payload or {}).get("schedule_type") or "unavailable",
+            "temporal_profile_hash": (payload or {}).get("exposure_profile_hash") or "",
+            "interruption_fraction": float((payload or {}).get("interruption_fraction") or 0.0),
+            "total_cumulative_dose_mg": total,
+        }
+        if total > primary_total:
+            primary_total = total
+            primary_drug = drug
+
+    return {
+        "status": "available",
+        "primary_drug": primary_drug,
+        "per_drug": per_drug,
+        "primary": per_drug.get(primary_drug) if primary_drug else None,
+        "limitation": "Exposure summaries describe modeled schedule inputs and do not establish clinical equivalence or causal effects.",
+    }
