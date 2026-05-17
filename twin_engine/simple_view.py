@@ -13,6 +13,7 @@ from .cockpit import (
     build_validation_panel,
     list_latest_completed_runs_by_label,
 )
+from .data_explainability import build_data_explainability_context
 from .developer_checks import detect_schedule_collapse
 from .models import AdverseEvent, CounterfactualRun, LongitudinalLabResult, TherapyInterruption
 from .state_model import get_current_twin_state
@@ -29,13 +30,30 @@ def build_simple_patient_story(patient: Patient, *, include_developer_links: boo
     scenario_rows = build_scenario_rows(patient, latest_runs_by_label, collapse_warnings)
     validation_panel = build_validation_panel(patient, current_state, scenario_rows)
     recommendation = build_assessment_recommendations(patient)
+    explainability = build_data_explainability_context(
+        patient,
+        current_state=current_state,
+        scenario_rows=scenario_rows,
+        validation_panel=validation_panel,
+    )
     data_blocks = _build_data_blocks(
         patient,
         current_state=current_state,
         scenario_rows=scenario_rows,
         include_developer_links=include_developer_links,
     )
+    dictionary_lookup = explainability["dictionary_lookup"]
+    for block in data_blocks:
+        meta = dictionary_lookup.get(block["title"])
+        if meta:
+            block["data_source"] = meta["data_source"]
+            block["model_use"] = meta["model_use"]
+            block["missing_data_message"] = meta["missingness_explanation"]
     next_action = _determine_next_action(patient, current_state, scenario_rows, validation_panel, recommendation)
+    scenario_story = _build_scenario_story(scenario_rows, validation_panel)
+    scenario_explanations = explainability["scenario_explanations"]
+    for scenario in scenario_story:
+        scenario.update(scenario_explanations.get(scenario["scenario_label"], {}))
     story = {
         "patient_summary": {
             "pseudonym": f"Research Patient {patient.id}",
@@ -45,12 +63,15 @@ def build_simple_patient_story(patient: Patient, *, include_developer_links: boo
             "next_action": next_action,
         },
         "data_blocks": data_blocks,
+        "data_dictionary_blocks": explainability["groups"],
+        "classification_legend": explainability["classification_legend"],
+        "help_box_steps": explainability["help_box_steps"],
         "model_story": _build_model_story(current_state, scenario_rows, validation_panel),
-        "scenario_story": _build_scenario_story(scenario_rows, validation_panel),
+        "scenario_story": scenario_story,
         "conclusion_cards": _build_conclusion_cards(data_blocks, scenario_rows, validation_panel, next_action),
         "one_minute_summary": _build_one_minute_summary(patient, current_state, scenario_rows, validation_panel, data_blocks),
         "steps": _build_steps(patient, current_state, scenario_rows, validation_panel),
-        "input_table": _build_input_table(data_blocks),
+        "input_table": explainability["model_input_map"],
         "lineage_nodes": _build_lineage_nodes(patient, current_state, scenario_rows, validation_panel),
         "allowed_conclusions": [
             "The model can compare simulated trajectories under different schedules.",
@@ -181,7 +202,7 @@ def _build_data_blocks(
             limit="The toxicity layer produces prototype risk signals, not validated AST/ALT predictions.",
         ),
         _make_block(
-            title="Treatments",
+            title="Treatment schedules",
             plain_meaning="Recorded treatment rows are converted into dated dose patterns.",
             fields_used=["drug", "dose", "schedule", "start date", "stop date", "interruptions"],
             available_count=len(therapies),
@@ -235,7 +256,7 @@ def _build_data_blocks(
             limit="Observed safety events are descriptive context, not future toxicity predictions.",
         ),
         _make_block(
-            title="Model states",
+            title="Twin state",
             plain_meaning="This is the mathematical starting state used before running a simulation.",
             fields_used=["state date", "initialization method", "model version"],
             available_count=patient.twin_states.count(),

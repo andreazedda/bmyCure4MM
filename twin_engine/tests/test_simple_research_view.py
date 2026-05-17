@@ -90,7 +90,9 @@ class SimpleResearchViewTests(TestCase):
             "Research simulation only",
             "Not a treatment recommendation",
             "Causal effect not identified",
+            "I don’t understand this page",
             "One-minute summary",
+            "What each data block means",
             "What is missing?",
             "What the model actually uses",
             "What has been simulated?",
@@ -117,6 +119,21 @@ class SimpleResearchViewTests(TestCase):
         self.assertNotContains(response, "do-operator")
         self.assertContains(response, "mathematical starting state")
         self.assertContains(response, "heuristic research score called utility_v2")
+        self.assertContains(response, "Source rows summary")
+
+    def test_simple_view_includes_data_classification_legend(self) -> None:
+        self.client.force_login(self.owner)
+        response = self.client.get(reverse("twin_engine:simple_research_view", args=[self.patient.id]))
+        self.assertEqual(response.status_code, 200)
+        for text in [
+            "Data classification legend",
+            "RAW STRUCTURED",
+            "DERIVED",
+            "SIMULATED",
+            "HEURISTIC",
+            "MISSING",
+        ]:
+            self.assertContains(response, text)
 
     def test_simple_view_contains_data_blocks_and_model_use_table(self) -> None:
         self.client.force_login(self.owner)
@@ -126,6 +143,43 @@ class SimpleResearchViewTests(TestCase):
         self.assertContains(response, "Used by model")
         self.assertContains(response, "Input group")
         self.assertContains(response, "Interpretation risk")
+        self.assertContains(response, "Source model")
+        self.assertContains(response, "Used in")
+
+    def test_disease_markers_explain_source_and_model_use(self) -> None:
+        self.client.force_login(self.owner)
+        response = self.client.get(reverse("twin_engine:simple_research_view", args=[self.patient.id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Structured lab records and assessment records.")
+        self.assertContains(response, "Used for initialization, calibration, and observed-vs-predicted comparison.")
+
+    def test_liver_markers_explain_toxicity_limitation(self) -> None:
+        self.client.force_login(self.owner)
+        response = self.client.get(reverse("twin_engine:simple_research_view", args=[self.patient.id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Missing AST/ALT weakens toxicity interpretation")
+        self.assertContains(response, "The toxicity layer remains a prototype research signal")
+
+    def test_treatment_schedules_explain_schedule_to_exposure_step(self) -> None:
+        self.client.force_login(self.owner)
+        response = self.client.get(reverse("twin_engine:simple_research_view", args=[self.patient.id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "The schedule-to-exposure step converts treatment timing into daily dose patterns for the model.")
+
+    def test_source_row_summaries_are_visible(self) -> None:
+        self.client.force_login(self.owner)
+        response = self.client.get(reverse("twin_engine:simple_research_view", args=[self.patient.id]))
+        self.assertEqual(response.status_code, 200)
+        for text in ["Source rows summary", "Source type", "Meaning"]:
+            self.assertContains(response, text)
+
+    def test_database_ids_are_absent_from_simple_view(self) -> None:
+        self.client.force_login(self.owner)
+        response = self.client.get(reverse("twin_engine:simple_research_view", args=[self.patient.id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "patient=")
+        self.assertNotContains(response, "twin_state=")
+        self.assertNotContains(response, "counterfactual run")
 
     def test_simple_view_excludes_clinical_overclaims(self) -> None:
         self.client.force_login(self.owner)
@@ -161,7 +215,8 @@ class SimpleResearchViewTests(TestCase):
         response = self.client.get(reverse("twin_engine:simple_research_view", args=[missing_patient.id]))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "No assessment history is available yet.")
-        self.assertContains(response, "No structured treatment schedule is currently available.")
+        self.assertContains(response, "No treatment schedule rows are recorded")
+        self.assertContains(response, "Missing now: FLC ratio, M-protein, kappa FLC, lambda FLC")
 
     def test_scenario_details_are_hidden_by_default(self) -> None:
         self.client.force_login(self.owner)
@@ -175,6 +230,7 @@ class SimpleResearchViewTests(TestCase):
         response = self.client.get(reverse("twin_engine:simple_research_view", args=[self.patient.id]))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Exposure pattern")
+        self.assertContains(response, "Why this result?")
         self.assertContains(response, "Allowed conclusion")
         self.assertContains(response, "Forbidden conclusion")
 

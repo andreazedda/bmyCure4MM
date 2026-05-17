@@ -27,6 +27,8 @@
     padding: 1rem;
   }
   .summary-grid,
+  .classification-grid,
+  .explain-grid,
   .data-grid,
   .lineage-grid,
   .nav-grid,
@@ -36,7 +38,9 @@
     gap: 0.85rem;
   }
   .summary-card,
+  .help-box,
   .data-card,
+  .explain-card,
   .lineage-card,
   .nav-card,
   .conclusion-card,
@@ -98,6 +102,45 @@
     grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
     gap: 0.85rem;
   }
+  .classification-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.18rem 0.45rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border: 1px solid transparent;
+  }
+  .classification-pill.raw_structured {
+    background: #e0f2fe;
+    border-color: #7dd3fc;
+    color: #0c4a6e;
+  }
+  .classification-pill.derived {
+    background: #fef3c7;
+    border-color: #fcd34d;
+    color: #92400e;
+  }
+  .classification-pill.simulated {
+    background: #dcfce7;
+    border-color: #86efac;
+    color: #166534;
+  }
+  .classification-pill.heuristic {
+    background: #ede9fe;
+    border-color: #c4b5fd;
+    color: #5b21b6;
+  }
+  .classification-pill.missing {
+    background: #fef2f2;
+    border-color: #fca5a5;
+    color: #991b1b;
+  }
+  .help-box {
+    background: linear-gradient(180deg, #f8fafc 0%, #fff 100%);
+  }
   @media (max-width: 768px) {
     .simple-hero {
       padding: 1rem;
@@ -155,6 +198,18 @@
     </div>
   </section>
 
+  <section class="story-section" id="help-box">
+    <div class="help-box">
+      <h2 class="h5 mb-2">I don’t understand this page</h2>
+      <div class="small text-muted mb-3">If you do not understand this page, read it in this order:</div>
+      <ol class="small mb-0">
+        {% for step in story.help_box_steps %}
+          <li><a href="{{ step.href }}">{{ step.title }}</a> — {{ step.explanation }}</li>
+        {% endfor %}
+      </ol>
+    </div>
+  </section>
+
   <section class="story-section" id="one-minute-summary">
     <div class="d-flex flex-column flex-lg-row justify-content-between gap-2 mb-3">
       <div>
@@ -171,6 +226,107 @@
             <span class="status-pill {{ card.status }}">{{ card.status }}</span>
           </div>
           <div class="small text-muted">{{ card.detail }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="story-section" id="classification-legend">
+    <h2 class="h5 mb-2">Data classification legend</h2>
+    <div class="text-muted small mb-3">Every drilldown item is labeled as one of these types, so the page stays readable without raw JSON.</div>
+    <div class="classification-grid">
+      {% for item in story.classification_legend %}
+        <div class="summary-card">
+          <div class="d-flex justify-content-between gap-2 align-items-start mb-2">
+            <strong>{{ item.label }}</strong>
+            <span class="classification-pill {{ item.key }}">{{ item.label }}</span>
+          </div>
+          <div class="small text-muted">{{ item.description }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="story-section" id="data-dictionary">
+    <h2 class="h5 mb-2">What each data block means</h2>
+    <div class="text-muted small mb-3">Each visible block explains what the data are, where they came from, how they are classified, whether the model uses them, what missingness means, and how to inspect source rows without reading JSON.</div>
+    <div class="data-grid">
+      {% for group in story.data_dictionary_blocks %}
+        <div class="data-card">
+          <div class="d-flex justify-content-between gap-2 align-items-start mb-2">
+            <strong>{{ group.title }}</strong>
+            <span class="status-pill {{ group.status }}">{{ group.status }}</span>
+          </div>
+          <div class="small mb-1"><strong>Plain explanation:</strong> {{ group.plain_explanation }}</div>
+          <div class="small mb-1"><strong>Data source:</strong> {{ group.data_source }}</div>
+          <div class="small mb-1"><strong>Model use:</strong> {{ group.model_use }}</div>
+          <div class="small mb-1"><strong>Status:</strong> {{ group.status_label }}</div>
+          <div class="small mb-2"><strong>Missingness:</strong> {{ group.missingness_explanation }}</div>
+          <details class="small" id="{{ group.detail_anchor }}">
+            <summary>{{ group.inspect_label }}</summary>
+            <div class="small text-muted mt-2">Source rows summary shows the latest structured or derived rows without raw JSON or direct identifiers.</div>
+            <div class="explain-grid mt-3">
+              {% for point in group.data_points %}
+                <div class="explain-card">
+                  <div class="d-flex justify-content-between gap-2 align-items-start mb-2">
+                    <div>
+                      <strong>{{ point.plain_name }}</strong>
+                      <div class="small text-muted">{{ point.label }}</div>
+                    </div>
+                    <span class="classification-pill {{ point.data_classification }}">{{ point.data_classification_label }}</span>
+                  </div>
+                  <div class="small mb-1"><strong>Technical field:</strong> {{ point.technical_field }}</div>
+                  <div class="small mb-1"><strong>Value summary:</strong> {{ point.value_summary }}</div>
+                  <div class="small mb-1"><strong>Date range:</strong> {{ point.date_range }}</div>
+                  <div class="small mb-1"><strong>Source model:</strong> {{ point.source_model }}</div>
+                  <div class="small mb-1"><strong>Source fields:</strong> {{ point.source_fields|join:", " }}</div>
+                  <div class="small mb-1"><strong>Model uses it:</strong> {{ point.used_by_model_label }}</div>
+                  <div class="small mb-1"><strong>Used in:</strong> {{ point.used_in_display|join:", " }}</div>
+                  <div class="small mb-1"><strong>Why it matters:</strong> {{ point.why_it_matters }}</div>
+                  <div class="small mb-1"><strong>What missing means:</strong> {{ point.what_missing_means }}</div>
+                  <div class="small"><strong>Next action if missing:</strong> {{ point.next_action_if_missing }}</div>
+                </div>
+              {% endfor %}
+            </div>
+            {% if group.source_rows_available %}
+              <div class="table-responsive mt-3">
+                <table class="table table-sm story-table mb-0">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Field</th>
+                      <th>Value</th>
+                      <th>Unit</th>
+                      <th>Source type</th>
+                      <th>Used by model</th>
+                      <th>Meaning</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for row in group.source_rows %}
+                      <tr>
+                        <td>{{ row.date }}</td>
+                        <td>{{ row.field }}</td>
+                        <td>{{ row.value }}</td>
+                        <td>{{ row.unit }}</td>
+                        <td>
+                          {{ row.source_type }}<br>
+                          <span class="classification-pill {{ row.data_classification }} mt-1">{{ row.data_classification_label }}</span>
+                        </td>
+                        <td>{{ row.used_by_model_label }}</td>
+                        <td>{{ row.meaning }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% else %}
+              <div class="small text-muted mt-3">No source rows summary is available in structured form for this block.</div>
+            {% endif %}
+            <div class="mt-3">
+              <a class="btn btn-sm btn-outline-secondary" href="{{ group.open_cockpit_href }}">Open scientific cockpit for full technical details</a>
+            </div>
+          </details>
         </div>
       {% endfor %}
     </div>
@@ -221,7 +377,13 @@
           <div class="small text-muted mb-2"><strong>Fields:</strong> {{ block.fields_used|join:", " }}</div>
           <div class="small text-muted mb-1"><strong>Available count:</strong> {{ block.available_count }}</div>
           <div class="small text-muted mb-1"><strong>Date range:</strong> {{ block.date_range }}</div>
+          {% if block.data_source %}
+            <div class="small text-muted mb-1"><strong>Data source:</strong> {{ block.data_source }}</div>
+          {% endif %}
           <div class="small text-muted mb-1"><strong>Used by model:</strong> {% if block.used_by_model %}Yes{% else %}No{% endif %}</div>
+          {% if block.model_use %}
+            <div class="small text-muted mb-1"><strong>Model section uses it:</strong> {{ block.model_use }}</div>
+          {% endif %}
           <div class="small mb-1"><strong>Why it matters:</strong> {{ block.why_it_matters }}</div>
           <div class="small mb-1"><strong>Missing data:</strong> {{ block.missing_data_message }}</div>
           <div class="small mb-2"><strong>Limit:</strong> {{ block.limit }}</div>
@@ -334,28 +496,44 @@
           </div>
           <div class="row g-3 small">
             <div class="col-md-4">
-              <div class="muted-label">Exposure pattern</div>
+              <div class="muted-label">Exposure pattern <span class="classification-pill derived">{{ scenario.exposure_classification_label }}</span></div>
               <div>{{ scenario.exposure_pattern }}</div>
             </div>
             <div class="col-md-4">
-              <div class="muted-label">Disease-control signal</div>
+              <div class="muted-label">Disease-control signal <span class="classification-pill simulated">{{ scenario.disease_signal_classification_label }}</span></div>
               <div>{{ scenario.tumor_signal_change }}</div>
             </div>
             <div class="col-md-4">
-              <div class="muted-label">Healthy-tissue signal</div>
+              <div class="muted-label">Healthy-tissue signal <span class="classification-pill simulated">{{ scenario.healthy_signal_classification_label }}</span></div>
               <div>{{ scenario.healthy_signal_change }}</div>
             </div>
             <div class="col-md-4">
-              <div class="muted-label">Toxicity signal</div>
+              <div class="muted-label">Toxicity signal <span class="classification-pill heuristic">{{ scenario.toxicity_signal_classification_label }}</span></div>
               <div>{{ scenario.toxicity_signal }}</div>
             </div>
             <div class="col-md-4">
-              <div class="muted-label">Uncertainty</div>
+              <div class="muted-label">Uncertainty <span class="classification-pill {% if scenario.uncertainty_signal_classification_label == 'MISSING' %}missing{% else %}heuristic{% endif %}">{{ scenario.uncertainty_signal_classification_label }}</span></div>
               <div>{{ scenario.uncertainty_summary }}</div>
             </div>
             <div class="col-md-4">
               <div class="muted-label">Interpretation</div>
               <div>{{ scenario.plain_interpretation }}</div>
+            </div>
+          </div>
+          <div class="summary-card mt-3">
+            <div class="fw-semibold mb-2">Why this result?</div>
+            <div class="row g-2 small">
+              {% for item in scenario.why_result_points %}
+                <div class="col-md-6">
+                  <div class="border rounded p-2 h-100">
+                    <div class="d-flex justify-content-between gap-2 align-items-start mb-1">
+                      <strong>{{ item.label }}</strong>
+                      <span class="classification-pill {{ item.data_classification }}">{{ item.data_classification_label }}</span>
+                    </div>
+                    <div>{{ item.detail }}</div>
+                  </div>
+                </div>
+              {% endfor %}
             </div>
           </div>
           <div class="alert alert-light border small mt-3 mb-2">
