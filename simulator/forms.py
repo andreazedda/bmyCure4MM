@@ -1217,34 +1217,6 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
             choices.append((assessment.pk, label))
         self.fields["twin_assessment_id"].choices = choices
 
-    def clean(self):
-        cleaned = super().clean()
-        use_twin = bool(cleaned.get("use_twin"))
-        assessment_id = cleaned.get("twin_assessment_id")
-        biology_mode = (cleaned.get("twin_biology_mode") or "auto").lower()
-
-        if use_twin and not assessment_id:
-            # Beginner-friendly behavior: don't hard-block runs when Twin is unavailable.
-            # Twin can only work with a selected Assessment snapshot.
-            cleaned["use_twin"] = False
-            use_twin = False
-            self.warnings.append(
-                "Patient Twin disabled: select an Assessment snapshot to enable Twin-driven biology."
-            )
-
-        twin_keys = (
-            "tumor_growth_rate",
-            "healthy_growth_rate",
-            "carrying_capacity_tumor",
-            "carrying_capacity_healthy",
-            "immune_compromise_index",
-        )
-        if use_twin and biology_mode == "auto":
-            for key in twin_keys:
-                cleaned[key] = None
-        cleaned["twin_biology_mode"] = biology_mode
-        return cleaned
-
     def _compute_slider_bounds(self, defaults: dict[str, float], slider_fields: list[str]) -> dict[str, dict[str, float]]:
         bounds = {}
         pct = float(self.preset_config.get("bounds_pct", 20)) / 100.0
@@ -1291,6 +1263,32 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
         cleaned = super().clean()
         cleaned["preset"] = self.preset_key
         cleaned["schedule"] = self.preset_config.get("schedule", {})
+
+        use_twin = bool(cleaned.get("use_twin"))
+        assessment_id = cleaned.get("twin_assessment_id")
+        raw_assessment_id = (self.data.get("twin_assessment_id") or "").strip() if self.is_bound else ""
+        biology_mode = (cleaned.get("twin_biology_mode") or "auto").lower()
+        cleaned["twin_biology_mode"] = biology_mode
+
+        if use_twin and not assessment_id and not raw_assessment_id:
+            # Beginner-friendly behavior: don't hard-block runs when Twin is unavailable.
+            # Twin can only work with a selected Assessment snapshot.
+            cleaned["use_twin"] = False
+            use_twin = False
+            self.warnings.append(
+                "Patient Twin disabled: select an Assessment snapshot to enable Twin-driven biology."
+            )
+
+        twin_keys = (
+            "tumor_growth_rate",
+            "healthy_growth_rate",
+            "carrying_capacity_tumor",
+            "carrying_capacity_healthy",
+            "immune_compromise_index",
+        )
+        if use_twin and biology_mode == "auto":
+            for key in twin_keys:
+                cleaned[key] = None
 
         len_dose = self._clean_numeric(cleaned, "lenalidomide_dose")
         bor_dose = self._clean_numeric(cleaned, "bortezomib_dose")

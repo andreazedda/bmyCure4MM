@@ -8,6 +8,7 @@ from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
 from clinic.models import Assessment, Patient
+from simulator import forms
 from simulator.models import Scenario, SimulationAttempt
 
 
@@ -93,6 +94,93 @@ class TwinPR1IntegrationTests(TestCase):
             ldH_u_l=300,
             beta2m_mg_l=4.0,
             flc_ratio=3.0,
+        )
+
+    def _simulation_form_payload(self) -> dict[str, object]:
+        return {
+            "baseline_tumor_cells": 1.0e9,
+            "baseline_healthy_cells": 5.0e11,
+            "lenalidomide_dose": 25.0,
+            "bortezomib_dose": 1.3,
+            "daratumumab_dose": 16.0,
+            "carfilzomib_dose": 0.0,
+            "time_horizon": 30,
+            "tumor_growth_rate": 0.023,
+            "healthy_growth_rate": 0.015,
+            "interaction_strength": 0.05,
+            "preset": forms.SimulationParameterForm.PRESET_CHOICES[0][0],
+            "creatinine_clearance": 90.0,
+            "neuropathy_grade": 0,
+            "anc": 2.0,
+            "platelets": 150,
+            "cohort_size": 1,
+        }
+
+    def test_simulation_parameter_form_disables_twin_without_assessment_in_auto_mode(self) -> None:
+        payload = self._simulation_form_payload()
+        payload.update(
+            {
+                "use_twin": "on",
+                "twin_biology_mode": "auto",
+            }
+        )
+
+        form = forms.SimulationParameterForm(data=payload, user=self.user)
+
+        self.assertTrue(form.is_valid(), form.errors)
+        self.assertFalse(form.cleaned_data["use_twin"])
+        self.assertEqual(form.cleaned_data["twin_biology_mode"], "auto")
+        self.assertEqual(form.cleaned_data["tumor_growth_rate"], 0.023)
+        self.assertEqual(form.cleaned_data["healthy_growth_rate"], 0.015)
+        self.assertIn(
+            "Patient Twin disabled: select an Assessment snapshot to enable Twin-driven biology.",
+            form.warnings,
+        )
+
+    def test_simulation_parameter_form_keeps_auto_mode_with_selected_assessment(self) -> None:
+        payload = self._simulation_form_payload()
+        payload.update(
+            {
+                "use_twin": "on",
+                "twin_assessment_id": str(self.assessment.pk),
+                "twin_biology_mode": "auto",
+            }
+        )
+
+        form = forms.SimulationParameterForm(data=payload, user=self.user)
+
+        self.assertTrue(form.is_valid(), form.errors)
+        self.assertTrue(form.cleaned_data["use_twin"])
+        self.assertEqual(form.cleaned_data["twin_assessment_id"], self.assessment.pk)
+        self.assertEqual(form.cleaned_data["twin_biology_mode"], "auto")
+        self.assertIsNone(form.cleaned_data["tumor_growth_rate"])
+        self.assertIsNone(form.cleaned_data["healthy_growth_rate"])
+        self.assertIsNone(form.cleaned_data["carrying_capacity_tumor"])
+        self.assertIsNone(form.cleaned_data["carrying_capacity_healthy"])
+        self.assertIsNone(form.cleaned_data["immune_compromise_index"])
+        self.assertEqual(form.warnings, [])
+
+    def test_simulation_parameter_form_disables_twin_without_assessment_in_manual_mode(self) -> None:
+        payload = self._simulation_form_payload()
+        payload.update(
+            {
+                "use_twin": "on",
+                "twin_biology_mode": "manual",
+                "tumor_growth_rate": 0.031,
+                "healthy_growth_rate": 0.019,
+            }
+        )
+
+        form = forms.SimulationParameterForm(data=payload, user=self.user)
+
+        self.assertTrue(form.is_valid(), form.errors)
+        self.assertFalse(form.cleaned_data["use_twin"])
+        self.assertEqual(form.cleaned_data["twin_biology_mode"], "manual")
+        self.assertEqual(form.cleaned_data["tumor_growth_rate"], 0.031)
+        self.assertEqual(form.cleaned_data["healthy_growth_rate"], 0.019)
+        self.assertIn(
+            "Patient Twin disabled: select an Assessment snapshot to enable Twin-driven biology.",
+            form.warnings,
         )
 
     def test_twin_preview_requires_login(self) -> None:
