@@ -1246,7 +1246,7 @@ def prognosis_api(request: HttpRequest, patient_id: int) -> JsonResponse:
 
 @login_required
 def regimen_suggestions(request: HttpRequest, patient_id: int) -> HttpResponse:
-    """Display treatment regimen suggestions for a patient."""
+    """Display exploratory regimen context for a patient."""
     from simulator.regimen_suggester import suggest_regimens
     
     patient = get_object_or_404(models.Patient, pk=patient_id)
@@ -1275,6 +1275,7 @@ def regimen_suggestions(request: HttpRequest, patient_id: int) -> HttpResponse:
     for pt in prior_therapies:
         if pt:
             prior_agents.extend([a.strip() for a in pt.split(",")])
+    prior_agents = list(dict.fromkeys(agent for agent in prior_agents if agent))
     
     # Get neuropathy grade from symptoms
     neuropathy = 0
@@ -1282,32 +1283,329 @@ def regimen_suggestions(request: HttpRequest, patient_id: int) -> HttpResponse:
         neuropathy = latest_symptoms.max_neuropathy_grade
     
     # Count therapy lines
-    line_of_therapy = max(patient.therapies.count(), 1)
+    therapy_count = patient.therapies.count()
+    line_of_therapy = max(therapy_count, 1)
+    ecog = latest_symptoms.ecog_status if latest_symptoms else 0
+    disease_setting = (
+        "Frontline / newly diagnosed context"
+        if line_of_therapy == 1
+        else "Relapsed / previously treated context"
+    )
+    creatinine_value = None
+    if latest_assessment and latest_assessment.creatinine_mg_dl is not None:
+        creatinine_value = float(latest_assessment.creatinine_mg_dl)
     
     # Get suggestions
     suggestions = suggest_regimens(
         age=age,
         transplant_eligible=transplant_eligible,
-        ecog=latest_symptoms.ecog_status if latest_symptoms else 0,
+        ecog=ecog,
         r_iss=latest_assessment.r_iss if latest_assessment else None,
         high_risk_cytogenetics=has_high_risk,
         line_of_therapy=line_of_therapy,
         prior_therapies=prior_agents,
         neuropathy_grade=neuropathy,
     )
-    
+
+    missing_inputs: list[str] = []
+    if latest_assessment is None:
+        missing_inputs.append("structured disease assessment")
+    if not patient_cytos:
+        missing_inputs.append("cytogenetic detail")
+    if not prior_agents:
+        missing_inputs.append("prior therapy components")
+    if latest_symptoms is None:
+        missing_inputs.append("symptom / toxicity assessment")
+    if creatinine_value is None and not (latest_symptoms and latest_symptoms.crab_renal):
+        missing_inputs.append("renal constraint summary")
+
+    patient_detail_url = reverse("clinic:patient_detail", args=[patient.id])
+    research_simple_url = reverse("twin_engine:simple_research_view", args=[patient.id])
+    research_cockpit_url = reverse("twin_engine:research_cockpit", args=[patient.id])
+    simulation_url = reverse("simulator:scenario_list")
+    if latest_assessment is not None:
+        simulation_url = f"{simulation_url}?twin_assessment_id={latest_assessment.pk}"
+
     context = {
         "patient": patient,
-        "suggestions": suggestions,
-        "patient_info": {
-            "age": age,
-            "transplant_eligible": transplant_eligible,
-            "high_risk_cytogenetics": has_high_risk,
-            "line_of_therapy": line_of_therapy,
-            "neuropathy_grade": neuropathy,
+        "page_purpose": "Use this page to inspect how the current rule set groups regimen hypotheses and constraints from the available structured inputs.",
+        "interpretation_status": {
+            "title": "Exploratory regimen context",
+            "summary": "This page organizes regimen-related context using heuristic and literature-informed rules. It is not a clinical treatment recommendation.",
+            "limit": "This page cannot determine whether one regimen would be clinically superior for this patient.",
+        },
+        "data_source_rows": _build_regimen_data_source_rows(
+            disease_setting=disease_setting,
+            therapy_count=therapy_count,
+            line_of_therapy=line_of_therapy,
+            prior_agents=prior_agents,
+            transplant_eligible=transplant_eligible,
+            patient_cytos=patient_cytos,
+            has_high_risk=has_high_risk,
+            latest_assessment=latest_assessment,
+            latest_symptoms=latest_symptoms,
+            neuropathy=neuropathy,
+            creatinine_value=creatinine_value,
+        ),
+        "regimen_sections": _build_regimen_sections(suggestions, missing_inputs=missing_inputs),
+        "constraint_cards": _build_regimen_constraint_cards(suggestions.get("avoid", []), missing_inputs=missing_inputs),
+        "what_can_be_concluded": [
+            "This page can organize regimen-related hypotheses.",
+            "This page can expose constraints and prior-therapy context.",
+            "This page can help decide what to inspect next in the Simple Research View or Scientific Cockpit.",
+        ],
+        "what_cannot_be_concluded": [
+            "It cannot establish clinical superiority.",
+            "It cannot infer patient-specific benefit.",
+            "It cannot determine what would have happened under another therapy.",
+            "It cannot replace counterfactual simulation or clinical validation.",
+        ],
+        "next_actions": {
+            "primary": {
+                "label": "Open Simple Research View",
+                "href": research_simple_url,
+            },
+            "secondary": [
+                {
+                    "label": "Back to Patient",
+                    "href": patient_detail_url,
+                },
+                {
+                    "label": "Open Scientific Cockpit",
+                    "href": research_cockpit_url,
+                },
+                {
+                    "label": "Start exploratory simulation",
+                    "href": simulation_url,
+                },
+                {
+                    "label": "View Algorithm Transparency",
+                    "href": reverse("simulator:algorithm_transparency"),
+                },
+            ],
         },
     }
     return render(request, "clinic/regimen_suggestions.html", context)
+
+
+def _build_regimen_data_source_rows(
+    *,
+    disease_setting: str,
+    therapy_count: int,
+    line_of_therapy: int,
+    prior_agents: list[str],
+    transplant_eligible: bool,
+    patient_cytos: list[str],
+    has_high_risk: bool,
+    latest_assessment: models.Assessment | None,
+    latest_symptoms: SymptomAssessment | None,
+    neuropathy: int,
+    creatinine_value: float | None,
+) -> list[dict[str, str]]:
+    cytogenetic_value = "No structured cytogenetic record surfaced on this page"
+    cytogenetic_classification = "UNKNOWN"
+    if patient_cytos:
+        cytogenetic_value = ", ".join(patient_cytos)
+        if has_high_risk:
+            cytogenetic_value = f"{cytogenetic_value} (high-risk pattern present)"
+        cytogenetic_classification = "RAW STRUCTURED"
+
+    renal_parts: list[str] = []
+    renal_classification = "UNKNOWN"
+    if creatinine_value is not None:
+        renal_parts.append(f"Creatinine {creatinine_value:.1f} mg/dL")
+        renal_classification = "RAW STRUCTURED"
+    if latest_symptoms and latest_symptoms.crab_renal:
+        renal_parts.append("Structured CRAB renal flag present")
+        renal_classification = "RAW STRUCTURED"
+    if renal_parts:
+        renal_parts.append("No hepatic variable is surfaced on this page")
+        renal_value = "; ".join(renal_parts)
+    else:
+        renal_value = "Renal/hepatic constraints are not captured in the current page inputs"
+
+    therapy_line_classification = "DERIVED" if therapy_count else "HEURISTIC"
+    therapy_line_value = (
+        f"Line {line_of_therapy}"
+        if therapy_count
+        else "Line 1 (default because no structured therapy history was recorded)"
+    )
+
+    prior_therapy_value = ", ".join(prior_agents) if prior_agents else "No structured prior therapy components recorded"
+    prior_therapy_classification = "RAW STRUCTURED" if prior_agents else "UNKNOWN"
+
+    neuropathy_value = "No structured symptom / toxicity assessment surfaced on this page"
+    neuropathy_classification = "UNKNOWN"
+    if latest_symptoms:
+        neuropathy_value = f"Neuropathy grade {neuropathy}; ECOG {latest_symptoms.ecog_status}"
+        neuropathy_classification = "RAW STRUCTURED"
+
+    r_iss_value = latest_assessment.r_iss if latest_assessment and latest_assessment.r_iss else "Not recorded"
+    r_iss_classification = "RAW STRUCTURED" if latest_assessment and latest_assessment.r_iss else "UNKNOWN"
+
+    return [
+        {
+            "factor": "Disease setting",
+            "value": disease_setting,
+            "classification": therapy_line_classification,
+            "role": "Derived from therapy line and used to route the page toward frontline or relapsed regimen buckets.",
+        },
+        {
+            "factor": "Therapy line",
+            "value": therapy_line_value,
+            "classification": therapy_line_classification,
+            "role": "Current line used by the rule set to switch between frontline, relapse, and later-line contexts.",
+        },
+        {
+            "factor": "Prior therapies",
+            "value": prior_therapy_value,
+            "classification": prior_therapy_classification,
+            "role": "Structured regimen components collapsed into agent exposure history for heuristic grouping.",
+        },
+        {
+            "factor": "Transplant status",
+            "value": "Eligible (age-based heuristic)" if transplant_eligible else "Ineligible (age-based heuristic)",
+            "classification": "HEURISTIC",
+            "role": "Age-based heuristic used by this page to separate transplant-oriented and non-transplant regimen contexts.",
+        },
+        {
+            "factor": "Disease stage (R-ISS)",
+            "value": r_iss_value,
+            "classification": r_iss_classification,
+            "role": "Structured staging context available to the rule set, but not the sole driver of regimen grouping.",
+        },
+        {
+            "factor": "High-risk cytogenetics",
+            "value": cytogenetic_value,
+            "classification": cytogenetic_classification,
+            "role": "Structured cytogenetic findings can shift the rule set toward more intensive or higher-risk exploratory contexts.",
+        },
+        {
+            "factor": "Neuropathy / toxicity constraints",
+            "value": neuropathy_value,
+            "classification": neuropathy_classification,
+            "role": "Structured symptom inputs are used to flag or deprioritize regimens that may worsen toxicity.",
+        },
+        {
+            "factor": "Renal / hepatic constraints",
+            "value": renal_value,
+            "classification": renal_classification,
+            "role": "Renal signals can affect lenalidomide or bortezomib handling; hepatic context is not surfaced in this page's current inputs.",
+        },
+        {
+            "factor": "Regimen grouping logic",
+            "value": "Bucketed by line, prior exposure, transplant heuristic, toxicity flags, and later-line investigational rules.",
+            "classification": "HEURISTIC",
+            "role": "Rule-based grouping determines whether a regimen appears as higher-priority, alternative, or constraint-flagged context.",
+        },
+    ]
+
+
+def _build_regimen_sections(
+    suggestions: dict[str, object], *, missing_inputs: list[str]
+) -> list[dict[str, object]]:
+    section_specs = [
+        (
+            "preferred",
+            "Higher-priority exploratory context",
+            "Rule-based bucket for regimens surfaced most prominently from the currently available inputs.",
+        ),
+        (
+            "alternative",
+            "Alternative exploratory context",
+            "Rule-based bucket for other regimen contexts that remain plausible under the currently available inputs.",
+        ),
+        (
+            "consider_in_clinical_trial",
+            "Alternative exploratory context: later-line / investigational",
+            "Later-line or investigational contexts surfaced by the current rules when therapy history is more advanced.",
+        ),
+    ]
+
+    sections: list[dict[str, object]] = []
+    for key, title, description in section_specs:
+        regimens = suggestions.get(key) or []
+        if not regimens:
+            continue
+        sections.append(
+            {
+                "title": title,
+                "description": description,
+                "cards": _build_regimen_cards(regimens, missing_inputs=missing_inputs),
+            }
+        )
+    return sections
+
+
+def _build_regimen_cards(
+    regimens: list[dict[str, object]], *, missing_inputs: list[str]
+) -> list[dict[str, object]]:
+    cards: list[dict[str, object]] = []
+    for regimen in regimens:
+        trial_list = list(regimen.get("key_trials") or [])
+        classification_labels = ["HEURISTIC"]
+        classification_labels.append("LITERATURE-BASED" if trial_list else "UNKNOWN")
+        cards.append(
+            {
+                "name": regimen.get("name", "Unnamed regimen"),
+                "full_name": regimen.get("full_name", ""),
+                "components": regimen.get("components", []),
+                "why_it_appears": _soften_regimen_rationale_text(
+                    str(regimen.get("rationale") or regimen.get("indication") or "Surfaced by the current rule set.")
+                ),
+                "classification_labels": classification_labels,
+                "logic_basis": (
+                    "Heuristic grouping using literature-informed regimen summaries."
+                    if trial_list
+                    else "Heuristic grouping with limited literature metadata surfaced on this page."
+                ),
+                "uncertainty_caveat": _build_regimen_uncertainty_caveat(missing_inputs),
+                "population_signal": regimen.get("expected_response_rate") or "Population response signal not surfaced",
+                "evidence_level": regimen.get("evidence_level") or "Not stated",
+                "key_trials": trial_list,
+                "considerations": regimen.get("considerations", []),
+                "contraindications": regimen.get("contraindications", []),
+            }
+        )
+    return cards
+
+
+def _build_regimen_constraint_cards(
+    avoid_items: list[dict[str, object]], *, missing_inputs: list[str]
+) -> list[dict[str, str]]:
+    cards: list[dict[str, str]] = []
+    for item in avoid_items:
+        cards.append(
+            {
+                "agent": str(item.get("agent") or "Constraint flag"),
+                "reason": str(item.get("reason") or "No reason provided"),
+                "classification": "HEURISTIC",
+                "logic_basis": "Constraint flag from the current toxicity or comorbidity rules.",
+                "uncertainty_caveat": _build_regimen_uncertainty_caveat(missing_inputs),
+            }
+        )
+    return cards
+
+
+def _build_regimen_uncertainty_caveat(missing_inputs: list[str]) -> str:
+    base = "This card reflects heuristic grouping plus literature-informed regimen summaries; it does not infer patient-specific benefit."
+    if not missing_inputs:
+        return base
+    return f"{base} Missing structured inputs for this page: {', '.join(missing_inputs)}."
+
+
+def _soften_regimen_rationale_text(text: str) -> str:
+    replacements = [
+        ("Preferred regimen for ", "Surfaced for "),
+        ("Preferred for ", "Surfaced for "),
+        ("Quadruplet preferred for ", "Quadruplet context surfaced for "),
+        ("Standard of care for ", "Commonly cited regimen context for "),
+        ("Good option", "Exploratory option"),
+    ]
+    softened = text
+    for old, new in replacements:
+        softened = softened.replace(old, new)
+    return softened
 
 
 @login_required

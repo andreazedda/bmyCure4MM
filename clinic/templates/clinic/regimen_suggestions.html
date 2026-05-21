@@ -1,373 +1,254 @@
 {% extends "base.html" %}
-{% load static %}
 
-{% block title %}
-<span class="t-en">Treatment Suggestions</span>
-<span class="t-it">Suggerimenti Terapie</span>
-- {{ patient }}
-{% endblock %}
+{% block title %}Exploratory Regimen Context - {{ patient }}{% endblock %}
 
 {% block extra_css %}
 <style>
-.suggestion-section {
-    margin-bottom: 2rem;
+.regimen-ia {
+    color: #1f2937;
 }
-
-.suggestion-section h5 {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid;
-}
-.suggestion-section.preferred h5 { border-color: #198754; color: #198754; }
-.suggestion-section.alternative h5 { border-color: #0d6efd; color: #0d6efd; }
-.suggestion-section.novel h5 { border-color: #6f42c1; color: #6f42c1; }
-.suggestion-section.avoid h5 { border-color: #dc3545; color: #dc3545; }
-
-.regimen-card {
-    border: 1px solid #dee2e6;
-    border-radius: 12px;
+.page-intro {
+    background: linear-gradient(135deg, #f7fbff 0%, #fff8ef 100%);
+    border: 1px solid #d9e4ef;
+    border-radius: 14px;
     padding: 1.25rem;
-    margin-bottom: 1rem;
-    background: white;
-    transition: all 0.2s;
 }
-.regimen-card:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+.eyebrow {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #64748b;
+    margin-bottom: 0.35rem;
+    font-weight: 700;
 }
-
-.regimen-card.preferred {
-    border-left: 4px solid #198754;
+.section-card {
+    background: #fff;
+    border: 1px solid #dfe7ef;
+    border-radius: 14px;
+    padding: 1.1rem;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
 }
-.regimen-card.alternative {
-    border-left: 4px solid #0d6efd;
+.regimen-card,
+.constraint-card {
+    border: 1px solid #dbe5ef;
+    border-radius: 12px;
+    padding: 1rem;
+    background: #f8fafc;
 }
-.regimen-card.novel {
-    border-left: 4px solid #6f42c1;
+.regimen-card + .regimen-card,
+.constraint-card + .constraint-card {
+    margin-top: 1rem;
 }
-
 .regimen-header {
     display: flex;
     justify-content: space-between;
+    gap: 1rem;
     align-items: flex-start;
-    margin-bottom: 0.75rem;
 }
-
-.regimen-name {
-    font-size: 1.25rem;
-    font-weight: bold;
-}
-
-.strength-badge {
-    font-size: 0.75rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-}
-.strength-badge.strong { background: #d1e7dd; color: #0f5132; }
-.strength-badge.moderate { background: #fff3cd; color: #664d03; }
-.strength-badge.conditional { background: #e2e3e5; color: #41464b; }
-
-.regimen-full-name {
-    color: #6c757d;
-    font-size: 0.9rem;
-    margin-bottom: 0.5rem;
-}
-
-.drug-pills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.drug-pill {
-    background: #e9ecef;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.85rem;
-}
-
-.regimen-rationale {
-    background: #f8f9fa;
-    padding: 0.75rem;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
-}
-.regimen-rationale::before {
-    content: "💡 ";
-}
-
-.regimen-details {
-    font-size: 0.85rem;
-}
-
-.detail-row {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-}
-.detail-row .label {
-    font-weight: 600;
-    min-width: 120px;
-}
-
+.drug-pills,
+.pill-row,
 .trial-list {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
 }
+.drug-pill {
+    background: #e2e8f0;
+    color: #1e293b;
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+}
+.classification-pill,
 .trial-badge {
-    background: #cfe2ff;
-    color: #084298;
-    padding: 0.15rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.18rem 0.45rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border: 1px solid transparent;
 }
-
-.consideration-list, .contraindication-list {
-    margin: 0;
-    padding-left: 1.25rem;
-    font-size: 0.85rem;
+.classification-pill.raw-structured {
+    background: #e0f2fe;
+    border-color: #7dd3fc;
+    color: #0c4a6e;
 }
-.contraindication-list li {
-    color: #dc3545;
+.classification-pill.derived {
+    background: #fef3c7;
+    border-color: #fcd34d;
+    color: #92400e;
 }
-
-.patient-factors {
-    background: #fff3cd;
-    border: 1px solid #ffecb5;
-    border-radius: 8px;
-    padding: 1rem;
-    margin-bottom: 1.5rem;
+.classification-pill.heuristic {
+    background: #ede9fe;
+    border-color: #c4b5fd;
+    color: #5b21b6;
 }
-.patient-factors h6 {
-    margin-bottom: 0.5rem;
+.classification-pill.literature-based,
+.trial-badge {
+    background: #dcfce7;
+    border-color: #86efac;
+    color: #166534;
 }
-.patient-factors ul {
-    margin: 0;
-    padding-left: 1.25rem;
+.classification-pill.unknown {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+    color: #374151;
 }
-
-.avoid-card {
-    background: #fff5f5;
-    border: 1px solid #f8d7da;
-    border-radius: 8px;
-    padding: 1rem;
-    margin-bottom: 0.75rem;
+.small-label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #64748b;
+    font-weight: 700;
+    margin-bottom: 0.35rem;
 }
-.avoid-card .agent {
-    font-weight: bold;
-    color: #dc3545;
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.9rem;
 }
-.avoid-card .reason {
-    font-size: 0.9rem;
-    color: #6c757d;
+.detail-block {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 0.85rem;
 }
-
-.disclaimer {
-    background: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    padding: 1rem;
-    font-size: 0.85rem;
-    margin-top: 2rem;
+.table th,
+.table td {
+    vertical-align: top;
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container py-4">
+<div class="container py-4 regimen-ia">
     <nav aria-label="breadcrumb" class="mb-3">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'clinic:patient_list' %}">
-                <span class="t-en">Patients</span>
-                <span class="t-it">Pazienti</span>
-            </a></li>
+            <li class="breadcrumb-item"><a href="{% url 'clinic:patient_list' %}">Patients</a></li>
             <li class="breadcrumb-item"><a href="{% url 'clinic:patient_detail' patient.pk %}">{{ patient }}</a></li>
-            <li class="breadcrumb-item active">
-                <span class="t-en">Treatment Suggestions</span>
-                <span class="t-it">Suggerimenti Terapie</span>
-            </li>
+            <li class="breadcrumb-item active">Exploratory regimen context</li>
         </ol>
     </nav>
 
-    <h2 class="mb-4">
-        💊 <span class="t-en">Treatment Suggestions for {{ patient }}</span>
-        <span class="t-it">Suggerimenti Terapie per {{ patient }}</span>
-    </h2>
-
-    <!-- Patient Factors -->
-    {% if suggestions.patient_factors %}
-    <div class="patient-factors">
-        <h6>
-            ⚠️ <span class="t-en">Patient-Specific Considerations</span>
-            <span class="t-it">Considerazioni Specifiche del Paziente</span>
-        </h6>
-        <ul>
-            {% for factor in suggestions.patient_factors %}
-            <li>{{ factor }}</li>
-            {% endfor %}
-        </ul>
+    <div class="page-intro mb-4">
+        <div class="eyebrow">Exploratory regimen context</div>
+        <h1 class="h3 mb-2">Exploratory regimen context for {{ patient }}</h1>
+        <p class="text-muted mb-0">{{ page_purpose }}</p>
     </div>
-    {% endif %}
 
-    <!-- Preferred Regimens -->
-    {% if suggestions.preferred %}
-    <div class="suggestion-section preferred">
-        <h5>
-            ⭐ <span class="t-en">Preferred Options</span>
-            <span class="t-it">Opzioni Preferite</span>
-        </h5>
-        
-        {% for regimen in suggestions.preferred %}
-        <div class="regimen-card preferred">
-            <div class="regimen-header">
+    <div class="section-card mb-4">
+        <h2 class="h5 mb-3">{{ interpretation_status.title }}</h2>
+        <p class="mb-2">This page organizes regimen-related context using heuristic and literature-informed rules. It is not a clinical decision tool.</p>
+        <p class="mb-0">This page cannot determine patient-specific comparative benefit.</p>
+    </div>
+
+    <div class="section-card mb-4">
+        <h2 class="h5 mb-3">Data source classification</h2>
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Factor</th>
+                        <th>Value</th>
+                        <th>Classification</th>
+                        <th>Role</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in data_source_rows %}
+                    <tr>
+                        <td>{{ row.factor }}</td>
+                        <td>{{ row.value }}</td>
+                        <td>
+                            <span class="classification-pill {{ row.classification|lower|slugify }}">{{ row.classification }}</span>
+                        </td>
+                        <td>{{ row.role }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% for section in regimen_sections %}
+    <div class="section-card mb-4">
+        <h2 class="h5 mb-2">{{ section.title }}</h2>
+        <p class="text-muted small mb-3">{{ section.description }}</p>
+
+        {% for regimen in section.cards %}
+        <div class="regimen-card">
+            <div class="regimen-header mb-3">
                 <div>
-                    <div class="regimen-name">{{ regimen.name }}</div>
-                    <div class="regimen-full-name">{{ regimen.full_name }}</div>
+                    <div class="eyebrow">{{ section.title }}</div>
+                    <h3 class="h5 mb-1">{{ regimen.name }}</h3>
+                    <p class="text-muted small mb-0">{{ regimen.full_name }}</p>
                 </div>
-                <span class="strength-badge {{ regimen.strength }}">
-                    {% if regimen.strength == "strong" %}
-                        <span class="t-en">Strong Recommendation</span>
-                        <span class="t-it">Raccomandazione Forte</span>
-                    {% elif regimen.strength == "moderate" %}
-                        <span class="t-en">Moderate Recommendation</span>
-                        <span class="t-it">Raccomandazione Moderata</span>
-                    {% else %}
-                        <span class="t-en">Conditional</span>
-                        <span class="t-it">Condizionale</span>
-                    {% endif %}
-                </span>
-            </div>
-            
-            <div class="drug-pills">
-                {% for drug in regimen.components %}
-                <span class="drug-pill">{{ drug }}</span>
-                {% endfor %}
-            </div>
-            
-            <div class="regimen-rationale">
-                {{ regimen.rationale }}
-            </div>
-            
-            <div class="regimen-details">
-                <div class="detail-row">
-                    <span class="label">
-                        <span class="t-en">Expected Response:</span>
-                        <span class="t-it">Risposta Attesa:</span>
-                    </span>
-                    <span>{{ regimen.expected_response_rate }}</span>
-                </div>
-                
-                <div class="detail-row">
-                    <span class="label">
-                        <span class="t-en">Key Trials:</span>
-                        <span class="t-it">Studi Principali:</span>
-                    </span>
-                    <div class="trial-list">
-                        {% for trial in regimen.key_trials %}
-                        <span class="trial-badge">{{ trial }}</span>
+                <div>
+                    <div class="small-label">Data source classification</div>
+                    <div class="pill-row justify-content-lg-end">
+                        {% for label in regimen.classification_labels %}
+                        <span class="classification-pill {{ label|lower|slugify }}">{{ label }}</span>
                         {% endfor %}
                     </div>
                 </div>
-                
-                {% if regimen.considerations %}
-                <div class="detail-row">
-                    <span class="label">
-                        <span class="t-en">Notes:</span>
-                        <span class="t-it">Note:</span>
-                    </span>
-                    <ul class="consideration-list">
-                        {% for note in regimen.considerations %}
-                        <li>{{ note }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                {% endif %}
             </div>
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
 
-    <!-- Alternative Regimens -->
-    {% if suggestions.alternative %}
-    <div class="suggestion-section alternative">
-        <h5>
-            🔄 <span class="t-en">Alternative Options</span>
-            <span class="t-it">Opzioni Alternative</span>
-        </h5>
-        
-        {% for regimen in suggestions.alternative %}
-        <div class="regimen-card alternative">
-            <div class="regimen-header">
-                <div>
-                    <div class="regimen-name">{{ regimen.name }}</div>
-                    <div class="regimen-full-name">{{ regimen.full_name }}</div>
-                </div>
-                <span class="strength-badge {{ regimen.strength }}">
-                    {% if regimen.strength == "strong" %}Strong{% elif regimen.strength == "moderate" %}Moderate{% else %}Conditional{% endif %}
-                </span>
-            </div>
-            
-            <div class="drug-pills">
+            <div class="drug-pills mb-3">
                 {% for drug in regimen.components %}
                 <span class="drug-pill">{{ drug }}</span>
                 {% endfor %}
             </div>
-            
-            <div class="regimen-rationale">
-                {{ regimen.rationale }}
-            </div>
-            
-            <div class="regimen-details">
-                <div class="detail-row">
-                    <span class="label">
-                        <span class="t-en">Expected Response:</span>
-                        <span class="t-it">Risposta Attesa:</span>
-                    </span>
-                    <span>{{ regimen.expected_response_rate }}</span>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
 
-    <!-- Novel Therapies -->
-    {% if suggestions.consider_in_clinical_trial %}
-    <div class="suggestion-section novel">
-        <h5>
-            🧬 <span class="t-en">Novel Therapies / Clinical Trials</span>
-            <span class="t-it">Terapie Innovative / Studi Clinici</span>
-        </h5>
-        
-        {% for regimen in suggestions.consider_in_clinical_trial %}
-        <div class="regimen-card novel">
-            <div class="regimen-header">
-                <div>
-                    <div class="regimen-name">{{ regimen.name }}</div>
-                    <div class="regimen-full-name">{{ regimen.full_name }}</div>
+            <div class="detail-grid mb-3">
+                <div class="detail-block">
+                    <div class="small-label">Why it appears</div>
+                    <p class="mb-0">{{ regimen.why_it_appears }}</p>
+                </div>
+                <div class="detail-block">
+                    <div class="small-label">Logic basis</div>
+                    <p class="mb-0">{{ regimen.logic_basis }}</p>
+                </div>
+                <div class="detail-block">
+                    <div class="small-label">Uncertainty / missing-data caveat</div>
+                    <p class="mb-0">{{ regimen.uncertainty_caveat }}</p>
+                </div>
+                <div class="detail-block">
+                    <div class="small-label">Population response signal</div>
+                    <p class="mb-1">{{ regimen.population_signal }}</p>
+                    <p class="text-muted small mb-0">Evidence level: {{ regimen.evidence_level }}</p>
                 </div>
             </div>
-            
-            <div class="drug-pills">
-                {% for drug in regimen.components %}
-                <span class="drug-pill">{{ drug }}</span>
-                {% endfor %}
+
+            {% if regimen.key_trials %}
+            <div class="mb-3">
+                <div class="small-label">Literature-informed sources</div>
+                <div class="trial-list">
+                    {% for trial in regimen.key_trials %}
+                    <span class="trial-badge">{{ trial }}</span>
+                    {% endfor %}
+                </div>
             </div>
-            
-            <div class="regimen-rationale">
-                {{ regimen.rationale }}
-            </div>
-            
+            {% endif %}
+
             {% if regimen.considerations %}
-            <div class="regimen-details">
-                <ul class="consideration-list">
+            <div class="mb-3">
+                <div class="small-label">Notes</div>
+                <ul class="mb-0">
                     {% for note in regimen.considerations %}
+                    <li>{{ note }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            {% if regimen.contraindications %}
+            <div>
+                <div class="small-label">Constraint notes</div>
+                <ul class="mb-0">
+                    {% for note in regimen.contraindications %}
                     <li>{{ note }}</li>
                     {% endfor %}
                 </ul>
@@ -376,38 +257,72 @@
         </div>
         {% endfor %}
     </div>
-    {% endif %}
+    {% endfor %}
 
-    <!-- Avoid -->
-    {% if suggestions.avoid %}
-    <div class="suggestion-section avoid">
-        <h5>
-            🚫 <span class="t-en">Avoid / Use with Caution</span>
-            <span class="t-it">Evitare / Usare con Cautela</span>
-        </h5>
-        
-        {% for item in suggestions.avoid %}
-        <div class="avoid-card">
-            <div class="agent">{{ item.agent }}</div>
-            <div class="reason">{{ item.reason }}</div>
+    {% if constraint_cards %}
+    <div class="section-card mb-4">
+        <h2 class="h5 mb-2">Constraint-flagged context</h2>
+        <p class="text-muted small mb-3">Rule-based flags surfaced from the currently captured toxicity or comorbidity inputs.</p>
+
+        {% for card in constraint_cards %}
+        <div class="constraint-card">
+            <div class="regimen-header mb-3">
+                <div>
+                    <div class="eyebrow">Constraint-flagged context</div>
+                    <h3 class="h5 mb-1">{{ card.agent }}</h3>
+                </div>
+                <span class="classification-pill {{ card.classification|lower|slugify }}">{{ card.classification }}</span>
+            </div>
+            <div class="detail-grid">
+                <div class="detail-block">
+                    <div class="small-label">Why it appears</div>
+                    <p class="mb-0">{{ card.reason }}</p>
+                </div>
+                <div class="detail-block">
+                    <div class="small-label">Logic basis</div>
+                    <p class="mb-0">{{ card.logic_basis }}</p>
+                </div>
+                <div class="detail-block">
+                    <div class="small-label">Uncertainty / missing-data caveat</div>
+                    <p class="mb-0">{{ card.uncertainty_caveat }}</p>
+                </div>
+            </div>
         </div>
         {% endfor %}
     </div>
     {% endif %}
 
-    <!-- Disclaimer -->
-    <div class="disclaimer">
-        ⚠️ <strong>{{ suggestions.disclaimer }}</strong>
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="section-card h-100">
+                <h2 class="h5 mb-3">What can be concluded</h2>
+                <ul class="mb-0">
+                    {% for item in what_can_be_concluded %}
+                    <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="section-card h-100">
+                <h2 class="h5 mb-3">What cannot be concluded</h2>
+                <ul class="mb-0">
+                    {% for item in what_cannot_be_concluded %}
+                    <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
     </div>
 
-    <!-- Actions -->
-    <div class="d-flex gap-2 justify-content-end mt-4">
-        <a href="{% url 'clinic:patient_detail' patient.pk %}" class="btn btn-outline-secondary">
-            ← <span class="t-en">Back to Patient</span><span class="t-it">Torna al Paziente</span>
-        </a>
-        <a href="{% url 'clinic:prognosis_timeline' patient.pk %}" class="btn btn-outline-primary">
-            📊 <span class="t-en">View Prognosis</span><span class="t-it">Vedi Prognosi</span>
-        </a>
+    <div class="section-card">
+        <h2 class="h5 mb-3">Next actions</h2>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{{ next_actions.primary.href }}" class="btn btn-primary">{{ next_actions.primary.label }}</a>
+            {% for action in next_actions.secondary %}
+            <a href="{{ action.href }}" class="btn btn-outline-secondary">{{ action.label }}</a>
+            {% endfor %}
+        </div>
     </div>
 </div>
 {% endblock %}

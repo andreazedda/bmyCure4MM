@@ -10,6 +10,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 
 from clinic.models import Patient, Assessment, Regimen, PatientTherapy
+from clinic.models_symptoms import SymptomAssessment
 from clinic.forms import PatientForm, AssessmentForm
 
 
@@ -309,6 +310,88 @@ class PatientCRUDViewTests(TestCase):
         self.assertNotContains(response, "clinically superior")
         self.assertNotContains(response, "should have been treated")
         self.assertNotContains(response, "proven outcome")
+
+    def test_patient_regimen_suggestions_use_exploratory_language(self) -> None:
+        patient = Patient.objects.create(
+            mrn="MM-REGIMEN-TEST",
+            first_name="Regimen",
+            last_name="Context",
+            birth_date=date(1964, 1, 1),
+            sex="F",
+            diagnosis_date=date(2022, 1, 1),
+        )
+        Assessment.objects.create(
+            patient=patient,
+            date=date(2025, 1, 5),
+            r_iss="II",
+            response="PR",
+            creatinine_mg_dl=2.2,
+            ldH_u_l=240,
+            beta2m_mg_l=3.4,
+            flc_ratio=2.2,
+        )
+        induction = Regimen.objects.create(
+            name="LenDex",
+            line="frontline",
+            components="Lenalidomide, Dexamethasone",
+        )
+        relapse = Regimen.objects.create(
+            name="BorDex",
+            line="relapsed",
+            components="Bortezomib, Dexamethasone",
+        )
+        PatientTherapy.objects.create(
+            patient=patient,
+            regimen=induction,
+            start_date=date(2023, 1, 1),
+        )
+        PatientTherapy.objects.create(
+            patient=patient,
+            regimen=relapse,
+            start_date=date(2024, 1, 1),
+        )
+        SymptomAssessment.objects.create(
+            patient=patient,
+            ecog_status=2,
+            neuropathy_sensory=3,
+            crab_renal=True,
+        )
+
+        response = self.client.get(reverse("clinic:regimen_suggestions", args=[patient.pk]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Exploratory regimen context")
+        self.assertContains(response, "not a clinical decision tool")
+        self.assertContains(response, "This page cannot determine patient-specific comparative benefit.")
+        self.assertContains(response, "heuristic")
+        self.assertContains(response, "literature-informed")
+        self.assertContains(response, "What can be concluded")
+        self.assertContains(response, "What cannot be concluded")
+        self.assertContains(response, "RAW STRUCTURED")
+        self.assertContains(response, "DERIVED")
+        self.assertContains(response, "HEURISTIC")
+        self.assertContains(response, "LITERATURE-BASED")
+        self.assertContains(response, "Higher-priority exploratory context")
+        self.assertContains(response, "Alternative exploratory context")
+        self.assertContains(response, "Constraint-flagged context")
+        self.assertContains(response, "Open Simple Research View")
+        self.assertContains(response, "Open Scientific Cockpit")
+        self.assertContains(response, "Start exploratory simulation")
+        self.assertContains(response, "View Algorithm Transparency")
+        self.assertNotContains(response, "best treatment")
+        self.assertNotContains(response, "recommended therapy")
+        self.assertNotContains(response, "clinically superior")
+        self.assertNotContains(response, "should have been treated")
+        self.assertNotContains(response, "proven outcome")
+        self.assertNotContains(response, "strong recommendation")
+        self.assertNotContains(response, "moderate recommendation")
+        self.assertNotContains(response, "treatment recommendation")
+        self.assertNotContains(response, "Strong Recommendation")
+        self.assertNotContains(response, "Moderate Recommendation")
+        self.assertNotContains(response, "Avoid / Use with Caution")
+
+        content = response.content.decode("utf-8")
+        self.assertLess(content.index("Open Simple Research View"), content.index("Start exploratory simulation"))
 
 
 class DemoEditPermissionsTests(TestCase):
