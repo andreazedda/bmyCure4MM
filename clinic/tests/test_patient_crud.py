@@ -255,7 +255,6 @@ class PatientCRUDViewTests(TestCase):
         self.assertNotContains(response, "clinically superior")
         self.assertNotContains(response, "should have been treated")
 
-
     def _create_patient_with_prognosis_assessment(self) -> Patient:
         patient = Patient.objects.create(
             mrn="MM-PROGNOSIS-TEST",
@@ -282,6 +281,35 @@ class PatientCRUDViewTests(TestCase):
         response = self.client.get(reverse("clinic:prognosis_timeline", args=[patient.pk]))
 
         self.assertEqual(response.status_code, 200)
+
+    def test_patient_prognosis_timeline_renders_without_clinical_overclaim(self) -> None:
+        patient = self._create_patient_with_prognosis_assessment()
+
+        response = self.client.get(reverse("clinic:prognosis_timeline", args=[patient.pk]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Prognosis / timeline interpretation status")
+        self.assertContains(response, "heuristic/literature-informed")
+        self.assertContains(response, "not a patient-specific clinical prediction")
+        self.assertContains(response, "This page cannot determine whether an alternative treatment would have changed this patient")
+        self.assertContains(response, "Model confidence")
+        self.assertContains(response, "Model completeness/confidence score")
+        self.assertContains(response, "83%")
+        self.assertContains(response, "What can be concluded")
+        self.assertContains(response, "What cannot be concluded")
+        self.assertContains(response, "Horizon")
+        self.assertContains(response, "PFS probability")
+        self.assertContains(response, "Population/heuristic estimate; not an individual prediction.")
+        self.assertContains(response, "Open Simple Research View")
+        self.assertContains(response, "Open Scientific Cockpit")
+        self.assertContains(response, "Start exploratory simulation")
+        self.assertNotContains(response, "Get Treatment Suggestions")
+        self.assertNotContains(response, "best treatment")
+        self.assertNotContains(response, "recommended therapy")
+        self.assertNotContains(response, "clinically superior")
+        self.assertNotContains(response, "should have been treated")
+        self.assertNotContains(response, "proven outcome")
+
 
 class DemoEditPermissionsTests(TestCase):
     def setUp(self) -> None:

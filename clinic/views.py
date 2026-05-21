@@ -900,8 +900,8 @@ def symptom_assessment_list(request: HttpRequest, patient_id: int) -> HttpRespon
 
 @login_required
 def prognosis_timeline(request: HttpRequest, patient_id: int) -> HttpResponse:
-    """Display prognosis estimates and timeline for a patient."""
-    from simulator.prognosis import estimate_prognosis, get_prognosis_explanation, compare_scenarios
+    """Display exploratory prognosis context and timeline for a patient."""
+    from simulator.prognosis import estimate_prognosis
     
     patient = get_object_or_404(models.Patient, pk=patient_id)
     
@@ -920,23 +920,33 @@ def prognosis_timeline(request: HttpRequest, patient_id: int) -> HttpResponse:
     # Count therapy lines
     therapy_count = patient.therapies.count()
     line_of_therapy = max(therapy_count, 1)
+    structured_r_iss = latest_assessment.r_iss if latest_assessment and latest_assessment.r_iss else None
+    response_value = latest_assessment.response if latest_assessment and latest_assessment.response else None
+    response_label = latest_assessment.get_response_display() if response_value else None
     
     # Build patient parameters
     patient_params = {
-        "r_iss": latest_assessment.r_iss if latest_assessment and latest_assessment.r_iss else "II",
+        "r_iss": structured_r_iss or "II",
         "cytogenetics": cytogenetics,
         "age": patient.age,
         "ecog": ecog,
-        "response": latest_assessment.response if latest_assessment else None,
+        "response": response_value,
         "line_of_therapy": line_of_therapy,
     }
     
     # Calculate prognosis estimate
     estimate = estimate_prognosis(**patient_params)
-    
-    # Get language from session/cookie
-    lang = request.COOKIES.get("lang", "en")
-    explanation = get_prognosis_explanation(estimate, lang=lang)
+    confidence_score = float(estimate.confidence or 0.0)
+    confidence_percentage = round(confidence_score * 100)
+    if confidence_score <= 0.10:
+        confidence_warning = "Model confidence is extremely limited. Treat this page as exploratory context only."
+        confidence_alert_class = "alert-danger"
+    elif confidence_score < 0.50:
+        confidence_warning = "Model confidence is limited. Do not use this page for treatment comparison."
+        confidence_alert_class = "alert-warning"
+    else:
+        confidence_warning = "Model confidence is still heuristic and does not establish individual prognosis."
+        confidence_alert_class = "alert-info"
     
     # Calculate intermediate timepoints (3m, 6m) by interpolation
     import math
@@ -948,34 +958,252 @@ def prognosis_timeline(request: HttpRequest, patient_id: int) -> HttpResponse:
     
     pfs_3m = survival_prob(estimate.median_pfs_months, 3)
     pfs_6m = survival_prob(estimate.median_pfs_months, 6)
-    
-    # Generate comparison scenarios
-    scenarios = compare_scenarios(
-        base_params={
-            "r_iss": patient_params["r_iss"],
-            "cytogenetics": patient_params["cytogenetics"],
-            "age": patient_params["age"],
-            "ecog": patient_params["ecog"],
-            "line_of_therapy": patient_params["line_of_therapy"],
-        },
-        scenarios=[
-            {"name": "Baseline (PR)", "response": "PR"},
-            {"name": "With VGPR", "response": "VGPR"},
-            {"name": "With CR", "response": "CR"},
-            {"name": "With MRD-negative CR", "response": "CR", "mrd_status": "negative"},
+    timeline_rows = [
+        {
+            "horizon": horizon,
+            "pfs_probability": f"{probability}%",
+            "interpretation": _build_prognosis_timeline_interpretation(probability),
+            "caveat": "Population/heuristic estimate; not an individual prediction.",
+        }
+        for horizon, probability in [
+            ("3 months", round(pfs_3m)),
+            ("6 months", round(pfs_6m)),
+            ("12 months", round(estimate.pfs_12m * 100)),
+            ("24 months", round(estimate.pfs_24m * 100)),
+            ("36 months", round(estimate.pfs_36m * 100)),
         ]
-    )
+    ]
+
+    adjustment_rows = _build_prognosis_adjustment_rows(estimate.modifiers_applied)
+    risk_group_label = _format_risk_category_label(estimate.risk_category)
+    patient_detail_url = reverse("clinic:patient_detail", args=[patient.id])
+    research_simple_url = reverse("twin_engine:simple_research_view", args=[patient.id])
+    research_cockpit_url = reverse("twin_engine:research_cockpit", args=[patient.id])
+    simulation_url = reverse("simulator:scenario_list")
+    if latest_assessment is not None:
+        simulation_url = f"{simulation_url}?twin_assessment_id={latest_assessment.pk}"
+
+    data_source_rows = [
+        {
+            "variable": "R-ISS",
+            "value": structured_r_iss or "II (default fallback)",
+            "classification": "RAW STRUCTURED" if structured_r_iss else "UNKNOWN",
+            "role": (
+                "Structured stage used to select the literature-derived baseline survival values."
+                if structured_r_iss
+                else "Fallback stage used because no structured R-ISS value was recorded."
+            ),
+        },
+        {
+            "variable": "Age",
+            "value": f"{patient.age} years",
+            "classification": "DERIVED",
+            "role": "Derived from birth date and used as a heuristic age modifier.",
+        },
+        {
+            "variable": "Line of therapy",
+            "value": str(line_of_therapy) if therapy_count else "1 (default from no recorded therapies)",
+            "classification": "DERIVED" if therapy_count else "HEURISTIC",
+            "role": (
+                "Derived from recorded therapy count and used as relapse context."
+                if therapy_count
+                else "Default context when no explicit therapy line is recorded."
+            ),
+        },
+        {
+            "variable": "Response / progression context",
+            "value": response_label or "Not recorded",
+            "classification": "RAW STRUCTURED" if response_label else "UNKNOWN",
+            "role": (
+                "Structured response context that modifies the heuristic estimate."
+                if response_label
+                else "No structured response context was available for this estimate."
+            ),
+        },
+        {
+            "variable": "Adjustments applied",
+            "value": "; ".join(estimate.modifiers_applied) if estimate.modifiers_applied else "No explicit adjustment beyond baseline stage.",
+            "classification": "HEURISTIC",
+            "role": "Rule-based modifiers that shift or contextualize the baseline estimate.",
+        },
+        {
+            "variable": "Reference",
+            "value": estimate.reference,
+            "classification": "LITERATURE-BASED",
+            "role": "Literature source used for the baseline numerical survival values in this estimate.",
+        },
+        {
+            "variable": "Median PFS",
+            "value": f"{estimate.median_pfs_months:.1f} months",
+            "classification": "HEURISTIC",
+            "role": "Adjusted exploratory progression-free survival estimate using literature baseline values plus rule-based modifiers.",
+        },
+        {
+            "variable": "Median OS",
+            "value": f"{estimate.median_os_months:.1f} months",
+            "classification": "HEURISTIC",
+            "role": "Adjusted exploratory overall survival estimate using literature baseline values plus rule-based modifiers.",
+        },
+    ]
+
+    estimate_cards = [
+        {
+            "label": "Risk group",
+            "value": risk_group_label,
+            "detail": "Derived from the literature-based baseline stage plus applied heuristic modifiers.",
+        },
+        {
+            "label": "Median PFS",
+            "value": f"{estimate.median_pfs_months:.1f} months",
+            "detail": "Exploratory progression-free survival estimate.",
+        },
+        {
+            "label": "Median OS",
+            "value": f"{estimate.median_os_months:.1f} months",
+            "detail": "Exploratory overall survival estimate.",
+        },
+        {
+            "label": "Confidence / completeness score",
+            "value": f"{confidence_percentage}%",
+            "detail": "Input completeness and heuristic reliability score, not clinical certainty.",
+        },
+    ]
     
     context = {
         "patient": patient,
-        "patient_params": patient_params,
-        "estimate": estimate,
-        "explanation": explanation,
-        "pfs_3m": pfs_3m,
-        "pfs_6m": pfs_6m,
-        "scenarios": scenarios,
+        "page_purpose": "This page organizes exploratory prognosis context from structured patient factors, literature-derived baseline survival values, and heuristic modifiers.",
+        "interpretation_status": {
+            "title": "Prognosis / timeline interpretation status",
+            "summary": "This page shows heuristic/literature-informed prognosis estimates, not a patient-specific clinical prediction.",
+            "limit": "This page cannot determine whether an alternative treatment would have changed this patient’s outcome.",
+        },
+        "confidence_panel": {
+            "title": "Model confidence / uncertainty",
+            "score_label": "Model completeness/confidence score",
+            "percentage": confidence_percentage,
+            "explanation": "This score reflects input completeness and heuristic reliability, not clinical certainty.",
+            "warning": confidence_warning,
+            "alert_class": confidence_alert_class,
+        },
+        "data_source_rows": data_source_rows,
+        "estimate_cards": estimate_cards,
+        "timeline_rows": timeline_rows,
+        "adjustment_rows": adjustment_rows,
+        "reference_info": {
+            "title": "Reference",
+            "label": "Literature source used for baseline numerical values",
+            "value": estimate.reference,
+            "detail": "The current code uses literature-derived baseline survival values and then applies rule-based heuristic modifiers to generate the displayed estimate.",
+        },
+        "what_can_be_concluded": [
+            "The page can provide exploratory prognosis context.",
+            "The page can show which patient factors modify the heuristic estimate.",
+            "The page can highlight uncertainty and missing evidence.",
+        ],
+        "what_cannot_be_concluded": [
+            "It cannot prove individual survival.",
+            "It cannot determine treatment superiority.",
+            "It cannot infer what would have happened under an alternative therapy.",
+            "It cannot replace counterfactual simulation or clinical validation.",
+        ],
+        "next_actions": {
+            "primary": {
+                "label": "Open Simple Research View",
+                "href": research_simple_url,
+            },
+            "secondary": [
+                {
+                    "label": "Back to Patient",
+                    "href": patient_detail_url,
+                },
+                {
+                    "label": "Open Scientific Cockpit",
+                    "href": research_cockpit_url,
+                },
+                {
+                    "label": "Start exploratory simulation",
+                    "href": simulation_url,
+                },
+            ],
+        },
     }
     return render(request, "clinic/prognosis_timeline.html", context)
+
+
+def _build_prognosis_timeline_interpretation(probability_pct: int) -> str:
+    if probability_pct >= 80:
+        return "Higher heuristic progression-free probability at this horizon."
+    if probability_pct >= 60:
+        return "Moderate heuristic progression-free probability at this horizon."
+    if probability_pct >= 40:
+        return "Meaningful uncertainty about remaining progression-free by this horizon."
+    return "Lower heuristic progression-free probability at this horizon."
+
+
+def _build_prognosis_adjustment_rows(modifiers_applied: list[str]) -> list[dict[str, str]]:
+    if not modifiers_applied:
+        return [
+            {
+                "trigger": "No explicit adjustment recorded beyond the baseline stage lookup.",
+                "source_type": "HEURISTIC",
+                "effect_direction": "No extra direction recorded beyond the baseline literature lookup.",
+                "estimate_effect": "Context only",
+            }
+        ]
+
+    rows: list[dict[str, str]] = []
+    for modifier in modifiers_applied:
+        modifier_lower = modifier.lower()
+        source_type = "HEURISTIC"
+        effect_direction = "Rule-based modifier applied to the estimate."
+        estimate_effect = "Changes PFS/OS estimate"
+
+        if modifier_lower.startswith("cytogenetics:"):
+            source_type = "RAW STRUCTURED"
+            effect_direction = "Higher-risk cytogenetics usually shift the estimate downward."
+        elif modifier_lower.startswith("age"):
+            source_type = "DERIVED"
+            effect_direction = "Age band changes the estimate through a stored heuristic modifier."
+        elif modifier_lower.startswith("ecog"):
+            source_type = "RAW STRUCTURED"
+            effect_direction = "Worse functional status shifts the estimate downward."
+        elif modifier_lower.startswith("response:"):
+            source_type = "RAW STRUCTURED"
+            effect_direction = _build_prognosis_response_effect_direction(modifier_lower)
+        elif "mrd" in modifier_lower:
+            source_type = "RAW STRUCTURED"
+            effect_direction = "MRD status changes the estimate according to the stored heuristic modifier."
+        elif modifier_lower.startswith("line"):
+            source_type = "DERIVED"
+            effect_direction = "Later therapy lines shift the estimate downward."
+
+        rows.append(
+            {
+                "trigger": modifier,
+                "source_type": source_type,
+                "effect_direction": effect_direction,
+                "estimate_effect": estimate_effect,
+            }
+        )
+    return rows
+
+
+def _build_prognosis_response_effect_direction(modifier_lower: str) -> str:
+    if "stringent complete response" in modifier_lower or "complete response" in modifier_lower or "very good partial response" in modifier_lower:
+        return "Deeper recorded response shifts the estimate upward relative to partial response."
+    if "stable disease" in modifier_lower or "progressive disease" in modifier_lower:
+        return "Less favorable recorded response shifts the estimate downward relative to partial response."
+    return "Recorded response modifies the estimate relative to the stored baseline response assumption."
+
+
+def _format_risk_category_label(risk_category: str) -> str:
+    labels = {
+        "standard": "Standard",
+        "intermediate": "Intermediate",
+        "high": "High",
+        "very_high": "Very High",
+    }
+    return labels.get(risk_category, risk_category.replace("_", " ").title())
 
 
 @login_required
