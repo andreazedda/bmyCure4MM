@@ -499,7 +499,10 @@ def compare_scenarios(
     
     results = []
     for i, scenario in enumerate(scenarios):
-        combined_params = {**base_params, **scenario}
+        scenario_params = {
+            key: value for key, value in scenario.items() if key != "name"
+        }
+        combined_params = {**base_params, **scenario_params}
         scenario_estimate = estimate_prognosis(**combined_params)
         
         pfs_diff = scenario_estimate.median_pfs_months - base_estimate.median_pfs_months
@@ -508,7 +511,7 @@ def compare_scenarios(
         results.append({
             "scenario_id": i + 1,
             "scenario_name": scenario.get("name", f"Scenario {i + 1}"),
-            "params": scenario,
+            "params": scenario_params,
             "estimate": scenario_estimate.to_dict(),
             "vs_baseline": {
                 "pfs_diff_months": round(pfs_diff, 1),

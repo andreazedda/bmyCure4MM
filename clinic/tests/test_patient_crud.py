@@ -256,6 +256,33 @@ class PatientCRUDViewTests(TestCase):
         self.assertNotContains(response, "should have been treated")
 
 
+    def _create_patient_with_prognosis_assessment(self) -> Patient:
+        patient = Patient.objects.create(
+            mrn="MM-PROGNOSIS-TEST",
+            first_name="Prognosis",
+            last_name="Timeline",
+            birth_date=date(1971, 1, 1),
+            sex="M",
+            diagnosis_date=date(2022, 1, 1),
+        )
+        Assessment.objects.create(
+            patient=patient,
+            date=date(2025, 1, 5),
+            r_iss="II",
+            response="PR",
+            ldH_u_l=240,
+            beta2m_mg_l=3.4,
+            flc_ratio=2.2,
+        )
+        return patient
+
+    def test_patient_prognosis_timeline_route_renders(self) -> None:
+        patient = self._create_patient_with_prognosis_assessment()
+
+        response = self.client.get(reverse("clinic:prognosis_timeline", args=[patient.pk]))
+
+        self.assertEqual(response.status_code, 200)
+
 class DemoEditPermissionsTests(TestCase):
     def setUp(self) -> None:
         self.user = get_user_model().objects.create_user(
