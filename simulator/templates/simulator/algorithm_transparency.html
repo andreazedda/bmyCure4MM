@@ -1,429 +1,341 @@
 {% extends "base.html" %}
 
-{% block title %}Decision Algorithm Transparency - bmyCure4MM{% endblock %}
+{% block title %}Algorithm Logic Transparency - bmyCure4MM{% endblock %}
+
+{% block extra_css %}
+<style>
+.algorithm-ia {
+    color: #1f2937;
+}
+.page-intro {
+    background: linear-gradient(135deg, #f7fbff 0%, #fff8ef 100%);
+    border: 1px solid #d9e4ef;
+    border-radius: 14px;
+    padding: 1.25rem;
+}
+.eyebrow {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #64748b;
+    margin-bottom: 0.35rem;
+    font-weight: 700;
+}
+.section-card {
+    background: #fff;
+    border: 1px solid #dfe7ef;
+    border-radius: 14px;
+    padding: 1.1rem;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+}
+.classification-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.18rem 0.45rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border: 1px solid transparent;
+}
+.classification-pill.heuristic {
+    background: #ede9fe;
+    border-color: #c4b5fd;
+    color: #5b21b6;
+}
+.classification-pill.literature-informed {
+    background: #dcfce7;
+    border-color: #86efac;
+    color: #166534;
+}
+.classification-pill.threshold-based {
+    background: #e0f2fe;
+    border-color: #7dd3fc;
+    color: #0c4a6e;
+}
+.classification-pill.simulation-support {
+    background: #fef3c7;
+    border-color: #fcd34d;
+    color: #92400e;
+}
+.classification-pill.unknown {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+    color: #374151;
+}
+.small-label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #64748b;
+    font-weight: 700;
+    margin-bottom: 0.35rem;
+}
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.9rem;
+}
+.detail-block {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 0.85rem;
+}
+.rule-card,
+.flag-card,
+.threshold-card {
+    border: 1px solid #dbe5ef;
+    border-radius: 12px;
+    padding: 1rem;
+    background: #f8fafc;
+}
+.rule-card + .rule-card,
+.flag-card + .flag-card,
+.threshold-card + .threshold-card {
+    margin-top: 1rem;
+}
+.table th,
+.table td {
+    vertical-align: top;
+}
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="h2">
-                <span class="t-en">🔍 Decision Algorithm - Full Transparency</span>
-                <span class="t-it">🔍 Algoritmo Decisionale - Piena Trasparenza</span>
-            </h1>
-            <p class="text-muted mb-0">
-                <span class="t-en">Version {{ version }} • Last updated: {{ last_updated }}</span>
-                <span class="t-it">Versione {{ version }} • Ultimo aggiornamento: {{ last_updated }}</span>
-            </p>
+<div class="container py-4 algorithm-ia">
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+        <div class="page-intro flex-grow-1">
+            <div class="eyebrow">Algorithm logic transparency</div>
+            <h1 class="h3 mb-2">Algorithm logic transparency</h1>
+            <p class="text-muted mb-2">{{ page_purpose }}</p>
+            <p class="text-muted small mb-0">Version {{ version }} • Last updated {{ last_updated }}</p>
         </div>
         <div>
-            <a href="{% url 'simulator:decision_algorithm_api' %}" class="btn btn-outline-primary btn-sm" target="_blank">
-                <i class="bi bi-download"></i>
-                <span class="t-en">Export JSON</span>
-                <span class="t-it">Esporta JSON</span>
-            </a>
+            <a href="{% url 'simulator:decision_algorithm_api' %}" class="btn btn-outline-primary btn-sm" target="_blank">Export JSON</a>
         </div>
     </div>
 
-    <!-- Intro Card -->
-    <div class="alert alert-info mb-4">
-        <div class="d-flex align-items-start gap-3">
-            <div style="font-size: 2rem;">📋</div>
-            <div>
-                <p class="mb-2 t-en">
-                    <strong>Why is this important?</strong> This platform uses transparent, evidence-based rules to generate 
-                    treatment recommendations. All thresholds and decision logic are disclosed here so you can understand 
-                    exactly how recommendations are made.
-                </p>
-                <p class="mb-2 t-it">
-                    <strong>Perché è importante?</strong> Questa piattaforma usa regole trasparenti e basate sull'evidenza 
-                    per generare raccomandazioni terapeutiche. Tutte le soglie e la logica decisionale sono divulgate qui 
-                    per permetterti di capire esattamente come vengono formulate le raccomandazioni.
-                </p>
-                <p class="mb-0 text-muted small">
-                    <span class="t-en">{{ disclaimer.en }}</span>
-                    <span class="t-it">{{ disclaimer.it }}</span>
-                </p>
-            </div>
-        </div>
+    <div class="section-card mb-4">
+        <h2 class="h5 mb-3">{{ interpretation_status.title }}</h2>
+        <p class="mb-2">{{ interpretation_status.summary }}</p>
+        <p class="mb-0">{{ interpretation_status.limit }}</p>
     </div>
 
-    <div class="row">
-        <!-- Left Column: Thresholds -->
-        <div class="col-lg-6 mb-4">
-            <!-- Efficacy Thresholds -->
-            <div class="card mb-4">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">
-                        <span class="t-en">📈 Efficacy Thresholds (Tumor Reduction)</span>
-                        <span class="t-it">📈 Soglie Efficacia (Riduzione Tumorale)</span>
-                    </h5>
-                </div>
-                <div class="card-body p-0">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th style="width: 30%">
-                                    <span class="t-en">Level</span>
-                                    <span class="t-it">Livello</span>
-                                </th>
-                                <th>
-                                    <span class="t-en">Condition</span>
-                                    <span class="t-it">Condizione</span>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for key, thresh in thresholds.efficacy.items %}
-                            <tr>
-                                <td>
-                                    <span class="badge bg-{{ thresh.badge }}">
-                                        {% if key == "good" %}🟢{% elif key == "moderate" %}🟡{% elif key == "poor" %}🔴{% else %}⚫{% endif %}
-                                        {{ key|title }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="t-en">{{ thresh.description_en }}</span>
-                                    <span class="t-it">{{ thresh.description_it }}</span>
-                                    <br><code class="small text-muted">{{ thresh.condition }}</code>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Toxicity Thresholds -->
-            <div class="card mb-4">
-                <div class="card-header bg-danger text-white">
-                    <h5 class="mb-0">
-                        <span class="t-en">⚠️ Toxicity Thresholds (Healthy Cell Loss)</span>
-                        <span class="t-it">⚠️ Soglie Tossicità (Perdita Cellule Sane)</span>
-                    </h5>
-                </div>
-                <div class="card-body p-0">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th style="width: 30%">
-                                    <span class="t-en">Level</span>
-                                    <span class="t-it">Livello</span>
-                                </th>
-                                <th>
-                                    <span class="t-en">Condition</span>
-                                    <span class="t-it">Condizione</span>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for key, thresh in thresholds.toxicity.items %}
-                            <tr>
-                                <td>
-                                    <span class="badge bg-{{ thresh.badge }}">
-                                        {% if key == "acceptable" %}🟢{% elif key == "borderline" %}🟡{% else %}🔴{% endif %}
-                                        {{ key|title }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="t-en">{{ thresh.description_en }}</span>
-                                    <span class="t-it">{{ thresh.description_it }}</span>
-                                    <br><code class="small text-muted">{{ thresh.condition }}</code>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Durability Thresholds -->
-            <div class="card mb-4">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0">
-                        <span class="t-en">⏱️ Durability Thresholds (Time to Recurrence)</span>
-                        <span class="t-it">⏱️ Soglie Durabilità (Tempo a Recidiva)</span>
-                    </h5>
-                </div>
-                <div class="card-body p-0">
-                    <table class="table table-hover mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th style="width: 30%">
-                                    <span class="t-en">Level</span>
-                                    <span class="t-it">Livello</span>
-                                </th>
-                                <th>
-                                    <span class="t-en">Condition</span>
-                                    <span class="t-it">Condizione</span>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for key, thresh in thresholds.durability.items %}
-                            <tr>
-                                <td>
-                                    <span class="badge bg-{{ thresh.badge }}">
-                                        {% if key == "good" %}🟢{% elif key == "moderate" %}🟡{% else %}🔴{% endif %}
-                                        {{ key|title }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="t-en">{{ thresh.description_en }}</span>
-                                    <span class="t-it">{{ thresh.description_it }}</span>
-                                    <br><code class="small text-muted">{{ thresh.condition }}</code>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Right Column: Risk Stratification -->
-        <div class="col-lg-6 mb-4">
-            <!-- R-ISS Staging -->
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">
-                        <span class="t-en">📊 R-ISS Risk Stratification</span>
-                        <span class="t-it">📊 Stratificazione Rischio R-ISS</span>
-                    </h5>
-                </div>
-                <div class="card-body">
-                    {% for key, stage in risk_stratification.items %}
-                    <div class="border rounded p-3 mb-3 {% if 'III' in key %}border-danger{% elif 'II' in key %}border-warning{% else %}border-success{% endif %}">
-                        <h6 class="{% if 'III' in key %}text-danger{% elif 'II' in key %}text-warning{% else %}text-success{% endif %}">
-                            {{ key|slice:"6:" }}
-                            {% if 'III' in key %}🔴 High Risk{% elif 'II' in key %}🟡 Intermediate{% else %}🟢 Low Risk{% endif %}
-                        </h6>
-                        <p class="small mb-2">
-                            <strong>
-                                <span class="t-en">Criteria:</span>
-                                <span class="t-it">Criteri:</span>
-                            </strong>
-                            <code>{{ stage.criteria }}</code>
-                        </p>
-                        <div class="row text-center">
-                            <div class="col-4">
-                                <div class="small text-muted">
-                                    <span class="t-en">Median PFS</span>
-                                    <span class="t-it">PFS Mediana</span>
-                                </div>
-                                <strong>{{ stage.median_PFS_months }} 
-                                    <span class="t-en">months</span>
-                                    <span class="t-it">mesi</span>
-                                </strong>
-                            </div>
-                            <div class="col-4">
-                                <div class="small text-muted">
-                                    <span class="t-en">Median OS</span>
-                                    <span class="t-it">OS Mediana</span>
-                                </div>
-                                <strong>
-                                    {% if stage.median_OS_months %}
-                                        {{ stage.median_OS_months }} 
-                                        <span class="t-en">months</span>
-                                        <span class="t-it">mesi</span>
-                                    {% else %}
-                                        <span class="t-en">Not reached</span>
-                                        <span class="t-it">Non raggiunta</span>
-                                    {% endif %}
-                                </strong>
-                            </div>
-                            <div class="col-4">
-                                <div class="small text-muted">
-                                    <span class="t-en">5-year survival</span>
-                                    <span class="t-it">Sopravvivenza 5 anni</span>
-                                </div>
-                                <strong>{{ stage.five_year_survival_percent }}%</strong>
-                            </div>
-                        </div>
-                        <p class="small mb-0 mt-2 text-muted">
-                            <span class="t-en">{{ stage.description_en }}</span>
-                            <span class="t-it">{{ stage.description_it }}</span>
-                        </p>
-                    </div>
+    <div class="section-card mb-4">
+        <h2 class="h5 mb-3">Rule classification table</h2>
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Rule family</th>
+                        <th>Inputs used</th>
+                        <th>Classification</th>
+                        <th>Purpose</th>
+                        <th>Limitation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rule_family_rows %}
+                    <tr>
+                        <td>{{ row.rule_family }}</td>
+                        <td>{{ row.inputs_used }}</td>
+                        <td><span class="classification-pill {{ row.classification|lower|slugify }}">{{ row.classification }}</span></td>
+                        <td>{{ row.purpose }}</td>
+                        <td>{{ row.limitation }}</td>
+                    </tr>
                     {% endfor %}
-                </div>
-            </div>
-
-            <!-- High-Risk Cytogenetics -->
-            <div class="card mb-4">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0">
-                        <span class="t-en">🧬 High-Risk Cytogenetics</span>
-                        <span class="t-it">🧬 Citogenetica ad Alto Rischio</span>
-                    </h5>
-                </div>
-                <div class="card-body p-0">
-                    <div class="list-group list-group-flush">
-                        {% for key, cyto in high_risk_cytogenetics.items %}
-                        <div class="list-group-item">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h6 class="mb-1">{{ cyto.name }} <small class="text-muted">({{ cyto.gene }})</small></h6>
-                            </div>
-                            <p class="mb-1 small">
-                                <span class="t-en"><strong>Impact:</strong> {{ cyto.impact_en }}</span>
-                                <span class="t-it"><strong>Impatto:</strong> {{ cyto.impact_it }}</span>
-                            </p>
-                            <p class="mb-0 small text-muted">
-                                <span class="t-en"><strong>Management:</strong> {{ cyto.management_en }}</span>
-                                <span class="t-it"><strong>Gestione:</strong> {{ cyto.management_it }}</span>
-                            </p>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <!-- Decision Rules -->
-    <div class="card mb-4">
-        <div class="card-header bg-warning">
-            <h5 class="mb-0">
-                <span class="t-en">📋 Decision Rules ({{ decision_rules|length }} rules)</span>
-                <span class="t-it">📋 Regole Decisionali ({{ decision_rules|length }} regole)</span>
-            </h5>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped align-middle">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>
-                                <span class="t-en">Rule Name</span>
-                                <span class="t-it">Nome Regola</span>
-                            </th>
-                            <th>
-                                <span class="t-en">Trigger Condition</span>
-                                <span class="t-it">Condizione Attivazione</span>
-                            </th>
-                            <th>
-                                <span class="t-en">Priority</span>
-                                <span class="t-it">Priorità</span>
-                            </th>
-                            <th>
-                                <span class="t-en">Recommended Action</span>
-                                <span class="t-it">Azione Raccomandata</span>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for rule in decision_rules %}
-                        <tr class="{% if rule.priority == 'critical' %}table-danger{% elif rule.priority == 'high' %}table-warning{% endif %}">
-                            <td><code>{{ rule.id }}</code></td>
-                            <td>
-                                {{ rule.icon }}
-                                <span class="t-en">{{ rule.name_en }}</span>
-                                <span class="t-it">{{ rule.name_it }}</span>
-                            </td>
-                            <td><code>{{ rule.trigger_condition }}</code></td>
-                            <td>
-                                <span class="badge {% if rule.priority == 'critical' %}bg-danger{% elif rule.priority == 'high' %}bg-warning text-dark{% elif rule.priority == 'medium' %}bg-info{% else %}bg-success{% endif %}">
-                                    {{ rule.priority|upper }}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="t-en">{{ rule.action_en }}</span>
-                                <span class="t-it">{{ rule.action_it }}</span>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+    {% for section in threshold_sections %}
+    <div class="section-card mb-4">
+        <h2 class="h5 mb-2">{{ section.title }}</h2>
+        <p class="text-muted small mb-3">{{ section.summary }}</p>
+
+        {% for item in section.items %}
+        <div class="threshold-card">
+            <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+                <div>
+                    <div class="eyebrow">Threshold section</div>
+                    <h3 class="h6 mb-1">{{ item.level }}</h3>
+                    <p class="text-muted small mb-0">{{ item.description }}</p>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="classification-pill {{ item.classification|lower|slugify }}">{{ item.classification }}</span>
+                    <span class="classification-pill {{ item.basis_label|lower|slugify }}">{{ item.basis_label }}</span>
+                </div>
             </div>
 
-            <!-- Expandable Details -->
-            <div class="accordion mt-3" id="ruleDetails">
-                {% for rule in decision_rules %}
-                <div class="accordion-item">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#rule-{{ rule.id }}">
-                            {{ rule.icon }} {{ rule.id }}: 
-                            <span class="t-en ms-1">{{ rule.name_en }}</span>
-                            <span class="t-it ms-1">{{ rule.name_it }}</span>
-                        </button>
-                    </h2>
-                    <div id="rule-{{ rule.id }}" class="accordion-collapse collapse" data-bs-parent="#ruleDetails">
-                        <div class="accordion-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <h6>
-                                        <span class="t-en">Rationale</span>
-                                        <span class="t-it">Razionale</span>
-                                    </h6>
-                                    <p>
-                                        <span class="t-en">{{ rule.rationale_en }}</span>
-                                        <span class="t-it">{{ rule.rationale_it }}</span>
-                                    </p>
-                                </div>
-                                <div class="col-md-6">
-                                    <h6>
-                                        <span class="t-en">Evidence Sources</span>
-                                        <span class="t-it">Fonti Evidenza</span>
-                                    </h6>
-                                    <ul class="small">
-                                        {% for evidence in rule.evidence %}
-                                        <li>{{ evidence }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                    {% if rule.suggested_alternatives %}
-                                    <h6 class="mt-3">
-                                        <span class="t-en">Suggested Alternatives</span>
-                                        <span class="t-it">Alternative Suggerite</span>
-                                    </h6>
-                                    <ul class="small">
-                                        {% for alt in rule.suggested_alternatives %}
-                                        <li><strong>{{ alt.name }}</strong>: {{ alt.indication }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
+            <div class="detail-grid">
+                <div class="detail-block">
+                    <div class="small-label">Variable used</div>
+                    <p class="mb-0"><code>{{ item.variable }}</code></p>
+                </div>
+                <div class="detail-block">
+                    <div class="small-label">Rule condition</div>
+                    <p class="mb-0"><code>{{ item.condition }}</code></p>
+                </div>
+                <div class="detail-block">
+                    <div class="small-label">What it changes</div>
+                    <p class="mb-0">{{ item.workflow_change }}</p>
+                </div>
+                <div class="detail-block">
+                    <div class="small-label">What it does not prove</div>
+                    <p class="mb-0">{{ item.not_prove }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+
+    <div class="section-card mb-4">
+        <h2 class="h5 mb-2">Exploratory rule outputs</h2>
+        <p class="text-muted small mb-3">These rows document how encoded triggers produce rule-based context and simulation-support labels inside the workflow.</p>
+
+        {% for rule in decision_rule_rows %}
+        <div class="rule-card">
+            <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+                <div>
+                    <div class="eyebrow">Simulation-support label</div>
+                    <h3 class="h6 mb-1">{{ rule.id }} · {{ rule.name }}</h3>
+                    <p class="text-muted small mb-0"><code>{{ rule.trigger_condition }}</code></p>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="classification-pill {{ rule.classification|lower|slugify }}">{{ rule.classification }}</span>
+                    <span class="classification-pill heuristic">{{ rule.priority }}</span>
+                </div>
+            </div>
+
+            <div class="detail-grid mb-3">
+                <div class="detail-block">
+                    <div class="small-label">Inputs used</div>
+                    <p class="mb-0">{{ rule.inputs_used }}</p>
+                </div>
+                <div class="detail-block">
+                    <div class="small-label">Exploratory rule output</div>
+                    <p class="mb-0">{{ rule.output_label }}</p>
+                </div>
+                <div class="detail-block">
+                    <div class="small-label">Purpose</div>
+                    <p class="mb-0">{{ rule.purpose }}</p>
+                </div>
+                <div class="detail-block">
+                    <div class="small-label">Limitation</div>
+                    <p class="mb-0">{{ rule.limitation }}</p>
+                </div>
+            </div>
+
+            {% if rule.evidence %}
+            <div>
+                <div class="small-label">Literature-informed sources</div>
+                <ul class="mb-0">
+                    {% for evidence in rule.evidence %}
+                    <li>{{ evidence }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="section-card h-100">
+                <h2 class="h5 mb-3">Risk/context flags</h2>
+                {% for row in risk_context_rows %}
+                <div class="flag-card">
+                    <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-2">
+                        <h3 class="h6 mb-0">{{ row.name }}</h3>
+                        <span class="classification-pill {{ row.classification|lower|slugify }}">{{ row.classification }}</span>
                     </div>
+                    <p class="mb-2"><strong>Criteria:</strong> <code>{{ row.criteria }}</code></p>
+                    <p class="mb-2"><strong>Purpose:</strong> {{ row.purpose }}</p>
+                    <p class="mb-2"><strong>Reference values:</strong> {{ row.reference_values }}</p>
+                    <p class="mb-0 text-muted small"><strong>Limitation:</strong> {{ row.limitation }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="section-card h-100">
+                <h2 class="h5 mb-3">Cytogenetic risk/context flags</h2>
+                {% for row in cytogenetic_flag_rows %}
+                <div class="flag-card">
+                    <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-2">
+                        <h3 class="h6 mb-0">{{ row.name }}{% if row.gene %} <span class="text-muted">({{ row.gene }})</span>{% endif %}</h3>
+                        <span class="classification-pill {{ row.classification|lower|slugify }}">{{ row.classification }}</span>
+                    </div>
+                    <p class="mb-2"><strong>Purpose:</strong> {{ row.purpose }}</p>
+                    <p class="mb-2"><strong>Impact summary:</strong> {{ row.impact }}</p>
+                    <p class="mb-0 text-muted small"><strong>Limitation:</strong> {{ row.limitation }}</p>
                 </div>
                 {% endfor %}
             </div>
         </div>
     </div>
 
-    <!-- Data Sources -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <h5 class="mb-0">
-                <span class="t-en">📚 Evidence Sources & References</span>
-                <span class="t-it">📚 Fonti Evidenza & Riferimenti</span>
-            </h5>
+    <div class="section-card mb-4">
+        <h2 class="h5 mb-3">Literature-informed sources</h2>
+        <ul class="list-unstyled mb-0">
+            {% for source in data_sources %}
+            <li class="mb-3">
+                <strong>{{ source.name }}</strong><br>
+                <span class="text-muted">{{ source.reference }}</span>
+                {% if source.doi %}
+                <br><a href="https://doi.org/{{ source.doi }}" target="_blank" class="small">DOI: {{ source.doi }}</a>
+                {% endif %}
+                {% if source.url %}
+                <br><a href="{{ source.url }}" target="_blank" class="small">{{ source.url }}</a>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="section-card h-100">
+                <h2 class="h5 mb-3">What can be concluded</h2>
+                <ul class="mb-0">
+                    {% for item in what_can_be_concluded %}
+                    <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
-        <div class="card-body">
-            <ul class="list-unstyled mb-0">
-                {% for source in data_sources %}
-                <li class="mb-2">
-                    <strong>{{ source.name }}</strong><br>
-                    <span class="text-muted">{{ source.reference }}</span>
-                    {% if source.doi %}
-                    <br><a href="https://doi.org/{{ source.doi }}" target="_blank" class="small">DOI: {{ source.doi }}</a>
-                    {% endif %}
-                    {% if source.url %}
-                    <br><a href="{{ source.url }}" target="_blank" class="small">{{ source.url }}</a>
-                    {% endif %}
-                </li>
-                {% endfor %}
-            </ul>
+        <div class="col-lg-6">
+            <div class="section-card h-100">
+                <h2 class="h5 mb-3">What cannot be concluded</h2>
+                <ul class="mb-0">
+                    {% for item in what_cannot_be_concluded %}
+                    <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
     </div>
 
-    <!-- Back Navigation -->
-    <div class="text-center">
-        <a href="{% url 'simulator:scenario_list' %}" class="btn btn-primary">
-            <span class="t-en">← Back to Simulator</span>
-            <span class="t-it">← Torna al Simulatore</span>
-        </a>
+    <div class="section-card">
+        <h2 class="h5 mb-3">Next actions</h2>
+        <div class="d-flex flex-wrap gap-2 mb-2">
+            <a href="{{ next_actions.primary.href }}" class="btn btn-primary">{{ next_actions.primary.label }}</a>
+            {% for action in next_actions.secondary %}
+                {% if action.disabled %}
+                <span class="btn btn-outline-secondary disabled">{{ action.label }}</span>
+                {% else %}
+                <a href="{{ action.href }}" class="btn btn-outline-secondary">{{ action.label }}</a>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% if next_actions.patient_context_note %}
+        <p class="text-muted small mb-0">{{ next_actions.patient_context_note }}</p>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
