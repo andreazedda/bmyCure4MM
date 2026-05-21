@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+from collections import Counter
+from datetime import date
 import logging
 
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -519,16 +521,28 @@ def patient_detail(request: HttpRequest, pk: int) -> HttpResponse:
     research_last_calibration_status = "Not initialized"
     research_missing_required_data: list[str] = ["assessment"] if latest_assessment is None else []
     research_counterfactual_count = 0
+    research_completed_counterfactual_count = 0
     research_provenance_count = 0
     research_simple_url = reverse("twin_engine:simple_research_view", args=[patient.id])
     research_cockpit_url = reverse("twin_engine:research_cockpit", args=[patient.id])
     research_developer_url = reverse("twin_engine:developer_console") + f"?patient_id={patient.id}"
     research_glossary_url = reverse("twin_engine:research_glossary")
     research_twin_url = research_cockpit_url
+    interpretation_lab_count = len(assessments)
+    interpretation_lab_date_range = _format_date_range([assessment.date for assessment in assessments])
+    interpretation_therapy_count = len(patient.therapies.all())
+    interpretation_therapy_date_range = _format_date_range(
+        [therapy.start_date for therapy in patient.therapies.all()] + [therapy.end_date for therapy in patient.therapies.all()]
+    )
+    interpretation_simulation_count = 0
+    interpretation_adverse_event_count = 0
+    interpretation_adverse_event_categories: list[str] = []
     try:
-        from twin_engine.models import ObservationResidual, SimulationRunMetadata
+        from twin_engine.models import AdverseEvent, CounterfactualRun, ObservationResidual, SimulationRunMetadata
         from twin_engine.state_model import get_current_twin_state
         from twin_engine.validators import validate_assessment_minimum_fields
+        from simulator.models import SimulationAttempt
+        from django.db.models import Q
 
         research_twin_state = get_current_twin_state(patient)
         if latest_assessment is not None:
@@ -546,8 +560,65 @@ def patient_detail(request: HttpRequest, pk: int) -> HttpResponse:
             research_last_calibration_status = research_twin_state.get_method_display()
             research_provenance_count = SimulationRunMetadata.objects.filter(twin_state=research_twin_state).count()
         research_counterfactual_count = patient.counterfactual_runs.count()
+        research_completed_counterfactual_count = patient.counterfactual_runs.filter(
+            status=CounterfactualRun.STATUS_COMPLETED
+        ).count()
+
+        patient_assessment_ids = [assessment.pk for assessment in assessments if assessment.pk is not None]
+        patient_assessment_ids_str = [str(assessment_id) for assessment_id in patient_assessment_ids]
+        if patient_assessment_ids:
+            interpretation_simulation_count = SimulationAttempt.objects.filter(
+                Q(parameters__twin_assessment_id__in=patient_assessment_ids)
+                | Q(parameters__twin_assessment_id__in=patient_assessment_ids_str)
+                | Q(parameters__assessment_id__in=patient_assessment_ids)
+                | Q(parameters__assessment_id__in=patient_assessment_ids_str)
+            ).count()
+
+        adverse_events = list(patient.adverse_events.order_by("-date"))
+        interpretation_adverse_event_count = len(adverse_events)
+        adverse_event_labels = dict(AdverseEvent.EVENT_TYPE_CHOICES)
+        interpretation_adverse_event_categories = [
+            adverse_event_labels.get(event_type, event_type)
+            for event_type, _count in Counter(event.event_type for event in adverse_events).most_common(3)
+        ]
     except Exception:
         research_twin_state = None
+
+    if research_completed_counterfactual_count == 0:
+        interpretation_current_conclusion = "No treatment-comparison conclusion available."
+    else:
+        interpretation_current_conclusion = (
+            f"{research_completed_counterfactual_count} exploratory what-if scenario"
+            f"{'s' if research_completed_counterfactual_count != 1 else ''} available for review in Simple Research View or Scientific Cockpit."
+        )
+
+    interpretation_data_available = []
+    if interpretation_lab_count:
+        interpretation_data_available.append(
+            f"Lab snapshots: {interpretation_lab_count} ({interpretation_lab_date_range})."
+        )
+    else:
+        interpretation_data_available.append("Lab snapshots: none recorded.")
+    if interpretation_therapy_count:
+        interpretation_data_available.append(
+            f"Therapies: {interpretation_therapy_count} ({interpretation_therapy_date_range})."
+        )
+    else:
+        interpretation_data_available.append("Therapies: none recorded.")
+    if interpretation_adverse_event_count:
+        interpretation_data_available.append(
+            f"Adverse events: {interpretation_adverse_event_count} ({', '.join(interpretation_adverse_event_categories)})."
+        )
+    else:
+        interpretation_data_available.append("Adverse events: no structured categories recorded.")
+
+    if interpretation_simulation_count or research_completed_counterfactual_count:
+        interpretation_run_status = (
+            f"Mechanistic simulation records: {interpretation_simulation_count}. "
+            f"Exploratory what-if runs completed: {research_completed_counterfactual_count}."
+        )
+    else:
+        interpretation_run_status = "No completed mechanistic simulation or exploratory what-if comparison is currently recorded for this patient."
 
     if research_missing_required_data:
         research_recommended_next_step = {
@@ -567,7 +638,7 @@ def patient_detail(request: HttpRequest, pk: int) -> HttpResponse:
             "detail": "Calibration residuals are needed to understand how well the model reproduces observed biomarkers.",
             "href": research_twin_url + "#calibration-quality",
         }
-    elif research_counterfactual_count == 0:
+    elif research_completed_counterfactual_count == 0:
         research_recommended_next_step = {
             "label": "Run predefined what-if scenarios",
             "detail": "Completed mechanistic runs are needed before trajectory and utility comparisons are meaningful.",
@@ -585,6 +656,31 @@ def patient_detail(request: HttpRequest, pk: int) -> HttpResponse:
             "detail": "Data, twin state, calibration, scenarios, and provenance are present; review limitations before interpreting outputs.",
             "href": research_twin_url,
         }
+
+    research_interpretation_status = {
+        "headline": "Research interpretation status",
+        "can_answer": "No. This page cannot determine whether the patient could have been treated better.",
+        "evidence_required": [
+            "A defined utility function, for example U(a)=benefit(a)-toxicity(a)-uncertainty(a).",
+            "Comparable exploratory what-if runs with documented assumptions, calibration, and uncertainty diagnostics.",
+            "Structured disease, therapy, and adverse-event data across time for the same patient context.",
+        ],
+        "data_available": interpretation_data_available,
+        "run_status": interpretation_run_status,
+        "current_conclusion": interpretation_current_conclusion,
+        "can_conclude": (
+            "The platform can compare mechanistic simulation outputs and exploratory what-if branches, "
+            "but only as research interpretation and not clinical recommendation."
+        ),
+        "cannot_conclude": (
+            "The platform cannot prove what would have happened clinically, cannot establish causal effect, "
+            "and cannot prove that one therapy would have produced a better real-world outcome on this page."
+        ),
+        "utility_formula": "U(a)=benefit(a)-toxicity(a)-uncertainty(a)",
+        "utility_explanation": "Better treatment is undefined until a utility function is specified.",
+        "plain_language": "The platform can compare simulated strategies, but cannot prove what would have happened clinically.",
+        "next_action": research_recommended_next_step,
+    }
 
     context = {
         "patient": patient,
@@ -616,6 +712,7 @@ def patient_detail(request: HttpRequest, pk: int) -> HttpResponse:
         "research_last_calibration_status": research_last_calibration_status,
         "research_missing_required_data": research_missing_required_data,
         "research_counterfactual_count": research_counterfactual_count,
+        "research_completed_counterfactual_count": research_completed_counterfactual_count,
         "research_provenance_count": research_provenance_count,
         "research_simple_url": research_simple_url,
         "research_cockpit_url": research_cockpit_url,
@@ -623,8 +720,18 @@ def patient_detail(request: HttpRequest, pk: int) -> HttpResponse:
         "research_glossary_url": research_glossary_url,
         "research_twin_url": research_twin_url,
         "research_recommended_next_step": research_recommended_next_step,
+        "research_interpretation_status": research_interpretation_status,
     }
     return render(request, "clinic/patient_detail.html", context)
+
+
+def _format_date_range(values: list[date | None]) -> str:
+    available = sorted(value for value in values if value is not None)
+    if not available:
+        return "no dated records"
+    if available[0] == available[-1]:
+        return available[0].isoformat()
+    return f"{available[0].isoformat()} to {available[-1].isoformat()}"
 
 
 def _build_patient_detail_chart_points(patient: models.Patient, assessments) -> list[dict[str, object]]:

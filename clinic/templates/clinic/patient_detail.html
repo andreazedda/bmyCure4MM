@@ -20,6 +20,83 @@
                 {% endif %}
             </div>
             <div class="card-body">
+                <div class="card shadow-sm mb-3 border-dark-subtle research-interpretation-status-panel">
+                    <div class="card-header bg-light">
+                        <div class="fw-semibold">{{ research_interpretation_status.headline }}</div>
+                        <div class="small text-muted">Mechanistic simulation · Exploratory what-if · Not clinical recommendation</div>
+                    </div>
+                    <div class="card-body small">
+                        <div class="alert alert-warning mb-3" role="alert">
+                            <strong>Can this page tell whether the patient could have been treated better?</strong><br>
+                            {{ research_interpretation_status.can_answer }}
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <div class="border rounded p-3 h-100">
+                                    <div class="fw-semibold mb-2">What evidence would be required?</div>
+                                    <ul class="mb-0 ps-3">
+                                        {% for item in research_interpretation_status.evidence_required %}
+                                            <li>{{ item }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="border rounded p-3 h-100">
+                                    <div class="fw-semibold mb-2">What data are currently available?</div>
+                                    <ul class="mb-0 ps-3">
+                                        {% for item in research_interpretation_status.data_available %}
+                                            <li>{{ item }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-4">
+                                <div class="border rounded p-3 h-100">
+                                    <div class="fw-semibold mb-2">Are there completed simulations or counterfactuals?</div>
+                                    <div>{{ research_interpretation_status.run_status }}</div>
+                                    <div class="mt-2 text-primary-emphasis fw-semibold">{{ research_interpretation_status.current_conclusion }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="border rounded p-3 h-100">
+                                    <div class="fw-semibold mb-2">What can be concluded now?</div>
+                                    <div>{{ research_interpretation_status.can_conclude }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="border rounded p-3 h-100">
+                                    <div class="fw-semibold mb-2">What cannot be concluded?</div>
+                                    <div>{{ research_interpretation_status.cannot_conclude }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-light border mb-3" role="alert">
+                            <div class="fw-semibold mb-1">{{ research_interpretation_status.utility_explanation }}</div>
+                            <div><code>{{ research_interpretation_status.utility_formula }}</code></div>
+                            <div class="mt-2">{{ research_interpretation_status.plain_language }}</div>
+                        </div>
+                        <div class="alert alert-info mb-3" role="alert">
+                            <strong>What is the next action?</strong><br>
+                            {{ research_interpretation_status.next_action.label }}<br>
+                            <span class="small">{{ research_interpretation_status.next_action.detail }}</span>
+                        </div>
+                        <div class="d-flex flex-wrap gap-2">
+                            <a href="{{ research_simple_url }}" class="btn btn-primary">Open Simple Research View</a>
+                            <a href="{{ research_cockpit_url }}" class="btn btn-outline-info">View Scientific Cockpit</a>
+                            {% if latest_assessment_id and quickstart_scenario_pk %}
+                                <a class="btn btn-outline-primary" href="{% url 'simulator:scenario_detail' quickstart_scenario_pk %}?twin_assessment_id={{ latest_assessment_id }}#simulateScenarioPanel">Start simulation</a>
+                            {% else %}
+                                <a class="btn btn-outline-primary" href="{% url 'simulator:scenario_list' %}{% if latest_assessment_id %}?twin_assessment_id={{ latest_assessment_id }}{% endif %}">Start simulation</a>
+                            {% endif %}
+                            <a href="{% url 'clinic:prognosis_timeline' patient.id %}" class="btn btn-outline-success">View timeline/prognosis</a>
+                            <a href="{% url 'simulator:algorithm_transparency' %}" class="btn btn-outline-secondary">View algorithm</a>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="alert alert-success" role="alert">
                     <div class="fw-semibold mb-1">
                         <span class="t-en">🧪 Simulate this patient (beginner)</span>

@@ -221,6 +221,40 @@ class PatientCRUDViewTests(TestCase):
         self.assertContains(response, "observed inputs, not model predictions")
         self.assertContains(response, "Missing chart lines mean missing structured records")
 
+    def test_patient_detail_shows_research_interpretation_status_before_simulation_launcher(self) -> None:
+        patient = Patient.objects.create(
+            mrn="MM-DETAIL-INTERPRET",
+            first_name="Interpret",
+            last_name="Status",
+            birth_date=date(1972, 1, 1),
+            sex="F",
+            diagnosis_date=date(2021, 1, 1),
+        )
+        Assessment.objects.create(
+            patient=patient,
+            date=date(2025, 1, 5),
+            r_iss="II",
+            ldH_u_l=240,
+            beta2m_mg_l=3.4,
+            flc_ratio=2.2,
+        )
+
+        response = self.client.get(reverse("clinic:patient_detail", args=[patient.pk]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Research interpretation status")
+        self.assertContains(response, "No treatment-comparison conclusion available.")
+        self.assertContains(response, "Better treatment is undefined until a utility function is specified.")
+        self.assertContains(response, "U(a)=benefit(a)-toxicity(a)-uncertainty(a)")
+
+        content = response.content.decode("utf-8")
+        self.assertLess(content.index("Open Simple Research View"), content.index("Start simulation now"))
+
+        self.assertNotContains(response, "best treatment")
+        self.assertNotContains(response, "recommended therapy")
+        self.assertNotContains(response, "clinically superior")
+        self.assertNotContains(response, "should have been treated")
+
 
 class DemoEditPermissionsTests(TestCase):
     def setUp(self) -> None:
