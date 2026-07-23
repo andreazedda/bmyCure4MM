@@ -65,7 +65,7 @@ class TwinEngineRegressionTests(TestCase):
             with override_settings(MEDIA_ROOT=tmpdir, MEDIA_URL="/media/"):
                 response = self.client.post(reverse("simulator:scenario_simulate", args=[self.scenario.pk]), data=payload)
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Simulation Results", response.content.decode())
+        self.assertIn("Simulated outputs", response.content.decode())
 
     def test_existing_twin_preview_still_works(self) -> None:
         response = self.client.get(reverse("simulator:twin_preview"), {"id": self.assessment.pk})

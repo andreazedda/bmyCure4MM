@@ -1,8 +1,8 @@
 <div class="card shadow-sm" id="simulationResults">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h2 class="h6 mb-0">
-            <span class="t-en">Simulation Results</span>
-            <span class="t-it">Risultati della simulazione</span>
+            <span class="t-en">Simulated outputs</span>
+            <span class="t-it">Output simulati</span>
         </h2>
         <span class="badge bg-info text-dark">
             {% if attempt %}
@@ -48,25 +48,30 @@
             </div>
         {% endif %}
 
+        <div class="alert alert-secondary small" role="note">
+            <span class="t-en">These outputs are model-generated summaries under the current parameter set and assumptions.</span>
+            <span class="t-it">Questi output sono riepiloghi generati dal modello con il set di parametri e le ipotesi correnti.</span>
+        </div>
+
         {% if summary %}
             <div class="alert alert-light border mt-2" role="alert">
                 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
                     <div class="fw-semibold">
-                        <span class="t-en">What to look at (60 seconds)</span>
-                        <span class="t-it">Cosa guardare (60 secondi)</span>
+                        <span class="t-en">Exploratory trade-off</span>
+                        <span class="t-it">Trade-off esplorativo</span>
                     </div>
                     <div>
                         {% if summary.healthy_loss and summary.healthy_loss > 0.30 %}
                             <span class="badge bg-danger">
-                                <span class="t-en">Toxic</span><span class="t-it">Tossico</span>
+                                <span class="t-en">Constraint flag</span><span class="t-it">Vincolo segnalato</span>
                             </span>
-                        {% elif summary.tumor_reduction and summary.tumor_reduction >= 0.90 and summary.healthy_loss and summary.healthy_loss <= 0.25 %}
+                        {% elif summary.effective and summary.healthy_loss and summary.healthy_loss <= 0.25 %}
                             <span class="badge bg-success">
-                                <span class="t-en">Good balance</span><span class="t-it">Buon equilibrio</span>
+                                <span class="t-en">Balanced signal</span><span class="t-it">Segnale bilanciato</span>
                             </span>
                         {% else %}
                             <span class="badge bg-warning text-dark">
-                                <span class="t-en">Monitor</span><span class="t-it">Monitorare</span>
+                                <span class="t-en">Simulation-support note</span><span class="t-it">Nota di supporto simulativo</span>
                             </span>
                         {% endif %}
                     </div>
@@ -74,41 +79,33 @@
 
                 <div class="small mt-2">
                     {% if summary.healthy_loss and summary.healthy_loss > 0.30 %}
-                        <span class="t-en">This run shows very strong tumor control but high toxicity: <strong>Healthy loss</strong> is above 30%.</span>
-                        <span class="t-it">Questa run mostra ottimo controllo del tumore ma tossicità alta: la <strong>Perdita sani</strong> supera il 30%.</span>
+                        <span class="t-en">This run shows strong simulated tumor control alongside higher simulated healthy-cell impact under the current model.</span>
+                        <span class="t-it">Questa run mostra un forte controllo tumorale simulato insieme a un impatto simulato più alto sulle cellule sane nel modello corrente.</span>
                     {% elif summary.tumor_reduction and summary.tumor_reduction < 0.70 %}
-                        <span class="t-en">This run is likely under-powered: <strong>Tumor reduction</strong> is below 70% within the chosen horizon.</span>
-                        <span class="t-it">Questa run è probabilmente poco efficace: la <strong>Riduzione tumorale</strong> è sotto 70% nell’orizzonte scelto.</span>
+                        <span class="t-en">This run shows a weaker simulated efficacy signal within the chosen horizon.</span>
+                        <span class="t-it">Questa run mostra un segnale di efficacia simulata più debole nell'orizzonte scelto.</span>
                     {% else %}
-                        <span class="t-en">Use the three KPIs below to judge the trade-off between efficacy and safety.</span>
-                        <span class="t-it">Usa i tre KPI qui sotto per giudicare il compromesso tra efficacia e sicurezza.</span>
+                        <span class="t-en">Use the simulated efficacy signal and simulated healthy-cell impact below to inspect the current trade-off under model assumptions.</span>
+                        <span class="t-it">Usa il segnale di efficacia simulata e l'impatto simulato sulle cellule sane qui sotto per osservare il trade-off corrente nelle ipotesi del modello.</span>
                     {% endif %}
                 </div>
 
                 <ul class="small mb-0 mt-2">
                     <li>
-                        <span class="t-en"><strong>Start here:</strong> Tumor reduction (aim ≥ 0.90) vs Healthy loss (aim ≤ 0.25).</span>
-                        <span class="t-it"><strong>Parti da qui:</strong> Riduzione tumorale (target ≥ 0.90) vs Perdita sani (target ≤ 0.25).</span>
+                        <span class="t-en"><strong>Start here:</strong> Compare the simulated efficacy signal with the simulated healthy-cell impact.</span>
+                        <span class="t-it"><strong>Parti da qui:</strong> Confronta il segnale di efficacia simulata con l'impatto simulato sulle cellule sane.</span>
                     </li>
                     <li>
-                        <span class="t-en"><strong>Then check timepoints:</strong> compare ~1, ~2, ~3 months to see when toxicity starts dominating.</span>
-                        <span class="t-it"><strong>Poi guarda i timepoint:</strong> confronta ~1, ~2, ~3 mesi per capire quando la tossicità “prende il sopravvento”.</span>
+                        <span class="t-en"><strong>Then check timepoints:</strong> compare ~1, ~2, and ~3 months to see when the current trade-off changes.</span>
+                        <span class="t-it"><strong>Poi guarda i timepoint:</strong> confronta ~1, ~2 e ~3 mesi per vedere quando cambia il trade-off corrente.</span>
                     </li>
                     <li>
-                        <span class="t-en"><strong>If you want “average/range”:</strong> set Virtual cohort size to 50–200 (slower) to get mean + P05/P95 bands.</span>
-                        <span class="t-it"><strong>Se vuoi “media/intervallo”:</strong> imposta Virtual cohort size a 50–200 (più lento) per avere media + bande P05/P95.</span>
+                        <span class="t-en"><strong>If you need variability bands:</strong> use a larger virtual cohort for a slower but broader simulated summary.</span>
+                        <span class="t-it"><strong>Se ti servono bande di variabilità:</strong> usa una coorte virtuale più grande per un riepilogo simulato più ampio ma più lento.</span>
                     </li>
                     <li>
-                        {% if summary.healthy_loss and summary.healthy_loss > 0.30 %}
-                            <span class="t-en"><strong>Concrete next test:</strong> reduce one dose (or shorten horizon) and re-run; keep Tumor reduction ≥ 0.90 while pushing Healthy loss ≤ 0.25.</span>
-                            <span class="t-it"><strong>Prossimo test concreto:</strong> riduci una dose (o accorcia l’orizzonte) e riesegui; mantieni Riduzione ≥ 0.90 portando Perdita sani ≤ 0.25.</span>
-                        {% elif summary.tumor_reduction and summary.tumor_reduction < 0.70 %}
-                            <span class="t-en"><strong>Concrete next test:</strong> launch the Optimization Lab to search doses that improve Tumor reduction without breaking safety constraints.</span>
-                            <span class="t-it"><strong>Prossimo test concreto:</strong> usa l’Optimization Lab per cercare dosi che aumentano la Riduzione tumorale senza superare i vincoli di sicurezza.</span>
-                        {% else %}
-                            <span class="t-en"><strong>Concrete next test:</strong> increase cohort size to verify robustness, or try small dose tweaks (+/- 10–20%) one at a time.</span>
-                            <span class="t-it"><strong>Prossimo test concreto:</strong> aumenta la coorte per verificare robustezza, oppure prova piccoli aggiustamenti (+/- 10–20%) uno alla volta.</span>
-                        {% endif %}
+                        <span class="t-en"><strong>Comparison note:</strong> Change one parameter set at a time if you want to inspect an alternative simulated trade-off.</span>
+                        <span class="t-it"><strong>Nota di confronto:</strong> Modifica un set di parametri alla volta se vuoi osservare un trade-off simulato alternativo.</span>
                     </li>
                 </ul>
             </div>
@@ -139,8 +136,8 @@
                     <tbody>
                         <tr>
                             <th scope="row">
-                                <span class="t-en" data-bs-toggle="tooltip" title="{{ kpi.tumor_reduction.en }}" aria-label="{{ kpi.tumor_reduction.en }}">Tumor reduction</span>
-                                <span class="t-it" data-bs-toggle="tooltip" title="{{ kpi.tumor_reduction.it }}" aria-label="{{ kpi.tumor_reduction.it }}">Riduzione tumorale</span>
+                                <span class="t-en" data-bs-toggle="tooltip" title="{{ kpi.tumor_reduction.en }}" aria-label="{{ kpi.tumor_reduction.en }}">Simulated efficacy signal</span>
+                                <span class="t-it" data-bs-toggle="tooltip" title="{{ kpi.tumor_reduction.it }}" aria-label="{{ kpi.tumor_reduction.it }}">Segnale di efficacia simulata</span>
                                 <button type="button" class="btn btn-link btn-sm p-0 ms-2" data-help="kpi_tumor_reduction" aria-controls="helpDrawer">
                                     <span class="t-en">Explain</span><span class="t-it">Spiega</span>
                                 </button>
@@ -156,8 +153,8 @@
                         </tr>
                         <tr>
                             <th scope="row">
-                                <span class="t-en" data-bs-toggle="tooltip" title="{{ kpi.healthy_loss.en }}" aria-label="{{ kpi.healthy_loss.en }}">Healthy loss</span>
-                                <span class="t-it" data-bs-toggle="tooltip" title="{{ kpi.healthy_loss.it }}" aria-label="{{ kpi.healthy_loss.it }}">Perdita cellule sane</span>
+                                <span class="t-en" data-bs-toggle="tooltip" title="{{ kpi.healthy_loss.en }}" aria-label="{{ kpi.healthy_loss.en }}">Simulated healthy-cell impact</span>
+                                <span class="t-it" data-bs-toggle="tooltip" title="{{ kpi.healthy_loss.it }}" aria-label="{{ kpi.healthy_loss.it }}">Impatto simulato sulle cellule sane</span>
                                 <button type="button" class="btn btn-link btn-sm p-0 ms-2" data-help="kpi_healthy_loss" aria-controls="helpDrawer">
                                     <span class="t-en">Explain</span><span class="t-it">Spiega</span>
                                 </button>
@@ -173,8 +170,8 @@
                         </tr>
                         <tr>
                             <th scope="row">
-                                <span class="t-en" data-bs-toggle="tooltip" title="{{ kpi.time_to_recurrence.en }}" aria-label="{{ kpi.time_to_recurrence.en }}">Time to recurrence</span>
-                                <span class="t-it" data-bs-toggle="tooltip" title="{{ kpi.time_to_recurrence.it }}" aria-label="{{ kpi.time_to_recurrence.it }}">Tempo alla recidiva</span>
+                                <span class="t-en" data-bs-toggle="tooltip" title="{{ kpi.time_to_recurrence.en }}" aria-label="{{ kpi.time_to_recurrence.en }}">Exploratory recurrence timing</span>
+                                <span class="t-it" data-bs-toggle="tooltip" title="{{ kpi.time_to_recurrence.it }}" aria-label="{{ kpi.time_to_recurrence.it }}">Timing esplorativo della recidiva</span>
                                 <button type="button" class="btn btn-link btn-sm p-0 ms-2" data-help="kpi_time_to_recurrence" aria-controls="helpDrawer">
                                     <span class="t-en">Explain</span><span class="t-it">Spiega</span>
                                 </button>
@@ -205,8 +202,8 @@
                         {% if summary.durability_index is not None %}
                         <tr>
                             <th scope="row">
-                                <span class="t-en" data-bs-toggle="tooltip" title="{{ kpi.durability_index.en }}" aria-label="{{ kpi.durability_index.en }}">Durability</span>
-                                <span class="t-it" data-bs-toggle="tooltip" title="{{ kpi.durability_index.it }}" aria-label="{{ kpi.durability_index.it }}">Durabilità</span>
+                                <span class="t-en" data-bs-toggle="tooltip" title="{{ kpi.durability_index.en }}" aria-label="{{ kpi.durability_index.en }}">Exploratory durability</span>
+                                <span class="t-it" data-bs-toggle="tooltip" title="{{ kpi.durability_index.it }}" aria-label="{{ kpi.durability_index.it }}">Durabilità esplorativa</span>
                             </th>
                             <td>
                                 {{ summary.durability_index|floatformat:2 }}
@@ -236,16 +233,19 @@
                         </tr>
                         <tr>
                             <th scope="row">
-                                <span class="t-en">Effective?</span>
-                                <span class="t-it">Efficace?</span>
+                                <span class="t-en">Exploratory trade-off</span>
+                                <span class="t-it">Trade-off esplorativo</span>
                             </th>
                             <td>
-                                {% if summary.effective %}
-                                    <span class="badge bg-success t-en">Effective</span>
-                                    <span class="badge bg-success t-it">Efficace</span>
+                                {% if summary.healthy_loss and summary.healthy_loss > 0.30 %}
+                                    <span class="badge bg-danger t-en">Constraint flag</span>
+                                    <span class="badge bg-danger t-it">Vincolo segnalato</span>
+                                {% elif summary.effective and summary.healthy_loss and summary.healthy_loss <= 0.25 %}
+                                    <span class="badge bg-success t-en">Balanced signal</span>
+                                    <span class="badge bg-success t-it">Segnale bilanciato</span>
                                 {% else %}
-                                    <span class="badge bg-warning text-dark t-en">Monitor</span>
-                                    <span class="badge bg-warning text-dark t-it">Monitorare</span>
+                                    <span class="badge bg-warning text-dark t-en">Simulation-support note</span>
+                                    <span class="badge bg-warning text-dark t-it">Nota di supporto simulativo</span>
                                 {% endif %}
                             </td>
                         </tr>
@@ -420,64 +420,38 @@
             </div>
             <div class="novice-tip alert alert-info mt-3">
                 <div class="t-en">
-                    <strong>What next:</strong>
+                    <strong>Simulation-support note:</strong>
                     <ul class="mb-0">
-                        <li>If Healthy loss &gt; 0.25, lower doses or shorten the horizon.</li>
-                        <li>If Tumor reduction &lt; 0.70, launch the Optimization Lab.</li>
-                        <li>Enable Patient Twin for lab-driven biology.</li>
+                        <li>Compare repeated runs one parameter set at a time.</li>
+                        <li>Use larger cohorts when you need broader variability bands.</li>
+                        <li>Use Patient Twin only if you want clinic-linked assessment context in the model inputs.</li>
                     </ul>
                 </div>
                 <div class="t-it">
-                    <strong>Prossimi passi:</strong>
+                    <strong>Nota di supporto simulativo:</strong>
                     <ul class="mb-0">
-                        <li>Se Perdita sani &gt; 0.25, riduci le dosi o accorcia l’orizzonte.</li>
-                        <li>Se Riduzione tumorale &lt; 0.70, usa l’Optimization Lab.</li>
-                        <li>Attiva il Gemello Paziente per parametri basati sui lab.</li>
+                        <li>Confronta run ripetute modificando un set di parametri alla volta.</li>
+                        <li>Usa coorti più grandi quando servono bande di variabilità più ampie.</li>
+                        <li>Usa Patient Twin solo se vuoi contesto clinico collegato agli input del modello.</li>
                     </ul>
                 </div>
             </div>
         {% else %}
-            <!-- 🎨 Improved Empty State with Actionable Guidance -->
-            <div class="empty-state">
-                <div class="empty-state-icon">🧪</div>
-                <h3>
-                    <span class="t-en">Ready to Run Your First Simulation!</span>
-                    <span class="t-it">Pronto per la Prima Simulazione!</span>
-                </h3>
-                <p class="text-muted">
-                    <span class="t-en">Results will appear here once you execute the model. Here's your checklist:</span>
-                    <span class="t-it">I risultati appariranno dopo l'esecuzione. Ecco la checklist:</span>
-                </p>
-                <ul class="checklist">
-                    <li>
-                        <span class="t-en">✓ Pick a <strong>preset regimen</strong> (try VRd for beginners)</span>
-                        <span class="t-it">✓ Scegli un <strong>regime preimpostato</strong> (prova VRd per iniziare)</span>
-                    </li>
-                    <li>
-                        <span class="t-en">✓ Adjust <strong>doses</strong> if needed (watch the colored zones!)</span>
-                        <span class="t-it">✓ Aggiusta le <strong>dosi</strong> se necessario (osserva le zone colorate!)</span>
-                    </li>
-                    <li>
-                        <span class="t-en">✓ Enable <strong>Digital Twin</strong> for personalized predictions</span>
-                        <span class="t-it">✓ Abilita <strong>Digital Twin</strong> per previsioni personalizzate</span>
-                    </li>
-                    <li>
-                        <span class="t-en">✓ Open the <strong>Simulation Panel</strong> then click <strong>Run simulation</strong></span>
-                        <span class="t-it">✓ Apri il <strong>Pannello Simulazione</strong> poi clicca <strong>Esegui simulazione</strong></span>
-                    </li>
-                </ul>
-                <button type="button" class="btn btn-primary mt-3" onclick="if(typeof Tour !== 'undefined') Tour.open();">
-                    <span class="t-en">📘 Show Me How</span>
-                    <span class="t-it">📘 Mostrami Come</span>
-                </button>
+            <div class="alert alert-light border">
+                <strong class="t-en">No simulated outputs yet.</strong>
+                <strong class="t-it">Nessun output simulato disponibile.</strong>
+                <div class="small text-muted mt-2">
+                    <span class="t-en">Run the exploratory simulation form to populate this panel with model-generated summaries.</span>
+                    <span class="t-it">Esegui il form di simulazione esplorativa per popolare questo pannello con riepiloghi generati dal modello.</span>
+                </div>
             </div>
         {% endif %}
     </div>
     <div class="card-footer">
         <label for="clinical-note" class="form-label small fw-semibold">
-            <span class="t-en">Clinical note (not stored)</span>
-            <span class="t-it">Nota clinica (non salvata)</span>
+            <span class="t-en">Workspace note (not stored)</span>
+            <span class="t-it">Nota workspace (non salvata)</span>
         </label>
-        <textarea id="clinical-note" class="form-control" rows="3" placeholder="Summarise interpretation or follow-up actions."></textarea>
+        <textarea id="clinical-note" class="form-control" rows="3" placeholder="Summarise model interpretation or comparison ideas."></textarea>
     </div>
 </div>

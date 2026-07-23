@@ -5,6 +5,9 @@
             Reference ranges
         </button>
     </div>
+    <div class="alert alert-secondary mb-3" role="note">
+        Inputs define a scenario to simulate, not an instruction to apply.
+    </div>
     <form id="simulation-parameters-form"
           method="post"
           hx-post="{% url 'simulator:scenario_simulate' scenario.pk %}"
@@ -109,10 +112,10 @@
         </fieldset>
 
         <fieldset class="mb-4">
-            <legend class="h6 mb-3">2. <span class="t-en">Doses & Schedule</span><span class="t-it">Dosi & Schedula</span></legend>
+            <legend class="h6 mb-3">2. <span class="t-en">Model configuration: exposure &amp; schedule</span><span class="t-it">Configurazione del modello: esposizione &amp; schedula</span></legend>
             <div class="novice-tip alert alert-info mb-3">
-                <span class="t-en">Stay within preset ranges; schedules follow validated clinical patterns.</span>
-                <span class="t-it">Rimani nei range dei preset; le schedulazioni seguono pattern clinici validati.</span>
+                <span class="t-en">Use these exploratory inputs to configure exposure and schedule parameters for the model. Encoded ranges are guardrails for simulation, not instructions to apply.</span>
+                <span class="t-it">Usa questi input esplorativi per configurare esposizione e schedula del modello. I range codificati sono guardrail per la simulazione, non istruzioni da applicare.</span>
             </div>
             <div class="row g-3">
                 <div class="col-12 col-md-3">
@@ -137,16 +140,16 @@
                 </div>
             </div>
             <div class="alert alert-info novice-tip mt-3 mb-0">
-                <span class="t-en"><strong>Why it matters:</strong> Higher AUC tends to increase toxicity—balance exposure vs efficacy.</span>
-                <span class="t-it"><strong>Perché conta:</strong> AUC più alta aumenta la tossicità—bilancia esposizione ed efficacia.</span>
+                <span class="t-en"><strong>Model note:</strong> Higher simulated AUC can increase simulated healthy-cell impact under the current assumptions.</span>
+                <span class="t-it"><strong>Nota del modello:</strong> Un'AUC simulata più alta può aumentare l'impatto simulato sulle cellule sane nelle ipotesi correnti.</span>
             </div>
         </fieldset>
 
         <fieldset class="mb-4">
-            <legend class="h6 mb-3">3. <span class="t-en">Horizon & Uncertainty</span><span class="t-it">Orizzonte & Incertezza</span></legend>
+            <legend class="h6 mb-3">3. <span class="t-en">Horizon & simulated variability</span><span class="t-it">Orizzonte & variabilità simulata</span></legend>
             <div class="novice-tip alert alert-info mb-3">
-                <span class="t-en">Bigger cohorts show variability bands but take longer. Start small, then scale.</span>
-                <span class="t-it">Coorti più grandi mostrano la variabilità ma richiedono più tempo. Inizia piccolo, poi scala.</span>
+                <span class="t-en">Bigger cohorts expose broader simulated variability bands but take longer. Cohort size is a model configuration, not a real-world sample size.</span>
+                <span class="t-it">Coorti più grandi mostrano bande di variabilità simulata più ampie ma richiedono più tempo. La dimensione della coorte è una configurazione del modello, non una numerosità reale.</span>
             </div>
             <div class="row g-3">
                 <div class="col-12 col-md-6">
@@ -160,7 +163,7 @@
 
         <fieldset class="mb-4">
             <legend class="h6 mb-3">
-                4. <span class="t-en">Advanced &amp; Twin</span><span class="t-it">Avanzate &amp; Gemello</span>
+                4. <span class="t-en">Advanced parameters &amp; Twin context</span><span class="t-it">Parametri avanzati &amp; contesto Twin</span>
                 <a href="{% url 'simulator:interactive_tutorial' %}" class="btn btn-sm btn-outline-info ms-2" target="_blank">
                     <span class="t-en">🎓 How to use Twin?</span>
                     <span class="t-it">🎓 Come usare il Twin?</span>
@@ -168,14 +171,14 @@
             </legend>
             <div class="novice-tip alert alert-info mb-3">
                 <div class="mb-2">
-                    <span class="t-en">Tweak biology and interactions cautiously; pair with Patient Twin for lab-driven values.</span>
-                    <span class="t-it">Modifica biologia e interazioni con cautela; usa il Gemello Paziente per valori guidati dai lab.</span>
+                    <span class="t-en">These parameters configure model behavior. A clinic-linked Patient Twin can auto-derive values from an assessment snapshot.</span>
+                    <span class="t-it">Questi parametri configurano il comportamento del modello. Un Patient Twin collegato alla clinica può derivare automaticamente i valori da uno snapshot di assessment.</span>
                 </div>
                 <div class="small">
-                    <strong class="t-en">⚡ Quick Twin Setup:</strong>
-                    <strong class="t-it">⚡ Setup Rapido Twin:</strong>
-                    <span class="t-en">1️⃣ Create Patient (Clinic) → 2️⃣ Add Assessment with labs → 3️⃣ Enable Twin below → 4️⃣ Select Assessment → 5️⃣ Choose "Auto" mode → 6️⃣ Run!</span>
-                    <span class="t-it">1️⃣ Crea Paziente (Clinica) → 2️⃣ Aggiungi Assessment con lab → 3️⃣ Abilita Twin qui sotto → 4️⃣ Seleziona Assessment → 5️⃣ Scegli modo "Auto" → 6️⃣ Lancia!</span>
+                    <strong class="t-en">Twin workflow:</strong>
+                    <strong class="t-it">Workflow Twin:</strong>
+                    <span class="t-en">Clinic patient → assessment snapshot with labs → enable Twin below → select assessment → choose Auto or Manual mapping → run the simulator.</span>
+                    <span class="t-it">Paziente in clinica → snapshot di assessment con lab → abilita Twin qui sotto → seleziona assessment → scegli mappatura Auto o Manual → esegui il simulatore.</span>
                 </div>
             </div>
             <div class="row g-3">
@@ -419,7 +422,7 @@
                                 <tr>
                                     <td>Lenalidomide dose</td>
                                     <td>25 mg daily (21/28 days)</td>
-                                    <td>IMiD prescribing info</td>
+                                    <td>IMiD product-reference source</td>
                                 </tr>
                                 <tr>
                                     <td>Bortezomib dose</td>
@@ -550,12 +553,12 @@
             it: 'Entro il guardrail del preset.',
         },
         warn: {
-            en: 'Near the limit — monitor closely. {help}',
-            it: 'Vicino al limite — monitora attentamente. {help}',
+            en: 'Near the limit — review parameter range. {help}',
+            it: 'Vicino al limite — rivedi il range del parametro. {help}',
         },
         danger: {
-            en: 'Outside guardrail — adjust dose. {help}',
-            it: 'Fuori guardrail — rivedi la dose. {help}',
+            en: 'Outside guardrail — revise simulation parameter. {help}',
+            it: 'Fuori guardrail — rivedi il parametro di simulazione. {help}',
         },
         unknown: {
             en: '',
@@ -568,12 +571,12 @@
             it: 'Accoppiamento entro la banda sicura.',
         },
         warn: {
-            en: 'Borderline synergy — watch toxicity. {help}',
-            it: 'Sinergia borderline — osserva la tossicità. {help}',
+            en: 'Borderline interaction zone — inspect simulated healthy-cell impact. {help}',
+            it: 'Zona di interazione borderline — osserva l\'impatto simulato sulle cellule sane. {help}',
         },
         danger: {
-            en: 'High synergy/toxicity — reduce doses. {help}',
-            it: 'Sinergia/tossicità alta — riduci le dosi. {help}',
+            en: 'High interaction zone — revisit model configuration. {help}',
+            it: 'Zona di interazione alta — rivedi la configurazione del modello. {help}',
         },
         unknown: {
             en: '',
@@ -627,8 +630,8 @@
      * Apply visual color zones to dose inputs based on value relative to preset range
      * @param {HTMLElement} input - The input element
      * @param {number} value - Current input value
-     * @param {number} min - Minimum safe dose from preset
-     * @param {number} max - Maximum safe dose from preset
+     * @param {number} min - Minimum preset dose bound
+     * @param {number} max - Maximum preset dose bound
      * @param {object} profile - Drug profile with optimal_dose
      */
     const applyDoseZoneColor = (input, value, min, max, profile) => {

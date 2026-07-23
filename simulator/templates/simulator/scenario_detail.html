@@ -8,664 +8,272 @@
     </ol>
 </nav>
 
+<div class="card shadow-sm border-primary mb-3">
+    <div class="card-body">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-start gap-3">
+            <div>
+                <div class="text-uppercase small text-muted mb-1">{{ workspace_status.title }}</div>
+                <h1 class="h4 mb-2">{{ scenario.title }}</h1>
+                <div class="text-muted mb-2">{{ scenario.get_clinical_stage_display }}</div>
+                <p class="mb-0">{{ workspace_status.statement }}</p>
+            </div>
+            <div class="small text-muted">
+                <div><strong>Latest run:</strong> {% if latest_simulation %}{{ latest_simulation.submitted|date:"Y-m-d H:i" }}{% else %}Awaiting first run{% endif %}</div>
+                <div><strong>Simulation runs:</strong> {{ simulation_runs_count }}</div>
+                <div><strong>Decision logs:</strong> {{ decision_logs_count }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="card shadow-sm mb-3">
     <div class="card-body">
-        <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
-            <div>
-                <div class="fw-semibold">
-                    <span class="t-en">You are viewing</span>
-                    <span class="t-it">Stai visualizzando</span>
-                </div>
-                <div class="text-muted small">
-                    <span class="t-en">A training <strong>Scenario</strong> (virtual) plus an optional <strong>Patient Twin</strong> snapshot from Clinic.</span>
-                    <span class="t-it">Uno <strong>Scenario</strong> di training (virtuale) più un eventuale <strong>Patient Twin</strong> (snapshot) dalla Clinica.</span>
-                </div>
-            </div>
-            <div class="d-flex flex-wrap gap-2">
-                <a class="btn btn-sm btn-primary" href="#simulateScenarioPanel">
-                    <span class="t-en">Open Simulation Panel</span>
-                    <span class="t-it">Apri Pannello Simulazione</span>
-                </a>
-                <a class="btn btn-sm btn-outline-primary" href="#simulation-results">
-                    <span class="t-en">See Results</span>
-                    <span class="t-it">Vedi Risultati</span>
-                </a>
-                <a class="btn btn-sm btn-outline-secondary" href="{% url 'clinic:patient_list' %}">
-                    <span class="t-en">Open Clinic</span>
-                    <span class="t-it">Apri Clinica</span>
-                </a>
-            </div>
-        </div>
-
-        <hr class="my-3">
-
-        <div class="row g-2">
-            <div class="col-md-6">
-                <div class="border rounded p-2 h-100">
-                    <div class="small text-muted">
-                        <span class="t-en">Scenario (virtual patient)</span>
-                        <span class="t-it">Scenario (paziente virtuale)</span>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-5 g-2">
+            {% for item in page_purpose_rows %}
+                <div class="col">
+                    <div class="border rounded p-3 h-100">
+                        <div class="small text-uppercase text-muted">{{ item.label }}</div>
+                        <div class="small fw-semibold">{{ item.value }}</div>
                     </div>
-                    <div class="fw-semibold">{{ scenario.title }}</div>
-                    <div class="small text-muted">{{ scenario.get_clinical_stage_display }}</div>
                 </div>
-            </div>
-            <div class="col-md-6">
-                <div class="border rounded p-2 h-100">
-                    <div class="small text-muted">
-                        <span class="t-en">Patient Twin (from Clinic)</span>
-                        <span class="t-it">Patient Twin (dalla Clinica)</span>
-                    </div>
-                    {% if twin_error %}
-                        <div class="text-danger small">{{ twin_error }}</div>
-                        <div class="small text-muted">
-                            <span class="t-en">Pick a patient in Clinic → open Simulator again.</span>
-                            <span class="t-it">Seleziona un paziente in Clinica → riapri il Simulator.</span>
-                        </div>
-                    {% elif twin_label %}
-                        <div class="fw-semibold">{{ twin_label }}</div>
-                        <div class="small">
-                            {% if twin_patient_pk %}
-                                <a href="{% url 'clinic:patient_detail' twin_patient_pk %}" class="text-decoration-none">
-                                    <span class="t-en">View patient in Clinic</span>
-                                    <span class="t-it">Vedi paziente in Clinica</span>
-                                </a>
-                            {% endif %}
-                            <span class="text-muted">·</span>
-                            <a href="{% url 'simulator:scenario_list' %}?twin_assessment_id={{ twin_assessment_id|urlencode }}" class="text-decoration-none">
-                                <span class="t-en">Change scenario</span>
-                                <span class="t-it">Cambia scenario</span>
-                            </a>
-                        </div>
-                        <div class="small text-muted">
-                            <span class="t-en">This uses the selected patient’s labs/assessment as biology inputs (the scenario is still virtual).</span>
-                            <span class="t-it">Questo usa i laboratori/assessment del paziente selezionato come input biologici (lo scenario resta virtuale).</span>
-                        </div>
-                    {% else %}
-                        <div class="fw-semibold">
-                            <span class="t-en">None selected</span>
-                            <span class="t-it">Nessuno selezionato</span>
-                        </div>
-                        <div class="small text-muted">
-                            <span class="t-en">To simulate Mario Rossi: open him in Clinic → click Open Simulator.</span>
-                            <span class="t-it">Per simulare Mario Rossi: aprilo in Clinica → clicca Apri Simulator.</span>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
+            {% endfor %}
         </div>
     </div>
 </div>
 
-<!-- START: Complete Explanation Section -->
-<div class="alert alert-info mb-4">
-    <div class="d-flex align-items-start gap-3">
-        <div style="font-size: 2rem;">💡</div>
-        <div class="flex-grow-1">
-            <h4 class="alert-heading">
-                <span class="t-en">How to Simulate a Therapy - Complete Guide</span>
-                <span class="t-it">Come Simulare una Terapia - Guida Completa</span>
-            </h4>
-            <hr>
-            <div class="t-en">
-                <p class="mb-2"><strong>What is this page?</strong></p>
-                <p>This is a <strong>virtual patient</strong> called "<em>{{ scenario.title }}</em>". You'll test drug combinations on this patient to see what happens - but it's completely safe because it's simulated!</p>
-                
-                <p class="mb-2 mt-3"><strong>How do I simulate a therapy? (4 Simple Steps)</strong></p>
-                <ol class="mb-0">
-                    <li><strong>Check the patient's lab values</strong> below (in "Key Laboratory Snapshot") - if values are out of safe range, the system blocks the simulation for safety</li>
-                    <li><strong>Click "Open Simulation Panel"</strong> (blue button at top right)</li>
-                    <li><strong>Choose your drugs and doses</strong> in the form that appears - see drug details below!</li>
-                    <li><strong>Click "Run simulation"</strong> at the bottom of the form - results appear in 5-30 seconds</li>
-                </ol>
-
-                <div class="alert alert-success mt-3 mb-0">
-                    <strong>🎯 Quick Tip:</strong> First time? Use the preset "Standard" doses - they're safe starting values!
-                </div>
-            </div>
-            <div class="t-it">
-                <p class="mb-2"><strong>Cos'è questa pagina?</strong></p>
-                <p>Questo è un <strong>paziente virtuale</strong> chiamato "<em>{{ scenario.title }}</em>". Testerai combinazioni di farmaci su questo paziente per vedere cosa succede - ma è completamente sicuro perché è simulato!</p>
-                
-                <p class="mb-2 mt-3"><strong>Come simulo una terapia? (4 Passi Semplici)</strong></p>
-                <ol class="mb-0">
-                    <li><strong>Controlla i valori di laboratorio</strong> del paziente qui sotto (in "Key Laboratory Snapshot") - se i valori sono fuori dal range sicuro, il sistema blocca la simulazione per sicurezza</li>
-                    <li><strong>Clicca "Apri Pannello Simulazione"</strong> (bottone blu in alto a destra)</li>
-                    <li><strong>Scegli farmaci e dosi</strong> nel form che appare - vedi dettagli farmaci sotto!</li>
-                    <li><strong>Clicca "Esegui simulazione"</strong> in fondo al form - risultati appaiono in 5-30 secondi</li>
-                </ol>
-
-                <div class="alert alert-success mt-3 mb-0">
-                    <strong>🎯 Consiglio Rapido:</strong> Prima volta? Usa il preset "Standard" - sono dosi sicure di partenza!
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Drug Information Cards -->
-<div class="card shadow-sm mb-4">
-    <div class="card-header bg-primary text-white">
-        <h3 class="h5 mb-0">
-            <span class="t-en">💊 Available Drugs - What They Do & How to Dose</span>
-            <span class="t-it">💊 Farmaci Disponibili - Cosa Fanno e Come Dosarli</span>
-        </h3>
-    </div>
-    <div class="card-body">
-        <div class="row g-3">
-            <!-- Lenalidomide -->
-            <div class="col-md-4">
-                <div class="card h-100 border-primary">
-                    <div class="card-header bg-primary bg-opacity-10">
-                        <h4 class="h6 mb-0">
-                            <span class="t-en">Lenalidomide (Revlimid)</span>
-                            <span class="t-it">Lenalidomide (Revlimid)</span>
-                        </h4>
-                    </div>
-                    <div class="card-body">
-                        <p class="mb-2"><strong class="t-en">Trade Name:</strong><strong class="t-it">Nome Commerciale:</strong> <span class="badge bg-info">Revlimid</span></p>
-                        
-                        <p class="mb-2"><strong class="t-en">What it does:</strong><strong class="t-it">Cosa fa:</strong></p>
-                        <ul class="small mb-2">
-                            <li class="t-en">Wakes up your immune system to attack myeloma cells</li>
-                            <li class="t-en">Stops new blood vessels from feeding the tumor</li>
-                            <li class="t-it">Sveglia il sistema immunitario per attaccare le cellule del mieloma</li>
-                            <li class="t-it">Blocca nuovi vasi sanguigni che nutrono il tumore</li>
-                        </ul>
-
-                        <p class="mb-2"><strong class="t-en">How to use:</strong><strong class="t-it">Come si usa:</strong></p>
-                        <ul class="small mb-2">
-                            <li class="t-en">💊 Oral pill (capsule)</li>
-                            <li class="t-en">📅 Daily for 21 days, then 7 days off (28-day cycle)</li>
-                            <li class="t-it">💊 Pastiglia orale (capsula)</li>
-                            <li class="t-it">📅 Ogni giorno per 21 giorni, poi 7 giorni di pausa (ciclo 28 giorni)</li>
-                        </ul>
-
-                        <p class="mb-2"><strong class="t-en">Typical Doses:</strong><strong class="t-it">Dosi Tipiche:</strong></p>
-                        <table class="table table-sm table-bordered mb-2">
-                            <tr>
-                                <td class="t-en">Normal kidneys</td>
-                                <td class="t-it">Reni normali</td>
-                                <td><strong>25 mg/day</strong></td>
-                            </tr>
-                            <tr>
-                                <td class="t-en">Mild kidney problems</td>
-                                <td class="t-it">Problemi renali lievi</td>
-                                <td><strong>15 mg/day</strong></td>
-                            </tr>
-                            <tr>
-                                <td class="t-en">Severe kidney problems</td>
-                                <td class="t-it">Problemi renali gravi</td>
-                                <td><strong>10 mg/day</strong></td>
-                            </tr>
-                        </table>
-
-                        <div class="alert alert-warning alert-sm mb-0">
-                            <small><strong class="t-en">⚠️ Important:</strong><strong class="t-it">⚠️ Importante:</strong> <span class="t-en">Reduce dose if kidneys don't work well (check Creatinine Clearance)</span><span class="t-it">Riduci la dose se i reni non funzionano bene (controlla Creatinina Clearance)</span></small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Bortezomib -->
-            <div class="col-md-4">
-                <div class="card h-100 border-success">
-                    <div class="card-header bg-success bg-opacity-10">
-                        <h4 class="h6 mb-0">
-                            <span class="t-en">Bortezomib (Velcade)</span>
-                            <span class="t-it">Bortezomib (Velcade)</span>
-                        </h4>
-                    </div>
-                    <div class="card-body">
-                        <p class="mb-2"><strong class="t-en">Trade Name:</strong><strong class="t-it">Nome Commerciale:</strong> <span class="badge bg-success">Velcade</span></p>
-                        
-                        <p class="mb-2"><strong class="t-en">What it does:</strong><strong class="t-it">Cosa fa:</strong></p>
-                        <ul class="small mb-2">
-                            <li class="t-en">Blocks the "waste disposal" system of myeloma cells</li>
-                            <li class="t-en">Cells fill with toxic waste and die</li>
-                            <li class="t-it">Blocca il sistema di "smaltimento rifiuti" delle cellule del mieloma</li>
-                            <li class="t-it">Le cellule si riempiono di rifiuti tossici e muoiono</li>
-                        </ul>
-
-                        <p class="mb-2"><strong class="t-en">How to use:</strong><strong class="t-it">Come si usa:</strong></p>
-                        <ul class="small mb-2">
-                            <li class="t-en">💉 Injection (under skin or IV)</li>
-                            <li class="t-en">📅 Twice per week (Day 1, 4, 8, 11 of 21-day cycle)</li>
-                            <li class="t-it">💉 Iniezione (sottocute o endovena)</li>
-                            <li class="t-it">📅 Due volte a settimana (Giorno 1, 4, 8, 11 di ciclo 21 giorni)</li>
-                        </ul>
-
-                        <p class="mb-2"><strong class="t-en">Typical Doses:</strong><strong class="t-it">Dosi Tipiche:</strong></p>
-                        <table class="table table-sm table-bordered mb-2">
-                            <tr>
-                                <td class="t-en">Standard dose</td>
-                                <td class="t-it">Dose standard</td>
-                                <td><strong>1.3 mg/m²</strong></td>
-                            </tr>
-                            <tr>
-                                <td class="t-en">If neuropathy (tingling)</td>
-                                <td class="t-it">Se neuropatia (formicolio)</td>
-                                <td><strong>1.0 mg/m²</strong></td>
-                            </tr>
-                            <tr>
-                                <td class="t-en">Elderly/frail patient</td>
-                                <td class="t-it">Paziente anziano/fragile</td>
-                                <td><strong>1.0 mg/m²</strong></td>
-                            </tr>
-                        </table>
-
-                        <div class="alert alert-warning alert-sm mb-0">
-                            <small><strong class="t-en">⚠️ Watch for:</strong><strong class="t-it">⚠️ Attenzione a:</strong> <span class="t-en">Tingling/numbness in hands/feet (neuropathy) - reduce dose if it happens</span><span class="t-it">Formicolio/intorpidimento mani/piedi (neuropatia) - riduci dose se capita</span></small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Daratumumab -->
-            <div class="col-md-4">
-                <div class="card h-100 border-danger">
-                    <div class="card-header bg-danger bg-opacity-10">
-                        <h4 class="h6 mb-0">
-                            <span class="t-en">Daratumumab (Darzalex)</span>
-                            <span class="t-it">Daratumumab (Darzalex)</span>
-                        </h4>
-                    </div>
-                    <div class="card-body">
-                        <p class="mb-2"><strong class="t-en">Trade Name:</strong><strong class="t-it">Nome Commerciale:</strong> <span class="badge bg-danger">Darzalex</span></p>
-                        
-                        <p class="mb-2"><strong class="t-en">What it does:</strong><strong class="t-it">Cosa fa:</strong></p>
-                        <ul class="small mb-2">
-                            <li class="t-en">Antibody that sticks to myeloma cells</li>
-                            <li class="t-en">Marks them so immune system destroys them</li>
-                            <li class="t-it">Anticorpo che si attacca alle cellule del mieloma</li>
-                            <li class="t-it">Le marca così il sistema immunitario le distrugge</li>
-                        </ul>
-
-                        <p class="mb-2"><strong class="t-en">How to use:</strong><strong class="t-it">Come si usa:</strong></p>
-                        <ul class="small mb-2">
-                            <li class="t-en">💉 IV infusion (slow drip, 3-7 hours first time)</li>
-                            <li class="t-en">📅 Weekly for 8 weeks, then every 2 weeks, then monthly</li>
-                            <li class="t-it">💉 Infusione endovenosa (goccia lenta, 3-7 ore prima volta)</li>
-                            <li class="t-it">📅 Settimanale per 8 settimane, poi ogni 2 settimane, poi mensile</li>
-                        </ul>
-
-                        <p class="mb-2"><strong class="t-en">Typical Doses:</strong><strong class="t-it">Dosi Tipiche:</strong></p>
-                        <table class="table table-sm table-bordered mb-2">
-                            <tr>
-                                <td class="t-en">Standard dose</td>
-                                <td class="t-it">Dose standard</td>
-                                <td><strong>16 mg/kg</strong></td>
-                            </tr>
-                            <tr>
-                                <td class="t-en">Example: 70 kg patient</td>
-                                <td class="t-it">Esempio: paziente 70 kg</td>
-                                <td><strong>1120 mg total</strong></td>
-                            </tr>
-                        </table>
-
-                        <div class="alert alert-info alert-sm mb-0">
-                            <small><strong class="t-en">ℹ️ Note:</strong><strong class="t-it">ℹ️ Nota:</strong> <span class="t-en">Dose doesn't change based on kidney/liver function - it's based on body weight only</span><span class="t-it">La dose non cambia in base a funzione reni/fegato - si basa solo sul peso corporeo</span></small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="alert alert-primary mt-3 mb-0">
-            <h5 class="alert-heading">
-                <span class="t-en">🤝 How to Combine These Drugs (Drug Combos)</span>
-                <span class="t-it">🤝 Come Combinare Questi Farmaci (Combinazioni)</span>
-            </h5>
-            <p class="t-en mb-2">When you click "Open Simulation Panel", you'll see a form with 3 sections for the 3 drugs. You can:</p>
-            <p class="t-it mb-2">Quando clicchi "Apri Pannello Simulazione", vedrai un form con 3 sezioni per i 3 farmaci. Puoi:</p>
-            <ul class="mb-2">
-                <li class="t-en"><strong>Use all 3 together</strong> (Triplet therapy - Len + Bort + Dara) = Most powerful!</li>
-                <li class="t-en"><strong>Use 2 drugs</strong> (Doublet therapy - Len + Dara OR Len + Bort) = Good balance</li>
-                <li class="t-en"><strong>Use 1 drug</strong> (Monotherapy - Just Lenalidomide) = For maintenance or frail patients</li>
-                <li class="t-it"><strong>Usa tutti e 3 insieme</strong> (Tripletta - Len + Bort + Dara) = Più potente!</li>
-                <li class="t-it"><strong>Usa 2 farmaci</strong> (Doppietta - Len + Dara O Len + Bort) = Buon equilibrio</li>
-                <li class="t-it"><strong>Usa 1 farmaco</strong> (Monoterapia - Solo Lenalidomide) = Per mantenimento o pazienti fragili</li>
-            </ul>
-            <p class="mb-0">
-                <strong class="t-en">💡 Tip:</strong><strong class="t-it">💡 Consiglio:</strong> 
-                <span class="t-en">Set a drug dose to <code>0</code> if you don't want to use it. For example: Lenalidomide = 25, Bortezomib = 1.3, Daratumumab = 0 means you're using only Len + Bort.</span>
-                <span class="t-it">Imposta la dose di un farmaco a <code>0</code> se non vuoi usarlo. Per esempio: Lenalidomide = 25, Bortezomib = 1.3, Daratumumab = 0 significa che usi solo Len + Bort.</span>
-            </p>
-        </div>
-    </div>
-</div>
-
-<!-- Virtual Patient Cohort Explanation -->
-<div class="card shadow-sm mb-4 border-warning">
-    <div class="card-header bg-warning bg-opacity-10">
-        <h3 class="h5 mb-0">
-            <span class="t-en">👥 What are "Virtual Patients"? (Cohort Explained)</span>
-            <span class="t-it">👥 Cosa sono i "Pazienti Virtuali"? (Coorte Spiegata)</span>
-        </h3>
-    </div>
-    <div class="card-body">
-        <div class="t-en">
-            <p class="mb-2"><strong>What you see on this page:</strong> 1 patient profile ("<em>{{ scenario.title }}</em>") with specific lab values</p>
-            
-            <p class="mb-2"><strong>What the simulator actually tests:</strong> Not just 1 patient, but a whole GROUP (called "cohort") of similar patients!</p>
-            
-            <p class="mb-3"><strong>Why?</strong> Because in real life, even 2 patients with identical lab values respond differently. So we simulate 30-100 virtual patients with slight variations to get realistic average results.</p>
-            
-            <div class="card bg-light mb-3">
-                <div class="card-body">
-                    <h6>📊 Mathematical Characteristics of Each Virtual Patient:</h6>
-                    <p class="mb-2">Each virtual patient in the cohort has these parameters (slightly randomized):</p>
-                    <ul class="small mb-0">
-                        <li><strong>Initial Tumor Cells:</strong> Based on disease stage (Low Risk: ~1M cells, High Risk: ~5M cells)</li>
-                        <li><strong>Initial Healthy Cells:</strong> Based on lab values (ANC, Platelets)</li>
-                        <li><strong>Tumor Growth Rate:</strong> How fast myeloma cells multiply (0.05-0.15/day)</li>
-                        <li><strong>Healthy Cell Growth Rate:</strong> How fast healthy cells recover (0.1-0.2/day)</li>
-                        <li><strong>Drug Sensitivity:</strong> How well each drug works on this patient (EC50 values)</li>
-                        <li><strong>Drug Clearance:</strong> How fast kidneys/liver eliminate drugs (based on Creatinine Clearance)</li>
-                        <li><strong>Interaction Strength:</strong> How much tumor cells compete with healthy cells</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="alert alert-success mb-0">
-                <strong>🎯 When you run a simulation:</strong>
-                <ol class="mb-0">
-                    <li>System creates 30-100 virtual patients (you choose "Cohort Size" in the form)</li>
-                    <li>Each has slightly different parameters (randomized within realistic ranges)</li>
-                    <li>System simulates treatment on ALL of them</li>
-                    <li>Results show the AVERAGE outcome + variation range</li>
-                </ol>
-                <p class="mb-0 mt-2"><strong>Example:</strong> If you test on 100 virtual patients and get "Tumor Reduction: 75%", it means on average across all 100 patients, the tumor shrank by 75%. Some patients had 80% reduction, some had 70%, but average is 75%.</p>
-            </div>
-        </div>
-        <div class="t-it">
-            <p class="mb-2"><strong>Cosa vedi in questa pagina:</strong> 1 profilo paziente ("<em>{{ scenario.title }}</em>") con valori di laboratorio specifici</p>
-            
-            <p class="mb-2"><strong>Cosa testa realmente il simulatore:</strong> Non solo 1 paziente, ma un intero GRUPPO (chiamato "coorte") di pazienti simili!</p>
-            
-            <p class="mb-3"><strong>Perché?</strong> Perché nella vita reale, anche 2 pazienti con valori di laboratorio identici rispondono diversamente. Quindi simuliamo 30-100 pazienti virtuali con leggere variazioni per ottenere risultati medi realistici.</p>
-            
-            <div class="card bg-light mb-3">
-                <div class="card-body">
-                    <h6>📊 Caratteristiche Matematiche di Ogni Paziente Virtuale:</h6>
-                    <p class="mb-2">Ogni paziente virtuale nella coorte ha questi parametri (leggermente randomizzati):</p>
-                    <ul class="small mb-0">
-                        <li><strong>Cellule Tumorali Iniziali:</strong> Basato su stadio malattia (Basso Rischio: ~1M cellule, Alto Rischio: ~5M cellule)</li>
-                        <li><strong>Cellule Sane Iniziali:</strong> Basato su valori di laboratorio (ANC, Piastrine)</li>
-                        <li><strong>Velocità Crescita Tumore:</strong> Quanto velocemente si moltiplicano le cellule mieloma (0.05-0.15/giorno)</li>
-                        <li><strong>Velocità Crescita Cellule Sane:</strong> Quanto velocemente si riprendono le cellule sane (0.1-0.2/giorno)</li>
-                        <li><strong>Sensibilità ai Farmaci:</strong> Quanto bene funziona ogni farmaco su questo paziente (valori EC50)</li>
-                        <li><strong>Eliminazione Farmaci:</strong> Quanto velocemente reni/fegato eliminano i farmaci (basato su Creatinina Clearance)</li>
-                        <li><strong>Forza Interazione:</strong> Quanto le cellule tumorali competono con quelle sane</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="alert alert-success mb-0">
-                <strong>🎯 Quando esegui una simulazione:</strong>
-                <ol class="mb-0">
-                    <li>Il sistema crea 30-100 pazienti virtuali (tu scegli "Cohort Size" nel form)</li>
-                    <li>Ognuno ha parametri leggermente diversi (randomizzati entro range realistici)</li>
-                    <li>Il sistema simula il trattamento su TUTTI loro</li>
-                    <li>I risultati mostrano l'esito MEDIO + range di variazione</li>
-                </ol>
-                <p class="mb-0 mt-2"><strong>Esempio:</strong> Se testi su 100 pazienti virtuali e ottieni "Riduzione Tumore: 75%", significa che in media su tutti i 100 pazienti, il tumore si è ridotto del 75%. Alcuni pazienti avevano riduzione 80%, altri 70%, ma la media è 75%.</p>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- END: Complete Explanation Section -->
-
-<div class="row g-3 mb-3">
-    <div class="col-lg-8">
-        <div class="card shadow-sm">
+        <!-- START: Complete Explanation Section -->
+        <details class="card shadow-sm mb-4">
+            <summary class="card-header fw-semibold" style="cursor: pointer;">Training notes and model background</summary>
             <div class="card-body">
-                <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-start gap-2">
-                    <div>
-                        <h1 class="h4 mb-1">{{ scenario.title }}</h1>
-                        <p class="text-muted mb-2">{{ scenario.get_clinical_stage_display }}</p>
-                    </div>
-                    {% if request.user.is_authenticated %}
-                        <div class="d-flex flex-wrap gap-2">
-                            <button type="button" class="btn btn-primary btn-sm"
-                                    data-bs-toggle="collapse"
-                                    data-bs-target="#simulateScenarioPanel"
-                                    aria-controls="simulateScenarioPanel"
-                                    aria-expanded="{% if game_mode or prefill_twin %}true{% else %}false{% endif %}">
-                                <span class="t-en">Open Simulation Panel</span>
-                                <span class="t-it">Apri Pannello Simulazione</span>
-                            </button>
-                            {% if is_editor %}
-                            <a href="{% url 'simulator:scenario_edit' scenario.pk %}" class="btn btn-outline-secondary btn-sm">Edit</a>
-                            <form method="post" action="{% url 'simulator:scenario_duplicate' scenario.pk %}" class="d-inline">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-outline-dark btn-sm">Duplicate</button>
-                            </form>
-                            <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="offcanvas" data-bs-target="#manageRegimensOffcanvas" aria-controls="manageRegimensOffcanvas" aria-expanded="false">
-                                Manage Regimens
-                            </button>
-                            {% endif %}
-                        </div>
-                    {% endif %}
-                </div>
-                {% if scenario.risk_stratification %}
-                    <span class="badge bg-warning text-dark mb-3">{{ scenario.risk_stratification }}</span>
-                {% endif %}
+                <p class="mb-2">This scenario is a virtual training case. A clinic-linked Patient Twin, when active, contributes an assessment snapshot only.</p>
+                <p class="mb-2">Virtual cohort size controls how much simulated variability appears in the outputs. Results remain model-generated summaries under the current assumptions.</p>
+                <p class="mb-0">Use the form help, reference ranges, tutorial, and field reference tabs below when you need deeper documentation.</p>
+            </div>
+        </details>
+        <!-- END: Complete Explanation Section -->
 
-                <div class="alert alert-info small">
-                    <div class="t-en">
-                        <strong>What is this section?</strong> This is the scenario overview (virtual patient). If a <strong>Patient Twin</strong> is selected, its Assessment provides lab-driven biology inputs.
-                    </div>
-                    <div class="t-it">
-                        <strong>Cos'è questa sezione?</strong> Questo è l’overview dello scenario (paziente virtuale). Se selezioni un <strong>Patient Twin</strong>, il suo Assessment fornisce input biologici guidati dai laboratori.
-                    </div>
-                    <div class="mt-2">
-                        {% if twin_label %}
+        <div class="row g-3 mb-3">
+            <div class="col-lg-8">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-start gap-2">
                             <div>
-                                <span class="t-en"><strong>Patient Twin selected:</strong> {{ twin_label }}</span>
-                                <span class="t-it"><strong>Patient Twin selezionato:</strong> {{ twin_label }}</span>
-                                {% if twin_patient_pk %}
-                                    <span class="text-muted">·</span>
-                                    <a href="{% url 'clinic:patient_detail' twin_patient_pk %}" class="text-decoration-none">
-                                        <span class="t-en">Open in Clinic</span>
-                                        <span class="t-it">Apri in Clinica</span>
-                                    </a>
+                                <h2 class="h5 mb-1">Scenario overview</h2>
+                                <p class="text-muted mb-2">{{ scenario.summary }}</p>
+                            </div>
+                            <div class="d-flex flex-wrap gap-2">
+                                <a class="btn btn-sm btn-primary" href="#simulateScenarioPanel">
+                                    Open simulation form
+                                </a>
+                                <a class="btn btn-sm btn-outline-primary" href="#simulation-results">
+                                    Review simulated outputs
+                                </a>
+                                <a class="btn btn-sm btn-outline-secondary" href="{% url 'simulator:scenario_list' %}{% if twin_assessment_id %}?twin_assessment_id={{ twin_assessment_id|urlencode }}{% endif %}">
+                                    Back to scenario list
+                                </a>
+                                {% if is_editor %}
+                                    <a href="{% url 'simulator:scenario_edit' scenario.pk %}" class="btn btn-outline-secondary btn-sm">Edit</a>
+                                    <form method="post" action="{% url 'simulator:scenario_duplicate' scenario.pk %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-outline-dark btn-sm">Duplicate</button>
+                                    </form>
                                 {% endif %}
                             </div>
-                        {% elif twin_error %}
-                            <div class="text-danger">{{ twin_error }}</div>
-                        {% else %}
-                            <div class="text-muted">
-                                <span class="t-en"><strong>No Patient Twin selected.</strong> To simulate Mario Rossi: open him in Clinic → Open Simulator.</span>
-                                <span class="t-it"><strong>Nessun Patient Twin selezionato.</strong> Per simulare Mario Rossi: aprilo in Clinica → Apri Simulator.</span>
+                        </div>
+                        {% if scenario.risk_stratification %}
+                            <span class="badge bg-warning text-dark mb-3">{{ scenario.risk_stratification }}</span>
+                        {% endif %}
+
+                        <div class="alert alert-info small">
+                            <div><strong>Virtual training scenario:</strong> {{ scenario.title }}</div>
+                            {% if twin_label %}
+                                <div class="mt-2"><strong>Clinic-linked Patient Twin:</strong> {{ twin_label }}</div>
+                                {% if twin_patient_pk %}
+                                    <div class="mt-1"><a href="{% url 'clinic:patient_detail' twin_patient_pk %}" class="text-decoration-none">Open linked patient workspace</a></div>
+                                {% endif %}
+                            {% elif twin_error %}
+                                <div class="mt-2 text-danger">{{ twin_error }}</div>
+                            {% else %}
+                                <div class="mt-2 text-muted">No clinic-linked Patient Twin is active on this page.</div>
+                            {% endif %}
+                            <div class="mt-2 text-muted">Simulated outputs stay on this page and update inside the workspace panel on the right.</div>
+                        </div>
+                        {% if scenario.lab_items %}
+                            <hr>
+                            <h3 class="h6">Key laboratory snapshot</h3>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-striped align-middle mb-0">
+                                    <tbody>
+                                        {% for label, value in scenario.lab_items %}
+                                            <tr>
+                                                <th class="w-50">{{ label }}</th>
+                                                <td>{{ value }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
                             </div>
                         {% endif %}
                     </div>
-                    <hr class="my-2">
-                    <div class="d-flex flex-wrap gap-2">
-                        <a class="btn btn-sm btn-primary" href="#simulateScenarioPanel">
-                            <span class="t-en">Open Simulation Panel</span>
-                            <span class="t-it">Apri Pannello Simulazione</span>
-                        </a>
-                        <a class="btn btn-sm btn-outline-primary" href="#simulation-results">
-                            <span class="t-en">See Results</span>
-                            <span class="t-it">Vedi Risultati</span>
-                        </a>
-                        <a class="btn btn-sm btn-outline-secondary" href="{% url 'simulator:scenario_list' %}{% if twin_assessment_id %}?twin_assessment_id={{ twin_assessment_id|urlencode }}{% endif %}">
-                            <span class="t-en">Change Scenario</span>
-                            <span class="t-it">Cambia Scenario</span>
-                        </a>
+                </div>
+
+                <div class="card shadow-sm mt-3">
+                    <div class="card-header">
+                        <h2 class="h6 mb-0">Input classification</h2>
                     </div>
-                    <div class="mt-2 text-muted">
-                        <span class="t-en">Results always appear on this page under <strong>Simulation Results</strong> (right column).</span>
-                        <span class="t-it">I risultati appaiono sempre in questa pagina sotto <strong>Simulation Results</strong> (colonna destra).</span>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th scope="col">Input</th>
+                                        <th scope="col">Classification</th>
+                                        <th scope="col">Purpose</th>
+                                        <th scope="col">Limitation</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in input_classification_rows %}
+                                        <tr>
+                                            <th scope="row">{{ row.input_label }}</th>
+                                            <td><span class="badge bg-secondary">{{ row.classification }}</span></td>
+                                            <td>{{ row.purpose }}</td>
+                                            <td>{{ row.limitation }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-                <p>{{ scenario.summary }}</p>
-                {% if scenario.lab_items %}
-                    <hr>
-                    <h2 class="h5">Key Laboratory Snapshot</h2>
-                    <div class="table-responsive">
-                        <table class="table table-sm table-striped align-middle">
-                            <tbody>
-                                {% for label, value in scenario.lab_items %}
-                                    <tr>
-                                        <th class="w-50">{{ label }}</th>
-                                        <td>{{ value }}</td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+
+                <div class="collapse {% if game_mode or prefill_twin or not latest_simulation %}show{% endif %} mt-3" id="simulateScenarioPanel">
+                    <div class="card shadow-sm">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h2 class="h6 mb-0">Simulation form</h2>
+                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#simulateScenarioPanel" aria-label="Close">&times;</button>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-info mb-3" role="alert">
+                                Use the form below to configure exploratory inputs and generate model outputs for this scenario.
+                            </div>
+                            <details class="mb-3">
+                                <summary class="fw-semibold" style="cursor: pointer;">Open training guidance for this form</summary>
+                                <div class="mt-3">
+                                    {% include "simulator/_onboarding.html" %}
+                                </div>
+                            </details>
+                            {% include "simulator/_simulation_form.html" with form=simulation_parameter_form scenario=scenario drug_profiles=drug_profiles helptext_it=sim_form_help_it helptext_en=sim_form_help_en is_editor=is_editor preset_descriptions=preset_descriptions game_mode=game_mode %}
+                        </div>
                     </div>
-                {% endif %}
-                {% if recommended_regimens %}
-                    <hr>
-                    <h2 class="h5">Guideline Reference</h2>
-                    <p class="mb-1"><strong>Aligned regimen(s):</strong> {{ regimen_names }}</p>
-                    {% if scenario.expected_response %}
-                        <p class="mb-0"><strong>Target response:</strong> {{ scenario.get_expected_response_display }}</p>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card shadow-sm mb-3">
+                    <div class="card-body">
+                        <h2 class="h6 mb-3">Next actions</h2>
+                        <a class="btn btn-primary w-100 mb-3" href="{{ next_actions.primary.href }}">{{ next_actions.primary.label }}</a>
+                        <div class="d-grid gap-2">
+                            {% for action in next_actions.secondary %}
+                                <a class="btn btn-outline-secondary btn-sm {% if action.disabled %}disabled{% endif %}" href="{{ action.href }}" {% if action.disabled %}aria-disabled="true" tabindex="-1"{% endif %}>{{ action.label }}</a>
+                            {% endfor %}
+                        </div>
+                        {% if next_actions.patient_context_note %}
+                            <div class="small text-muted mt-3">{{ next_actions.patient_context_note }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card shadow-sm mb-3">
+                    <div class="card-body">
+                        <h2 class="h6 mb-2">Decision log entry</h2>
+                        <div class="alert alert-secondary small" role="alert">
+                            <strong>What this does:</strong> Records regimen and note selections as technical annotations for this scenario. It does <strong>not</strong> run the mathematical model.
+                        </div>
+                        <form method="post" class="pt-2">
+                            {% csrf_token %}
+                            {% if form.non_field_errors %}
+                                <div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>
+                            {% endif %}
+                            {% for field in form %}
+                                <div class="mb-3">
+                                    <label class="form-label" for="id_{{ field.name }}">{{ field.label }}</label>
+                                    {{ field }}
+                                    {% if field.help_text %}
+                                        <div class="form-text">{{ field.help_text }}</div>
+                                    {% endif %}
+                                    {% if field.errors %}
+                                        <div class="invalid-feedback d-block">{{ field.errors|striptags }}</div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                            <button type="submit" class="btn btn-primary w-100">Save log entry</button>
+                        </form>
+                    </div>
+                </div>
+                <div id="simulation-status" class="alert alert-light small py-2 mb-2" role="status" aria-live="polite">
+                    {% if latest_simulation %}
+                        <span class="t-en"><strong>Status:</strong> Showing the latest run below. You can compare it with a new parameter set at any time.</span>
+                        <span class="t-it"><strong>Stato:</strong> Qui sotto vedi l’ultima esecuzione. Puoi confrontarla con un nuovo set di parametri in qualsiasi momento.</span>
+                    {% else %}
+                        <span class="t-en"><strong>Status:</strong> No simulated outputs yet. Open the simulation form and run the model to populate this panel.</span>
+                        <span class="t-it"><strong>Stato:</strong> Nessun output simulato ancora. Apri il form di simulazione ed esegui il modello per popolare questo pannello.</span>
                     {% endif %}
+                </div>
+                <div id="simulation-results" class="mt-3">
+                    {% include "simulator/_simulation_results.html" with scenario=scenario attempt=latest_simulation summary=latest_simulation_summary results=latest_simulation_results kpi=kpi game_mode=game_mode game=game %}
+                </div>
+                {% if not latest_simulation %}
+                    {% include "simulator/_simulation_wizard.html" %}
+                {% endif %}
+                {% if is_editor %}
+                    <div id="pareto-panel" class="mt-3"></div>
+                {% endif %}
+
+                {% if is_editor %}
+                    <div class="card shadow-sm mt-3">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h2 class="h6 mb-0">Reference regimen context</h2>
+                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="offcanvas" data-bs-target="#manageRegimensOffcanvas" aria-controls="manageRegimensOffcanvas" aria-expanded="false">
+                                Manage
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div id="guideline-regimens-card-body">
+                                {% include "simulator/_guideline_regimens_card.html" with scenario=scenario regimens=recommended_regimens available_regimens=available_regimens target_id="guideline-regimens-card-body" allow_multiple=False %}
+                            </div>
+                        </div>
+                    </div>
                 {% endif %}
             </div>
         </div>
-    </div>
-    <div class="col-lg-4">
+
         <div class="card shadow-sm mb-3">
             <div class="card-body">
-                <h2 class="h6 mb-2">
-                    <span class="t-en">What do I do now?</span>
-                    <span class="t-it">Cosa devo fare adesso?</span>
-                </h2>
-                <ol class="small mb-3">
-                    <li>
-                        <span class="t-en">Confirm Patient Twin (optional)</span>
-                        <span class="t-it">Conferma Patient Twin (opzionale)</span>
-                        {% if twin_label %}
-                            <div class="text-muted">{{ twin_label }}</div>
-                        {% else %}
-                            <div class="text-muted">
-                                <span class="t-en">Not selected → to use Mario Rossi, open him in Clinic → Open Simulator.</span>
-                                <span class="t-it">Non selezionato → per usare Mario Rossi, aprilo in Clinica → Apri Simulator.</span>
-                            </div>
-                        {% endif %}
-                    </li>
-                    <li>
-                        <span class="t-en">Open the Simulation Panel</span>
-                        <span class="t-it">Apri il Pannello Simulazione</span>
-                        <div class="text-muted">
-                            <span class="t-en">Use the blue button on the left.</span>
-                            <span class="t-it">Usa il bottone blu a sinistra.</span>
-                        </div>
-                    </li>
-                    <li>
-                        <span class="t-en">Run a first safe test</span>
-                        <span class="t-it">Esegui un primo test sicuro</span>
-                        <div class="text-muted">
-                            <span class="t-en">Inside the panel, click “Beginner: run in 1 click”, or keep the preset and click “Run simulation”.</span>
-                            <span class="t-it">Nel pannello, clicca “Beginner: run in 1 click”, oppure lascia il preset e clicca “Esegui simulazione”.</span>
-                        </div>
-                    </li>
-                    <li>
-                        <span class="t-en">Read outcomes</span>
-                        <span class="t-it">Leggi gli esiti</span>
-                        <div class="text-muted">
-                            <span class="t-en">Results appear below in “Simulation Results”. Check the badges/warnings (Good/Monitor/Toxic).</span>
-                            <span class="t-it">I risultati appaiono sotto in “Simulation Results”. Controlla badge/avvisi (Good/Monitor/Toxic).</span>
-                        </div>
-                    </li>
-                </ol>
-                <div class="d-flex flex-wrap gap-2">
-                    <a class="btn btn-sm btn-primary" href="#simulateScenarioPanel">
-                        <span class="t-en">Open Simulation Panel</span>
-                        <span class="t-it">Apri Pannello</span>
-                    </a>
-                    <a class="btn btn-sm btn-outline-primary" href="#simulation-results">
-                        <span class="t-en">Jump to Results</span>
-                        <span class="t-it">Vai ai Risultati</span>
-                    </a>
-                    <a class="btn btn-sm btn-outline-secondary" href="{% url 'clinic:patient_list' %}">
-                        <span class="t-en">Find patient in Clinic</span>
-                        <span class="t-it">Cerca paziente in Clinica</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h2 class="h5">Submit Your Plan</h2>
-                <div class="alert alert-secondary small" role="alert">
-                    <span class="t-en"><strong>What this does:</strong> Records your chosen regimen/notes for this scenario (training + guideline comparison). It does <strong>not</strong> run the mathematical model.</span>
-                    <span class="t-it"><strong>Cosa fa:</strong> Registra regime/note scelti per questo scenario (training + confronto con linee guida). <strong>Non</strong> esegue il modello matematico.</span>
-                    <div class="mt-1">
-                        <span class="t-en"><strong>To get model results:</strong> open the Simulation Panel (blue button on the left), then click <strong>Run simulation</strong> inside the form. Results appear in <strong>Simulation Results</strong> below.</span>
-                        <span class="t-it"><strong>Per avere risultati del modello:</strong> apri il Pannello Simulazione (bottone blu a sinistra), poi clicca <strong>Esegui simulazione</strong> nel form. I risultati appaiono in <strong>Risultati della simulazione</strong> sotto.</span>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <h2 class="h6">What can be concluded</h2>
+                        <ul class="small mb-0">
+                            {% for item in what_can_be_concluded %}
+                                <li>{{ item }}</li>
+                            {% endfor %}
+                        </ul>
                     </div>
-                </div>
-                <form method="post" class="pt-2">
-                    {% csrf_token %}
-                    {% if form.non_field_errors %}
-                        <div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>
-                    {% endif %}
-                    {% for field in form %}
-                        <div class="mb-3">
-                            <label class="form-label" for="id_{{ field.name }}">{{ field.label }}</label>
-                            {{ field }}
-                            {% if field.help_text %}
-                                <div class="form-text">{{ field.help_text }}</div>
-                            {% endif %}
-                            {% if field.errors %}
-                                <div class="invalid-feedback d-block">{{ field.errors|striptags }}</div>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                    <button type="submit" class="btn btn-primary w-100">Record Decision</button>
-                </form>
-            </div>
-        </div>
-        {% if request.user.is_authenticated %}
-            <!-- Fix overlapping cards and ensure single simulation results container -->
-            <div id="simulation-status" class="alert alert-light small py-2 mb-2" role="status" aria-live="polite">
-                {% if latest_simulation %}
-                    <span class="t-en"><strong>Status:</strong> Showing the latest run below. You can run again anytime.</span>
-                    <span class="t-it"><strong>Stato:</strong> Qui sotto vedi l’ultima esecuzione. Puoi rieseguire in qualsiasi momento.</span>
-                {% else %}
-                    <span class="t-en"><strong>Status:</strong> No results yet. Open the Simulation Panel → click <strong>Run simulation</strong>.</span>
-                    <span class="t-it"><strong>Stato:</strong> Nessun risultato ancora. Apri il Pannello Simulazione → clicca <strong>Esegui simulazione</strong>.</span>
-                {% endif %}
-            </div>
-            <div id="simulation-results" class="mt-3">
-                {% include "simulator/_simulation_results.html" with scenario=scenario attempt=latest_simulation summary=latest_simulation_summary results=latest_simulation_results kpi=kpi game_mode=game_mode game=game %}
-            </div>
-            {% if not latest_simulation %}
-                {% include "simulator/_simulation_wizard.html" %}
-            {% endif %}
-        {% endif %}
-        {% if is_editor %}
-            <div id="pareto-panel" class="mt-3"></div>
-        {% endif %}
-
-        {% if is_editor %}
-            <div class="card shadow-sm mt-3">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h2 class="h6 mb-0">Guideline Regimens</h2>
-                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="offcanvas" data-bs-target="#manageRegimensOffcanvas" aria-controls="manageRegimensOffcanvas" aria-expanded="false">
-                        Manage
-                    </button>
-                </div>
-                <div class="card-body">
-                    <div id="guideline-regimens-card-body">
-                        {% include "simulator/_guideline_regimens_card.html" with scenario=scenario regimens=recommended_regimens available_regimens=available_regimens target_id="guideline-regimens-card-body" allow_multiple=False %}
+                    <div class="col-md-6">
+                        <h2 class="h6">What cannot be concluded</h2>
+                        <ul class="small mb-0">
+                            {% for item in what_cannot_be_concluded %}
+                                <li>{{ item }}</li>
+                            {% endfor %}
+                        </ul>
                     </div>
                 </div>
             </div>
-        {% endif %}
-    </div>
-</div>
+        </div>
 
 {% if guide_articles %}
 <div class="card shadow-sm mb-3">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h2 class="h6 mb-0">Guide</h2>
+                <h2 class="h6 mb-0">Training guide and field reference</h2>
         <button type="button" class="btn btn-outline-primary btn-sm" onclick="Tour.open()" data-audit="tour_start">
             <span class="t-en">Start Tutorial</span><span class="t-it">Avvia Tutorial</span>
         </button>
@@ -721,8 +329,8 @@
 <div class="card shadow-sm mb-3">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h2 class="h5 mb-0">
-            <span class="t-en">Simulation Runs</span>
-            <span class="t-it">Esecuzioni Simulazione</span>
+            <span class="t-en">Simulation run history</span>
+            <span class="t-it">Storico esecuzioni simulazione</span>
         </h2>
         <span class="badge bg-secondary">{{ simulation_runs_count }}</span>
     </div>
@@ -730,8 +338,8 @@
         <div class="px-3 pt-3">
             <div class="alert alert-info py-2 mb-0">
                 <div class="small">
-                    <span class="t-en"><strong>What happens when you click Run simulation?</strong> The mathematical model runs and the output appears on this page under <strong>Simulation Results</strong> (right column).</span>
-                    <span class="t-it"><strong>Cosa succede quando clicchi Esegui simulazione?</strong> Esegue il modello matematico e l’output appare in questa pagina sotto <strong>Risultati della simulazione</strong> (colonna destra).</span>
+                    <span class="t-en"><strong>What this section stores:</strong> Model-generated outputs from prior runs on this scenario.</span>
+                    <span class="t-it"><strong>Cosa conserva questa sezione:</strong> Output generati dal modello nelle esecuzioni precedenti di questo scenario.</span>
                 </div>
             </div>
         </div>
@@ -744,9 +352,9 @@
                             <th>User</th>
                             <th>Preset</th>
                             <th>Twin</th>
-                            <th>Tumor</th>
-                            <th>Healthy</th>
-                            <th>Status</th>
+                            <th>Simulated efficacy signal</th>
+                            <th>Simulated healthy-cell impact</th>
+                            <th>Output flag</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -766,11 +374,11 @@
                                 <td>{{ run.results_summary.healthy_loss|default_if_none:"—"|floatformat:2 }}</td>
                                 <td>
                                     {% if run.results_summary.healthy_loss and run.results_summary.healthy_loss > 0.3 %}
-                                        <span class="badge bg-danger">Toxic</span>
+                                        <span class="badge bg-danger">Constraint flag</span>
                                     {% elif run.results_summary.tumor_reduction and run.results_summary.tumor_reduction >= 0.9 and run.results_summary.healthy_loss and run.results_summary.healthy_loss <= 0.25 %}
-                                        <span class="badge bg-success">Good</span>
+                                        <span class="badge bg-success">Balanced signal</span>
                                     {% else %}
-                                        <span class="badge bg-warning text-dark">Monitor</span>
+                                        <span class="badge bg-warning text-dark">Review</span>
                                     {% endif %}
                                 </td>
                             </tr>
@@ -786,8 +394,8 @@
             {% endif %}
         {% else %}
             <p class="m-3 text-muted">
-                <span class="t-en">No simulation runs yet. Open the <strong>Simulation Panel</strong>, then click <strong>Run simulation</strong> to generate results.</span>
-                <span class="t-it">Nessuna simulazione eseguita. Apri il <strong>Pannello Simulazione</strong>, poi clicca <strong>Esegui simulazione</strong> per generare risultati.</span>
+                <span class="t-en">No simulation runs yet. Use the exploratory simulation form to generate model outputs.</span>
+                <span class="t-it">Nessuna simulazione eseguita. Usa il form di simulazione esplorativa per generare output del modello.</span>
             </p>
         {% endif %}
     </div>
@@ -796,8 +404,8 @@
 <div class="card shadow-sm mb-3">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h2 class="h5 mb-0">
-            <span class="t-en">Decision Log</span>
-            <span class="t-it">Registro Decisioni</span>
+            <span class="t-en">Decision log history</span>
+            <span class="t-it">Storico log decisionale</span>
         </h2>
         <span class="badge bg-secondary">{{ decision_logs_count }}</span>
     </div>
@@ -805,8 +413,8 @@
         <div class="px-3 pt-3">
             <div class="alert alert-secondary py-2 mb-0">
                 <div class="small">
-                    <span class="t-en"><strong>What happens when you click Record Decision?</strong> It saves your plan (for training/guideline comparison). It does <strong>not</strong> run the model.</span>
-                    <span class="t-it"><strong>Cosa succede quando clicchi Record Decision?</strong> Salva il tuo piano (training/confronto linee guida). <strong>Non</strong> esegue il modello.</span>
+                    <span class="t-en"><strong>What this section stores:</strong> Logged regimen selections and notes. It does <strong>not</strong> run the model.</span>
+                    <span class="t-it"><strong>Cosa conserva questa sezione:</strong> Regimi selezionati e note registrate. <strong>Non</strong> esegue il modello.</span>
                 </div>
             </div>
         </div>
@@ -816,11 +424,11 @@
                     <thead class="table-light">
                         <tr>
                             <th>When</th>
-                            <th>Clinician</th>
-                            <th>Chosen Regimen</th>
-                            <th>Expected Response</th>
+                            <th>User</th>
+                            <th>Logged regimen</th>
+                            <th>Logged response label</th>
                             <th>Confidence</th>
-                            <th>Guideline Alignment</th>
+                            <th>Reference-set alignment</th>
                             <th>Notes</th>
                         </tr>
                     </thead>
@@ -834,9 +442,9 @@
                                 <td>{{ attempt.confidence }}%</td>
                                 <td>
                                     {% if attempt.is_guideline_aligned %}
-                                        <span class="badge bg-success">Aligned</span>
+                                        <span class="badge bg-success">Matches reference set</span>
                                     {% else %}
-                                        <span class="badge bg-warning text-dark">Review</span>
+                                        <span class="badge bg-warning text-dark">Differs from reference set</span>
                                     {% endif %}
                                 </td>
                                 <td>{{ attempt.notes|default:"–" }}</td>
@@ -853,20 +461,28 @@
             {% endif %}
         {% else %}
             <p class="m-3 text-muted">
-                <span class="t-en">No decisions recorded yet.</span>
-                <span class="t-it">Nessuna decisione registrata.</span>
+                <span class="t-en">No log entries recorded yet.</span>
+                <span class="t-it">Nessuna voce di log registrata.</span>
             </p>
         {% endif %}
     </div>
 </div>
 
-{% if scenario.guideline_notes %}
-    <div class="card shadow-sm">
+{% if recommended_regimens or scenario.guideline_notes %}
+    <div class="card shadow-sm mb-3">
         <div class="card-header">
-            <h2 class="h5 mb-0">Guideline Notes</h2>
+            <h2 class="h5 mb-0">Scenario-linked reference context</h2>
         </div>
         <div class="card-body">
-            <p class="mb-0">{{ scenario.guideline_notes }}</p>
+            {% if recommended_regimens %}
+                <p class="mb-1"><strong>Reference regimen set:</strong> {{ regimen_names }}</p>
+            {% endif %}
+            {% if scenario.expected_response %}
+                <p class="mb-1"><strong>Stored response label:</strong> {{ scenario.get_expected_response_display }}</p>
+            {% endif %}
+            {% if scenario.guideline_notes %}
+                <p class="mb-0">{{ scenario.guideline_notes }}</p>
+            {% endif %}
         </div>
     </div>
 {% endif %}
@@ -874,36 +490,12 @@
 {% if is_editor %}
 <div class="offcanvas offcanvas-end" tabindex="-1" id="manageRegimensOffcanvas" aria-labelledby="manageRegimensOffcanvasLabel">
     <div class="offcanvas-header">
-        <h2 class="h5 mb-0" id="manageRegimensOffcanvasLabel">Manage Guideline Regimens</h2>
+        <h2 class="h5 mb-0" id="manageRegimensOffcanvasLabel">Manage reference regimens</h2>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
         <div id="guideline-regimens-offcanvas-body">
             {% include "simulator/_guideline_regimens_card.html" with scenario=scenario regimens=recommended_regimens available_regimens=available_regimens target_id="guideline-regimens-offcanvas-body" allow_multiple=True %}
-        </div>
-    </div>
-</div>
-{% endif %}
-
-{% if request.user.is_authenticated %}
-<div class="collapse {% if game_mode or prefill_twin %}show{% endif %}" id="simulateScenarioPanel">
-    <div class="card shadow-sm mt-3">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h2 class="h6 mb-0">
-                <span class="t-en">Simulation Panel</span>
-                <span class="t-it">Pannello Simulazione</span>
-            </h2>
-            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#simulateScenarioPanel" aria-label="Close">&times;</button>
-        </div>
-        <div class="card-body">
-            <div class="alert alert-info mb-3" role="alert">
-                <div class="small">
-                    <span class="t-en"><strong>Where are results?</strong> After you click <strong>Run simulation</strong>, results appear on this page in the right column under <strong>Simulation Results</strong>.</span>
-                    <span class="t-it"><strong>Dove sono i risultati?</strong> Dopo aver cliccato <strong>Esegui simulazione</strong>, i risultati appaiono in questa pagina nella colonna a destra sotto <strong>Risultati della simulazione</strong>.</span>
-                </div>
-            </div>
-            {% include "simulator/_onboarding.html" %}
-                        {% include "simulator/_simulation_form.html" with form=simulation_parameter_form scenario=scenario drug_profiles=drug_profiles helptext_it=sim_form_help_it helptext_en=sim_form_help_en is_editor=is_editor preset_descriptions=preset_descriptions game_mode=game_mode %}
         </div>
     </div>
 </div>
@@ -941,8 +533,8 @@
     document.body.addEventListener('htmx:beforeRequest', (event) => {
         if (event.detail && event.detail.target && event.detail.target.id === 'simulation-results') {
             setStatus(
-                '<strong>Status:</strong> Running simulation… this will create a new row in “Simulation Runs”.',
-                '<strong>Stato:</strong> Simulazione in corso… verrà aggiunta una nuova riga in “Esecuzioni Simulazione”.',
+                '<strong>Status:</strong> Running exploratory simulation… this will add a new row in “Simulation run history”.',
+                '<strong>Stato:</strong> Simulazione esplorativa in corso… verrà aggiunta una nuova riga nello “Storico esecuzioni simulazione”.',
                 'alert-info'
             );
         }
@@ -951,8 +543,8 @@
     document.body.addEventListener('htmx:responseError', (event) => {
         if (event.detail && event.detail.target && event.detail.target.id === 'simulation-results') {
             setStatus(
-                '<strong>Status:</strong> Error while running. Try again or adjust inputs.',
-                '<strong>Stato:</strong> Errore durante l’esecuzione. Riprova o modifica gli input.',
+                '<strong>Status:</strong> Error while running. Review the parameter set and try again.',
+                '<strong>Stato:</strong> Errore durante l’esecuzione. Rivedi il set di parametri e riprova.',
                 'alert-danger'
             );
         }
@@ -963,8 +555,8 @@
             updateBest();
             const now = new Date();
             setStatus(
-                `<strong>Status:</strong> Completed at ${now.toLocaleTimeString()}. Results updated below.`,
-                `<strong>Stato:</strong> Completato alle ${now.toLocaleTimeString()}. Risultati aggiornati qui sotto.`,
+                `<strong>Status:</strong> Completed at ${now.toLocaleTimeString()}. Simulated outputs updated below.`,
+                `<strong>Stato:</strong> Completato alle ${now.toLocaleTimeString()}. Output simulati aggiornati qui sotto.`,
                 'alert-success'
             );
             // Make results discoverable: scroll into view after a run.

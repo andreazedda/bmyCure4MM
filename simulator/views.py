@@ -136,17 +136,21 @@ def scenario_detail(request, pk: int):
         if attempt.is_guideline_aligned:
             messages.success(
                 request,
-                "Plan recorded. Great choice—aligned with the guideline set for this scenario.",
+                "Log entry recorded. The selected regimen matches the scenario's linked reference set.",
             )
         else:
             messages.warning(
                 request,
-                "Plan recorded. Review the guideline notes below to compare approaches.",
+                "Log entry recorded. The selected regimen differs from the scenario's linked reference set.",
             )
         return redirect(reverse("simulator:scenario_detail", args=[scenario.pk]))
 
     recommended_regimens = scenario.recommended_regimens.order_by("name")
-    regimen_names = ", ".join(regimen.name for regimen in recommended_regimens) if recommended_regimens else "No guideline regimen linked yet."
+    regimen_names = (
+        ", ".join(regimen.name for regimen in recommended_regimens)
+        if recommended_regimens
+        else "No scenario-linked reference regimen stored."
+    )
     editor = is_editor(request.user)
     available_regimens = (
         Regimen.objects.exclude(pk__in=recommended_regimens.values_list("pk", flat=True)).order_by("name")
@@ -166,12 +170,18 @@ def scenario_detail(request, pk: int):
         healthy_loss = latest_summary.get("healthy_loss")
         if healthy_loss is not None:
             if healthy_loss > 0.3:
-                latest_warnings.append("Healthy cell loss exceeded 30% in the most recent simulation—dose reduction recommended.")
+                latest_warnings.append(
+                    "Simulated healthy-cell impact exceeded 30% in the most recent run, triggering a constraint flag under the current model."
+                )
             elif healthy_loss > 0.2:
-                latest_warnings.append("Healthy cell loss above 20% warrants close monitoring for toxicity.")
+                latest_warnings.append(
+                    "Simulated healthy-cell impact exceeded 20% in the most recent run, indicating a higher-impact zone under the current model."
+                )
         tumor_reduction = latest_summary.get("tumor_reduction")
         if tumor_reduction is not None and tumor_reduction < 0:
-            latest_warnings.append("Latest simulation predicted tumor regrowth (negative reduction). Adjust parameters and re-run.")
+            latest_warnings.append(
+                "The latest simulation showed tumor regrowth under the current parameter set; use another configuration to compare simulated outputs."
+            )
     def _profile_with_ranges(drug: str):
         profile = pharmaco_registry.get_drug_profile(drug)
         if not profile:
@@ -217,6 +227,7 @@ def scenario_detail(request, pk: int):
     twin_assessment_id = (request.GET.get("twin_assessment_id") or "").strip()
     twin_label = ""
     twin_patient_pk = None
+    twin_context_active = False
     twin_error = ""
     sim_initial = {}
     if twin_assessment_id.isdigit():
@@ -240,6 +251,7 @@ def scenario_detail(request, pk: int):
                 full_name = (f"{first} {last}").strip() or last or first
                 twin_label = f"{a.patient.mrn} · {full_name} · {a.date}"
                 twin_patient_pk = a.patient.pk
+                twin_context_active = True
             else:
                 twin_error = "Selected assessment is not accessible (permissions)."
         except Exception:
@@ -292,8 +304,202 @@ def scenario_detail(request, pk: int):
         "simulation_runs_count": simulation_runs_count,
         "decision_logs": decision_logs,
         "decision_logs_count": decision_logs_count,
+        "workspace_status": {
+            "title": "Exploratory simulation workspace",
+            "statement": "This page runs exploratory, mechanistic simulations. It is not a prescribing tool and does not establish patient-specific comparative benefit.",
+        },
+        "page_purpose_rows": _build_scenario_page_purpose_rows(
+            scenario=scenario,
+            twin_context_active=twin_context_active,
+            latest_simulation=latest_simulation,
+            simulation_runs_count=simulation_runs_count,
+            decision_logs_count=decision_logs_count,
+        ),
+        "input_classification_rows": _build_scenario_input_classification_rows(
+            twin_context_active=twin_context_active
+        ),
+        "what_can_be_concluded": [
+            "The page can simulate parameterized scenarios.",
+            "The page can compare simulated tumor and healthy-cell trajectories.",
+            "The page can expose trade-offs under the current model assumptions.",
+        ],
+        "what_cannot_be_concluded": [
+            "It cannot establish individual clinical benefit.",
+            "It cannot infer what would have happened under a real alternative intervention.",
+            "It cannot prove treatment superiority.",
+            "It cannot replace calibrated counterfactual analysis or clinical validation.",
+        ],
+        "next_actions": _build_scenario_next_actions(
+            latest_simulation=latest_simulation,
+            twin_patient_pk=twin_patient_pk,
+        ),
     }
     return render(request, "simulator/scenario_detail.html", context)
+
+
+def _build_scenario_page_purpose_rows(
+    *,
+    scenario,
+    twin_context_active: bool,
+    latest_simulation,
+    simulation_runs_count: int,
+    decision_logs_count: int,
+):
+    latest_output = (
+        latest_simulation.submitted.strftime("%Y-%m-%d %H:%M")
+        if latest_simulation is not None and latest_simulation.submitted is not None
+        else "Awaiting first run"
+    )
+
+    return [
+        {
+            "label": "Virtual training scenario",
+            "value": f"{scenario.title} ({scenario.get_clinical_stage_display() or 'Stage not specified'})",
+        },
+        {
+            "label": "Clinic-linked Patient Twin",
+            "value": (
+                "Active accessible clinic-linked assessment"
+                if twin_context_active
+                else "No active Patient Twin context"
+            ),
+        },
+        {
+            "label": "Simulation form",
+            "value": "Configure exploratory inputs and run the model.",
+        },
+        {
+            "label": "Simulated outputs",
+            "value": latest_output,
+        },
+        {
+            "label": "Technical logs/history",
+            "value": f"{simulation_runs_count} simulation run(s) and {decision_logs_count} logged note(s)",
+        },
+    ]
+
+
+def _build_scenario_input_classification_rows(*, twin_context_active: bool):
+    twin_classification = (
+        "CLINIC-LINKED STRUCTURED"
+        if twin_context_active
+        else "UNKNOWN"
+    )
+    twin_limitation = (
+        "Only the selected assessment snapshot is used; the scenario remains virtual."
+        if twin_context_active
+        else "No clinic-linked Patient Twin is active on this page."
+    )
+
+    return [
+        {
+            "input_label": "Scenario laboratory snapshot",
+            "classification": "SCENARIO-DEFINED",
+            "purpose": "Shows the stored scenario attributes and lab context that define the virtual training case.",
+            "limitation": "These are structured virtual-scenario inputs, not observed clinical measurements.",
+        },
+        {
+            "input_label": "Clinic-linked Patient Twin assessment",
+            "classification": twin_classification,
+            "purpose": "Supplies a clinic assessment snapshot when a Patient Twin context is active.",
+            "limitation": twin_limitation,
+        },
+        {
+            "input_label": "Baseline cell counts and Twin-derived biology",
+            "classification": "DERIVED",
+            "purpose": "Transforms baseline fields and optional Twin context into model-ready biological parameters.",
+            "limitation": "Derived parameters inherit the assumptions of the current mapping logic.",
+        },
+        {
+            "input_label": "Dose, schedule, horizon, cohort, and seed",
+            "classification": "USER-PROVIDED",
+            "purpose": "Captures the exploratory inputs used to configure the scenario before a run.",
+            "limitation": "User-provided values are model configurations, not instructions to apply.",
+        },
+        {
+            "input_label": "Tumor and healthy-cell trajectories",
+            "classification": "SIMULATED",
+            "purpose": "Represents model-generated outputs from the current parameter set.",
+            "limitation": "Simulated trajectories depend on encoded assumptions and do not prove real outcomes.",
+        },
+        {
+            "input_label": "Threshold flags and balance labels",
+            "classification": "HEURISTIC",
+            "purpose": "Maps continuous outputs into stable labels that make trade-offs easier to inspect.",
+            "limitation": "Heuristic labels do not establish superiority, safety, or prescribing value.",
+        },
+        {
+            "input_label": "Reference ranges and stage anchors",
+            "classification": "LITERATURE-INFORMED",
+            "purpose": "Provides encoded reference ranges and published context used by the interface.",
+            "limitation": "Literature-informed anchors are population references, not patient-specific proof.",
+        },
+        {
+            "input_label": "Unmodeled preferences, comorbidities, and counterfactuals",
+            "classification": "UNKNOWN",
+            "purpose": "Marks factors that are relevant outside the current simulator inputs.",
+            "limitation": "The simulator cannot infer absent context or real alternative interventions.",
+        },
+    ]
+
+
+def _build_scenario_next_actions(*, latest_simulation, twin_patient_pk: int | None):
+    secondary = [
+        {
+            "label": "Back to scenario list",
+            "href": reverse("simulator:scenario_list"),
+            "disabled": False,
+        },
+        {
+            "label": "Open Algorithm Transparency",
+            "href": reverse("simulator:algorithm_transparency"),
+            "disabled": False,
+        },
+    ]
+
+    if twin_patient_pk is not None:
+        secondary.extend(
+            [
+                {
+                    "label": "Open Simple Research View",
+                    "href": reverse("twin_engine:simple_research_view", args=[twin_patient_pk]),
+                    "disabled": False,
+                },
+                {
+                    "label": "Open Scientific Cockpit",
+                    "href": reverse("twin_engine:research_cockpit", args=[twin_patient_pk]),
+                    "disabled": False,
+                },
+            ]
+        )
+        patient_context_note = None
+    else:
+        secondary.extend(
+            [
+                {
+                    "label": "Open Simple Research View",
+                    "href": "#",
+                    "disabled": True,
+                },
+                {
+                    "label": "Open Scientific Cockpit",
+                    "href": "#",
+                    "disabled": True,
+                },
+            ]
+        )
+        patient_context_note = (
+            "Clinic-linked Patient Twin context is required before patient-specific research links become available."
+        )
+
+    return {
+        "primary": {
+            "label": "Review simulated outputs" if latest_simulation is not None else "Run exploratory simulation",
+            "href": "#simulation-results" if latest_simulation is not None else "#simulateScenarioPanel",
+        },
+        "secondary": secondary,
+        "patient_context_note": patient_context_note,
+    }
 
 
 @login_required

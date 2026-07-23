@@ -373,13 +373,15 @@ def simulate_scenario(request: HttpRequest, pk: int) -> HttpResponse:
     if healthy_loss is not None:
         if healthy_loss > 0.3:
             summary_warnings.append(
-                "Healthy cell loss exceeded 30%, indicating a potentially toxic regimen—consider reducing doses."
+                "Simulated healthy-cell impact exceeded 30%, so this run is flagged as a higher-impact constraint under the current model."
             )
         elif healthy_loss > 0.2:
-            summary_warnings.append("Healthy cell loss is above 20%; monitor for immunosuppression.")
+            summary_warnings.append(
+                "Simulated healthy-cell impact exceeded 20%, so this run sits in a higher-impact zone under the current model."
+            )
     if tumor_reduction is not None and tumor_reduction < 0:
         summary_warnings.append(
-            "Tumor reduction is negative (tumor growth). Adjust doses or shorten the horizon to explore alternatives."
+            "The model produced tumor regrowth under the current parameter set. Use another configuration to compare simulated outputs."
         )
 
     context = {

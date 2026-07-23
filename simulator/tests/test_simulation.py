@@ -67,7 +67,8 @@ class SimulationModelTests(TestCase):
         payload = self._parameters(lenalidomide=25.0)
         response = self.client.post(url, payload, HTTP_HX_REQUEST="true")
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Simulation Results", response.content.decode())
+        self.assertIn("Simulated outputs", response.content.decode())
+
 
     def test_cohort_size_adds_uncertainty_summary(self) -> None:
         attempt = models.SimulationAttempt.objects.create(
