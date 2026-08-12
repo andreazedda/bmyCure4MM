@@ -42,6 +42,7 @@ class PatientTwinState(models.Model):
     )
     model_version = models.CharField(max_length=64)
     config_hash = models.CharField(max_length=128)
+    lineage = models.JSONField(default=dict, blank=True)
     source_assessments = models.ManyToManyField(
         "clinic.Assessment",
         related_name="twin_state_sources",

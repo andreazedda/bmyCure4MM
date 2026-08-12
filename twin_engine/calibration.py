@@ -7,6 +7,7 @@ from typing import Any
 from django.core.exceptions import ValidationError
 from django.db import transaction
 
+from .input_contract import build_twin_lineage
 from .models import ObservationResidual, PatientTwinState
 from .observation_model import compute_residuals, observed_from_assessment, predict_biomarkers
 from .provenance import CURRENT_MODEL_VERSION, collect_twin_config_hash
@@ -30,6 +31,7 @@ DEFAULT_PARAMETER_BOUNDS = {
 
 def calibrate_patient_parameters(patient, start_state, assessments, therapies, bounds: dict[str, tuple[float, float]] | None = None):
     assessments = sorted(list(assessments), key=lambda item: item.date)
+    therapies = list(therapies)
     if len(assessments) < 2:
         raise ValidationError("Calibration requires at least two assessments.")
 
@@ -101,6 +103,17 @@ def calibrate_patient_parameters(patient, start_state, assessments, therapies, b
         calibration_status=optimizer_status,
     )
 
+    calibration_lineage = build_twin_lineage(
+        patient=patient,
+        assessments=assessments,
+        therapies=therapies,
+        purpose="calibration",
+        parent_state=start_state,
+        extra={
+            "parameter_bounds": parameter_bounds,
+        },
+    )
+
     with transaction.atomic():
         calibrated_state = PatientTwinState.objects.create(
             patient=patient,
@@ -114,6 +127,7 @@ def calibrate_patient_parameters(patient, start_state, assessments, therapies, b
             method=PatientTwinState.METHOD_RESIDUAL_MINIMIZATION,
             model_version=CURRENT_MODEL_VERSION,
             config_hash=collect_twin_config_hash(),
+            lineage=calibration_lineage,
             created_by=start_state.created_by,
         )
         calibrated_state.source_assessments.add(*assessments)
