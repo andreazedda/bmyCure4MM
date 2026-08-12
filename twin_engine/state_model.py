@@ -4,6 +4,7 @@ from django.db import transaction
 
 from simulator.twin import build_patient_twin
 
+from .input_contract import build_twin_lineage
 from .models import PatientTwinState
 from .observation_model import default_observation_parameters
 from .provenance import CURRENT_MODEL_VERSION, collect_twin_config_hash
@@ -17,6 +18,12 @@ def initialize_from_assessment(assessment, user=None) -> PatientTwinState:
     twin_payload = preview_payload["twin_payload"]
     state_vector = preview_payload["state_vector"]
     parameters = preview_payload["parameters"]
+    lineage = build_twin_lineage(
+        patient=assessment.patient,
+        assessments=[assessment],
+        therapies=[],
+        purpose="initialization",
+    )
 
     with transaction.atomic():
         state = PatientTwinState.objects.create(
@@ -31,6 +38,7 @@ def initialize_from_assessment(assessment, user=None) -> PatientTwinState:
             method=PatientTwinState.METHOD_INITIAL_RISK_MAPPING,
             model_version=CURRENT_MODEL_VERSION,
             config_hash=collect_twin_config_hash(),
+            lineage=lineage,
             created_by=user,
         )
         state.source_assessments.add(assessment)
@@ -90,6 +98,7 @@ def serialize_state(state: PatientTwinState) -> dict[str, object]:
         "method": state.method,
         "model_version": state.model_version,
         "config_hash": state.config_hash,
+        "lineage": state.lineage,
         "source_assessment_ids": list(state.source_assessments.values_list("id", flat=True)),
         "created_at": state.created_at.isoformat(),
         "created_by_id": state.created_by_id,
