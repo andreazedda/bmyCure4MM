@@ -1,5 +1,9 @@
 # Architecture
 
+> **Governance boundary:** this is an `E1_research_prototype`. Components and
+> data flows described below do not constitute clinical decision support,
+> validated patient-specific prediction, or identified causal inference.
+
 === "IT"
     ## Cos’è bmyCure4MM
 

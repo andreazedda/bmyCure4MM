@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Virtual Cohort - Simulator{% endblock %}
+{% block title %}Synthetic Model Cohort - Simulator{% endblock %}
 
 {% block content %}
 <div class="container-fluid my-4">
@@ -9,7 +9,7 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h1 class="h2">
-                    <i class="bi bi-people-fill"></i> Virtual Cohort Runner
+                    <i class="bi bi-people-fill"></i> Synthetic Model Cohort
                 </h1>
                 <a href="{% url 'simulator:scenario_manage_list' %}" class="btn btn-outline-secondary">
                     <i class="bi bi-arrow-left"></i> Back to Scenarios
@@ -27,9 +27,9 @@
                 </div>
                 <div class="card-body">
                     <p class="text-muted small">
-                        Run in-silico clinical trial with synthetic patient population. 
-                        Variability sampled from log-normal distributions for baseline cells, 
-                        growth rates, and PK/PD parameters.
+                        Run an exploratory model-cohort experiment. Sampled instances are
+                        not patients and this workflow is not a clinical trial. Variability
+                        is applied to baseline compartments, growth rates, and PK/PD inputs.
                     </p>
 
                     <form id="cohort-form" hx-post="{% url 'simulator:cohort_run' %}" hx-target="#cohort-results" hx-swap="innerHTML">
@@ -65,7 +65,7 @@
                                 max="1000" 
                                 required
                             >
-                            <div class="form-text">Number of virtual patients (10-1000)</div>
+                            <div class="form-text">Number of synthetic model instances (10-1000)</div>
                         </div>
 
                         <!-- Random seed -->

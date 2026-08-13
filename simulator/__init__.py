@@ -1,2 +1,1 @@
-"""Interactive training simulator for MM treatment decisions."""
-
+"""Interactive research simulator for mechanistic MM scenarios."""

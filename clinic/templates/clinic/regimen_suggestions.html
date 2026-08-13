@@ -141,7 +141,7 @@
 
     <div class="section-card mb-4">
         <h2 class="h5 mb-3">{{ interpretation_status.title }}</h2>
-        <p class="mb-2">This page organizes regimen-related context using heuristic and literature-informed rules. It is not a clinical decision tool.</p>
+        <p class="mb-2">This page organizes regimen-related context using heuristic rules whose source-level evidence requires verification. It is not a clinical decision tool.</p>
         <p class="mb-0">This page cannot determine patient-specific comparative benefit.</p>
     </div>
 
@@ -224,7 +224,7 @@
 
             {% if regimen.key_trials %}
             <div class="mb-3">
-                <div class="small-label">Literature-informed sources</div>
+                <div class="small-label">Named source candidates (verification required)</div>
                 <div class="trial-list">
                     {% for trial in regimen.key_trials %}
                     <span class="trial-badge">{{ trial }}</span>

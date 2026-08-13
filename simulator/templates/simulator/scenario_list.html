@@ -7,28 +7,28 @@
         <div style="font-size: 3rem;">🎯</div>
         <div class="flex-grow-1">
             <h1 class="h4 alert-heading mb-2">
-                <span class="t-en">Welcome to the Multiple Myeloma Treatment Simulator</span>
-                <span class="t-it">Benvenuto al Simulatore Trattamenti Mieloma Multiplo</span>
+                <span class="t-en">Multiple Myeloma Mechanistic Research Simulator</span>
+                <span class="t-it">Simulatore Meccanicistico di Ricerca sul Mieloma Multiplo</span>
             </h1>
             <div class="t-en">
-                <p class="mb-2"><strong>What you see below:</strong> These are <strong>virtual patients</strong> (called "scenarios"). Each card represents 1 patient case with specific characteristics.</p>
+                <p class="mb-2"><strong>What you see below:</strong> These are synthetic research scenarios, not validated patient predictions.</p>
                 <p class="mb-2"><strong>What to do:</strong></p>
                 <ol class="mb-2">
                     <li><strong>Choose a scenario</strong> (virtual case) by clicking any card below</li>
-                    <li><strong>Read patient details</strong> (lab values, risk level)</li>
-                    <li><strong>Test drug combinations</strong> on that patient</li>
-                    <li><strong>See results</strong> (tumor reduction, side effects)</li>
+                    <li><strong>Inspect scenario-defined inputs</strong> and their epistemic labels</li>
+                    <li><strong>Vary hypothetical configurations</strong> within the model domain</li>
+                    <li><strong>Inspect simulated outputs</strong>, limitations, and provenance</li>
                 </ol>
                 <p class="mb-0"><strong>💡 First time?</strong> Click the green button below to start with a beginner-friendly tutorial!</p>
             </div>
             <div class="t-it">
-                <p class="mb-2"><strong>Cosa vedi sotto:</strong> Questi sono <strong>pazienti virtuali</strong> (chiamati "scenari"). Ogni card rappresenta 1 caso paziente con caratteristiche specifiche.</p>
+                <p class="mb-2"><strong>Cosa vedi sotto:</strong> Questi sono scenari sintetici di ricerca, non predizioni validate del paziente.</p>
                 <p class="mb-2"><strong>Cosa fare:</strong></p>
                 <ol class="mb-2">
                     <li><strong>Scegli un paziente</strong> cliccando su qualsiasi card sotto</li>
-                    <li><strong>Leggi dettagli paziente</strong> (valori laboratorio, livello rischio)</li>
-                    <li><strong>Testa combinazioni farmaci</strong> su quel paziente</li>
-                    <li><strong>Vedi risultati</strong> (riduzione tumore, effetti collaterali)</li>
+                    <li><strong>Esamina gli input dello scenario</strong> e le etichette epistemiche</li>
+                    <li><strong>Varia configurazioni ipotetiche</strong> nel dominio del modello</li>
+                    <li><strong>Esamina output simulati</strong>, limiti e provenienza</li>
                 </ol>
                 <p class="mb-0"><strong>💡 Prima volta?</strong> Clicca il bottone verde sotto per iniziare con un tutorial per principianti!</p>
             </div>
@@ -115,12 +115,12 @@
                 <span class="t-it">Nuovo al Simulatore?</span>
             </h4>
             <p class="mb-2">
-                <span class="t-en">Start with our step-by-step tutorial to learn how to simulate treatments, understand results, and practice with virtual patients.</span>
-                <span class="t-it">Inizia con il nostro tutorial passo-passo per imparare a simulare trattamenti, comprendere risultati e praticare con pazienti virtuali.</span>
+                <span class="t-en">Start with the lineage tutorial to distinguish inputs, model assumptions, and simulated outputs.</span>
+                <span class="t-it">Inizia con il tutorial sulla lineage per distinguere input, assunzioni del modello e output simulati.</span>
             </p>
             <a href="{% url 'simulator:getting_started' %}" class="btn btn-success">
-                <span class="t-en">📖 Start Getting Started Guide (Recommended!)</span>
-                <span class="t-it">📖 Inizia Guida Introduttiva (Consigliato!)</span>
+                <span class="t-en">📖 Open the learning guide</span>
+                <span class="t-it">📖 Apri la guida didattica</span>
             </a>
         </div>
     </div>
@@ -130,8 +130,8 @@
 <div class="card shadow-sm mb-4 border-info">
     <div class="card-header bg-info bg-opacity-10">
         <h5 class="mb-0">
-            <span class="t-en">🏷️ Understanding Patient Labels (Risk Levels)</span>
-            <span class="t-it">🏷️ Capire Etichette Pazienti (Livelli Rischio)</span>
+            <span class="t-en">🏷️ Synthetic scenario complexity labels</span>
+            <span class="t-it">🏷️ Etichette di complessità degli scenari sintetici</span>
         </h5>
     </div>
     <div class="card-body">
@@ -140,12 +140,10 @@
                 <div class="card h-100 border-success">
                     <div class="card-body">
                         <h6 class="text-success">🟢 Low Risk</h6>
-                        <p class="small mb-1 t-en"><strong>Who:</strong> Newly diagnosed patients with favorable lab values</p>
-                        <p class="small mb-1 t-it"><strong>Chi:</strong> Pazienti appena diagnosticati con valori favorevoli</p>
-                        <p class="small mb-1 t-en"><strong>Treatment:</strong> Standard doses work well</p>
-                        <p class="small mb-1 t-it"><strong>Trattamento:</strong> Dosi standard funzionano bene</p>
-                        <p class="small mb-0 t-en"><strong>Best for beginners:</strong> ✅ Yes! Start here!</p>
-                        <p class="small mb-0 t-it"><strong>Meglio per principianti:</strong> ✅ Sì! Inizia qui!</p>
+                        <p class="small mb-1 t-en"><strong>Context:</strong> Fewer activated model constraints</p>
+                        <p class="small mb-1 t-it"><strong>Contesto:</strong> Meno vincoli del modello attivati</p>
+                        <p class="small mb-0 t-en"><strong>Learning level:</strong> Introductory</p>
+                        <p class="small mb-0 t-it"><strong>Livello didattico:</strong> Introduttivo</p>
                     </div>
                 </div>
             </div>
@@ -153,12 +151,10 @@
                 <div class="card h-100 border-warning">
                     <div class="card-body">
                         <h6 class="text-warning">🟡 Intermediate Risk</h6>
-                        <p class="small mb-1 t-en"><strong>Who:</strong> Patients with moderate disease or complications</p>
-                        <p class="small mb-1 t-it"><strong>Chi:</strong> Pazienti con malattia moderata o complicazioni</p>
-                        <p class="small mb-1 t-en"><strong>Treatment:</strong> May need dose adjustments</p>
-                        <p class="small mb-1 t-it"><strong>Trattamento:</strong> Potrebbero servire aggiustamenti dosi</p>
-                        <p class="small mb-0 t-en"><strong>Best for beginners:</strong> ⚠️ Try after Low Risk</p>
-                        <p class="small mb-0 t-it"><strong>Meglio per principianti:</strong> ⚠️ Prova dopo Basso Rischio</p>
+                        <p class="small mb-1 t-en"><strong>Context:</strong> Additional scenario-defined constraints</p>
+                        <p class="small mb-1 t-it"><strong>Contesto:</strong> Vincoli aggiuntivi definiti dallo scenario</p>
+                        <p class="small mb-0 t-en"><strong>Learning level:</strong> Intermediate</p>
+                        <p class="small mb-0 t-it"><strong>Livello didattico:</strong> Intermedio</p>
                     </div>
                 </div>
             </div>
@@ -166,12 +162,10 @@
                 <div class="card h-100 border-danger">
                     <div class="card-body">
                         <h6 class="text-danger">🔴 High Risk</h6>
-                        <p class="small mb-1 t-en"><strong>Who:</strong> Advanced disease, poor lab values, or relapsed</p>
-                        <p class="small mb-1 t-it"><strong>Chi:</strong> Malattia avanzata, valori scarsi, o recidiva</p>
-                        <p class="small mb-1 t-en"><strong>Treatment:</strong> Requires careful dose balancing</p>
-                        <p class="small mb-1 t-it"><strong>Trattamento:</strong> Richiede bilanciamento dosi attento</p>
-                        <p class="small mb-0 t-en"><strong>Best for beginners:</strong> ❌ Advanced users only</p>
-                        <p class="small mb-0 t-it"><strong>Meglio per principianti:</strong> ❌ Solo utenti avanzati</p>
+                        <p class="small mb-1 t-en"><strong>Context:</strong> Multiple coupled model constraints</p>
+                        <p class="small mb-1 t-it"><strong>Contesto:</strong> Più vincoli del modello accoppiati</p>
+                        <p class="small mb-0 t-en"><strong>Learning level:</strong> Advanced</p>
+                        <p class="small mb-0 t-it"><strong>Livello didattico:</strong> Avanzato</p>
                     </div>
                 </div>
             </div>
@@ -179,8 +173,8 @@
         <div class="alert alert-info mt-3 mb-0">
             <p class="mb-0">
                 <strong class="t-en">💡 Tip:</strong><strong class="t-it">💡 Consiglio:</strong>
-                <span class="t-en">Look for the colored badges on each patient card below. Green = easiest, Yellow = medium, Red = hardest.</span>
-                <span class="t-it">Cerca i badge colorati su ogni card paziente sotto. Verde = più facile, Giallo = medio, Rosso = più difficile.</span>
+                <span class="t-en">These labels organize synthetic learning scenarios; they do not provide patient prognosis or treatment guidance.</span>
+                <span class="t-it">Queste etichette organizzano scenari didattici sintetici; non forniscono prognosi o indicazioni terapeutiche.</span>
             </p>
         </div>
     </div>
@@ -188,8 +182,8 @@
 
 <div id="scenarios" class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
     <h1 class="h3 mb-0">
-        <span class="t-en">👥 Available Virtual Patients</span>
-        <span class="t-it">👥 Pazienti Virtuali Disponibili</span>
+        <span class="t-en">🧪 Available Synthetic Scenarios</span>
+        <span class="t-it">🧪 Scenari Sintetici Disponibili</span>
     </h1>
     <span class="badge bg-primary fs-6">{{ scenarios|length }} <span class="t-en">patient{{ scenarios|length|pluralize }}</span><span class="t-it">pazient{{ scenarios|length|pluralize:"e,i" }}</span></span>
 </div>
@@ -200,8 +194,8 @@
         <div>
             <strong class="t-en">Choose a scenario below to start:</strong>
             <strong class="t-it">Scegli uno scenario sotto per iniziare:</strong>
-            <span class="t-en">Click on any card to open details and simulate treatments</span>
-            <span class="t-it">Clicca su qualsiasi card per aprire i dettagli e simulare trattamenti</span>
+            <span class="t-en">Open a card to inspect and run its hypothetical configuration</span>
+            <span class="t-it">Apri una card per esaminare ed eseguire la configurazione ipotetica</span>
         </div>
     </div>
 </div>
@@ -233,8 +227,8 @@
                                 {% with regs=scenario.recommended_regimens.all %}
                                     {% if regs %}
                                         <span class="badge bg-success">
-                                            <span class="t-en">✅ Guideline ready</span>
-                                            <span class="t-it">✅ Linee guida pronte</span>
+                                            <span class="t-en">Reference set linked</span>
+                                            <span class="t-it">Set di riferimento collegato</span>
                                         </span>
                                     {% else %}
                                         <span class="badge bg-secondary">
@@ -247,7 +241,7 @@
                             {% with regs=scenario.recommended_regimens.all %}
                                 {% if regs %}
                                     <div class="small text-muted">
-                                        <strong class="t-en">Recommended:</strong><strong class="t-it">Raccomandato:</strong> {{ regs|join:", " }}
+                                        <strong class="t-en">Associated exploratory regimens:</strong><strong class="t-it">Regimi esplorativi associati:</strong> {{ regs|join:", " }}
                                     </div>
                                 {% endif %}
                             {% endwith %}
@@ -264,16 +258,6 @@
                                     <span class="t-en">View →</span>
                                     <span class="t-it">Vedi →</span>
                                 </a>
-                                {% if request.user.is_authenticated %}
-                                    {% if twin_assessment_id %}
-                                        <a class="badge bg-dark text-decoration-none" href="{% url 'simulator:scenario_detail' scenario.pk %}?twin_assessment_id={{ twin_assessment_id|urlencode }}&game=1#simulateScenarioPanel" onclick="event.stopPropagation();">
-                                    {% else %}
-                                        <a class="badge bg-dark text-decoration-none" href="{% url 'simulator:scenario_detail' scenario.pk %}?game=1#simulateScenarioPanel" onclick="event.stopPropagation();">
-                                    {% endif %}
-                                        <span class="t-en">🎮 Game</span>
-                                        <span class="t-it">🎮 Gioco</span>
-                                    </a>
-                                {% endif %}
                             </div>
                         </div>
                     </div>

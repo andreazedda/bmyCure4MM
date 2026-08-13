@@ -162,9 +162,6 @@ def scenario_detail(request, pk: int):
     )
     latest_summary = latest_simulation.results_summary if latest_simulation else None
     latest_results = latest_simulation.results if latest_simulation else {}
-    game_mode = request.GET.get("game") == "1"
-    from .game import compute_game_metrics
-    game = compute_game_metrics(latest_summary) if game_mode else None
     latest_warnings: list[str] = []
     if latest_summary:
         healthy_loss = latest_summary.get("healthy_loss")
@@ -199,16 +196,18 @@ def scenario_detail(request, pk: int):
         "daratumumab": _profile_with_ranges("daratumumab"),
         "carfilzomib": _profile_with_ranges("carfilzomib"),
     }
+    from .api_help import _static_article_payload
+
     guide_slugs = ["quickstart", "optimization_lab"]
     guides: dict[str, dict[str, dict[str, str]]] = {}
-    articles = {article.slug: article for article in HelpArticle.objects.filter(slug__in=guide_slugs)}
     for slug in guide_slugs:
-        article = articles.get(slug)
-        if not article:
+        en_payload = _static_article_payload(slug, "en")
+        it_payload = _static_article_payload(slug, "it")
+        if en_payload is None or it_payload is None:
             continue
         guides[slug] = {
-            "en": article.as_lang("en"),
-            "it": article.as_lang("it"),
+            "en": en_payload,
+            "it": it_payload,
         }
     preset_descriptions = {
         key: {
@@ -287,8 +286,6 @@ def scenario_detail(request, pk: int):
         "latest_simulation_summary": latest_summary,
         "latest_simulation_results": latest_results,
         "latest_simulation_warnings": latest_warnings,
-        "game_mode": game_mode,
-        "game": game,
         "drug_profiles": drug_profiles,
         "sim_form_help_it": forms.SIMULATION_FORM_HELP_TEXT_IT,
         "sim_form_help_en": forms.SIMULATION_FORM_HELP_TEXT_EN,
@@ -676,6 +673,21 @@ def _build_algorithm_risk_context_rows(risk_stratification):
 
 
 def _build_algorithm_cytogenetic_flag_rows(high_risk_cytogenetics):
+    if "status" in high_risk_cytogenetics:
+        return [
+            {
+                "name": "High-risk cytogenetics context catalog",
+                "gene": "",
+                "impact": high_risk_cytogenetics.get("status", "context unavailable"),
+                "classification": high_risk_cytogenetics.get(
+                    "epistemic_label", "UNKNOWN"
+                ).replace("_", "-"),
+                "purpose": "Records the current epistemic status of this contextual catalog.",
+                "limitation": high_risk_cytogenetics.get(
+                    "limitation", "No patient-specific inference is available."
+                ),
+            }
+        ]
     rows = []
     for _, cyto in high_risk_cytogenetics.items():
         rows.append(

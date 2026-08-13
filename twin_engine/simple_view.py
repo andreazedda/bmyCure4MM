@@ -79,9 +79,9 @@ def build_simple_patient_story(patient: Patient, *, include_developer_links: boo
             "Some outputs are more uncertain than others.",
         ],
         "forbidden_conclusions": [
-            "This is the best treatment.",
-            "This proves clinical superiority.",
-            "This estimates a causal effect.",
+            "A patient-specific treatment-selection claim.",
+            "A comparative clinical-superiority claim.",
+            "An identified causal-effect claim.",
         ],
         "navigation": {
             "patient_page_url": reverse("clinic:patient_detail", args=[patient.id]),
@@ -334,7 +334,7 @@ def _build_scenario_story(scenario_rows: list[dict[str, Any]], validation_panel:
                 "robustness_label": _ranking_stability_label(robustness_row),
                 "plain_interpretation": _plain_interpretation(row, robustness_row, utility_summary),
                 "allowed_conclusion": "This simulated schedule changes the model output under the current mechanistic assumptions.",
-                "forbidden_conclusion": "Do not read this as proof of the best treatment, clinical superiority, or a causal effect.",
+                "forbidden_conclusion": "Do not read this as a patient-specific treatment selection, comparative clinical conclusion, or identified causal effect.",
                 "technical_metrics": {
                     "tumor_reduction": row.get("tumor_reduction_delta"),
                     "healthy_loss": row.get("healthy_loss_delta"),

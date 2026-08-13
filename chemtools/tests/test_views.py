@@ -157,6 +157,18 @@ class JobStatusViewTests(TestCase):
         data = response.json()
         self.assertIn("status", data)
         self.assertIn("variant", data)
+        self.assertEqual(data["governance"]["intended_use_level"], "E1_research_prototype")
+        self.assertFalse(data["governance"]["clinical_decision_support"])
+
+    def test_job_status_is_private_to_owner(self) -> None:
+        other = get_user_model().objects.create_user("other", password="pass123")
+        job = models.ChemJob.objects.create(
+            kind=models.ChemJob.SIM,
+            input_a="CCO",
+            user=other,
+        )
+        response = self.client.get(reverse("chemtools:job_status", args=[job.pk]))
+        self.assertEqual(response.status_code, 404)
 
 
 class RetryJobViewTests(TestCase):
@@ -189,6 +201,20 @@ class RetryJobViewTests(TestCase):
         """Test retrying non-existent job returns 404."""
         response = self.client.get(reverse("chemtools:job_retry", args=[9999]))
         self.assertEqual(response.status_code, 404)
+
+    def test_retry_job_is_private_to_owner(self) -> None:
+        other = get_user_model().objects.create_user("other", password="pass123")
+        job = models.ChemJob.objects.create(
+            kind=models.ChemJob.SIM,
+            input_a="CCO",
+            user=other,
+        )
+
+        with patch("chemtools.views._enqueue") as enqueue:
+            response = self.client.get(reverse("chemtools:job_retry", args=[job.pk]))
+
+        self.assertEqual(response.status_code, 404)
+        enqueue.assert_not_called()
 
 
 class ChemToolsSecurityTests(TestCase):
@@ -497,4 +523,3 @@ class ChemToolsIntegrationTests(TestCase):
         # Check job detail shows embedded content
         response = self.client.get(reverse("chemtools:job_detail", args=[job.pk]))
         self.assertContains(response, "<p>Results</p>")  # Embedded HTML
-

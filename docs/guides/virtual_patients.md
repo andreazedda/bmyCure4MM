@@ -1,5 +1,10 @@
 # Virtual Patients (archetypes + parameter distributions)
 
+> **E1 terminology notice:** this historical page uses “virtual patient” for a
+> sampled synthetic model state. The distributions are `HEURISTIC`, are not a
+> validated representation of a patient population, and cannot support
+> patient-specific prediction.
+
 === "IT"
     Questa pagina descrive come il progetto genera **virtual patients** per simulazioni in-silico (cohort) in modo riproducibile e trasparente.
 
@@ -12,7 +17,7 @@
     | elenco archetipi e distribuzioni | `simulator/virtual_patients.py` → `get_archetype_library()` |
     | come viene campionato un parametro | `ParameterDistribution.sample(...)` |
     | incertezza/cohort e bande | `Guides → Mathematical Models` + `Guides → Simulations Gallery` |
-    | difficulty score e outcome | `Guides → Difficulty Scoring` |
+    | stato epistemico | `Governance → Epistemic Labels` |
 
     ## Terminologia
 
@@ -22,8 +27,7 @@
 
     ## Concetto: perché archetipi
 
-    In clinica MM non esiste “il paziente medio”: esistono sottopopolazioni con fenotipo/prognosi differenti.
-    Un **archetipo** rappresenta una popolazione con distribuzioni definite per:
+    Un **archetipo** rappresenta uno stato sintetico con distribuzioni euristiche definite per:
 
     - età/sesso
     - R-ISS
@@ -130,7 +134,7 @@
     | archetypes and distributions | `simulator/virtual_patients.py` → `get_archetype_library()` |
     | how a parameter is sampled | `ParameterDistribution.sample(...)` |
     | cohort uncertainty bands | `Guides → Mathematical Models` + `Guides → Simulations Gallery` |
-    | difficulty score and outcomes | `Guides → Difficulty Scoring` |
+    | epistemic status | `Governance → Epistemic Labels` |
 
     ## Terminology
 
@@ -140,8 +144,7 @@
 
     ## Why archetypes
 
-    In MM there is no single “average patient”: there are sub-populations with different phenotype/prognosis.
-    An **archetype** represents a population with specified distributions for:
+    An **archetype** represents a synthetic state with heuristic distributions for:
 
     - age/sex
     - R-ISS

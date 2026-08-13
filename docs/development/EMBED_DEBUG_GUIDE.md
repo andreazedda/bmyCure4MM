@@ -506,4 +506,4 @@ Prevent embed_debug.log from growing indefinitely:
 
 **Last Updated:** January 2026  
 **Maintainer:** Development Team  
-**Related:** [Decision Support System](../features/DECISION_SUPPORT_SYSTEM.md)
+**Related:** [Canonical Intended Use](../governance/INTENDED_USE.md)

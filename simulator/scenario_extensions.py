@@ -1,11 +1,11 @@
 """
-Enhanced Scenario Model with Mathematical Framework Integration.
+Legacy Scenario Model mixin retained for schema/code traceability.
 
 This module extends the Django Scenario model with:
 - Automatic difficulty score calculation
 - Virtual patient archetype assignment
 - Mathematical model parameter storage
-- Clinical outcome prediction
+- fail-closed outcome-prediction gate
 
 All additions maintain backward compatibility with existing models.
 """
@@ -15,6 +15,8 @@ from typing import Dict, Optional
 from django.db import models
 from django.core.exceptions import ValidationError
 
+from mmportal.governance import EpistemicLabel, governance_metadata
+
 from .difficulty_scoring import (
     TumorBurdenScore,
     GrowthRateScore,
@@ -23,9 +25,6 @@ from .difficulty_scoring import (
     StageScore,
     DifficultyScoreCalculator,
     RISSStagingSystem,
-    estimate_response_probability,
-    estimate_toxicity_risk,
-    estimate_survival_metrics,
 )
 from .virtual_patients import (
     PatientArchetype,
@@ -50,7 +49,7 @@ class ScenarioMathematicalMixin(models.Model):
     - difficulty_level: Human-readable level (Very Easy to Very Hard)
     - patient_archetype: Clinical phenotype category
     - mathematical_parameters: JSON storage for all simulation parameters
-    - expected_outcomes: Predicted response rates, survival, toxicity
+    - expected_outcomes: governed fail-closed status payload
     """
     
     # Difficulty scoring
@@ -99,7 +98,7 @@ class ScenarioMathematicalMixin(models.Model):
     expected_outcomes = models.JSONField(
         default=dict,
         blank=True,
-        help_text="Predicted response rates, survival metrics, toxicity risk.",
+        help_text="Governed status payload; individual outcome prediction is not validated.",
     )
     
     # R-ISS staging
@@ -244,23 +243,20 @@ class ScenarioMathematicalMixin(models.Model):
         return total_score
     
     def calculate_expected_outcomes(self) -> Dict:
-        """
-        Predict expected clinical outcomes based on difficulty.
-        
-        Returns:
-            Dictionary with response rates, survival, toxicity predictions
-        """
-        if self.difficulty_score is None:
-            self.calculate_difficulty_score()
-        
-        frailty_component = self.mathematical_parameters.get(
-            "difficulty_breakdown", {}
-        ).get("frailty", 7.5)
-        
+        """Fail closed because individual outcome prediction is not validated."""
         outcomes = {
-            "response_probabilities": estimate_response_probability(self.difficulty_score),
-            "toxicity_risk": estimate_toxicity_risk(self.difficulty_score, frailty_component),
-            "survival_estimates": estimate_survival_metrics(self.difficulty_score),
+            "status": "PATIENT_SPECIFIC_PREDICTION_NOT_VALIDATED",
+            "response_probabilities": None,
+            "toxicity_risk": None,
+            "survival_estimates": None,
+            "governance": governance_metadata(
+                epistemic_label=EpistemicLabel.UNKNOWN,
+                output_kind="legacy_scenario_outcome_gate",
+            ),
+            "limitations": [
+                "Historical transforms lack governed source verification.",
+                "No individual response, toxicity, or survival estimate is emitted.",
+            ],
         }
         
         self.expected_outcomes = outcomes

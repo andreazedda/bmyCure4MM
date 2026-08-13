@@ -14,173 +14,18 @@ from django.views.decorators.http import require_http_methods
 
 import django_filters
 
+from mmportal.governance import (
+    EpistemicLabel,
+    build_model_relative_diagnostics,
+    governance_metadata,
+)
+
 from . import forms, models
 from .models_symptoms import SymptomAssessment
 from .forms_symptoms import SymptomAssessmentForm, QuickSymptomForm
 
 embed_debug_logger = logging.getLogger("embed_debug")
 
-
-def _interpret_latest_simulation(summary: dict[str, object] | None, parameters: dict[str, object] | None) -> dict[str, object] | None:
-    """Comprehensive decision support: interpretation + actionable recommendations."""
-    if not summary:
-        return None
-
-    def f(name: str) -> float | None:
-        v = summary.get(name)
-        try:
-            return float(v) if v is not None else None
-        except Exception:
-            return None
-
-    tumor_reduction = f("tumor_reduction")
-    healthy_loss = f("healthy_loss")
-    time_to_recurrence = f("time_to_recurrence")
-
-    def band_label(value: float | None, *, good_ge: float | None = None, bad_lt: float | None = None) -> str:
-        if value is None:
-            return "unknown"
-        if good_ge is not None and value >= good_ge:
-            return "good"
-        if bad_lt is not None and value < bad_lt:
-            return "bad"
-        return "caution"
-
-    # Heuristics (UX-only): meant for beginner orientation, not clinical advice.
-    tumor_label = band_label(tumor_reduction, good_ge=0.50, bad_lt=0.0)
-    # Lower healthy loss is better.
-    if healthy_loss is None:
-        healthy_label = "unknown"
-    elif healthy_loss < 0.20:
-        healthy_label = "good"
-    elif healthy_loss < 0.30:
-        healthy_label = "caution"
-    else:
-        healthy_label = "bad"
-
-    # Longer time to recurrence is better (if present).
-    if time_to_recurrence is None:
-        recurrence_label = "unknown"
-    elif time_to_recurrence >= 180:
-        recurrence_label = "good"
-    elif time_to_recurrence >= 90:
-        recurrence_label = "caution"
-    else:
-        recurrence_label = "bad"
-
-    # Overall: worst-of with a slight preference for toxicity (healthy_loss) warnings.
-    labels = [tumor_label, healthy_label, recurrence_label]
-    if "bad" in labels:
-        overall = "bad"
-    elif "caution" in labels:
-        overall = "caution"
-    elif "good" in labels:
-        overall = "good"
-    else:
-        overall = "unknown"
-
-    # Extract current parameters (for recommendations)
-    param = parameters or {}
-    time_horizon = param.get("time_horizon")
-    try:
-        time_horizon = int(time_horizon) if time_horizon is not None else 168
-    except Exception:
-        time_horizon = 168
-
-    # Generate actionable recommendations based on results.
-    recommendations: list[dict[str, str]] = []
-
-    # Scenario 1: High toxicity (healthy_loss ≥ 0.30)
-    if healthy_loss is not None and healthy_loss >= 0.30:
-        recommendations.append({
-            "issue_en": "High toxicity (healthy cell loss ≥30%)",
-            "issue_it": "Alta tossicità (perdita di cellule sane ≥30%)",
-            "action_en": "Reduce drug doses by 20–30% or shorten time horizon",
-            "action_it": "Riduci le dosi dei farmaci del 20–30% o accorcia l'orizzonte temporale",
-            "rationale_en": "Too much damage to healthy plasma cells. Lower doses preserve immune function.",
-            "rationale_it": "Troppo danno alle plasmacellule sane. Dosi più basse preservano la funzione immunitaria.",
-            "icon": "⚠️",
-            "priority": "high",
-        })
-    elif healthy_loss is not None and healthy_loss >= 0.20:
-        recommendations.append({
-            "issue_en": "Moderate toxicity (healthy cell loss 20–30%)",
-            "issue_it": "Tossicità moderata (perdita di cellule sane 20–30%)",
-            "action_en": "Consider reducing doses by 10–15% if patient shows clinical toxicity signs",
-            "action_it": "Considera di ridurre le dosi del 10–15% se il paziente mostra segni clinici di tossicità",
-            "rationale_en": "Borderline toxicity. Monitor closely; reduce if side effects appear.",
-            "rationale_it": "Tossicità al limite. Monitora attentamente; riduci se compaiono effetti collaterali.",
-            "icon": "⚠️",
-            "priority": "medium",
-        })
-
-    # Scenario 2: Poor efficacy (tumor_reduction < 0.30)
-    if tumor_reduction is not None and tumor_reduction < 0.30:
-        if healthy_loss is None or healthy_loss < 0.30:
-            # Low efficacy but tolerable toxicity → try increasing doses or horizon
-            recommendations.append({
-                "issue_en": "Low tumor reduction (<30%)",
-                "issue_it": "Bassa riduzione tumorale (<30%)",
-                "action_en": "Increase drug doses by 15–25% or extend time horizon to 224–280 days",
-                "action_it": "Aumenta le dosi dei farmaci del 15–25% o estendi l'orizzonte a 224–280 giorni",
-                "rationale_en": "More aggressive therapy may improve response if toxicity remains acceptable.",
-                "rationale_it": "Una terapia più aggressiva può migliorare la risposta se la tossicità resta accettabile.",
-                "icon": "📈",
-                "priority": "high",
-            })
-
-    # Scenario 3: Negative tumor reduction (tumor growth)
-    if tumor_reduction is not None and tumor_reduction < 0:
-        recommendations.append({
-            "issue_en": "Tumor growth (negative reduction)",
-            "issue_it": "Crescita tumorale (riduzione negativa)",
-            "action_en": "Switch to a different regimen or significantly increase doses",
-            "action_it": "Cambia regime terapeutico o aumenta significativamente le dosi",
-            "rationale_en": "Current regimen is ineffective. Consider alternative drug combinations.",
-            "rationale_it": "Il regime attuale è inefficace. Considera combinazioni alternative di farmaci.",
-            "icon": "🚨",
-            "priority": "critical",
-        })
-
-    # Scenario 4: Short time to recurrence (if measured)
-    if time_to_recurrence is not None and time_to_recurrence < 90:
-        if time_horizon < 200:
-            recommendations.append({
-                "issue_en": "Early recurrence predicted (<90 days)",
-                "issue_it": "Recidiva precoce prevista (<90 giorni)",
-                "action_en": "Extend time horizon to 224–280 days to simulate longer treatment",
-                "action_it": "Estendi l'orizzonte a 224–280 giorni per simulare un trattamento più lungo",
-                "rationale_en": "Longer therapy duration may delay recurrence and improve durability.",
-                "rationale_it": "Una durata più lunga può ritardare la recidiva e migliorare la durabilità.",
-                "icon": "⏱️",
-                "priority": "medium",
-            })
-
-    # Scenario 5: Good balance
-    if overall == "good":
-        recommendations.append({
-            "issue_en": "Favorable balance (good efficacy, acceptable toxicity)",
-            "issue_it": "Equilibrio favorevole (buona efficacia, tossicità accettabile)",
-            "action_en": "Fine-tune by testing ±10% dose variations or compare alternative regimens",
-            "action_it": "Ottimizza testando variazioni di dose ±10% o confronta regimi alternativi",
-            "rationale_en": "Current settings look promising. Minor adjustments may further optimize.",
-            "rationale_it": "Le impostazioni attuali sono promettenti. Piccole modifiche possono ottimizzare ulteriormente.",
-            "icon": "✅",
-            "priority": "low",
-        })
-
-    # Sort by priority
-    priority_order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
-    recommendations.sort(key=lambda r: priority_order.get(r.get("priority", "low"), 99))
-
-    return {
-        "overall": overall,
-        "tumor_reduction_label": tumor_label,
-        "healthy_loss_label": healthy_label,
-        "time_to_recurrence_label": recurrence_label,
-        "recommendations": recommendations,
-        "has_recommendations": len(recommendations) > 0,
-    }
 
 is_staff = user_passes_test(lambda u: u.is_staff)
 
@@ -452,7 +297,7 @@ def patient_detail(request: HttpRequest, pk: int) -> HttpResponse:
     latest_simulation_summary = None
     latest_simulation_artifacts = None
     latest_simulation_scenario_url = None
-    latest_simulation_interpretation = None
+    latest_simulation_diagnostics = None
     if latest_assessment_id:
         try:
             from django.db.models import Q
@@ -492,9 +337,8 @@ def patient_detail(request: HttpRequest, pk: int) -> HttpResponse:
             if latest_simulation_attempt:
                 latest_simulation_summary = latest_simulation_attempt.results_summary or None
                 latest_simulation_artifacts = latest_simulation_attempt.artifacts or None
-                latest_simulation_interpretation = _interpret_latest_simulation(
+                latest_simulation_diagnostics = build_model_relative_diagnostics(
                     latest_simulation_summary if isinstance(latest_simulation_summary, dict) else None,
-                    latest_simulation_attempt.parameters if isinstance(latest_simulation_attempt.parameters, dict) else None,
                 )
                 latest_simulation_scenario_url = (
                     reverse("simulator:scenario_detail", args=[latest_simulation_attempt.scenario_id])
@@ -621,37 +465,37 @@ def patient_detail(request: HttpRequest, pk: int) -> HttpResponse:
         interpretation_run_status = "No completed mechanistic simulation or exploratory what-if comparison is currently recorded for this patient."
 
     if research_missing_required_data:
-        research_recommended_next_step = {
+        research_next_step = {
             "label": "Complete minimum research input fields",
             "detail": "The latest assessment is missing fields required for a reproducible twin initialization.",
             "href": reverse("clinic:assessment_new", args=[patient.id]) if editable else research_twin_url,
         }
     elif research_twin_state is None:
-        research_recommended_next_step = {
+        research_next_step = {
             "label": "Initialize research twin",
             "detail": "Create a PatientTwinState from a dated assessment before calibration or what-if simulation.",
             "href": research_twin_url + "#twin-state",
         }
     elif research_latest_residual is None:
-        research_recommended_next_step = {
+        research_next_step = {
             "label": "Run or review calibration",
             "detail": "Calibration residuals are needed to understand how well the model reproduces observed biomarkers.",
             "href": research_twin_url + "#calibration-quality",
         }
     elif research_completed_counterfactual_count == 0:
-        research_recommended_next_step = {
+        research_next_step = {
             "label": "Run predefined what-if scenarios",
             "detail": "Completed mechanistic runs are needed before trajectory and utility comparisons are meaningful.",
             "href": research_twin_url + "#what-if-scenarios",
         }
     elif research_provenance_count == 0:
-        research_recommended_next_step = {
+        research_next_step = {
             "label": "Regenerate provenance metadata",
             "detail": "Traceability is incomplete until simulation metadata records exist for the current twin state.",
             "href": research_twin_url + "#provenance",
         }
     else:
-        research_recommended_next_step = {
+        research_next_step = {
             "label": "Review full research cockpit",
             "detail": "Data, twin state, calibration, scenarios, and provenance are present; review limitations before interpreting outputs.",
             "href": research_twin_url,
@@ -677,9 +521,9 @@ def patient_detail(request: HttpRequest, pk: int) -> HttpResponse:
             "and cannot prove that one therapy would have produced a better real-world outcome on this page."
         ),
         "utility_formula": "U(a)=benefit(a)-toxicity(a)-uncertainty(a)",
-        "utility_explanation": "Better treatment is undefined until a utility function is specified.",
+        "utility_explanation": "A cross-scenario ordering is undefined until a research utility function is specified.",
         "plain_language": "The platform can compare simulated strategies, but cannot prove what would have happened clinically.",
-        "next_action": research_recommended_next_step,
+        "next_action": research_next_step,
     }
 
     context = {
@@ -706,7 +550,7 @@ def patient_detail(request: HttpRequest, pk: int) -> HttpResponse:
         "latest_simulation_summary": latest_simulation_summary,
         "latest_simulation_artifacts": latest_simulation_artifacts,
         "latest_simulation_scenario_url": latest_simulation_scenario_url,
-        "latest_simulation_interpretation": latest_simulation_interpretation,
+        "latest_simulation_diagnostics": latest_simulation_diagnostics,
         "research_twin_state": research_twin_state,
         "research_latest_residual": research_latest_residual,
         "research_last_calibration_status": research_last_calibration_status,
@@ -719,7 +563,7 @@ def patient_detail(request: HttpRequest, pk: int) -> HttpResponse:
         "research_developer_url": research_developer_url,
         "research_glossary_url": research_glossary_url,
         "research_twin_url": research_twin_url,
-        "research_recommended_next_step": research_recommended_next_step,
+        "research_next_step": research_next_step,
         "research_interpretation_status": research_interpretation_status,
     }
     return render(request, "clinic/patient_detail.html", context)
@@ -900,229 +744,100 @@ def symptom_assessment_list(request: HttpRequest, patient_id: int) -> HttpRespon
 
 @login_required
 def prognosis_timeline(request: HttpRequest, patient_id: int) -> HttpResponse:
-    """Display exploratory prognosis context and timeline for a patient."""
-    from simulator.prognosis import estimate_prognosis
-    
+    """Fail closed until individual prognosis has governed validation."""
     patient = get_object_or_404(models.Patient, pk=patient_id)
-    
-    # Get latest assessment for R-ISS and response
-    latest_assessment = patient.assessments.first()
-    
-    # Get cytogenetics
-    cytogenetics = list(
-        patient.cytogenetics.values_list("abnormality__code", flat=True)
-    )
-    
-    # Get latest symptom assessment for ECOG
-    latest_symptoms = SymptomAssessment.objects.filter(patient=patient).first()
-    ecog = latest_symptoms.ecog_status if latest_symptoms else None
-    
-    # Count therapy lines
-    therapy_count = patient.therapies.count()
-    line_of_therapy = max(therapy_count, 1)
-    structured_r_iss = latest_assessment.r_iss if latest_assessment and latest_assessment.r_iss else None
-    response_value = latest_assessment.response if latest_assessment and latest_assessment.response else None
-    response_label = latest_assessment.get_response_display() if response_value else None
-    
-    # Build patient parameters
-    patient_params = {
-        "r_iss": structured_r_iss or "II",
-        "cytogenetics": cytogenetics,
-        "age": patient.age,
-        "ecog": ecog,
-        "response": response_value,
-        "line_of_therapy": line_of_therapy,
-    }
-    
-    # Calculate prognosis estimate
-    estimate = estimate_prognosis(**patient_params)
-    confidence_score = float(estimate.confidence or 0.0)
-    confidence_percentage = round(confidence_score * 100)
-    if confidence_score <= 0.10:
-        confidence_warning = "Model confidence is extremely limited. Treat this page as exploratory context only."
-        confidence_alert_class = "alert-danger"
-    elif confidence_score < 0.50:
-        confidence_warning = "Model confidence is limited. Do not use this page for treatment comparison."
-        confidence_alert_class = "alert-warning"
-    else:
-        confidence_warning = "Model confidence is still heuristic and does not establish individual prognosis."
-        confidence_alert_class = "alert-info"
-    
-    # Calculate intermediate timepoints (3m, 6m) by interpolation
-    import math
-    def survival_prob(median: float, months: float) -> float:
-        if median <= 0:
-            return 0.0
-        lambda_rate = math.log(2) / median
-        return math.exp(-lambda_rate * months) * 100
-    
-    pfs_3m = survival_prob(estimate.median_pfs_months, 3)
-    pfs_6m = survival_prob(estimate.median_pfs_months, 6)
-    timeline_rows = [
-        {
-            "horizon": horizon,
-            "pfs_probability": f"{probability}%",
-            "interpretation": _build_prognosis_timeline_interpretation(probability),
-            "caveat": "Population/heuristic estimate; not an individual prediction.",
-        }
-        for horizon, probability in [
-            ("3 months", round(pfs_3m)),
-            ("6 months", round(pfs_6m)),
-            ("12 months", round(estimate.pfs_12m * 100)),
-            ("24 months", round(estimate.pfs_24m * 100)),
-            ("36 months", round(estimate.pfs_36m * 100)),
-        ]
-    ]
 
-    adjustment_rows = _build_prognosis_adjustment_rows(estimate.modifiers_applied)
-    risk_group_label = _format_risk_category_label(estimate.risk_category)
-    patient_detail_url = reverse("clinic:patient_detail", args=[patient.id])
-    research_simple_url = reverse("twin_engine:simple_research_view", args=[patient.id])
-    research_cockpit_url = reverse("twin_engine:research_cockpit", args=[patient.id])
-    simulation_url = reverse("simulator:scenario_list")
-    if latest_assessment is not None:
-        simulation_url = f"{simulation_url}?twin_assessment_id={latest_assessment.pk}"
-
-    data_source_rows = [
-        {
-            "variable": "R-ISS",
-            "value": structured_r_iss or "II (default fallback)",
-            "classification": "RAW STRUCTURED" if structured_r_iss else "UNKNOWN",
-            "role": (
-                "Structured stage used to select the literature-derived baseline survival values."
-                if structured_r_iss
-                else "Fallback stage used because no structured R-ISS value was recorded."
-            ),
-        },
-        {
-            "variable": "Age",
-            "value": f"{patient.age} years",
-            "classification": "DERIVED",
-            "role": "Derived from birth date and used as a heuristic age modifier.",
-        },
-        {
-            "variable": "Line of therapy",
-            "value": str(line_of_therapy) if therapy_count else "1 (default from no recorded therapies)",
-            "classification": "DERIVED" if therapy_count else "HEURISTIC",
-            "role": (
-                "Derived from recorded therapy count and used as relapse context."
-                if therapy_count
-                else "Default context when no explicit therapy line is recorded."
-            ),
-        },
-        {
-            "variable": "Response / progression context",
-            "value": response_label or "Not recorded",
-            "classification": "RAW STRUCTURED" if response_label else "UNKNOWN",
-            "role": (
-                "Structured response context that modifies the heuristic estimate."
-                if response_label
-                else "No structured response context was available for this estimate."
-            ),
-        },
-        {
-            "variable": "Adjustments applied",
-            "value": "; ".join(estimate.modifiers_applied) if estimate.modifiers_applied else "No explicit adjustment beyond baseline stage.",
-            "classification": "HEURISTIC",
-            "role": "Rule-based modifiers that shift or contextualize the baseline estimate.",
-        },
-        {
-            "variable": "Reference",
-            "value": estimate.reference,
-            "classification": "LITERATURE-BASED",
-            "role": "Literature source used for the baseline numerical survival values in this estimate.",
-        },
-        {
-            "variable": "Median PFS",
-            "value": f"{estimate.median_pfs_months:.1f} months",
-            "classification": "HEURISTIC",
-            "role": "Adjusted exploratory progression-free survival estimate using literature baseline values plus rule-based modifiers.",
-        },
-        {
-            "variable": "Median OS",
-            "value": f"{estimate.median_os_months:.1f} months",
-            "classification": "HEURISTIC",
-            "role": "Adjusted exploratory overall survival estimate using literature baseline values plus rule-based modifiers.",
-        },
-    ]
-
-    estimate_cards = [
-        {
-            "label": "Risk group",
-            "value": risk_group_label,
-            "detail": "Derived from the literature-based baseline stage plus applied heuristic modifiers.",
-        },
-        {
-            "label": "Median PFS",
-            "value": f"{estimate.median_pfs_months:.1f} months",
-            "detail": "Exploratory progression-free survival estimate.",
-        },
-        {
-            "label": "Median OS",
-            "value": f"{estimate.median_os_months:.1f} months",
-            "detail": "Exploratory overall survival estimate.",
-        },
-        {
-            "label": "Confidence / completeness score",
-            "value": f"{confidence_percentage}%",
-            "detail": "Input completeness and heuristic reliability score, not clinical certainty.",
-        },
-    ]
-    
     context = {
         "patient": patient,
-        "page_purpose": "This page organizes exploratory prognosis context from structured patient factors, literature-derived baseline survival values, and heuristic modifiers.",
+        "page_purpose": (
+            "This page records the E1 scientific gate for individual prognosis "
+            "and links back to observed longitudinal data."
+        ),
         "interpretation_status": {
-            "title": "Prognosis / timeline interpretation status",
-            "summary": "This page shows heuristic/literature-informed prognosis estimates, not a patient-specific clinical prediction.",
-            "limit": "This page cannot determine whether an alternative treatment would have changed this patient’s outcome.",
+            "title": "PATIENT_SPECIFIC_PREDICTION_NOT_VALIDATED",
+            "summary": (
+                "No patient-specific PFS, OS, survival probability, or benefit "
+                "estimate is emitted at the current evidence level."
+            ),
+            "limit": (
+                "Population references and heuristic modifiers have not passed "
+                "the governed validation required for individual prediction."
+            ),
         },
         "confidence_panel": {
-            "title": "Model confidence / uncertainty",
-            "score_label": "Model completeness/confidence score",
-            "percentage": confidence_percentage,
-            "explanation": "This score reflects input completeness and heuristic reliability, not clinical certainty.",
-            "warning": confidence_warning,
-            "alert_class": confidence_alert_class,
+            "title": "Scientific validation gate",
+            "score_label": "Validated individual-prediction confidence",
+            "percentage": 0,
+            "explanation": (
+                "Zero represents unavailable governed validation, not a "
+                "probability about this patient."
+            ),
+            "warning": (
+                "INSUFFICIENT_VALIDATION: individual prognosis is suppressed "
+                "and cannot be recovered by adding a disclaimer."
+            ),
+            "alert_class": "alert-danger",
         },
-        "data_source_rows": data_source_rows,
-        "estimate_cards": estimate_cards,
-        "timeline_rows": timeline_rows,
-        "adjustment_rows": adjustment_rows,
+        "data_source_rows": [
+            {
+                "variable": "Observed assessment timeline",
+                "value": f"{patient.assessments.count()} dated assessment(s)",
+                "classification": "OBSERVED",
+                "role": "Available for descriptive longitudinal review only.",
+            },
+            {
+                "variable": "Recorded therapy timeline",
+                "value": f"{patient.therapies.count()} dated therapy record(s)",
+                "classification": "OBSERVED",
+                "role": "Available for chronology; no counterfactual effect is inferred.",
+            },
+            {
+                "variable": "Individual prognosis model",
+                "value": "Not validated",
+                "classification": "UNKNOWN",
+                "role": "Suppressed by claims-policy-v1.",
+            },
+        ],
+        "estimate_cards": [
+            {
+                "label": "Scientific status",
+                "value": "INSUFFICIENT_VALIDATION",
+                "detail": "No individual numerical prognosis is available.",
+            }
+        ],
+        "timeline_rows": [],
+        "adjustment_rows": [],
         "reference_info": {
-            "title": "Reference",
-            "label": "Literature source used for baseline numerical values",
-            "value": estimate.reference,
-            "detail": "The current code uses literature-derived baseline survival values and then applies rule-based heuristic modifiers to generate the displayed estimate.",
+            "title": "Validation requirement",
+            "label": "Required before numerical individual prognosis",
+            "value": "Separately governed source verification and external validation",
+            "detail": (
+                "The dormant heuristic research module is not evidence of "
+                "patient-level applicability."
+            ),
         },
         "what_can_be_concluded": [
-            "The page can provide exploratory prognosis context.",
-            "The page can show which patient factors modify the heuristic estimate.",
-            "The page can highlight uncertainty and missing evidence.",
+            "Dated observed assessments and therapies can be reviewed.",
+            "Missing validation is an explicit scientific result.",
         ],
         "what_cannot_be_concluded": [
-            "It cannot prove individual survival.",
-            "It cannot determine treatment superiority.",
-            "It cannot infer what would have happened under an alternative therapy.",
-            "It cannot replace counterfactual simulation or clinical validation.",
+            "Individual PFS, OS, or survival probability.",
+            "Patient benefit under an observed or alternative therapy.",
+            "A comparative or causal treatment effect.",
         ],
         "next_actions": {
             "primary": {
-                "label": "Open Simple Research View",
-                "href": research_simple_url,
+                "label": "Back to observed patient timeline",
+                "href": reverse("clinic:patient_detail", args=[patient.id]),
             },
             "secondary": [
                 {
-                    "label": "Back to Patient",
-                    "href": patient_detail_url,
+                    "label": "Open Simple Research View",
+                    "href": reverse("twin_engine:simple_research_view", args=[patient.id]),
                 },
                 {
                     "label": "Open Scientific Cockpit",
-                    "href": research_cockpit_url,
-                },
-                {
-                    "label": "Start exploratory simulation",
-                    "href": simulation_url,
+                    "href": reverse("twin_engine:research_cockpit", args=[patient.id]),
                 },
             ],
         },
@@ -1130,118 +845,32 @@ def prognosis_timeline(request: HttpRequest, patient_id: int) -> HttpResponse:
     return render(request, "clinic/prognosis_timeline.html", context)
 
 
-def _build_prognosis_timeline_interpretation(probability_pct: int) -> str:
-    if probability_pct >= 80:
-        return "Higher heuristic progression-free probability at this horizon."
-    if probability_pct >= 60:
-        return "Moderate heuristic progression-free probability at this horizon."
-    if probability_pct >= 40:
-        return "Meaningful uncertainty about remaining progression-free by this horizon."
-    return "Lower heuristic progression-free probability at this horizon."
-
-
-def _build_prognosis_adjustment_rows(modifiers_applied: list[str]) -> list[dict[str, str]]:
-    if not modifiers_applied:
-        return [
-            {
-                "trigger": "No explicit adjustment recorded beyond the baseline stage lookup.",
-                "source_type": "HEURISTIC",
-                "effect_direction": "No extra direction recorded beyond the baseline literature lookup.",
-                "estimate_effect": "Context only",
-            }
-        ]
-
-    rows: list[dict[str, str]] = []
-    for modifier in modifiers_applied:
-        modifier_lower = modifier.lower()
-        source_type = "HEURISTIC"
-        effect_direction = "Rule-based modifier applied to the estimate."
-        estimate_effect = "Changes PFS/OS estimate"
-
-        if modifier_lower.startswith("cytogenetics:"):
-            source_type = "RAW STRUCTURED"
-            effect_direction = "Higher-risk cytogenetics usually shift the estimate downward."
-        elif modifier_lower.startswith("age"):
-            source_type = "DERIVED"
-            effect_direction = "Age band changes the estimate through a stored heuristic modifier."
-        elif modifier_lower.startswith("ecog"):
-            source_type = "RAW STRUCTURED"
-            effect_direction = "Worse functional status shifts the estimate downward."
-        elif modifier_lower.startswith("response:"):
-            source_type = "RAW STRUCTURED"
-            effect_direction = _build_prognosis_response_effect_direction(modifier_lower)
-        elif "mrd" in modifier_lower:
-            source_type = "RAW STRUCTURED"
-            effect_direction = "MRD status changes the estimate according to the stored heuristic modifier."
-        elif modifier_lower.startswith("line"):
-            source_type = "DERIVED"
-            effect_direction = "Later therapy lines shift the estimate downward."
-
-        rows.append(
-            {
-                "trigger": modifier,
-                "source_type": source_type,
-                "effect_direction": effect_direction,
-                "estimate_effect": estimate_effect,
-            }
-        )
-    return rows
-
-
-def _build_prognosis_response_effect_direction(modifier_lower: str) -> str:
-    if "stringent complete response" in modifier_lower or "complete response" in modifier_lower or "very good partial response" in modifier_lower:
-        return "Deeper recorded response shifts the estimate upward relative to partial response."
-    if "stable disease" in modifier_lower or "progressive disease" in modifier_lower:
-        return "Less favorable recorded response shifts the estimate downward relative to partial response."
-    return "Recorded response modifies the estimate relative to the stored baseline response assumption."
-
-
-def _format_risk_category_label(risk_category: str) -> str:
-    labels = {
-        "standard": "Standard",
-        "intermediate": "Intermediate",
-        "high": "High",
-        "very_high": "Very High",
-    }
-    return labels.get(risk_category, risk_category.replace("_", " ").title())
-
-
 @login_required
 @require_http_methods(["GET"])
 def prognosis_api(request: HttpRequest, patient_id: int) -> JsonResponse:
-    """JSON API for prognosis data."""
-    from simulator.prognosis import estimate_prognosis
-    
+    """Fail-closed JSON status for the unavailable individual prognosis."""
     patient = get_object_or_404(models.Patient, pk=patient_id)
     if not can_edit_patient(request.user, patient):
         return JsonResponse({"error": "forbidden"}, status=403)
-    
-    # Get parameters from request or patient data
-    latest_assessment = patient.assessments.first()
-    cytogenetics = list(patient.cytogenetics.values_list("abnormality__code", flat=True))
-    latest_symptoms = SymptomAssessment.objects.filter(patient=patient).first()
-    
-    params = {
-        "r_iss": request.GET.get("r_iss") or (latest_assessment.r_iss if latest_assessment else "II"),
-        "cytogenetics": request.GET.getlist("cytogenetics") or cytogenetics,
-        "age": int(request.GET.get("age", patient.age)),
-        "ecog": int(request.GET.get("ecog")) if request.GET.get("ecog") else (latest_symptoms.ecog_status if latest_symptoms else None),
-        "response": request.GET.get("response") or (latest_assessment.response if latest_assessment else None),
-        "mrd_status": request.GET.get("mrd_status"),
-        "line_of_therapy": int(request.GET.get("line", 1)),
-    }
-    
-    estimate = estimate_prognosis(**params)
-    
+
     return JsonResponse({
+        "governance": governance_metadata(
+            epistemic_label=EpistemicLabel.UNKNOWN,
+            output_kind="individual_prognosis_gate",
+        ),
         "patient_id": patient_id,
-        "parameters": params,
-        "estimate": estimate.to_dict(),
+        "status": "PATIENT_SPECIFIC_PREDICTION_NOT_VALIDATED",
+        "estimate": None,
+        "limitations": [
+            "No patient-specific PFS, OS, survival probability, or benefit estimate is emitted.",
+            "Population heuristics have not passed governed external validation for individual use.",
+        ],
     })
 
 
+
 # ══════════════════════════════════════════════════════════════════════════════
-# REGIMEN SUGGESTER VIEWS
+# EXPLORATORY REGIMEN-CONTEXT VIEWS
 # ══════════════════════════════════════════════════════════════════════════════
 
 @login_required
@@ -1331,8 +960,8 @@ def regimen_suggestions(request: HttpRequest, patient_id: int) -> HttpResponse:
         "page_purpose": "Use this page to inspect how the current rule set groups regimen hypotheses and constraints from the available structured inputs.",
         "interpretation_status": {
             "title": "Exploratory regimen context",
-            "summary": "This page organizes regimen-related context using heuristic and literature-informed rules. It is not a clinical treatment recommendation.",
-            "limit": "This page cannot determine whether one regimen would be clinically superior for this patient.",
+            "summary": "This page organizes regimen-related context using heuristic rules whose source-level evidence requires verification. It is not a clinical treatment recommendation.",
+            "limit": "This page cannot support a patient-specific comparative clinical conclusion.",
         },
         "data_source_rows": _build_regimen_data_source_rows(
             disease_setting=disease_setting,
@@ -1544,18 +1173,20 @@ def _build_regimen_cards(
     for regimen in regimens:
         trial_list = list(regimen.get("key_trials") or [])
         classification_labels = ["HEURISTIC"]
-        classification_labels.append("LITERATURE-BASED" if trial_list else "UNKNOWN")
+        classification_labels.append("LITERATURE-INFORMED" if trial_list else "NEEDS_EVIDENCE")
         cards.append(
             {
                 "name": regimen.get("name", "Unnamed regimen"),
                 "full_name": regimen.get("full_name", ""),
                 "components": regimen.get("components", []),
-                "why_it_appears": _soften_regimen_rationale_text(
-                    str(regimen.get("rationale") or regimen.get("indication") or "Surfaced by the current rule set.")
+                "why_it_appears": (
+                    "This catalog entry was surfaced by the current heuristic "
+                    "bucket rules for the provided inputs. The rule does not "
+                    "estimate patient benefit."
                 ),
                 "classification_labels": classification_labels,
                 "logic_basis": (
-                    "Heuristic grouping using literature-informed regimen summaries."
+                    "Heuristic grouping with named source candidates."
                     if trial_list
                     else "Heuristic grouping with limited literature metadata surfaced on this page."
                 ),
@@ -1563,8 +1194,8 @@ def _build_regimen_cards(
                 "population_signal": regimen.get("expected_response_rate") or "Population response signal not surfaced",
                 "evidence_level": regimen.get("evidence_level") or "Not stated",
                 "key_trials": trial_list,
-                "considerations": regimen.get("considerations", []),
-                "contraindications": regimen.get("contraindications", []),
+                "considerations": [],
+                "contraindications": [],
             }
         )
     return cards
@@ -1578,7 +1209,10 @@ def _build_regimen_constraint_cards(
         cards.append(
             {
                 "agent": str(item.get("agent") or "Constraint flag"),
-                "reason": str(item.get("reason") or "No reason provided"),
+                "reason": (
+                    "The provided inputs activated a configured research "
+                    "constraint for this catalog entry."
+                ),
                 "classification": "HEURISTIC",
                 "logic_basis": "Constraint flag from the current toxicity or comorbidity rules.",
                 "uncertainty_caveat": _build_regimen_uncertainty_caveat(missing_inputs),
@@ -1588,30 +1222,16 @@ def _build_regimen_constraint_cards(
 
 
 def _build_regimen_uncertainty_caveat(missing_inputs: list[str]) -> str:
-    base = "This card reflects heuristic grouping plus literature-informed regimen summaries; it does not infer patient-specific benefit."
+    base = "This card reflects heuristic grouping; its source-level evidence requires verification and it does not infer patient-specific benefit."
     if not missing_inputs:
         return base
     return f"{base} Missing structured inputs for this page: {', '.join(missing_inputs)}."
 
 
-def _soften_regimen_rationale_text(text: str) -> str:
-    replacements = [
-        ("Preferred regimen for ", "Surfaced for "),
-        ("Preferred for ", "Surfaced for "),
-        ("Quadruplet preferred for ", "Quadruplet context surfaced for "),
-        ("Standard of care for ", "Commonly cited regimen context for "),
-        ("Good option", "Exploratory option"),
-    ]
-    softened = text
-    for old, new in replacements:
-        softened = softened.replace(old, new)
-    return softened
-
-
 @login_required
 @require_http_methods(["GET"])
 def regimen_suggestions_api(request: HttpRequest, patient_id: int) -> JsonResponse:
-    """JSON API for regimen suggestions."""
+    """JSON API for non-prescriptive regimen catalog context."""
     from simulator.regimen_suggester import suggest_regimens
     
     patient = get_object_or_404(models.Patient, pk=patient_id)
@@ -1638,7 +1258,21 @@ def regimen_suggestions_api(request: HttpRequest, patient_id: int) -> JsonRespon
     )
     
     return JsonResponse({
+        "governance": governance_metadata(
+            epistemic_label=EpistemicLabel.HEURISTIC,
+            output_kind="regimen_context",
+        ),
         "patient_id": patient_id,
-        "suggestions": suggestions,
+        "exploratory_reference_sets": _build_regimen_sections(
+            suggestions,
+            missing_inputs=[],
+        ),
+        "constraint_flags": _build_regimen_constraint_cards(
+            suggestions.get("avoid", []),
+            missing_inputs=[],
+        ),
+        "limitations": [
+            "Catalog buckets are heuristic and their source-level evidence requires verification.",
+            "No patient-specific benefit, safety, or comparative clinical conclusion is identified.",
+        ],
     })
-

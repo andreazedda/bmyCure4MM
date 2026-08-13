@@ -3,15 +3,23 @@
 <div class="card shadow-sm">
     <div class="card-header bg-success text-white">
         <h5 class="mb-0">
-            <i class="bi bi-check-circle"></i> Cohort Results
+            <i class="bi bi-check-circle"></i> Synthetic Model-Cohort Results
             <span class="badge bg-light text-dark ms-2">n={{ n_patients }}</span>
         </h5>
     </div>
     <div class="card-body">
         <p class="text-muted">
-            Simulated <strong>{{ n_patients }}</strong> virtual patients with parameter variability. 
-            Results aggregated below.
+            Simulated <strong>{{ n_patients }}</strong> synthetic model instances with
+            parameter variability. Results are model-relative aggregates, not clinical
+            efficacy, safety, or patient-outcome estimates.
         </p>
+
+        <div class="alert alert-warning small" role="alert">
+            <strong>{{ cohort_governance.intended_use_level }}</strong> ·
+            {{ cohort_governance.epistemic_label }} ·
+            model {{ cohort_governance.model_version }}.
+            No clinical decision support or patient-specific prediction is validated.
+        </div>
 
         <!-- KPI Summary Cards -->
         <div class="row g-3 mb-4">
@@ -19,7 +27,7 @@
                 <div class="card border-primary">
                     <div class="card-body">
                         <h6 class="card-subtitle text-muted mb-2">
-                            <i class="bi bi-arrow-up-circle"></i> Efficacy
+                            <i class="bi bi-arrow-up-circle"></i> Modeled tumor-reduction signal
                         </h6>
                         <div class="h4 text-primary mb-1">{{ result.aggregates.efficacy_mean|floatformat:3 }}</div>
                         <small class="text-muted">
@@ -34,7 +42,7 @@
                 <div class="card border-warning">
                     <div class="card-body">
                         <h6 class="card-subtitle text-muted mb-2">
-                            <i class="bi bi-shield-exclamation"></i> Toxicity
+                            <i class="bi bi-shield-exclamation"></i> Modeled healthy-compartment loss
                         </h6>
                         <div class="h4 text-warning mb-1">{{ result.aggregates.toxicity_mean|floatformat:3 }}</div>
                         <small class="text-muted">
@@ -53,7 +61,7 @@
                         </h6>
                         <div class="h4 text-danger mb-1">{{ result.aggregates.recurrence_rate|floatformat:1 }}%</div>
                         <small class="text-muted">
-                            Fraction with time_to_recurrence
+                            Fraction with a modeled time_to_recurrence event
                         </small>
                     </div>
                 </div>
@@ -63,7 +71,7 @@
         <!-- Distribution placeholder -->
         <div class="alert alert-info" role="alert">
             <strong><i class="bi bi-graph-up"></i> Distributions:</strong>
-            Violin/box plots for efficacy and toxicity will be added in next iteration with Plotly.
+            Distribution plots for the model-relative compartment signals are not yet available.
         </div>
 
         <!-- Regimen summary -->

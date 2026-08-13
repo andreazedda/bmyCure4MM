@@ -1,16 +1,14 @@
-"""
-Virtual cohort simulation for in-silico clinical trials.
+"""Synthetic model-cohort simulation for exploratory research.
 
-Generates synthetic patient populations with parameter variability
-and runs regimen simulations across the cohort to assess aggregate outcomes.
+Generates sampled model instances with parameter variability and evaluates
+model-relative trajectories. It does not simulate a clinical trial or estimate
+outcomes for a real patient population.
 """
 from __future__ import annotations
 
-import random
 from typing import Dict, List
 
 import numpy as np
-from django.db import transaction
 from django.utils import timezone
 
 from . import models
@@ -86,10 +84,10 @@ def run_cohort(
     seed: int = 42,
 ) -> Dict:
     """
-    Run virtual cohort simulation.
-    
-    Generates n synthetic patients and simulates regimen outcomes
-    for each, collecting aggregate statistics.
+    Run a synthetic model-cohort simulation.
+
+    Generates ``n`` sampled model instances and collects aggregate,
+    model-relative statistics.
     
     Parameters:
         scenario: Clinical scenario context

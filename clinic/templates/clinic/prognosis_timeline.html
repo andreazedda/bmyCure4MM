@@ -1,312 +1,74 @@
 {% extends "base.html" %}
 
-{% block title %}
-<span class="t-en">Prognosis & Timeline</span>
-<span class="t-it">Prognosi e Timeline</span>
-- {{ patient }}
-{% endblock %}
-
-{% block extra_css %}
-<style>
-.prognosis-ia {
-    color: #1f2937;
-}
-.page-intro {
-    background: linear-gradient(135deg, #f7fbff 0%, #fffaf2 100%);
-    border: 1px solid #d9e4ef;
-    border-radius: 14px;
-    padding: 1.25rem;
-}
-.eyebrow {
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: #64748b;
-    margin-bottom: 0.35rem;
-    font-weight: 700;
-}
-.section-card {
-    background: #fff;
-    border: 1px solid #dfe7ef;
-    border-radius: 14px;
-    padding: 1.1rem;
-    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
-}
-.metric-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 0.85rem;
-}
-.metric-card {
-    border: 1px solid #dbe5ef;
-    border-radius: 12px;
-    padding: 1rem;
-    background: #f8fafc;
-}
-.metric-card.emphasis {
-    background: #eff6ff;
-    border-color: #bfdbfe;
-}
-.metric-label {
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: #64748b;
-    margin-bottom: 0.35rem;
-}
-.metric-value {
-    font-size: 1.85rem;
-    font-weight: 700;
-    color: #0f172a;
-    line-height: 1.1;
-}
-.metric-subtitle {
-    display: inline-flex;
-    margin-top: 0.55rem;
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: #1d4ed8;
-    background: #dbeafe;
-    border: 1px solid #bfdbfe;
-    border-radius: 999px;
-    padding: 0.15rem 0.5rem;
-}
-.classification-pill {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.18rem 0.45rem;
-    border-radius: 999px;
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    border: 1px solid transparent;
-}
-.classification-pill.raw-structured {
-    background: #e0f2fe;
-    border-color: #7dd3fc;
-    color: #0c4a6e;
-}
-.classification-pill.derived {
-    background: #fef3c7;
-    border-color: #fcd34d;
-    color: #92400e;
-}
-.classification-pill.heuristic {
-    background: #ede9fe;
-    border-color: #c4b5fd;
-    color: #5b21b6;
-}
-.classification-pill.literature-based {
-    background: #dcfce7;
-    border-color: #86efac;
-    color: #166534;
-}
-.classification-pill.unknown {
-    background: #f3f4f6;
-    border-color: #d1d5db;
-    color: #374151;
-}
-.small-label {
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: #64748b;
-    font-weight: 700;
-}
-.table th,
-.table td {
-    vertical-align: top;
-}
-</style>
-{% endblock %}
+{% block title %}Individual Prediction Gate - {{ patient }}{% endblock %}
 
 {% block content %}
-<div class="container py-4 prognosis-ia">
+<div class="container py-4">
     <nav aria-label="breadcrumb" class="mb-3">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'clinic:patient_list' %}">
-                <span class="t-en">Patients</span>
-                <span class="t-it">Pazienti</span>
-            </a></li>
+            <li class="breadcrumb-item"><a href="{% url 'clinic:patient_list' %}">Patients</a></li>
             <li class="breadcrumb-item"><a href="{% url 'clinic:patient_detail' patient.pk %}">{{ patient }}</a></li>
-            <li class="breadcrumb-item active">
-                <span class="t-en">Prognosis</span>
-                <span class="t-it">Prognosi</span>
-            </li>
+            <li class="breadcrumb-item active">Prediction validation gate</li>
         </ol>
     </nav>
 
-    <div class="page-intro mb-4">
-        <div class="eyebrow">Exploratory prognosis context</div>
-        <h1 class="h3 mb-2">
-            <span class="t-en">Prognosis & Timeline for {{ patient }}</span>
-            <span class="t-it">Prognosi e Timeline per {{ patient }}</span>
-        </h1>
-        <p class="text-muted mb-0">{{ page_purpose }}</p>
-    </div>
-
-    <div class="section-card mb-4">
-        <h2 class="h5 mb-3">{{ interpretation_status.title }}</h2>
-        <p class="mb-2">{{ interpretation_status.summary }}</p>
+    <div class="alert alert-danger" role="alert">
+        <div class="small text-uppercase fw-bold mb-1">E1 scientific fail-closed status · UNKNOWN</div>
+        <h1 class="h3">{{ interpretation_status.title }}</h1>
+        <p>{{ interpretation_status.summary }}</p>
         <p class="mb-0">{{ interpretation_status.limit }}</p>
     </div>
 
-    <div class="section-card mb-4">
-        <h2 class="h5 mb-3">{{ confidence_panel.title }}</h2>
-        <div class="row g-3 align-items-start">
-            <div class="col-lg-4">
-                <div class="metric-card emphasis h-100">
-                    <div class="metric-label">{{ confidence_panel.score_label }}</div>
-                    <div class="metric-value">{{ confidence_panel.percentage }}%</div>
-                    <div class="metric-subtitle">HEURISTIC / LITERATURE-INFORMED</div>
-                </div>
-            </div>
-            <div class="col-lg-8">
-                <p class="mb-2">{{ confidence_panel.explanation }}</p>
-                <div class="alert {{ confidence_panel.alert_class }} mb-0" role="alert">
-                    {{ confidence_panel.warning }}
-                </div>
-            </div>
+    <section class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h2 class="h5">Scientific validation gate</h2>
+            <p><strong>INSUFFICIENT_VALIDATION</strong></p>
+            <p>No patient-specific probability is emitted at E1. No numerical PFS, OS, survival, or treatment-benefit estimate is available.</p>
+            <p class="mb-0">The absence of an estimate is the scientific result. It is not a zero probability and cannot be reversed by adding a disclaimer.</p>
         </div>
-    </div>
+    </section>
 
-    <div class="section-card mb-4">
-        <h2 class="h5 mb-3">Data source classification</h2>
-        <div class="table-responsive">
-            <table class="table table-sm align-middle mb-0">
-                <thead>
-                    <tr>
-                        <th>Variable</th>
-                        <th>Value</th>
-                        <th>Classification</th>
-                        <th>Role in estimate</th>
-                    </tr>
-                </thead>
-                <tbody>
+    <section class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h2 class="h5">Available descriptive lineage</h2>
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead><tr><th>Variable</th><th>Value</th><th>Epistemic label</th><th>Allowed role</th></tr></thead>
+                    <tbody>
                     {% for row in data_source_rows %}
-                    <tr>
-                        <td>{{ row.variable }}</td>
-                        <td>{{ row.value }}</td>
-                        <td>
-                            <span class="classification-pill {{ row.classification|lower|slugify }}">{{ row.classification }}</span>
-                        </td>
-                        <td>{{ row.role }}</td>
-                    </tr>
+                        <tr><td>{{ row.variable }}</td><td>{{ row.value }}</td><td>{{ row.classification }}</td><td>{{ row.role }}</td></tr>
                     {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="section-card mb-4">
-        <h2 class="h5 mb-3">Main estimates</h2>
-        <div class="metric-grid">
-            {% for card in estimate_cards %}
-            <div class="metric-card h-100">
-                <div class="metric-label">{{ card.label }}</div>
-                <div class="metric-value">{{ card.value }}</div>
-                <div class="metric-subtitle">HEURISTIC / LITERATURE-INFORMED</div>
-                <p class="text-muted small mb-0 mt-2">{{ card.detail }}</p>
+                    </tbody>
+                </table>
             </div>
-            {% endfor %}
         </div>
-    </div>
-
-    <div class="section-card mb-4">
-        <h2 class="h5 mb-3">Timeline table</h2>
-        <div class="table-responsive">
-            <table class="table table-sm align-middle mb-0">
-                <thead>
-                    <tr>
-                        <th>Horizon</th>
-                        <th>PFS probability</th>
-                        <th>Interpretation</th>
-                        <th>Caveat</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for row in timeline_rows %}
-                    <tr>
-                        <td>{{ row.horizon }}</td>
-                        <td>{{ row.pfs_probability }}</td>
-                        <td>{{ row.interpretation }}</td>
-                        <td>{{ row.caveat }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="section-card mb-4">
-        <h2 class="h5 mb-3">Adjustments applied</h2>
-        <div class="table-responsive">
-            <table class="table table-sm align-middle mb-0">
-                <thead>
-                    <tr>
-                        <th>Trigger</th>
-                        <th>Source type</th>
-                        <th>Effect direction</th>
-                        <th>Effect on estimate</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for row in adjustment_rows %}
-                    <tr>
-                        <td>{{ row.trigger }}</td>
-                        <td>
-                            <span class="classification-pill {{ row.source_type|lower|slugify }}">{{ row.source_type }}</span>
-                        </td>
-                        <td>{{ row.effect_direction }}</td>
-                        <td>{{ row.estimate_effect }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="section-card mb-4">
-        <h2 class="h5 mb-2">{{ reference_info.title }}</h2>
-        <div class="small-label mb-2">{{ reference_info.label }}</div>
-        <p class="mb-2">{{ reference_info.value }}</p>
-        <p class="text-muted small mb-0">{{ reference_info.detail }}</p>
-    </div>
+    </section>
 
     <div class="row g-4 mb-4">
         <div class="col-lg-6">
-            <div class="section-card h-100">
-                <h2 class="h5 mb-3">What can be concluded</h2>
-                <ul class="mb-0">
-                    {% for item in what_can_be_concluded %}
-                    <li>{{ item }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
+            <section class="card shadow-sm h-100"><div class="card-body">
+                <h2 class="h5">What can be concluded</h2>
+                <ul class="mb-0">{% for item in what_can_be_concluded %}<li>{{ item }}</li>{% endfor %}</ul>
+            </div></section>
         </div>
         <div class="col-lg-6">
-            <div class="section-card h-100">
-                <h2 class="h5 mb-3">What cannot be concluded</h2>
-                <ul class="mb-0">
-                    {% for item in what_cannot_be_concluded %}
-                    <li>{{ item }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
+            <section class="card shadow-sm h-100"><div class="card-body">
+                <h2 class="h5">What cannot be concluded</h2>
+                <ul class="mb-0">{% for item in what_cannot_be_concluded %}<li>{{ item }}</li>{% endfor %}</ul>
+            </div></section>
         </div>
     </div>
 
-    <div class="section-card">
-        <h2 class="h5 mb-3">Next actions</h2>
-        <div class="d-flex flex-wrap gap-2">
-            <a href="{{ next_actions.primary.href }}" class="btn btn-primary">{{ next_actions.primary.label }}</a>
-            {% for action in next_actions.secondary %}
-            <a href="{{ action.href }}" class="btn btn-outline-secondary">{{ action.label }}</a>
-            {% endfor %}
+    <section class="card shadow-sm">
+        <div class="card-body">
+            <h2 class="h5">Required evidence</h2>
+            <p><strong>{{ reference_info.value }}</strong></p>
+            <p>{{ reference_info.detail }}</p>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{{ next_actions.primary.href }}" class="btn btn-primary">{{ next_actions.primary.label }}</a>
+                {% for action in next_actions.secondary %}<a href="{{ action.href }}" class="btn btn-outline-secondary">{{ action.label }}</a>{% endfor %}
+            </div>
         </div>
-    </div>
+    </section>
 </div>
 {% endblock %}

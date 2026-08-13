@@ -144,7 +144,7 @@ class CohortViewTestCase(TestCase):
         """Test that cohort view displays configuration form."""
         response = self.client.get(reverse("simulator:cohort"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Virtual Cohort")
+        self.assertContains(response, "Synthetic Model Cohort")
         self.assertContains(response, "n_patients")
     
     def test_cohort_run_with_valid_params(self):
@@ -167,8 +167,9 @@ class CohortViewTestCase(TestCase):
         )
         
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Cohort Results")
-        self.assertContains(response, "Efficacy")
+        self.assertContains(response, "Synthetic Model-Cohort Results")
+        self.assertContains(response, "Modeled tumor-reduction signal")
+        self.assertContains(response, "research-twin-v1")
     
     def test_cohort_run_rejects_invalid_n_patients(self):
         """Test that invalid n_patients is rejected."""
@@ -223,6 +224,9 @@ class CohortViewTestCase(TestCase):
         
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "text/csv")
+        self.assertEqual(response["X-bmyCure4MM-Intended-Use"], "E1_research_prototype")
+        self.assertEqual(response["X-bmyCure4MM-Model-Version"], "research-twin-v1")
+        self.assertIn(b"epistemic_label,SIMULATED", response.content)
         self.assertIn(b"patient_id", response.content)
         self.assertIn(b"tumor_reduction", response.content)
         self.assertIn(b"SUMMARY STATISTICS", response.content)

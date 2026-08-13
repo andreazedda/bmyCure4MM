@@ -6,6 +6,8 @@ from django.utils.crypto import salted_hmac
 from django.utils.http import http_date
 from django.views.decorators.http import require_GET
 
+from mmportal.governance import EpistemicLabel, governance_metadata
+
 from .forms import SIMULATION_FORM_HELP_TEXT_EN, SIMULATION_FORM_HELP_TEXT_IT
 from .models_help import HelpArticle
 from .presets import PRESETS
@@ -84,35 +86,103 @@ def _field_payload(slug: str, lang: str) -> dict[str, str] | None:
     return {"title": title, "body": "\n".join(body_parts)}
 
 
-def _static_article_payload(slug: str, lang: str) -> dict[str, str] | None:
-    if slug != "quickstart":
-        return None
+GOVERNED_STATIC_HELP = {
+    "quickstart": {
+        "en": (
+            "Research quickstart",
+            "<p>Choose a synthetic scenario, record a hypothetical configuration and seed, run the model, then inspect lineage, uncertainty, and limitations.</p>",
+        ),
+        "it": (
+            "Avvio rapido di ricerca",
+            "<p>Scegli uno scenario sintetico, registra configurazione ipotetica e seed, esegui il modello, poi esamina lineage, incertezza e limiti.</p>",
+        ),
+    },
+    "doses": {
+        "en": (
+            "Hypothetical exposure inputs",
+            "<p>Displayed bounds delimit the configured model domain. They are not clinical safety ranges and do not authorize a dose change.</p>",
+        ),
+        "it": (
+            "Input ipotetici di esposizione",
+            "<p>I limiti mostrati delimitano il dominio del modello. Non sono intervalli di sicurezza clinica e non autorizzano modifiche di dose.</p>",
+        ),
+    },
+    "horizon_cohort": {
+        "en": (
+            "Simulation horizon and virtual cohort",
+            "<p>Long horizons can increase numerical stiffness. Cohort size controls virtual sampling; report seed and uncertainty.</p>",
+        ),
+        "it": (
+            "Orizzonte e coorte virtuale",
+            "<p>Orizzonti lunghi possono aumentare la rigidità numerica. La dimensione della coorte controlla il campionamento virtuale; riporta seed e incertezza.</p>",
+        ),
+    },
+    "optimization_lab": {
+        "en": (
+            "Exploratory parameter search",
+            "<p>The search compares model objectives and heuristic constraints. Pareto membership is not evidence of clinical safety, efficacy, or superiority.</p>",
+        ),
+        "it": (
+            "Ricerca esplorativa dei parametri",
+            "<p>La ricerca confronta obiettivi del modello e vincoli euristici. L'appartenenza al fronte Pareto non prova sicurezza, efficacia o superiorità clinica.</p>",
+        ),
+    },
+    "kpi_tumor_reduction": {
+        "en": (
+            "Simulated tumor-state change",
+            "<p>Computed as 1 - endpoint/start for the model state. It is SIMULATED and is not a validated clinical response category.</p>",
+        ),
+        "it": (
+            "Variazione simulata dello stato tumorale",
+            "<p>Calcolata come 1 - fine/inizio per lo stato del modello. È SIMULATED e non è una categoria di risposta clinica validata.</p>",
+        ),
+    },
+    "kpi_healthy_loss": {
+        "en": (
+            "Simulated healthy-cell-state change",
+            "<p>Computed from a simplified model state. Thresholds are heuristic flags, not validated toxicity endpoints or dose instructions.</p>",
+        ),
+        "it": (
+            "Variazione simulata dello stato delle cellule sane",
+            "<p>Calcolata da uno stato semplificato del modello. Le soglie sono segnali euristici, non endpoint di tossicità validati o istruzioni di dose.</p>",
+        ),
+    },
+    "kpi_auc": {
+        "en": (
+            "Simulated exposure summary",
+            "<p>AUC is derived from the configured exposure model. Interpretation requires the schedule, units, assumptions, and model version.</p>",
+        ),
+        "it": (
+            "Sintesi simulata dell'esposizione",
+            "<p>AUC deriva dal modello di esposizione configurato. L'interpretazione richiede calendario, unità, assunzioni e versione del modello.</p>",
+        ),
+    },
+    "kpi_time_to_recurrence": {
+        "en": (
+            "Model-relative recurrence time",
+            "<p>The first configured threshold crossing after the model nadir. It is a simulated horizon result, not patient prognosis.</p>",
+        ),
+        "it": (
+            "Tempo di recidiva relativo al modello",
+            "<p>Primo superamento della soglia configurata dopo il nadir del modello. È un risultato simulato, non una prognosi del paziente.</p>",
+        ),
+    },
+}
 
-    if lang == "it":
-        title = "Guida rapida"
-        body = (
-            "<p>Per fare un test completo (incluso Patient Twin) in pochi minuti:</p>"
-            "<ol>"
-            "<li>Crea un paziente: Clinica → Pazienti → Nuovo.</li>"
-            "<li>Aggiungi almeno un Assessment al paziente (serve al Twin).</li>"
-            "<li>Vai al simulatore (/sim/…) e apri il form.</li>"
-            "<li>In <strong>Advanced &amp; Gemello</strong>, abilita <strong>Use Twin</strong>, seleziona l'Assessment e scegli <strong>Auto</strong>.</li>"
-            "<li>Esegui la simulazione e controlla nei risultati <code>twin_params.json</code>.</li>"
-            "</ol>"
-        )
-    else:
-        title = "Quickstart"
-        body = (
-            "<p>End-to-end run (including Patient Twin) in a few minutes:</p>"
-            "<ol>"
-            "<li>Create a patient: Clinic → Patients → New.</li>"
-            "<li>Add at least one Assessment to the patient (required for the Twin).</li>"
-            "<li>Open the simulator (/sim/…) and the simulation form.</li>"
-            "<li>Under <strong>Advanced &amp; Twin</strong>, enable <strong>Use Twin</strong>, pick the Assessment and choose <strong>Auto</strong>.</li>"
-            "<li>Run the simulation and check the results for <code>twin_params.json</code>.</li>"
-            "</ol>"
-        )
+
+def _static_article_payload(slug: str, lang: str) -> dict[str, object] | None:
+    article = GOVERNED_STATIC_HELP.get(slug)
+    if article is None:
+        return None
+    title, body = article["it" if lang == "it" else "en"]
     return {"title": title, "body": body}
+
+
+def _add_governance(payload: dict[str, object], *, output_kind: str) -> None:
+    payload["governance"] = governance_metadata(
+        epistemic_label=EpistemicLabel.HYPOTHETICAL,
+        output_kind=output_kind,
+    )
 
 
 def infer_type(slug: str) -> str:
@@ -128,38 +198,16 @@ def infer_type(slug: str) -> str:
 def _preset_payload(slug: str, lang: str) -> dict[str, str]:
     preset = PRESETS[slug]
     title = str(preset.get("label") or slug)
-    description = str(preset.get(f"description_{lang}") or preset.get("description_en") or "")
-    story = preset.get(f"story_{lang}") or preset.get("story_en") or {}
-
-    body_parts: list[str] = []
-    if description:
-        body_parts.append(f"<p>{description}</p>")
-
-    if isinstance(story, dict) and story:
-        story_title = story.get("title")
-        if story_title:
-            body_parts.append(f"<h5>{story_title}</h5>")
-
-        for key, heading_en, heading_it in (
-            ("background", "Background", "Contesto"),
-            ("challenge", "Challenge", "Sfida"),
-            ("why_these_drugs", "Why these drugs", "Perché questi farmaci"),
-            ("expected_outcome", "Expected outcome", "Risultato atteso"),
-        ):
-            value = story.get(key)
-            if not value:
-                continue
-            heading = heading_it if lang == "it" else heading_en
-            body_parts.append(f"<h6>{heading}</h6><p>{value}</p>")
-
-        learning_points = story.get("learning_points")
-        if isinstance(learning_points, list) and learning_points:
-            heading = "Learning points" if lang != "it" else "Punti chiave"
-            items = "".join(f"<li>{point}</li>" for point in learning_points if point)
-            if items:
-                body_parts.append(f"<h6>{heading}</h6><ul>{items}</ul>")
-
-    body = "\n".join(body_parts) if body_parts else "<p>(no details)</p>"
+    if lang == "it":
+        body = (
+            "<p>Preset ipotetico di input e calendario del modello. Il nome non "
+            "costituisce una selezione terapeutica e i valori non sono limiti di sicurezza clinica.</p>"
+        )
+    else:
+        body = (
+            "<p>Hypothetical model-input and schedule preset. Its name is not a "
+            "treatment selection and its values are not clinical safety limits.</p>"
+        )
     return {"title": title, "body": body}
 
 
@@ -172,6 +220,7 @@ def help_item(request, slug: str):
     if static_payload:
         static_payload["type"] = infer_type(slug)
         static_payload["slug"] = slug
+        _add_governance(static_payload, output_kind="governed_help_article")
         resp = JsonResponse(static_payload)
         resp["Cache-Control"] = "max-age=600, public"
         return resp
@@ -180,6 +229,7 @@ def help_item(request, slug: str):
     if field_payload:
         field_payload["type"] = infer_type(slug)
         field_payload["slug"] = slug
+        _add_governance(field_payload, output_kind="model_input_help")
         resp = JsonResponse(field_payload)
         resp["Cache-Control"] = "max-age=600, public"
         return resp
@@ -188,6 +238,7 @@ def help_item(request, slug: str):
         payload = _preset_payload(slug, lang)
         payload["type"] = "preset"
         payload["slug"] = slug
+        _add_governance(payload, output_kind="hypothetical_preset_help")
         resp = JsonResponse(payload)
         resp["Cache-Control"] = "max-age=600, public"
         return resp
@@ -199,6 +250,7 @@ def help_item(request, slug: str):
     payload = article.as_lang(lang)
     payload["type"] = infer_type(article.slug)
     payload["slug"] = article.slug
+    _add_governance(payload, output_kind="legacy_help_article")
 
     # ETag for caching
     etag = salted_hmac(
@@ -271,4 +323,10 @@ def help_search(request):
         dedup.append(it)
 
     # Cutoff to 20 results
-    return JsonResponse({"results": dedup[:20]})
+    return JsonResponse({
+        "governance": governance_metadata(
+            epistemic_label=EpistemicLabel.DERIVED,
+            output_kind="help_search_index",
+        ),
+        "results": dedup[:20],
+    })

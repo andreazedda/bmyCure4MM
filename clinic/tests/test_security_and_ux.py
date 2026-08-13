@@ -97,14 +97,18 @@ class OwnershipCheckTests(TestCase):
         resp = self.client.get(
             reverse("clinic:prognosis_api", args=[self.patient.pk])
         )
-        self.assertIn(resp.status_code, [200, 500])  # 500 if prognosis module missing deps
+        self.assertEqual(resp.status_code, 200)
+        payload = resp.json()
+        self.assertEqual(payload["status"], "PATIENT_SPECIFIC_PREDICTION_NOT_VALIDATED")
+        self.assertIsNone(payload["estimate"])
 
     def test_prognosis_api_allowed_for_staff(self):
         self.client.login(username="staffuser", password="pass1234")
         resp = self.client.get(
             reverse("clinic:prognosis_api", args=[self.patient.pk])
         )
-        self.assertIn(resp.status_code, [200, 500])
+        self.assertEqual(resp.status_code, 200)
+        self.assertIsNone(resp.json()["estimate"])
 
     def test_regimen_api_forbidden_for_stranger(self):
         self.client.login(username="stranger", password="pass1234")

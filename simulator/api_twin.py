@@ -8,6 +8,7 @@ from django.views.decorators.http import require_GET
 from clinic.models import Assessment
 from simulator.twin import build_patient_twin
 from simulator.permissions import is_editor
+from mmportal.governance import EpistemicLabel, governance_metadata
 
 from .access import get_accessible_assessment_by_id
 
@@ -37,6 +38,10 @@ def twin_preview(request: HttpRequest) -> JsonResponse:
     patient = getattr(assessment, "patient", None)
     patient_id = getattr(patient, "pk", None)
     response = {
+        "governance": governance_metadata(
+            epistemic_label=EpistemicLabel.DERIVED,
+            output_kind="twin_preview",
+        ),
         "assessment": {
             "id": assessment.pk,
             "date": str(getattr(assessment, "date", "")),

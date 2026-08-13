@@ -20,7 +20,7 @@ class GameModeTests(TestCase):
             active=True,
         )
 
-    def test_simulate_scenario_renders_game_panel_when_enabled(self) -> None:
+    def test_legacy_game_mode_input_does_not_render_game_panel(self) -> None:
         self.client.login(username="player", password="pass")
 
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -48,4 +48,7 @@ class GameModeTests(TestCase):
                 }
                 response = self.client.post(url, data=payload)
                 self.assertEqual(response.status_code, 200)
-                self.assertIn("Game Mode", response.content.decode("utf-8"))
+                content = response.content.decode("utf-8")
+                self.assertNotIn("Game Mode", content)
+                self.assertNotIn("WIN", content)
+                self.assertNotIn("Score:", content)

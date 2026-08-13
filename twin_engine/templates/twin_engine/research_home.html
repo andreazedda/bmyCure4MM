@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Research Workspace{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-lg-start mb-4">
+  <div>
+    <div class="text-uppercase small fw-bold text-secondary">/research/ · lineage-bound workspace</div>
+    <h1 class="h2 mb-2">Reproducible Patient Twin Research</h1>
+    <p class="text-muted mb-0">Use structured records to inspect readiness, twin lineage, calibration, mechanistic scenarios, uncertainty, and artifacts.</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-primary" href="{% url 'twin_engine:research_glossary' %}">Research glossary</a>
+    {% if request.user.is_staff %}<a class="btn btn-outline-secondary" href="{% url 'twin_engine:developer_console' %}">Developer console</a>{% endif %}
+  </div>
+</div>
+
+<div class="alert alert-warning" role="note">
+  <strong>E1 boundary:</strong> this workspace supports mechanistic research and reproducibility review. It does not validate patient-specific prediction, clinical decision support, treatment selection, or a causal effect.
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4"><div class="card h-100"><div class="card-body"><h2 class="h5">Observed inputs</h2><p class="mb-0">Review dated structured records and their provenance. Missing or conflicting values remain unresolved.</p></div></div></div>
+  <div class="col-md-4"><div class="card h-100"><div class="card-body"><h2 class="h5">Derived and simulated state</h2><p class="mb-0">Keep transformations, model versions, assumptions, and mechanistic scenario outputs explicit.</p></div></div></div>
+  <div class="col-md-4"><div class="card h-100"><div class="card-body"><h2 class="h5">Scientific gates</h2><p class="mb-0">Negative results, insufficient data, non-identifiability, and failed validation are valid outcomes.</p></div></div></div>
+</div>
+
+<section class="card shadow-sm">
+  <div class="card-body">
+    <h2 class="h4">Accessible research records</h2>
+    <p class="text-muted">Open a record to enter the Simple Research View or Scientific Cockpit. Visibility does not imply readiness.</p>
+    <div class="list-group">
+      {% for patient in patients %}
+      <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" href="{% url 'twin_engine:simple_research_view' patient.id %}">
+        <span>{{ patient }}</span><span class="badge text-bg-secondary">Open research view</span>
+      </a>
+      {% empty %}
+      <div class="list-group-item text-muted">No accessible structured research records.</div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

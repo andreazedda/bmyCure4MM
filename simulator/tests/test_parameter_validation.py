@@ -38,7 +38,7 @@ class SimulationParameterValidationTests(TestCase):
         payload["bortezomib_dose"] = 1.6
         form = forms.SimulationParameterForm(data=payload)
         self.assertFalse(form.is_valid())
-        self.assertIn("Combined high doses", form.non_field_errors()[0])
+        self.assertIn("configured research domain", form.non_field_errors()[0])
 
     def test_warning_emitted_for_borderline_values(self) -> None:
         payload = self._base_payload()

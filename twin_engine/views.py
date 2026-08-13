@@ -8,6 +8,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
+from django.db.models import Q
 from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -35,6 +36,22 @@ from .state_model import get_current_twin_state, initialize_from_assessment, ser
 from .therapy_schedule import build_therapy_schedule
 from .toxicity_model import compute_toxicity_constraints
 from .validators import validate_assessment_minimum_fields, validate_patient_access
+
+
+@login_required
+def research_home_view(request: HttpRequest) -> HttpResponse:
+    """Landing page for lineage-bound, non-clinical research workflows."""
+    patients = Patient.objects.order_by("last_name", "first_name", "pk")
+    if not request.user.is_staff:
+        patients = patients.filter(
+            Q(owner=request.user)
+            | Q(owner__isnull=True, mrn__istartswith="DEMO")
+        )
+    return render(
+        request,
+        "twin_engine/research_home.html",
+        {"patients": patients[:25]},
+    )
 
 
 @login_required

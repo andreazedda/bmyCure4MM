@@ -18,7 +18,7 @@
     | trovare **un oggetto DB** (Model ↔ tabella ↔ file) | `Reference → Database Objects` |
     | capire il **modello ODE / PK/PD** e KPI | `Guides → Mathematical Models` |
     | capire l’**Optimization Lab** (Pareto, obiettivi) | `Guides → Optimization Theory` |
-    | capire difficulty / prognosis / virtual patients | `Guides → Difficulty Scoring`, `Guides → Prognosis`, `Guides → Virtual Patients` |
+    | capire stati sintetici e limiti epistemici | `Guides → Virtual Patients`, `Start Here → Epistemic Labels` |
     | vedere regole e soglie “auditabili” | `Guides → Decision Algorithm` |
     | avviare local/dev/docker | `Guides → Operations` + `Guides → Development` |
     | consultare documenti lunghi/tecnici | `Deep Dives` |
@@ -74,7 +74,7 @@
     | find a **DB object** (Model ↔ table ↔ file) | `Reference → Database Objects` |
     | understand the **ODE / PK/PD** model and KPIs | `Guides → Mathematical Models` |
     | understand the **Optimization Lab** (Pareto, objectives) | `Guides → Optimization Theory` |
-    | understand difficulty / prognosis / virtual patients | `Guides → Difficulty Scoring`, `Guides → Prognosis`, `Guides → Virtual Patients` |
+    | understand synthetic states and epistemic limits | `Guides → Virtual Patients`, `Start Here → Epistemic Labels` |
     | see auditable rules and thresholds | `Guides → Decision Algorithm` |
     | run local/dev/docker | `Guides → Operations` + `Guides → Development` |
     | read long/technical documents | `Deep Dives` |

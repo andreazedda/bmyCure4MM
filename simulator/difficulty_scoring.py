@@ -1,9 +1,8 @@
-"""
-Treatment Difficulty Scoring System for Multiple Myeloma Scenarios.
+"""Legacy heuristic scenario-score transforms.
 
-This module implements a mathematical framework for quantifying the difficulty
-of treating virtual patients based on clinical, biological, and pharmacological
-factors.
+This module preserves pre-governance research code for numerical traceability.
+Its coefficients and clinical mappings have not passed source verification or
+external validation and are not current patient-specific prediction outputs.
 
 The difficulty score is a composite metric (0-100) that accounts for:
 - Tumor burden and growth characteristics
@@ -12,7 +11,7 @@ The difficulty score is a composite metric (0-100) that accounts for:
 - Disease stage
 - Treatment resistance factors
 
-All scoring algorithms are transparent and clinically interpretable.
+All outputs are ``HEURISTIC`` and require evidence review before stronger use.
 """
 from __future__ import annotations
 
@@ -396,12 +395,14 @@ class DifficultyScoreCalculator:
 
 
 # =============================================================================
-# EXPECTED OUTCOME PREDICTION
+# LEGACY UNVALIDATED OUTCOME TRANSFORMS — NOT RUNTIME PREDICTIONS
 # =============================================================================
 
 def estimate_response_probability(difficulty_score: float) -> Dict[str, float]:
     """
-    Estimate response rate probabilities based on difficulty.
+    Compute a legacy heuristic response-category transform.
+
+    Returned values are not validated patient probabilities.
     
     Mathematical Formulation:
     -------------------------
@@ -411,10 +412,10 @@ def estimate_response_probability(difficulty_score: float) -> Dict[str, float]:
     
     Where:
         DS = difficulty score (0-100)
-        β₀ = intercept (fitted to clinical data)
+        β₀ = historical heuristic intercept
         β₁ = slope coefficient (negative, higher difficulty → lower response)
         
-    Based on meta-analysis of clinical trials:
+    Historical, unverified interpretation:
         - Easy scenarios (DS<30): 80-90% response rate
         - Moderate (DS 40-60): 60-75% response rate
         - Hard (DS>70): 30-50% response rate
@@ -425,7 +426,7 @@ def estimate_response_probability(difficulty_score: float) -> Dict[str, float]:
     Returns:
         Dictionary with probability estimates for each response category
     """
-    # Logistic model parameters (fitted from literature)
+    # Historical heuristic parameters; source-level verification is pending.
     beta_0_cr = 2.5
     beta_1_cr = -0.05
     
@@ -449,7 +450,9 @@ def estimate_response_probability(difficulty_score: float) -> Dict[str, float]:
 
 def estimate_toxicity_risk(difficulty_score: float, frailty_score: float) -> Dict[str, float]:
     """
-    Estimate toxicity risk based on difficulty and frailty.
+    Compute a legacy heuristic toxicity-category transform.
+
+    Returned values are not validated patient risks.
     
     Mathematical Formulation:
     -------------------------
@@ -487,7 +490,9 @@ def estimate_toxicity_risk(difficulty_score: float, frailty_score: float) -> Dic
 
 def estimate_survival_metrics(difficulty_score: float) -> Dict[str, float]:
     """
-    Estimate survival outcomes based on difficulty.
+    Compute a legacy heuristic survival transform.
+
+    Returned values are not validated patient survival estimates.
     
     Mathematical Formulation:
     -------------------------

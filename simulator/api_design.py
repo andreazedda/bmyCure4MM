@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 
 from simulator.design.reporting import run_design_report
+from mmportal.governance import EpistemicLabel, governance_metadata
 
 
 def _parse_int(value: str | None, default: int, *, min_value: int, max_value: int) -> int:
@@ -42,7 +43,12 @@ def design_report(request):
 
     report = run_design_report(seed=seed, steps=steps, dt_days=dt_days)
 
-    resp = JsonResponse(asdict(report))
+    payload = asdict(report)
+    payload["governance"] = governance_metadata(
+        epistemic_label=EpistemicLabel.SIMULATED,
+        output_kind="design_simulation_report",
+    )
+    resp = JsonResponse(payload)
     # This is deterministic for a given seed, but can be expensive.
     resp["Cache-Control"] = "max-age=60, private"
     return resp

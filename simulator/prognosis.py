@@ -1,17 +1,10 @@
-"""
-Prognosis estimation module for Multiple Myeloma patients.
+"""Legacy unvalidated prognosis transforms retained for traceability.
 
-Provides survival estimates based on:
-- R-ISS staging (I, II, III)
-- High-risk cytogenetics [t(4;14), t(14;16), del(17p), 1q gain, etc.]
-- Patient characteristics (age, ECOG, comorbidities)
-- Treatment response
-
-All estimates are based on published literature and clinical trials.
-References are provided for transparency.
-
-DISCLAIMER: These are statistical estimates for educational purposes only.
-Individual patient outcomes may vary significantly.
+This module is not wired to the current runtime prognosis interface. Its
+historical coefficients and source mappings have not passed governed,
+source-level verification or external validation. Under ``claims-policy-v1``
+its numerical values are invalid for individual prognosis, clinical
+interpretation, or comparison. The runtime fails closed instead.
 """
 
 from __future__ import annotations
@@ -215,7 +208,10 @@ def estimate_prognosis(
     line_of_therapy: int = 1,
 ) -> PrognosisEstimate:
     """
-    Estimate prognosis for a MM patient based on multiple factors.
+    Compute a legacy, unvalidated numerical transform.
+
+    This function is retained only for historical traceability and must not be
+    presented as an individual prognosis or current governed model output.
     
     Args:
         r_iss: R-ISS stage (I, II, or III)
@@ -227,7 +223,7 @@ def estimate_prognosis(
         line_of_therapy: Current line of therapy (1=frontline, 2+=relapsed)
     
     Returns:
-        PrognosisEstimate with survival predictions and confidence
+        Legacy numerical fields; not validated survival predictions
     """
     cytogenetics = cytogenetics or []
     modifiers_applied = []

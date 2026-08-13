@@ -6,7 +6,7 @@
             {% endfor %}
         </div>
     {% else %}
-        <p class="text-muted small">No guideline regimens assigned yet.</p>
+        <p class="text-muted small">No exploratory regimen references linked yet.</p>
     {% endif %}
     {% if available_regimens %}
         <form method="post"
@@ -16,7 +16,7 @@
               class="d-flex flex-column flex-md-row gap-2 align-items-start">
             {% csrf_token %}
             <div class="flex-grow-1 w-100">
-                <label class="form-label" for="{{ target_id }}-add-select">Add regimen</label>
+                <label class="form-label" for="{{ target_id }}-add-select">Link regimen reference</label>
                 <select id="{{ target_id }}-add-select"
                         name="regimen_id"
                         class="form-select"
@@ -25,7 +25,7 @@
                         <option value="{{ regimen.pk }}">{{ regimen.name }}</option>
                     {% endfor %}
                 </select>
-                <div class="form-text">Selected regimens will be added to this scenario.</div>
+                <div class="form-text">Selected catalog references will be linked to this synthetic scenario.</div>
             </div>
             <div class="d-grid">
                 <button type="submit" class="btn btn-primary mt-md-4">{% if allow_multiple %}Add selected{% else %}Add{% endif %}</button>
