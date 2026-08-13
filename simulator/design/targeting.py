@@ -69,7 +69,12 @@ def estimate_tp_fp(
             return 0.0
         hits = 0
         for p in profiles:
-            if activation_probability(p, logic=logic, target_antigen=target_antigen, affinity=affinity, rng=rng) >= 0.5:
+            if (
+                activation_probability(
+                    p, logic=logic, target_antigen=target_antigen, affinity=affinity, rng=rng
+                )
+                >= 0.5
+            ):
                 hits += 1
         return hits / float(len(profiles))
 

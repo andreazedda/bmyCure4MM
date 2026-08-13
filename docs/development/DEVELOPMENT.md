@@ -54,22 +54,17 @@ Press Ctrl+C to stop all services.
 If you don't want to install Redis:
 
 ```bash
-source venv/bin/activate
 export CELERY_TASK_ALWAYS_EAGER=True
-python manage.py runserver 8001
+uv run python manage.py runserver 8001
 ```
 
 **Note:** Jobs will run synchronously (blocking the request until complete).
 
-### Method 3: Supervisord (Production-like)
+### Method 3: Legacy Supervisord scripts
 
-```bash
-pip install supervisor
-./manage_services.sh start    # Start all
-./manage_services.sh status   # Check status
-./manage_services.sh logs     # View logs
-./manage_services.sh stop     # Stop all
-```
+The legacy `manage_services.sh` path depends on Supervisor, which is not part
+of the canonical lock and is not a supported reproducible environment. Use the
+Docker Compose path below for a production-like local stack.
 
 ### Method 4: Docker Compose
 
@@ -139,8 +134,7 @@ redis-server
 
 **Solution:**
 ```bash
-source venv/bin/activate
-pip install -r requirements.txt
+uv sync --frozen --extra chemistry
 ```
 
 ## Development Workflow

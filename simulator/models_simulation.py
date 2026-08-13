@@ -109,15 +109,11 @@ class MathematicalModel:
             toxicity_effect = effects.mean() if effects.size else 0.0
             immune_index = max(self.immune_compromise_index, 0.1)
             d_tumor = (
-                self.growth_rates.get("tumor", 0.0)
-                * tumor
-                * (1.0 - tumor / max(carrying_t, 1e-6))
+                self.growth_rates.get("tumor", 0.0) * tumor * (1.0 - tumor / max(carrying_t, 1e-6))
                 - total_effect * tumor
             )
             d_healthy = (
-                self.growth_rates.get("healthy", 0.0)
-                * healthy
-                * (1.0 - healthy / max(carrying_h, 1e-6))
+                self.growth_rates.get("healthy", 0.0) * healthy * (1.0 - healthy / max(carrying_h, 1e-6))
                 - immune_index * toxicity_effect * healthy
             )
             d_concentrations = np.zeros_like(concentrations)

@@ -14,7 +14,7 @@ This project includes comprehensive testing at multiple levels:
 
 ```bash
 # Install test dependencies
-pip install -U pytest pytest-django pytest-cov pytest-xdist model_bakery hypothesis freezegun requests
+uv sync --frozen --group test
 
 # Run all Python tests
 pytest -q
@@ -33,7 +33,7 @@ pytest -n auto
 
 ```bash
 # Install Python Playwright dependencies
-pip install playwright pytest-playwright
+uv sync --frozen --group test --group screenshots
 
 # Install Playwright browsers
 playwright install chromium
@@ -154,8 +154,11 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-      - run: pip install -r requirements.txt
-      - run: pytest --cov --cov-report=xml
+      - uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.12.3"
+      - run: uv sync --frozen --group test
+      - run: uv run pytest --cov --cov-report=xml
       - uses: codecov/codecov-action@v3
 
   e2e-tests:
@@ -164,8 +167,11 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
       - uses: actions/setup-python@v4
-      - run: pip install -r requirements.txt
-      - run: python manage.py migrate
+      - uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.12.3"
+      - run: uv sync --frozen --group test --group screenshots
+      - run: uv run python manage.py migrate
       - run: cd tests/e2e && npm install
       - run: npx playwright install --with-deps
       - run: npm run test:e2e
@@ -173,15 +179,8 @@ jobs:
 
 ## Test Data
 
-Many tests use `model_bakery` for factory-style test data generation:
-
-```python
-from model_bakery import baker
-
-def test_example(db):
-    scenario = baker.make('simulator.Scenario', name='Test')
-    # test code...
-```
+Tests create explicit model fixtures so scientific inputs remain visible in
+the test source.
 
 ## Coverage Goals
 

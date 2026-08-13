@@ -1,6 +1,11 @@
-FROM python:3.11-slim
+FROM ghcr.io/astral-sh/uv:0.12.3 AS uv
+FROM python:3.11.11-slim
 
 WORKDIR /app
+
+ENV PATH="/app/.venv/bin:$PATH" \
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -9,9 +14,11 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements and install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY --from=uv /uv /uvx /bin/
+
+# Install the exact application graph before copying source for layer reuse.
+COPY pyproject.toml uv.lock .python-version ./
+RUN uv sync --frozen --no-dev --extra chemistry --no-install-project
 
 # Copy project files
 COPY . .

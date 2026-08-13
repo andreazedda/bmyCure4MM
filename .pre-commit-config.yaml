@@ -1,0 +1,23 @@
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-check
+        name: Ruff check (governed surface)
+        entry: uv run --frozen ruff check .
+        language: system
+        pass_filenames: false
+      - id: ruff-format
+        name: Ruff format check (governed surface)
+        entry: uv run --frozen ruff format --check .
+        language: system
+        pass_filenames: false
+      - id: mypy
+        name: mypy (progressive typed surface)
+        entry: uv run --frozen mypy
+        language: system
+        pass_filenames: false
+      - id: repository-hygiene
+        name: generated/private/notebook hygiene
+        entry: uv run --frozen python -m scripts.check_repository_hygiene
+        language: system
+        pass_filenames: false

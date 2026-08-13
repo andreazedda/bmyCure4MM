@@ -73,7 +73,7 @@ def estimate_toxicity(
 
         # Payload-mediated: bystander + systemic leakage + linker/payload potency
         payload = model.payload_potency * (0.5 * model.bystander_diffusion + 0.5 * model.systemic_leakage)
-        payload *= (0.5 + 0.5 * model.linker_cleavage)
+        payload *= 0.5 + 0.5 * model.linker_cleavage
         scores["payload_mediated"] = _clamp01(payload)
         why["payload_mediated"].extend(
             [
@@ -112,7 +112,11 @@ def estimate_toxicity(
         max_risk = 0.0
         for comp in normal_compartments:
             density = comp.antigen_profile.get(model.target_antigen)
-            bind = 1.0 if density >= model.activation_threshold else density / max(1e-6, model.activation_threshold)
+            bind = (
+                1.0
+                if density >= model.activation_threshold
+                else density / max(1e-6, model.activation_threshold)
+            )
             comp_risk = comp.vulnerability * _clamp01(bind)
             max_risk = max(max_risk, comp_risk)
             if comp_risk > 0.05:

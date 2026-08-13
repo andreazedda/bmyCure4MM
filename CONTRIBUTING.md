@@ -24,18 +24,15 @@ cd bmyCure4MM
 ### 2. Set Up Development Environment
 
 ```bash
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
+# Bootstrap the required resolver and install the frozen graph
+python3.11 -m pip install uv==0.12.3
+uv sync --frozen --extra chemistry
 
 # Apply migrations
-python manage.py migrate
+uv run python manage.py migrate
 
 # Create superuser (optional)
-python manage.py createsuperuser
+uv run python manage.py createsuperuser
 ```
 
 ### 3. Install Redis (for Celery tasks)

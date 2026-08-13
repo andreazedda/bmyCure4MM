@@ -40,6 +40,10 @@ nav:
           - Documentation Roadmap: guides/documentation_roadmap.md
       - Development: development/DEVELOPMENT.md
       - Troubleshooting: development/TROUBLESHOOTING.md
+  - Reproducibility:
+      - Dependency Operations: operations/DEPENDENCIES.md
+      - Dependency Audit Triage: operations/DEPENDENCY_AUDIT_TRIAGE.md
+      - Numerical Policy: research/NUMERICAL_REPRODUCIBILITY.md
   - Reference:
       - Configuration: reference/configuration.md
       - Database Objects: reference/database_objects.md

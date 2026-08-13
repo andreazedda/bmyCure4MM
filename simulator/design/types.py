@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
-
 CompartmentName = Literal["bulk", "reservoir"]
 ToxicityCategory = Literal[
     "on_target_off_tumor",

@@ -31,9 +31,8 @@
     1. Crea un virtualenv e installa dipendenze:
 
     ```bash
-    python3 -m venv venv
-    source venv/bin/activate
-    pip install -r requirements.txt
+    python3.11 -m pip install uv==0.12.3
+    uv sync --frozen --extra chemistry
     ```
 
     2. Variabili d’ambiente minime (dev):
@@ -126,9 +125,8 @@
     ## Local development
 
     ```bash
-    python3 -m venv venv
-    source venv/bin/activate
-    pip install -r requirements.txt
+    python3.11 -m pip install uv==0.12.3
+    uv sync --frozen --extra chemistry
 
     export DJANGO_DEBUG=1
     export DJANGO_SECRET_KEY='dev-key-not-for-production'

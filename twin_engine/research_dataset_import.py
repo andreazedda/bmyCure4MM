@@ -16,12 +16,7 @@ from twin_engine.models import (
     TherapyInterruption,
 )
 
-
-SCHEMA_PATH = (
-    Path(__file__).resolve().parent
-    / "schemas"
-    / "research_dataset_v0_1.schema.json"
-)
+SCHEMA_PATH = Path(__file__).resolve().parent / "schemas" / "research_dataset_v0_1.schema.json"
 
 DATASET_PROVENANCE_KEY = "_dataset_provenance"
 
@@ -82,9 +77,7 @@ def _read_json(path: Path, label: str) -> dict[str, Any]:
     except FileNotFoundError as exc:
         raise DatasetImportError(f"{label} does not exist") from exc
     except json.JSONDecodeError as exc:
-        raise DatasetImportError(
-            f"{label} is not valid JSON at line {exc.lineno}"
-        ) from exc
+        raise DatasetImportError(f"{label} is not valid JSON at line {exc.lineno}") from exc
 
     if not isinstance(payload, dict):
         raise DatasetImportError(f"{label} must contain a JSON object")
@@ -98,9 +91,7 @@ def _walk_identifier_keys(value: Any, path: str = "$") -> None:
             normalized = str(key).strip().lower()
 
             if normalized in BANNED_IDENTIFIER_KEYS:
-                raise DatasetImportError(
-                    f"direct identifier key is forbidden at {path}.{key}"
-                )
+                raise DatasetImportError(f"direct identifier key is forbidden at {path}.{key}")
 
             _walk_identifier_keys(child, f"{path}.{key}")
 
@@ -132,9 +123,7 @@ def _validate_schema(dataset: dict[str, Any]) -> None:
 
     # Deliberately do not print the private offending value.
     raise DatasetImportError(
-        "dataset schema validation failed: "
-        f"path={path} validator={first.validator} "
-        f"errors={len(errors)}"
+        f"dataset schema validation failed: path={path} validator={first.validator} errors={len(errors)}"
     )
 
 
@@ -167,9 +156,7 @@ def _semantic_key(record: dict[str, Any]) -> tuple[Any, ...]:
             identity.get("end_date"),
         )
 
-    raise DatasetImportError(
-        f"unsupported record_type: {record_type}"
-    )
+    raise DatasetImportError(f"unsupported record_type: {record_type}")
 
 
 def _validate_record_semantics(dataset: dict[str, Any]) -> None:
@@ -184,9 +171,7 @@ def _validate_record_semantics(dataset: dict[str, Any]) -> None:
         source_id = source["source_id"]
 
         if source_id in source_ids:
-            raise DatasetImportError(
-                f"duplicate source_id: {source_id}"
-            )
+            raise DatasetImportError(f"duplicate source_id: {source_id}")
 
         source_ids.add(source_id)
 
@@ -203,76 +188,52 @@ def _validate_record_semantics(dataset: dict[str, Any]) -> None:
             )
 
         if record_id in record_ids:
-            raise DatasetImportError(
-                f"duplicate record_id: {record_id}"
-            )
+            raise DatasetImportError(f"duplicate record_id: {record_id}")
 
         record_ids.add(record_id)
 
         if identity.get("case_ref") != case_ref:
-            raise DatasetImportError(
-                f"record case_ref mismatch: {record_id}"
-            )
+            raise DatasetImportError(f"record case_ref mismatch: {record_id}")
 
         semantic_key = _semantic_key(record)
 
         if semantic_key in semantic_keys:
-            raise DatasetImportError(
-                f"duplicate semantic identity: {record_id}"
-            )
+            raise DatasetImportError(f"duplicate semantic identity: {record_id}")
 
         semantic_keys.add(semantic_key)
 
         if record_type == "lab_result":
             if payload.get("date") != identity.get("date"):
-                raise DatasetImportError(
-                    f"date identity/payload mismatch: {record_id}"
-                )
+                raise DatasetImportError(f"date identity/payload mismatch: {record_id}")
 
             if payload.get("analyte") != identity.get("analyte"):
-                raise DatasetImportError(
-                    f"analyte identity/payload mismatch: {record_id}"
-                )
+                raise DatasetImportError(f"analyte identity/payload mismatch: {record_id}")
 
         elif record_type == "adverse_event":
             if payload.get("date") != identity.get("date"):
-                raise DatasetImportError(
-                    f"date identity/payload mismatch: {record_id}"
-                )
+                raise DatasetImportError(f"date identity/payload mismatch: {record_id}")
 
             if payload.get("event_type") != identity.get("event_type"):
-                raise DatasetImportError(
-                    f"event_type identity/payload mismatch: {record_id}"
-                )
+                raise DatasetImportError(f"event_type identity/payload mismatch: {record_id}")
 
         elif record_type == "therapy_interruption":
             for field in ("drug", "start_date", "end_date"):
                 if payload.get(field) != identity.get(field):
-                    raise DatasetImportError(
-                        f"{field} identity/payload mismatch: {record_id}"
-                    )
+                    raise DatasetImportError(f"{field} identity/payload mismatch: {record_id}")
 
-            if DATASET_PROVENANCE_KEY in (
-                payload.get("evidence", {}) or {}
-            ):
-                raise DatasetImportError(
-                    f"reserved evidence key used by payload: {record_id}"
-                )
+            if DATASET_PROVENANCE_KEY in (payload.get("evidence", {}) or {}):
+                raise DatasetImportError(f"reserved evidence key used by payload: {record_id}")
 
         for assertion in record["provenance"]:
             assertion_id = assertion["assertion_id"]
 
             if assertion_id in assertion_ids:
-                raise DatasetImportError(
-                    f"duplicate assertion_id: {assertion_id}"
-                )
+                raise DatasetImportError(f"duplicate assertion_id: {assertion_id}")
 
             assertion_ids.add(assertion_id)
 
             if assertion["source_id"] not in source_ids:
-                raise DatasetImportError(
-                    f"unknown source_id in provenance: {record_id}"
-                )
+                raise DatasetImportError(f"unknown source_id in provenance: {record_id}")
 
 
 def load_dataset_bundle(
@@ -297,20 +258,14 @@ def load_dataset_bundle(
     canonical_sha = canonical_dataset_sha256(dataset)
     physical_sha = file_sha256(dataset_path)
 
-    expected_canonical_sha = manifest.get(
-        "canonical_dataset_sha256"
-    )
+    expected_canonical_sha = manifest.get("canonical_dataset_sha256")
     expected_file_sha = manifest.get("dataset_file_sha256")
 
     if expected_canonical_sha != canonical_sha:
-        raise DatasetImportError(
-            "canonical dataset SHA-256 does not match manifest"
-        )
+        raise DatasetImportError("canonical dataset SHA-256 does not match manifest")
 
     if expected_file_sha != physical_sha:
-        raise DatasetImportError(
-            "dataset file SHA-256 does not match manifest"
-        )
+        raise DatasetImportError("dataset file SHA-256 does not match manifest")
 
     for field in (
         "dataset_id",
@@ -318,19 +273,12 @@ def load_dataset_bundle(
         "case_ref",
     ):
         if manifest.get(field) != dataset.get(field):
-            raise DatasetImportError(
-                f"dataset/manifest {field} mismatch"
-            )
+            raise DatasetImportError(f"dataset/manifest {field} mismatch")
 
     record_counts = manifest.get("record_counts") or {}
 
-    if (
-        "total" in record_counts
-        and int(record_counts["total"]) != len(dataset["records"])
-    ):
-        raise DatasetImportError(
-            "manifest record total does not match dataset"
-        )
+    if "total" in record_counts and int(record_counts["total"]) != len(dataset["records"]):
+        raise DatasetImportError("manifest record total does not match dataset")
 
     actual_by_type: dict[str, int] = {}
 
@@ -339,13 +287,8 @@ def load_dataset_bundle(
         actual_by_type[kind] = actual_by_type.get(kind, 0) + 1
 
     for kind, actual_count in actual_by_type.items():
-        if (
-            kind in record_counts
-            and int(record_counts[kind]) != actual_count
-        ):
-            raise DatasetImportError(
-                f"manifest count mismatch for {kind}"
-            )
+        if kind in record_counts and int(record_counts[kind]) != actual_count:
+            raise DatasetImportError(f"manifest count mismatch for {kind}")
 
     return {
         "dataset_path": str(dataset_path),
@@ -360,10 +303,7 @@ def load_dataset_bundle(
 def _choice_values(model, field_name: str) -> set[str]:
     field = model._meta.get_field(field_name)
 
-    return {
-        str(value)
-        for value, _label in field.choices
-    }
+    return {str(value) for value, _label in field.choices}
 
 
 def _require_choice(
@@ -375,9 +315,7 @@ def _require_choice(
     allowed = _choice_values(model, field_name)
 
     if value not in allowed:
-        raise DatasetImportError(
-            f"invalid {field_name} for {record_id}"
-        )
+        raise DatasetImportError(f"invalid {field_name} for {record_id}")
 
 
 def _numbers_equal(left: Any, right: Any) -> bool:
@@ -399,9 +337,7 @@ def _dataset_provenance(
     return {
         "dataset_id": dataset["dataset_id"],
         "dataset_version": dataset["dataset_version"],
-        "canonical_dataset_sha256": bundle[
-            "canonical_dataset_sha256"
-        ],
+        "canonical_dataset_sha256": bundle["canonical_dataset_sha256"],
         "record_id": record["record_id"],
         "assertions": record["provenance"],
     }
@@ -429,9 +365,7 @@ def _resolve_patient_therapy(
     start = date.fromisoformat(start_date)
     end = date.fromisoformat(end_date) if end_date else None
 
-    therapies = patient.therapies.select_related("regimen").order_by(
-        "start_date"
-    )
+    therapies = patient.therapies.select_related("regimen").order_by("start_date")
 
     for therapy in therapies:
         therapy_end = therapy.end_date or end or start
@@ -444,15 +378,9 @@ def _resolve_patient_therapy(
 
         components = (therapy.regimen.components or "").lower()
 
-        dose_keys = {
-            str(key).lower()
-            for key in (therapy.doses or {}).keys()
-        }
+        dose_keys = {str(key).lower() for key in (therapy.doses or {}).keys()}
 
-        if (
-            drug.lower() in components
-            or drug.lower() in dose_keys
-        ):
+        if drug.lower() in components or drug.lower() in dose_keys:
             return therapy
 
     return None
@@ -545,9 +473,7 @@ def _plan_lab(patient, bundle, record):
 
     updates = {}
 
-    if existing.assessment_id != (
-        assessment.id if assessment else None
-    ):
+    if existing.assessment_id != (assessment.id if assessment else None):
         updates["assessment"] = assessment
 
     for field in (
@@ -593,17 +519,13 @@ def _plan_adverse_event(patient, bundle, record):
 
     desired = {
         "grade": str(payload.get("grade", "")),
-        "suspected_drug": str(
-            payload.get("suspected_drug", "")
-        ),
+        "suspected_drug": str(payload.get("suspected_drug", "")),
         "observed_values": payload.get(
             "observed_values",
             {},
         )
         or {},
-        "action_taken": str(
-            payload.get("action_taken", "")
-        ),
+        "action_taken": str(payload.get("action_taken", "")),
         "outcome": str(payload.get("outcome", "")),
         "provenance": provenance,
     }
@@ -636,11 +558,7 @@ def _plan_adverse_event(patient, bundle, record):
         "outcome",
     )
 
-    conflicts = [
-        field
-        for field in semantic_fields
-        if getattr(existing, field) != desired[field]
-    ]
+    conflicts = [field for field in semantic_fields if getattr(existing, field) != desired[field]]
 
     if conflicts:
         return {
@@ -683,11 +601,7 @@ def _plan_interruption(patient, bundle, record):
 
     start_date = date.fromisoformat(identity["start_date"])
 
-    end_date = (
-        date.fromisoformat(identity["end_date"])
-        if identity.get("end_date")
-        else None
-    )
+    end_date = date.fromisoformat(identity["end_date"]) if identity.get("end_date") else None
 
     drug = str(identity["drug"])
 
@@ -698,9 +612,7 @@ def _plan_interruption(patient, bundle, record):
         identity.get("end_date"),
     )
 
-    clinical_evidence = dict(
-        payload.get("evidence", {}) or {}
-    )
+    clinical_evidence = dict(payload.get("evidence", {}) or {})
 
     desired_evidence = {
         **clinical_evidence,
@@ -710,17 +622,13 @@ def _plan_interruption(patient, bundle, record):
         ),
     }
 
-    source_quality = str(
-        payload.get("source_quality", "clinical_record")
-    )
+    source_quality = str(payload.get("source_quality", "clinical_record"))
 
     desired = {
         "patient_therapy": patient_therapy,
         "reason": reason,
         "evidence": desired_evidence,
-        "action_taken": str(
-            payload.get("action_taken", "")
-        ),
+        "action_taken": str(payload.get("action_taken", "")),
         "source_quality": source_quality,
     }
 
@@ -746,9 +654,7 @@ def _plan_interruption(patient, bundle, record):
             },
         }
 
-    current_clinical_evidence = _strip_interruption_metadata(
-        existing.evidence
-    )
+    current_clinical_evidence = _strip_interruption_metadata(existing.evidence)
 
     conflicts = []
 
@@ -771,9 +677,7 @@ def _plan_interruption(patient, bundle, record):
 
     updates = {}
 
-    if existing.patient_therapy_id != (
-        patient_therapy.id if patient_therapy else None
-    ):
+    if existing.patient_therapy_id != (patient_therapy.id if patient_therapy else None):
         updates["patient_therapy"] = patient_therapy
 
     if existing.evidence != desired_evidence:
@@ -814,9 +718,7 @@ def _plan_record(patient, bundle, record):
             record,
         )
 
-    raise DatasetImportError(
-        f"unsupported record_type: {record_type}"
-    )
+    raise DatasetImportError(f"unsupported record_type: {record_type}")
 
 
 def import_dataset(
@@ -833,9 +735,7 @@ def import_dataset(
         "dataset_id": dataset["dataset_id"],
         "dataset_version": dataset["dataset_version"],
         "case_ref": dataset["case_ref"],
-        "canonical_dataset_sha256": bundle[
-            "canonical_dataset_sha256"
-        ],
+        "canonical_dataset_sha256": bundle["canonical_dataset_sha256"],
         "records_total": len(dataset["records"]),
         "created": 0,
         "changed": 0,
@@ -854,11 +754,7 @@ def import_dataset(
 
         action = plan["action"]
         record_type = plan["record_type"]
-        counter_key = (
-            "conflicts"
-            if action == "conflict"
-            else action
-        )
+        counter_key = "conflicts" if action == "conflict" else action
 
         result[counter_key] += 1
 
@@ -878,9 +774,7 @@ def import_dataset(
             result["conflict_records"].append(
                 {
                     "record_id": plan["record_id"],
-                    "fields": sorted(
-                        plan["conflict_fields"]
-                    ),
+                    "fields": sorted(plan["conflict_fields"]),
                 }
             )
 
@@ -890,9 +784,7 @@ def import_dataset(
     with transaction.atomic():
         for plan in plans:
             if plan["action"] == "created":
-                plan["model"].objects.create(
-                    **plan["create"]
-                )
+                plan["model"].objects.create(**plan["create"])
 
             elif plan["action"] == "changed":
                 obj = plan["object"]
@@ -901,9 +793,7 @@ def import_dataset(
                 for field, value in updates.items():
                     setattr(obj, field, value)
 
-                obj.save(
-                    update_fields=sorted(updates.keys())
-                )
+                obj.save(update_fields=sorted(updates.keys()))
 
     result["applied"] = True
 

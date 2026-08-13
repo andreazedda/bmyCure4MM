@@ -1,0 +1,9 @@
+{
+  "schema_version": "repository-quality-baseline-v1",
+  "known_invalid_notebooks": {
+    "lab/graphs_classifier.ipynb": "d782f5eb2b8e275acebe5d0a28864ec5ea1ed8b4cab989932df952c14a97c11b",
+    "lab/load_csv_example.ipynb": "5a05ccb8c16b128430350fae0097e8cda2d45b4ae882d33b00631fea35b20c4c"
+  },
+  "measured_legacy_ruff_findings": 496,
+  "measured_legacy_files_requiring_format": 220
+}

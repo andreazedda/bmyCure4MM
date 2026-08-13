@@ -35,20 +35,22 @@ Negative and inconclusive results are valid research outcomes.
 
 ## Local setup
 
-The repository currently uses `requirements.txt`; deterministic dependency
-locking is tracked in GitHub issue #15. Until that issue closes, record the
-exact environment used for every scientific result.
+Python 3.11 and 3.12 are supported. `uv.lock` is the sole dependency lock;
+`uv` 0.12.3 is required and refuses a stale lock.
 
 ```bash
 git clone https://github.com/andreazedda/bmyCure4MM.git
 cd bmyCure4MM
-python3 -m venv venv
-source venv/bin/activate
-python -m pip install -r requirements.txt
-python manage.py migrate
-python manage.py check
-python manage.py runserver
+python3.11 -m pip install uv==0.12.3  # one-time bootstrap
+uv sync --frozen --extra chemistry
+uv run python manage.py migrate
+uv run python manage.py check
+uv run python manage.py runserver
 ```
+
+Omit `--extra chemistry` for core work that does not use RDKit or the molecular
+pipelines. Dependency groups, lock updates, audits, and deterministic numerical
+checks are documented in [Dependency Operations](docs/operations/DEPENDENCIES.md).
 
 Do not use production secrets or private patient payloads in development
 commands, fixtures, tests, or Git.
@@ -56,9 +58,14 @@ commands, fixtures, tests, or Git.
 ## Tests and safety gate
 
 ```bash
-python manage.py check
-python manage.py makemigrations --check --dry-run
-python manage.py test
+uv run python manage.py check
+uv run python manage.py makemigrations --check --dry-run
+uv run python manage.py test
+uv run ruff check .
+uv run ruff format --check .
+uv run mypy
+uv run python -m scripts.check_numerical_baseline
+uv run python -m scripts.audit_dependencies
 scripts/pre_push_research_safety_check.sh
 ```
 

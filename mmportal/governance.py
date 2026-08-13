@@ -3,7 +3,6 @@ from __future__ import annotations
 from enum import Enum
 from typing import Any
 
-
 INTENDED_USE_LEVEL = "E1_research_prototype"
 CLINICAL_DECISION_SUPPORT = False
 PATIENT_SPECIFIC_PREDICTION_VALIDATED = False
@@ -41,18 +40,12 @@ def governance_metadata(
     model_version: str = CURRENT_RESEARCH_MODEL_VERSION,
     output_kind: str,
 ) -> dict[str, Any]:
-    label = (
-        epistemic_label.value
-        if isinstance(epistemic_label, EpistemicLabel)
-        else str(epistemic_label)
-    )
+    label = epistemic_label.value if isinstance(epistemic_label, EpistemicLabel) else str(epistemic_label)
     return {
         "claims_policy_version": CLAIMS_POLICY_VERSION,
         "intended_use_level": INTENDED_USE_LEVEL,
         "clinical_decision_support": CLINICAL_DECISION_SUPPORT,
-        "patient_specific_prediction_validated": (
-            PATIENT_SPECIFIC_PREDICTION_VALIDATED
-        ),
+        "patient_specific_prediction_validated": (PATIENT_SPECIFIC_PREDICTION_VALIDATED),
         "causal_effect_identified": CAUSAL_EFFECT_IDENTIFIED,
         "epistemic_label": label,
         "model_version": model_version,
