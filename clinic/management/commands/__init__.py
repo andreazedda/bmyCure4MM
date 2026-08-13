@@ -1,2 +1,1 @@
 """Management command package."""
-
