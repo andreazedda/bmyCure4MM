@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from clinic.models import Patient
 from twin_engine.backtesting import run_patient_backtest
-from twin_engine.provenance import CURRENT_MODEL_VERSION, record_simulation_metadata
+from twin_engine.provenance import record_simulation_metadata
 from twin_engine.state_model import get_current_twin_state
 
 
@@ -25,7 +25,7 @@ class Command(BaseCommand):
         result = run_patient_backtest(patient, current_state, minimum_history_points=options["minimum_history_points"])
         record = record_simulation_metadata(
             twin_state=current_state,
-            model_version=CURRENT_MODEL_VERSION,
+            model_id="observation_model",
             solver_name="rolling_origin_backtest",
             input_payload={"patient_id": patient.id, "minimum_history_points": options["minimum_history_points"]},
             solver_parameters={"diagnostic_summary": result},

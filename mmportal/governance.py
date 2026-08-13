@@ -4,11 +4,17 @@ from enum import Enum
 from typing import Any
 
 INTENDED_USE_LEVEL = "E1_research_prototype"
+APP_VERSION = "0.1.0"
+API_VERSION = "research-api-v1"
 CLINICAL_DECISION_SUPPORT = False
 PATIENT_SPECIFIC_PREDICTION_VALIDATED = False
 CAUSAL_EFFECT_IDENTIFIED = False
 CURRENT_RESEARCH_MODEL_VERSION = "research-twin-v1"
 CLAIMS_POLICY_VERSION = "claims-policy-v1"
+MODEL_CARD_VERSION = "model-card-v1"
+EVIDENCE_GRAPH_VERSION = "evidence-graph-v1"
+VALIDATION_PROTOCOL_VERSION = "validation-protocol-v1"
+REPORT_TEMPLATE_VERSION = "research-report-v1"
 
 
 class EpistemicLabel(str, Enum):

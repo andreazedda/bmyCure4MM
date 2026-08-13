@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bmycure4mm.local/schemas/observation-residual-v1.json",
+  "title": "Observation residual payload v1",
+  "type": "object",
+  "required": ["predicted_values", "observed_values", "residuals", "normalized_residuals", "biomarker_weights"],
+  "properties": {
+    "predicted_values": {"type": "object"},
+    "observed_values": {"type": "object"},
+    "residuals": {"type": "object", "additionalProperties": {"type": "number"}},
+    "normalized_residuals": {"type": "object", "additionalProperties": {"type": "number"}},
+    "biomarker_weights": {"type": "object", "additionalProperties": {"type": "number", "minimum": 0}}
+  },
+  "additionalProperties": false
+}

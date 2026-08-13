@@ -450,8 +450,8 @@ def build_scenario_rows(patient: Patient, latest_runs_by_label: dict[str, Counte
     for label, run in latest_runs_by_label.items():
         metrics = run.comparison_metrics or {}
         summary = run.simulation_summary or {}
-        uncertainty = metrics.get("uncertainty") or {}
-        sensitivity = metrics.get("sensitivity") or {}
+        uncertainty = _run_diagnostic(run, "counterfactual_uncertainty", "uncertainty")
+        sensitivity = _run_diagnostic(run, "counterfactual_sensitivity", "sensitivity")
         predicted = summary.get("predicted_biomarkers") or {}
         baseline_predicted = summary.get("baseline_predicted_biomarkers") or {}
         trajectory_payload = load_json_artifact(run.trajectory_artifact)
@@ -513,6 +513,13 @@ def build_scenario_rows(patient: Patient, latest_runs_by_label: dict[str, Counte
         )
     rows.sort(key=lambda item: (item["utility"] is None, -(item["utility"] or -999999), -item["run"].id))
     return rows
+
+
+def _run_diagnostic(run: CounterfactualRun, solver_name: str, legacy_key: str) -> dict[str, Any]:
+    record = run.metadata_records.filter(solver_name=solver_name).order_by("-created_at").first()
+    if record is not None:
+        return dict((record.solver_parameters or {}).get("diagnostic_summary") or {})
+    return dict((run.comparison_metrics or {}).get(legacy_key) or {})
 
 
 def build_trajectory_chart_data(scenario_rows: list[dict[str, Any]]) -> dict[str, Any]:

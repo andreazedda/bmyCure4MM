@@ -48,9 +48,9 @@ uv run python -m scripts.reproducibility_report
 The report records the Git SHA, lock SHA-256, Python/platform identity, and
 scientifically material package versions. Release automation must provide an
 OCI digest through `CONTAINER_IMAGE_DIGEST`; local reports fail closed to
-`UNAVAILABLE_LOCAL` rather than inventing a digest. Issue #19 will bind these
-fields into the immutable run manifest; until then, retain the report beside
-every research artifact.
+`UNAVAILABLE_LOCAL` rather than inventing a digest. Scientific run manifests
+bind the lock hash, Git SHA, registry hash, and container digest to each
+persisted execution.
 
 ## System dependencies
 

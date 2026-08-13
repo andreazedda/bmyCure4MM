@@ -28,7 +28,8 @@ passed; it is not evidence of calibration, clinical validity, or causal effect.
   retained with the result.
 - Repeated runs with the same seed and version vector must be identical within
   the declared floating-point policy.
-- Issue #19 will make the seed mandatory in every run manifest.
+- Every persisted scientific execution records a seed in its immutable run
+  manifest. Deterministic paths use the explicit default seed `0`.
 
 ## Floating point and parallelism
 

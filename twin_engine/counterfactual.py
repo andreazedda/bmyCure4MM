@@ -4,6 +4,7 @@ import logging
 from datetime import timedelta
 from typing import Any
 
+from django.db import transaction
 from django.db.models import Q
 
 from clinic.models import Regimen
@@ -11,7 +12,7 @@ from clinic.models import Regimen
 from .causal import distinguish_mechanistic_counterfactual_vs_causal_estimand
 from .exposure_bridge import compare_exposure_profiles
 from .models import CounterfactualRun
-from .provenance import CURRENT_MODEL_VERSION, record_simulation_metadata
+from .provenance import prepare_simulation_identity, record_simulation_metadata
 from .report_builder import build_counterfactual_report_payload, write_json_artifact
 from .simulation_bridge import run_patient_simulation
 from .therapy_schedule import SUPPORTED_DRUG_ALIASES, build_therapy_schedule
@@ -151,6 +152,28 @@ def run_counterfactual(
         }
         counterfactual_run.comparison_metrics = comparison_metrics
 
+        input_payload = {
+            "base_twin_state_id": base_twin_state.id,
+            "intervention_definition": _sanitize_payload_for_artifact(intervention_definition),
+            "execution_definition": _sanitize_payload_for_artifact(execution_definition),
+        }
+        solver_parameters = {
+            **alternative_result["solver_inputs"]["raw_parameters"],
+            "exposure_summary": alternative_result["summary"].get("exposure_summary") or {},
+            "toxicity_dynamics": alternative_toxicity_dynamics,
+        }
+        prepared_identity = prepare_simulation_identity(
+            model_id="counterfactual_model",
+            solver_name="MathematicalModel",
+            input_payload=input_payload,
+            solver_parameters=solver_parameters,
+            twin_state=base_twin_state,
+            random_seed=execution_definition.get("random_seed"),
+        )
+        run_identity = {
+            "run_id": prepared_identity.run_id,
+            "version_vector": prepared_identity.version_vector,
+        }
         trajectory_payload = {
             "label": "research simulation",
             "counterfactual_type": "mechanistic model counterfactual",
@@ -160,8 +183,9 @@ def run_counterfactual(
             "comparison_metrics": comparison_metrics,
             "baseline_toxicity_dynamics": baseline_toxicity_dynamics,
             "alternative_toxicity_dynamics": alternative_toxicity_dynamics,
+            "run_identity": run_identity,
         }
-        trajectory_url, _ = write_json_artifact(
+        trajectory_url, trajectory_path = write_json_artifact(
             "counterfactual_trajectory",
             trajectory_payload,
             patient_id=patient.id,
@@ -170,12 +194,13 @@ def run_counterfactual(
         )
 
         report_metadata = {
-            "model_version": CURRENT_MODEL_VERSION,
+            "model_version": prepared_identity.version_vector["model_version"],
             "solver_name": "MathematicalModel",
             "input_hash_source": {
                 "base_twin_state_id": base_twin_state.id,
                 "intervention_definition": _sanitize_payload_for_artifact(intervention_definition),
             },
+            "run_identity": run_identity,
         }
         report_payload = build_counterfactual_report_payload(
             counterfactual_run,
@@ -186,7 +211,7 @@ def run_counterfactual(
             toxicity_constraints=toxicity_constraints,
             warnings=warning_block,
         )
-        report_url, _ = write_json_artifact(
+        report_url, report_path = write_json_artifact(
             "counterfactual_report",
             report_payload,
             patient_id=patient.id,
@@ -194,41 +219,39 @@ def run_counterfactual(
             folder_name="research_reports",
         )
 
-        counterfactual_run.trajectory_artifact = trajectory_url
-        counterfactual_run.report_artifact = report_url
-        counterfactual_run.status = CounterfactualRun.STATUS_COMPLETED
-        counterfactual_run.error_message = ""
-        counterfactual_run.save(
-            update_fields=[
-                "alternative_regimen",
-                "alternative_parameters",
-                "simulation_summary",
-                "comparison_metrics",
-                "trajectory_artifact",
-                "report_artifact",
-                "status",
-                "error_message",
-            ]
-        )
+        with transaction.atomic():
+            counterfactual_run.trajectory_artifact = trajectory_url
+            counterfactual_run.report_artifact = report_url
+            counterfactual_run.status = CounterfactualRun.STATUS_COMPLETED
+            counterfactual_run.error_message = ""
+            counterfactual_run.save(
+                update_fields=[
+                    "alternative_regimen",
+                    "alternative_parameters",
+                    "simulation_summary",
+                    "comparison_metrics",
+                    "trajectory_artifact",
+                    "report_artifact",
+                    "status",
+                    "error_message",
+                ]
+            )
 
-        record_simulation_metadata(
-            counterfactual_run=counterfactual_run,
-            twin_state=base_twin_state,
-            model_version=CURRENT_MODEL_VERSION,
-            solver_name="MathematicalModel",
-            input_payload={
-                "base_twin_state_id": base_twin_state.id,
-                "intervention_definition": _sanitize_payload_for_artifact(intervention_definition),
-                "execution_definition": _sanitize_payload_for_artifact(execution_definition),
-            },
-            solver_parameters={
-                **alternative_result["solver_inputs"]["raw_parameters"],
-                "exposure_summary": alternative_result["summary"].get("exposure_summary") or {},
-                "toxicity_dynamics": alternative_toxicity_dynamics,
-            },
-            output_payload=report_payload,
-            random_seed=execution_definition.get("random_seed"),
-        )
+            record_simulation_metadata(
+                counterfactual_run=counterfactual_run,
+                twin_state=base_twin_state,
+                model_id="counterfactual_model",
+                solver_name="MathematicalModel",
+                input_payload=input_payload,
+                solver_parameters=solver_parameters,
+                output_payload=report_payload,
+                random_seed=execution_definition.get("random_seed"),
+                prepared_identity=prepared_identity,
+                artifact_paths=[
+                    ("counterfactual_trajectory", "output", trajectory_path),
+                    ("counterfactual_report", "output", report_path),
+                ],
+            )
 
         logger.info(
             "counterfactual_completed patient_id=%s state_id=%s run_id=%s",
@@ -238,9 +261,29 @@ def run_counterfactual(
         )
         return counterfactual_run
     except Exception as exc:
+        counterfactual_run.refresh_from_db()
         counterfactual_run.status = CounterfactualRun.STATUS_FAILED
         counterfactual_run.error_message = str(exc)
         counterfactual_run.save(update_fields=["status", "error_message"])
+        if not counterfactual_run.metadata_records.filter(manifest__isnull=False).exists():
+            try:
+                record_simulation_metadata(
+                    counterfactual_run=counterfactual_run,
+                    twin_state=base_twin_state,
+                    model_id="counterfactual_model",
+                    solver_name="MathematicalModel",
+                    input_payload={
+                        "base_twin_state_id": base_twin_state.id,
+                        "intervention_definition": _sanitize_payload_for_artifact(intervention_definition),
+                        "execution_definition": _sanitize_payload_for_artifact(execution_definition),
+                    },
+                    solver_parameters={"horizon_days": int(horizon_days)},
+                    output_payload={"status": "failed", "error_type": type(exc).__name__},
+                    random_seed=execution_definition.get("random_seed"),
+                    status="failed",
+                )
+            except Exception:
+                logger.exception("counterfactual_failure_manifest_failed run_id=%s", counterfactual_run.id)
         logger.exception(
             "counterfactual_failed patient_id=%s state_id=%s run_id=%s",
             patient.id,

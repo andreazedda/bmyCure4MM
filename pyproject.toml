@@ -92,8 +92,12 @@ include = [
   "simulator/models_simulation.py",
   "simulator/design/*.py",
   "twin_engine/input_contract.py",
+  "twin_engine/comparability.py",
+  "twin_engine/contracts.py",
+  "twin_engine/model_registry.py",
   "twin_engine/provenance.py",
   "twin_engine/research_dataset_import.py",
+  "twin_engine/run_manifest.py",
 ]
 extend-exclude = [
   "lab",
@@ -117,6 +121,10 @@ files = [
   "scripts/reproducibility_report.py",
   "simulator/design/logic.py",
   "simulator/design/types.py",
+  "twin_engine/comparability.py",
+  "twin_engine/contracts.py",
+  "twin_engine/model_registry.py",
+  "twin_engine/run_manifest.py",
 ]
 warn_unused_configs = true
 warn_redundant_casts = true
@@ -130,8 +138,11 @@ exclude = ["lab/", ".*/migrations/"]
 [[tool.mypy.overrides]]
 module = [
   "django.*",
+  "jsonschema",
+  "jsonschema.*",
   "numpy.*",
   "pandas.*",
   "scipy.*",
 ]
 ignore_missing_imports = true
+disable_error_code = ["import-untyped"]

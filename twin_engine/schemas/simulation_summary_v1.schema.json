@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bmycure4mm.local/schemas/simulation-summary-v1.json",
+  "title": "Simulation summary v1",
+  "type": "object",
+  "properties": {
+    "label": {"type": "string"},
+    "counterfactual_type": {"type": "string"},
+    "causal_interpretation": {"type": "string"},
+    "classification": {"type": "object"},
+    "baseline": {"type": "object"},
+    "alternative": {"type": "object"},
+    "baseline_predicted_biomarkers": {"type": ["object", "null"]},
+    "predicted_biomarkers": {"type": ["object", "null"]},
+    "toxicity_constraints": {"type": "object"},
+    "baseline_toxicity_dynamics": {"type": "object"},
+    "alternative_toxicity_dynamics": {"type": "object"},
+    "schedule_comparison": {"type": "object"},
+    "warning_block": {"type": "array", "items": {"type": ["string", "null"]}}
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bmycure4mm.local/schemas/twin-parameters-v1.json",
+  "title": "Twin parameters v1",
+  "type": "object",
+  "required": [
+    "risk_score",
+    "tumor_growth_rate",
+    "healthy_growth_rate",
+    "carrying_capacity_tumor",
+    "carrying_capacity_healthy",
+    "immune_compromise_index"
+  ],
+  "properties": {
+    "risk_score": {"type": "number", "minimum": 0, "maximum": 1},
+    "tumor_growth_rate": {"type": "number", "minimum": 0},
+    "healthy_growth_rate": {"type": "number", "minimum": 0},
+    "carrying_capacity_tumor": {"type": ["number", "null"], "minimum": 0},
+    "carrying_capacity_healthy": {"type": ["number", "null"], "minimum": 0},
+    "immune_compromise_index": {"type": "number", "exclusiveMinimum": 0},
+    "interaction_strength": {"type": "number"},
+    "observation": {"type": "object"},
+    "assumptions": {
+      "type": "object",
+      "properties": {
+        "label": {"type": "string"},
+        "counterfactual_type": {"type": "string"},
+        "validation_status": {"type": "string"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

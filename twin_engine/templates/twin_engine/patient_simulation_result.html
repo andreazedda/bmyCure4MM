@@ -85,6 +85,9 @@
                     <p class="small text-muted"><strong>Traceability chain:</strong> patient pseudonym -> structured inputs -> twin state -> simulation schedule -> solver output -> artifact -> metadata record.</p>
                     <p class="mb-1"><strong>Metadata record:</strong> {{ simulation_metadata.id }}</p>
                     <p class="mb-1"><strong>Model version:</strong> {{ simulation_metadata.model_version }}</p>
+                    <p class="mb-1"><strong>Run ID:</strong> <code>{{ simulation_metadata.manifest.run_id }}</code></p>
+                    <p class="mb-1"><strong>Dataset:</strong> {{ simulation_metadata.manifest.dataset_id }} / {{ simulation_metadata.manifest.dataset_version }}</p>
+                    <p class="mb-1"><strong>Epistemic label:</strong> {{ simulation_metadata.manifest.epistemic_label }}</p>
                     <p class="mb-1"><strong>Solver:</strong> {{ simulation_metadata.solver_name }}</p>
                     <p class="mb-1"><strong>Input hash:</strong> <code>{{ simulation_metadata.input_hash }}</code></p>
                     <p class="mb-0"><strong>Artifact:</strong> <a href="{{ simulation_artifact_url }}" target="_blank" rel="noopener">Open JSON artifact</a></p>

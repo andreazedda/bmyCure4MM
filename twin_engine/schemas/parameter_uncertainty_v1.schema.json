@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bmycure4mm.local/schemas/parameter-uncertainty-v1.json",
+  "title": "Parameter uncertainty v1",
+  "type": "object",
+  "properties": {
+    "optimizer": {"type": "string"},
+    "optimizer_success": {"type": "boolean"},
+    "success": {"type": "boolean"},
+    "status": {"type": "string"},
+    "calibration_status": {"type": "string"},
+    "message": {"type": "string"},
+    "objective_before": {"type": "number"},
+    "objective_after": {"type": "number"},
+    "rmse_before": {"type": ["number", "null"]},
+    "rmse_after": {"type": ["number", "null"]},
+    "mae_before": {"type": ["number", "null"]},
+    "mae_after": {"type": ["number", "null"]},
+    "n_observations": {"type": "integer", "minimum": 0},
+    "n_parameters": {"type": "integer", "minimum": 0},
+    "data_points_by_analyte": {
+      "type": "object",
+      "additionalProperties": {"type": "integer", "minimum": 0}
+    },
+    "improvement_ratio": {"type": ["number", "null"]}
+  },
+  "additionalProperties": false
+}

@@ -161,8 +161,7 @@ class ResearchCockpitTests(TestCase):
                 "classification": {"counterfactual_class": "mechanistic"},
             },
         )
-        metrics = dict(run.comparison_metrics or {})
-        metrics["uncertainty"] = {
+        uncertainty = {
             "status": "completed",
             "parameter_uncertainty_source": "heuristic_perturbation_not_calibrated_distribution",
             "metric_summaries": {
@@ -174,13 +173,27 @@ class ResearchCockpitTests(TestCase):
                 "neutropenia_signal_0_1": {"p05": 0.1, "median": 0.2, "p95": 0.3},
             },
         }
-        metrics["sensitivity"] = {
+        sensitivity = {
             "status": "completed",
             "top_drivers": [{"parameter": "tumor_growth_rate", "max_abs_utility_v2_delta": 0.12, "sensitivity_classification": "moderate"}],
             "unstable_parameters": ["tumor_growth_rate"],
         }
-        run.comparison_metrics = metrics
-        run.save(update_fields=["comparison_metrics"])
+        SimulationRunMetadata.objects.create(
+            counterfactual_run=run,
+            twin_state=self.state,
+            model_version="research-twin-v1",
+            solver_name="counterfactual_uncertainty",
+            solver_parameters={"diagnostic_summary": uncertainty},
+            input_hash="u",
+        )
+        SimulationRunMetadata.objects.create(
+            counterfactual_run=run,
+            twin_state=self.state,
+            model_version="research-twin-v1",
+            solver_name="counterfactual_sensitivity",
+            solver_parameters={"diagnostic_summary": sensitivity},
+            input_hash="s",
+        )
         SimulationRunMetadata.objects.create(
             twin_state=self.state,
             model_version="research-twin-v1",

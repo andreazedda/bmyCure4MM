@@ -39,6 +39,14 @@
             <p class="mb-1"><strong>Alternative regimen:</strong> {{ counterfactual_run.alternative_regimen|default:"custom" }}</p>
             <p class="mb-1"><strong>Research utility:</strong> {{ report_payload.comparison_metrics.research_utility|default:"unknown" }}</p>
             <p class="mb-1"><strong>Research utility v2:</strong> {{ report_payload.comparison_metrics.research_utility_v2|default:"unknown" }}</p>
+            {% if run_manifest %}
+                <p class="mb-1"><strong>Run ID:</strong> <code>{{ run_manifest.run_id }}</code></p>
+                <p class="mb-1"><strong>Dataset:</strong> {{ run_manifest.dataset_id }} / {{ run_manifest.dataset_version }}</p>
+                <p class="mb-1"><strong>Model:</strong> {{ run_manifest.model_id }} / {{ run_manifest.model_version }}</p>
+                <p class="mb-1"><strong>Epistemic label:</strong> {{ run_manifest.epistemic_label }}</p>
+            {% else %}
+                <p class="mb-1 text-muted"><strong>Run identity:</strong> legacy unversioned run; rerun required for direct comparability.</p>
+            {% endif %}
             <p class="mb-0"><strong>Report artifact:</strong> <a href="{{ counterfactual_run.report_artifact }}" target="_blank" rel="noopener">Open JSON report</a></p>
             <p class="small text-muted mt-2 mb-0"><strong>Provenance chain:</strong> patient pseudonym -> twin state -> intervention definition -> simulation run #{{ counterfactual_run.id }} -> report artifact -> metadata if available.</p>
         </div>

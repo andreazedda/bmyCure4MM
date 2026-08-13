@@ -268,8 +268,8 @@ def run_validation_checks(patient: Patient | None = None) -> list[dict[str, Any]
                 missing_robustness.append(item.id)
 
         for run in latest_runs.values():
-            uncertainty = ((run.comparison_metrics or {}).get("uncertainty") or {})
-            sensitivity = ((run.comparison_metrics or {}).get("sensitivity") or {})
+            uncertainty = _stored_diagnostic(run, "counterfactual_uncertainty", "uncertainty")
+            sensitivity = _stored_diagnostic(run, "counterfactual_sensitivity", "sensitivity")
             if uncertainty.get("status") != "completed":
                 missing_uncertainty.append(run.id)
             else:
@@ -285,6 +285,13 @@ def run_validation_checks(patient: Patient | None = None) -> list[dict[str, Any]
     checks.append(build_check("pass" if not missing_robustness else "warn", "robust ranking summary exists", "Patients with multiple completed scenarios should have a stored robust ranking summary.", object_ids=missing_robustness, next_action="Run robust ranking after uncertainty diagnostics."))
     checks.append(build_check("pass" if not wide_uncertainty else "warn", "utility_v2 uncertainty is not wide", "Wide utility_v2 intervals mean scenario ranking should be treated as exploratory only.", object_ids=wide_uncertainty, next_action="Label wide-interval scenarios as exploratory and inspect sensitivity drivers."))
     return checks
+
+
+def _stored_diagnostic(run: CounterfactualRun, solver_name: str, legacy_key: str) -> dict[str, Any]:
+    record = run.metadata_records.filter(solver_name=solver_name).order_by("-created_at").first()
+    if record is not None:
+        return dict((record.solver_parameters or {}).get("diagnostic_summary") or {})
+    return dict((run.comparison_metrics or {}).get(legacy_key) or {})
 
 
 def load_model_references() -> list[dict[str, Any]]:

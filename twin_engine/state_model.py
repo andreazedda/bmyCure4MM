@@ -7,7 +7,7 @@ from simulator.twin import build_patient_twin
 from .input_contract import build_twin_lineage
 from .models import PatientTwinState
 from .observation_model import default_observation_parameters
-from .provenance import CURRENT_MODEL_VERSION, collect_twin_config_hash
+from .provenance import CURRENT_MODEL_VERSION, collect_twin_config_hash, record_simulation_metadata
 from .validators import validate_assessment_minimum_fields
 
 
@@ -43,6 +43,21 @@ def initialize_from_assessment(assessment, user=None) -> PatientTwinState:
         )
         state.source_assessments.add(assessment)
         set_current_state(state)
+        record_simulation_metadata(
+            twin_state=state,
+            model_id="patient_twin_state_model",
+            solver_name="initial_state_mapping",
+            input_payload={
+                "assessment_date": assessment.date.isoformat(),
+                "computational_input_sha256": lineage["computational_input"]["sha256"],
+            },
+            solver_parameters={"mapping": "simulator.twin.build_patient_twin"},
+            output_payload={
+                "state_vector": state_vector,
+                "parameters": parameters,
+                "lineage_sha256": lineage["computational_input"]["sha256"],
+            },
+        )
     return state
 
 

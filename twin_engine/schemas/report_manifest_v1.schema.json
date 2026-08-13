@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bmycure4mm.local/schemas/report-manifest-v1.json",
+  "title": "Research report manifest v1",
+  "type": "object",
+  "required": ["run_id", "version_vector", "artifact_manifest", "manifest_sha256"],
+  "properties": {
+    "run_id": {"type": "string", "pattern": "^RUN_[A-Za-z0-9_.-]+$"},
+    "version_vector": {"type": "object"},
+    "artifact_manifest": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "role", "media_type", "uri", "sha256"],
+        "properties": {
+          "name": {"type": "string", "minLength": 1},
+          "role": {"enum": ["input", "output"]},
+          "media_type": {"type": "string", "minLength": 1},
+          "uri": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "hash_only": {"type": "boolean"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "manifest_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "additionalProperties": false
+}

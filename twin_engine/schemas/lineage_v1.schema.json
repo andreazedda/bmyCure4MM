@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bmycure4mm.local/schemas/twin-lineage-v1.json",
+  "title": "Twin lineage v1",
+  "type": "object",
+  "required": ["contract", "purpose", "runtime", "dataset_binding", "computational_input"],
+  "properties": {
+    "contract": {"const": "research-twin-lineage-v0.1"},
+    "purpose": {"type": "string", "minLength": 1},
+    "runtime": {
+      "type": "object",
+      "required": ["model_version", "twin_config_hash", "drug_preset_hashes", "code_commit_hash"],
+      "properties": {
+        "model_version": {"type": "string", "minLength": 1},
+        "twin_config_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "drug_preset_hashes": {"type": "object", "additionalProperties": {"type": "string", "pattern": "^[0-9a-f]{64}$"}},
+        "code_commit_hash": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "dataset_binding": {"type": "object"},
+    "computational_input": {
+      "type": "object",
+      "required": ["contract", "sha256", "assessment_count", "therapy_count", "interruption_count", "contains_local_database_ids", "raw_manifest_persisted"],
+      "properties": {
+        "contract": {"const": "research-computational-input-v0.1"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "assessment_count": {"type": "integer", "minimum": 0},
+        "therapy_count": {"type": "integer", "minimum": 0},
+        "interruption_count": {"type": "integer", "minimum": 0},
+        "horizon_start_date": {"type": "string", "format": "date"},
+        "horizon_end_date": {"type": "string", "format": "date"},
+        "contains_local_database_ids": {"const": false},
+        "raw_manifest_persisted": {"const": false}
+      },
+      "additionalProperties": false
+    },
+    "parent": {"type": "object"}
+  },
+  "additionalProperties": false
+}

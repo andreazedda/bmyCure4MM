@@ -1,11 +1,17 @@
 {
   "schema": "bmycure4mm-release-claims-v1",
+  "app_version": "0.1.0",
+  "api_version": "research-api-v1",
   "claims_policy_version": "claims-policy-v1",
   "intended_use_level": "E1_research_prototype",
   "clinical_decision_support": false,
   "patient_specific_prediction_validated": false,
   "causal_effect_identified": false,
   "model_version": "research-twin-v1",
+  "model_card_version": "model-card-v1",
+  "evidence_graph_version": "evidence-graph-v1",
+  "validation_protocol_version": "validation-protocol-v1",
+  "report_template_version": "research-report-v1",
   "epistemic_labels": [
     "UNKNOWN",
     "NEEDS_EVIDENCE",
