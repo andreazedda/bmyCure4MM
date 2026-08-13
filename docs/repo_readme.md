@@ -24,11 +24,11 @@ research experiments.
    git clone <repo-url>
    cd bmyCure4MM
    ```
-2. **Install dependencies**
-   Python 3.10+ is required.  All Python dependencies used in the notebooks
-   and scripts can be installed with
+2. **Install governed application dependencies**
+   Python 3.11 or 3.12 is required. The application and molecular utilities use
+   the repository lock:
    ```bash
-   pip install -r lab/requirements.txt
+   uv sync --frozen --extra chemistry
    ```
 3. **Generate local settings**
    The pipeline scripts expect a `pipelines/configs/general_settings.json`
@@ -61,6 +61,8 @@ for outputs and logs.
 
 ### Lab Notebooks
 
-The `lab` directory collects exploratory notebooks and prototypes.
-They require the packages listed in `lab/requirements.txt` and can be opened
-with Jupyter Lab or Jupyter Notebook after installing the environment.
+The `lab` directory contains historical exploratory notebooks and prototypes.
+Its former 2023 environment conflicted with the application numerical stack
+and is not a reproducible supported environment. Do not use those notebooks as
+scientific evidence until each is migrated into an explicit future lock and
+passes the repository hygiene and numerical gates.

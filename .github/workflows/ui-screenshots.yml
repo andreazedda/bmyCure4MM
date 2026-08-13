@@ -10,8 +10,8 @@ on:
       - "clinic/**"
       - "simulator/**"
       - "docs/assets/scripts/generate_ui_screenshots.py"
-      - "requirements.txt"
-      - "requirements-screenshots.txt"
+      - "pyproject.toml"
+      - "uv.lock"
 
 permissions:
   contents: read
@@ -25,19 +25,23 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          cache: pip
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.12.3"
+          enable-cache: true
 
       - name: Install Python deps
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt -r requirements-screenshots.txt
+        run: uv sync --frozen --no-default-groups --group screenshots --extra chemistry
 
       - name: Install Playwright Chromium
-        run: |
+        run: >-
+          uv run --frozen --no-default-groups --group screenshots --extra chemistry
           python -m playwright install --with-deps chromium
 
       - name: Generate screenshots
-        run: |
+        run: >-
+          uv run --frozen --no-default-groups --group screenshots --extra chemistry
           python docs/assets/scripts/generate_ui_screenshots.py
 
       - name: Upload screenshots artifact

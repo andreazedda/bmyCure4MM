@@ -34,7 +34,7 @@ The **Binding Visualizer** is a comprehensive Python module designed for interac
 binding_visualizer/
 ├── binding_visualizer.py          # Main module script
 ├── binding_visualizer.yaml        # Configuration file
-├── requirements.txt              # Python dependencies
+├── ../../pyproject.toml          # Canonical optional chemistry dependencies
 ├── 3Dmol-min.js                 # Local 3Dmol.js library (auto-downloaded)
 ├── docs/                        # Documentation
 │   └── README.md               # This documentation
@@ -385,7 +385,7 @@ base64_image = bv.generate_structure_image(
 ### Python Packages
 
 ```bash
-pip install -r requirements.txt
+uv sync --frozen --extra chemistry
 ```
 
 **Core Dependencies:**
@@ -393,11 +393,9 @@ pip install -r requirements.txt
 - `requests==2.32.3`: HTTP requests for PDB data
 - `PyYAML==6.0.2`: Configuration file parsing
 - `colorama==0.4.6`: Colored console output
-- `biopython==1.85`: Molecular data processing
+- `biopython==1.87`: Molecular data processing
 - `numpy==2.0.2`: Numerical computations
-- `jinja2==3.1.2`: LaTeX template rendering
-- `matplotlib==3.7.2`: Image processing and generation
-- `pillow==10.0.0`: Image manipulation
+- transitive template/image packages are fixed by `uv.lock`.
 
 ### System Dependencies
 

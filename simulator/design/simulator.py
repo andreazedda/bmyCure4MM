@@ -43,7 +43,9 @@ def _kill_strength(
     elif therapy.modality == "car_t":
         model = CARTModel(**therapy.params)
         density = clone.antigen_profile.get(model.target_antigen)
-        act = 1.0 if density >= model.activation_threshold else density / max(1e-6, model.activation_threshold)
+        act = (
+            1.0 if density >= model.activation_threshold else density / max(1e-6, model.activation_threshold)
+        )
         eff = _clamp01(model.expansion_rate * (1.0 - model.exhaustion_rate))
         base = _clamp01(eff * _clamp01(act) * clone.sensitivity("car_t"))
 
@@ -87,7 +89,9 @@ def step(
         sens = clone.sensitivity(therapy.modality)
         survival_advantage[name] = 1.0 + 0.6 * (1.0 - sens)
 
-    evolved_state = apply_selection(state, clones=clones, survival_advantage=survival_advantage, drift=0.02, rng=rng)
+    evolved_state = apply_selection(
+        state, clones=clones, survival_advantage=survival_advantage, drift=0.02, rng=rng
+    )
     evolved_state.loads = new_loads
     evolved_state.time_days = state.time_days + dt_days
 
@@ -111,7 +115,11 @@ def step(
     for p in fr.values():
         if p > 1e-12:
             diversity -= p * math.log(p)
-    relapse_risk = _clamp01(0.65 * (res / max(1e-9, bulk + res)) + 0.2 * _clamp01(diversity / 2.0) + 0.15 * tox_scores["marrow_reserve_depletion"])
+    relapse_risk = _clamp01(
+        0.65 * (res / max(1e-9, bulk + res))
+        + 0.2 * _clamp01(diversity / 2.0)
+        + 0.15 * tox_scores["marrow_reserve_depletion"]
+    )
 
     outcome = StepOutcome(
         time_days=float(evolved_state.time_days),

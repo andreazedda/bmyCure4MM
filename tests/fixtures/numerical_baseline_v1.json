@@ -1,0 +1,45 @@
+{
+  "baseline_id": "dependency-lock-baseline-v1",
+  "characterized_from_git_sha": "d99ff81dd73dec0245e3d6971cee9291c1c5572b",
+  "characterized_legacy_environment": {
+    "numpy": "2.0.2",
+    "python": "3.9.6",
+    "scipy": "1.13.1"
+  },
+  "comparison_policy": {
+    "absolute_tolerance": 1e-10,
+    "relative_tolerance": 1e-7,
+    "seeded_report_hash": "exact"
+  },
+  "expected": {
+    "environment": {
+      "numpy": "2.0.2",
+      "python": "3.11",
+      "scipy": "1.13.1"
+    },
+    "ode": {
+      "bortezomib_auc": 3.0066673886266333,
+      "final_bortezomib_concentration": 0.052097320920269724,
+      "final_healthy_cells": 100904548954.478,
+      "final_lenalidomide_concentration": 0.15028084629061295,
+      "final_tumor_burden": 52957421.81153798,
+      "lenalidomide_auc": 9.086668584274644,
+      "minimum_healthy_cells": 100904548954.478,
+      "minimum_tumor_burden": 52957421.81153798
+    },
+    "seeded_design_report": {
+      "canonical_bytes": 28247,
+      "canonical_sha256": "708b828060bb06d5842f95850479c1f270c565e69c1fc8d2f40b0e97862ac957",
+      "end_state": {
+        "relapse_risk": 0.5942136201626025,
+        "time_days": 126.0,
+        "tumor_load_bulk": 0.050232005073679406,
+        "tumor_load_reservoir": 0.17535886720234525
+      },
+      "relapse_mean_days": 49.0,
+      "relapse_p50_days": 42.0,
+      "relapse_p90_days": 112.0,
+      "selected_therapy": "ADC-BCMA"
+    }
+  }
+}

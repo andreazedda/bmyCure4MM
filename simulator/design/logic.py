@@ -46,7 +46,7 @@ def activation_score(profile: AntigenProfile, gate: LogicGate, *, rng: random.Ra
         # noisy-OR: 1 - Π(1-p)
         miss = 1.0
         for p in pos:
-            miss *= (1.0 - p)
+            miss *= 1.0 - p
         pos_score = 1.0 - miss
     elif gate.kind == "NOT":
         # NOT without positives is undefined; treat as 0 unless overridden by positives
@@ -58,7 +58,7 @@ def activation_score(profile: AntigenProfile, gate: LogicGate, *, rng: random.Ra
     inhib_score = 1.0
     for p in inhib:
         # if inhibitory antigen is high -> strong inhibition
-        inhib_score *= (1.0 - p)
+        inhib_score *= 1.0 - p
 
     score = pos_score * inhib_score
 

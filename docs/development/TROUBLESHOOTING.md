@@ -71,7 +71,7 @@ celery -A mmportal worker --loglevel=info --pool=solo
 ```
 
 **Se i log mostrano errori:**
-- Controlla che tutte le dipendenze siano installate: `pip install -r requirements.txt`
+- Verifica il lock e installa le dipendenze canoniche: `uv sync --frozen --extra chemistry`
 - Verifica che il virtual environment sia attivato
 - Riavvia i servizi
 
@@ -113,7 +113,7 @@ CELERY_TASK_EAGER_PROPAGATES = True
 
 ### ImportError: No module named 'celery'
 ```bash
-pip install celery redis
+uv sync --frozen
 ```
 
 ### ConnectionError: Error 61 connecting to localhost:6379

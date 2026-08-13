@@ -10,7 +10,6 @@ from mmportal.governance import CURRENT_RESEARCH_MODEL_VERSION
 
 from .models import SimulationRunMetadata
 
-
 CURRENT_MODEL_VERSION = CURRENT_RESEARCH_MODEL_VERSION
 
 
@@ -47,10 +46,7 @@ def collect_drug_preset_hashes() -> dict[str, str]:
     presets_dir = Path(__file__).resolve().parent.parent / "simulator" / "presets" / "drugs"
     if not presets_dir.exists():
         return {}
-    return {
-        path.name: hash_file(path)
-        for path in sorted(presets_dir.glob("*.yaml"))
-    }
+    return {path.name: hash_file(path) for path in sorted(presets_dir.glob("*.yaml"))}
 
 
 def collect_twin_config_hash() -> str:

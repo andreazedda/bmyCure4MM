@@ -182,8 +182,8 @@ Created 4 Playwright test suites:
 ### Installation Commands
 
 ```bash
-# Install Python test dependencies
-pip install -U pytest pytest-django pytest-cov pytest-xdist model_bakery hypothesis freezegun requests
+# Install the canonical Python test graph
+uv sync --frozen --group test
 
 # Install Playwright and dependencies
 cd tests/e2e

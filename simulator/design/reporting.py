@@ -176,7 +176,9 @@ def run_design_report(*, seed: int = 7, steps: int = 18, dt_days: float = 7.0) -
             }
         )
 
-    pareto = _pareto_front([{k: v for k, v in p.items() if k in ("therapy", "tp", "fp")} for p in tradeoff_points])
+    pareto = _pareto_front(
+        [{k: v for k, v in p.items() if k in ("therapy", "tp", "fp")} for p in tradeoff_points]
+    )
 
     # Pick a therapy to simulate: best on Pareto (TP desc, FP asc)
     pareto_sorted = sorted(pareto, key=lambda p: (-p["tp"], p["fp"]))
@@ -211,7 +213,9 @@ def run_design_report(*, seed: int = 7, steps: int = 18, dt_days: float = 7.0) -
         "samples_days": relapse_times_days,
         "mean_days": float(statistics.fmean(relapse_times_days)) if relapse_times_days else 0.0,
         "p50_days": float(statistics.median(relapse_times_days)) if relapse_times_days else 0.0,
-        "p90_days": float(sorted(relapse_times_days)[int(0.9 * (len(relapse_times_days) - 1))]) if relapse_times_days else 0.0,
+        "p90_days": float(sorted(relapse_times_days)[int(0.9 * (len(relapse_times_days) - 1))])
+        if relapse_times_days
+        else 0.0,
     }
 
     tox_scores, tox_why = estimate_toxicity(best_therapy, normal_compartments=normals)

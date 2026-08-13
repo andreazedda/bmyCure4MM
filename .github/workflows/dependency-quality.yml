@@ -1,0 +1,81 @@
+name: Dependency and Reproducibility Gates
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  OPENBLAS_NUM_THREADS: "1"
+  OMP_NUM_THREADS: "1"
+  MKL_NUM_THREADS: "1"
+  VECLIB_MAXIMUM_THREADS: "1"
+
+jobs:
+  locked-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.12.3"
+          enable-cache: true
+      - run: uv lock --check
+      - run: uv sync --frozen --extra chemistry
+      - run: uv run --frozen --extra chemistry ruff check .
+      - run: uv run --frozen --extra chemistry ruff format --check .
+      - run: uv run --frozen --extra chemistry mypy
+      - run: uv run --frozen --extra chemistry python -m scripts.check_repository_hygiene
+      - run: uv run --frozen --extra chemistry python -m scripts.check_numerical_baseline
+      - run: uv run --frozen --extra chemistry python -m scripts.audit_dependencies
+      - run: uv run --frozen --extra chemistry python manage.py check
+      - run: uv run --frozen --extra chemistry python manage.py makemigrations --check --dry-run
+      - run: uv run --frozen --extra chemistry pytest -q tests/test_dependency_reproducibility.py
+
+  core-without-chemistry:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.12.3"
+          enable-cache: true
+      - run: uv sync --python ${{ matrix.python-version }} --frozen --no-default-groups --group test
+      - run: >-
+          uv run --frozen --no-default-groups --group test
+          --python ${{ matrix.python-version }} python manage.py check
+      - run: >-
+          uv run --frozen --no-default-groups --group test
+          --python ${{ matrix.python-version }} python manage.py test
+          mmportal.tests simulator.tests twin_engine.tests clinic.tests docs_viewer.tests
+          --verbosity 1
+
+  docker-lock:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build the frozen production graph
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          tags: bmycure4mm:dependency-gate
+      - name: Record image digest
+        env:
+          IMAGE_DIGEST: ${{ steps.build.outputs.digest }}
+        run: echo "container_digest=${IMAGE_DIGEST}" >> "$GITHUB_STEP_SUMMARY"

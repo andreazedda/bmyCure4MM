@@ -21,7 +21,6 @@ from .provenance import (
     hash_json,
 )
 
-
 COMPUTATIONAL_INPUT_CONTRACT = "research-computational-input-v0.1"
 TWIN_LINEAGE_CONTRACT = "research-twin-lineage-v0.1"
 DATASET_BINDING_SCOPE = "structured_subset_only"
@@ -52,10 +51,7 @@ def _normalize(value: Any) -> Any:
         return float(value)
 
     if isinstance(value, dict):
-        return {
-            str(key): _normalize(value[key])
-            for key in sorted(value, key=str)
-        }
+        return {str(key): _normalize(value[key]) for key in sorted(value, key=str)}
 
     if isinstance(value, (list, tuple)):
         return [_normalize(item) for item in value]
@@ -107,12 +103,7 @@ def serialize_start_state_input(state) -> dict[str, Any] | None:
 def serialize_therapy_input(therapy) -> dict[str, Any]:
     regimen = therapy.regimen
 
-    days_on = sorted(
-        {
-            int(day)
-            for day in (therapy.days_on or [])
-        }
-    )
+    days_on = sorted({int(day) for day in (therapy.days_on or [])})
 
     return _normalize(
         {
@@ -134,9 +125,7 @@ def serialize_interruption_input(interruption) -> dict[str, Any]:
         {
             "start_date": interruption.start_date,
             "end_date": interruption.end_date,
-            "drug": str(
-                interruption.drug or ""
-            ).strip().lower(),
+            "drug": str(interruption.drug or "").strip().lower(),
         }
     )
 
@@ -152,30 +141,15 @@ def build_computational_input_manifest(
     start_state=None,
     extra: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    assessment_payloads = [
-        serialize_assessment_input(item)
-        for item in assessments
-    ]
+    assessment_payloads = [serialize_assessment_input(item) for item in assessments]
 
-    therapy_payloads = [
-        serialize_therapy_input(item)
-        for item in therapies
-    ]
+    therapy_payloads = [serialize_therapy_input(item) for item in therapies]
 
-    interruption_payloads = [
-        serialize_interruption_input(item)
-        for item in interruptions
-    ]
+    interruption_payloads = [serialize_interruption_input(item) for item in interruptions]
 
-    assessment_payloads.sort(
-        key=_canonical_sort_key
-    )
-    therapy_payloads.sort(
-        key=_canonical_sort_key
-    )
-    interruption_payloads.sort(
-        key=_canonical_sort_key
-    )
+    assessment_payloads.sort(key=_canonical_sort_key)
+    therapy_payloads.sort(key=_canonical_sort_key)
+    interruption_payloads.sort(key=_canonical_sort_key)
 
     return _normalize(
         {
@@ -185,9 +159,7 @@ def build_computational_input_manifest(
                 "start_date": horizon_start_date,
                 "end_date": horizon_end_date,
             },
-            "start_state": serialize_start_state_input(
-                start_state
-            ),
+            "start_state": serialize_start_state_input(start_state),
             "assessments": assessment_payloads,
             "therapies": therapy_payloads,
             "interruptions": interruption_payloads,
@@ -208,10 +180,12 @@ def _dataset_provenance_payload(
 ) -> dict[str, Any]:
     if record_type == "therapy_interruption":
         return dict(
-            ((row.evidence or {}).get(
-                "_dataset_provenance",
-                {},
-            ))
+            (
+                (row.evidence or {}).get(
+                    "_dataset_provenance",
+                    {},
+                )
+            )
         )
 
     return dict(row.provenance or {})
@@ -222,26 +196,11 @@ def collect_structured_dataset_binding(
 ) -> dict[str, Any]:
     rows: list[tuple[str, Any]] = []
 
-    rows.extend(
-        ("lab_result", row)
-        for row in LongitudinalLabResult.objects.filter(
-            patient=patient
-        )
-    )
+    rows.extend(("lab_result", row) for row in LongitudinalLabResult.objects.filter(patient=patient))
 
-    rows.extend(
-        ("adverse_event", row)
-        for row in AdverseEvent.objects.filter(
-            patient=patient
-        )
-    )
+    rows.extend(("adverse_event", row) for row in AdverseEvent.objects.filter(patient=patient))
 
-    rows.extend(
-        ("therapy_interruption", row)
-        for row in TherapyInterruption.objects.filter(
-            patient=patient
-        )
-    )
+    rows.extend(("therapy_interruption", row) for row in TherapyInterruption.objects.filter(patient=patient))
 
     binding_counts: dict[
         tuple[str, str, str],
@@ -268,18 +227,11 @@ def collect_structured_dataset_binding(
         identity = (
             str(provenance.get("dataset_id") or ""),
             str(provenance.get("dataset_version") or ""),
-            str(
-                provenance.get(
-                    "canonical_dataset_sha256"
-                )
-                or ""
-            ),
+            str(provenance.get("canonical_dataset_sha256") or ""),
         )
 
         if all(identity):
-            binding_counts[identity] = (
-                binding_counts.get(identity, 0) + 1
-            )
+            binding_counts[identity] = binding_counts.get(identity, 0) + 1
             bound_record_count += 1
         else:
             unbound_record_count += 1
@@ -307,9 +259,7 @@ def collect_structured_dataset_binding(
                 "canonical_dataset_sha256": identity[2],
                 "record_count": count,
             }
-            for identity, count in sorted(
-                binding_counts.items()
-            )
+            for identity, count in sorted(binding_counts.items())
         ]
 
         return {
@@ -318,15 +268,9 @@ def collect_structured_dataset_binding(
             "bindings": bindings,
         }
 
-    identity, count = next(
-        iter(binding_counts.items())
-    )
+    identity, count = next(iter(binding_counts.items()))
 
-    status = (
-        "bound"
-        if unbound_record_count == 0
-        else "partially_bound"
-    )
+    status = "bound" if unbound_record_count == 0 else "partially_bound"
 
     return {
         **base,
@@ -347,10 +291,7 @@ def _interruptions_for_horizon(
         patient.therapy_interruptions.filter(
             start_date__lte=end_date,
         )
-        .filter(
-            Q(end_date__isnull=True)
-            | Q(end_date__gte=start_date)
-        )
+        .filter(Q(end_date__isnull=True) | Q(end_date__gte=start_date))
         .order_by(
             "start_date",
             "drug",
@@ -386,10 +327,7 @@ def build_twin_lineage(
     )
 
     if not assessment_list:
-        raise ValueError(
-            "At least one assessment is required "
-            "to build twin lineage"
-        )
+        raise ValueError("At least one assessment is required to build twin lineage")
 
     if parent_state is None:
         horizon_start_date = assessment_list[0].date
@@ -419,9 +357,7 @@ def build_twin_lineage(
         extra=extra,
     )
 
-    input_sha = computational_input_sha256(
-        manifest
-    )
+    input_sha = computational_input_sha256(manifest)
 
     parent_input_sha = ""
 
@@ -446,34 +382,18 @@ def build_twin_lineage(
         "runtime": {
             "model_version": CURRENT_MODEL_VERSION,
             "twin_config_hash": collect_twin_config_hash(),
-            "drug_preset_hashes": (
-                collect_drug_preset_hashes()
-            ),
+            "drug_preset_hashes": (collect_drug_preset_hashes()),
             "code_commit_hash": get_code_commit_hash(),
         },
-        "dataset_binding": (
-            collect_structured_dataset_binding(
-                patient
-            )
-        ),
+        "dataset_binding": (collect_structured_dataset_binding(patient)),
         "computational_input": {
             "contract": COMPUTATIONAL_INPUT_CONTRACT,
             "sha256": input_sha,
-            "assessment_count": len(
-                assessment_list
-            ),
-            "therapy_count": len(
-                therapy_list
-            ),
-            "interruption_count": len(
-                interruptions
-            ),
-            "horizon_start_date": (
-                horizon_start_date.isoformat()
-            ),
-            "horizon_end_date": (
-                horizon_end_date.isoformat()
-            ),
+            "assessment_count": len(assessment_list),
+            "therapy_count": len(therapy_list),
+            "interruption_count": len(interruptions),
+            "horizon_start_date": (horizon_start_date.isoformat()),
+            "horizon_end_date": (horizon_end_date.isoformat()),
             "contains_local_database_ids": False,
             "raw_manifest_persisted": False,
         },
@@ -485,9 +405,7 @@ def build_twin_lineage(
             # It is deliberately excluded from the
             # computational-input hash.
             "local_twin_state_id": parent_state.pk,
-            "parent_computational_input_sha256": (
-                parent_input_sha
-            ),
+            "parent_computational_input_sha256": (parent_input_sha),
             "model_version": parent_state.model_version,
             "config_hash": parent_state.config_hash,
         }
