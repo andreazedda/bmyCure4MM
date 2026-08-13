@@ -80,8 +80,12 @@ bind model/config/Git identity, dataset identity, and a content-addressed
 computational-input hash. Historical states without lineage remain explicitly
 unbound; they are not silently reinterpreted.
 
-The mandatory cross-run manifest and model registry are tracked in GitHub issue
-#19. Until then, do not infer comparability from a successful process exit.
+Every persisted scientific execution now creates an immutable run manifest
+containing the mandatory model/data/code/configuration version vector and
+artifact hashes. The governed model registry, direct-comparison rules, and
+append-only invalidation semantics are documented in
+[Research run manifests](docs/research/RUN_MANIFESTS.md). A successful process
+exit still does not imply calibration, validation, or scientific success.
 
 ## Epistemic labels
 

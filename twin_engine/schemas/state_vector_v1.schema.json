@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bmycure4mm.local/schemas/twin-state-vector-v1.json",
+  "title": "Twin state vector v1",
+  "type": "object",
+  "required": ["tumor_cells", "healthy_cells"],
+  "properties": {
+    "tumor_cells": {"type": "number", "minimum": 0},
+    "healthy_cells": {"type": "number", "minimum": 0},
+    "m_protein_g_dl": {"type": "number"},
+    "flc_ratio": {"type": "number"},
+    "hemoglobin_g_dl": {"type": "number"}
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,110 @@
+{
+  "registry_version": "model-registry-v1",
+  "models": [
+    {
+      "model_id": "patient_twin_state_model",
+      "model_version": "research-twin-v1",
+      "input_schema_version": "twin-state-vector-v1",
+      "output_schema_version": "simulation-summary-v1",
+      "endpoint_definition_version": "mechanistic-endpoints-v1",
+      "parameter_definitions": [
+        {"name": "tumor_growth_rate", "unit": "1/day", "evidence_status": "HEURISTIC"},
+        {"name": "healthy_growth_rate", "unit": "1/day", "evidence_status": "HEURISTIC"},
+        {"name": "carrying_capacity_tumor", "unit": "cells", "evidence_status": "HEURISTIC"},
+        {"name": "carrying_capacity_healthy", "unit": "cells", "evidence_status": "HEURISTIC"}
+      ],
+      "entry_point": "twin_engine.simulation_bridge.run_patient_simulation",
+      "model_card": "twin_engine/model_references.json",
+      "compatible_major_versions": [1],
+      "invalidated_prior_versions": []
+    },
+    {
+      "model_id": "observation_model",
+      "model_version": "observation-model-v1",
+      "input_schema_version": "observation-residual-v1",
+      "output_schema_version": "observation-residual-v1",
+      "endpoint_definition_version": "observed-biomarkers-v1",
+      "parameter_definitions": [
+        {"name": "alpha_M", "unit": "g/dL/cell", "evidence_status": "HEURISTIC"},
+        {"name": "beta_M", "unit": "g/dL", "evidence_status": "HEURISTIC"}
+      ],
+      "entry_point": "twin_engine.observation_model.predict_biomarkers",
+      "model_card": "twin_engine/model_references.json",
+      "compatible_major_versions": [1],
+      "invalidated_prior_versions": []
+    },
+    {
+      "model_id": "lenalidomide_exposure_model",
+      "model_version": "exposure-bridge-v1",
+      "input_schema_version": "intervention-v1",
+      "output_schema_version": "simulation-summary-v1",
+      "endpoint_definition_version": "exposure-profile-v1",
+      "parameter_definitions": [
+        {"name": "daily_administered_dose_mg", "unit": "mg/day", "evidence_status": "DERIVED"},
+        {"name": "cumulative_dose_mg", "unit": "mg", "evidence_status": "DERIVED"}
+      ],
+      "entry_point": "twin_engine.exposure_bridge.build_exposure_dose_function",
+      "model_card": "twin_engine/model_references.json",
+      "compatible_major_versions": [1],
+      "invalidated_prior_versions": []
+    },
+    {
+      "model_id": "hepatic_signal_model",
+      "model_version": "toxicity-prototype-v1",
+      "input_schema_version": "simulation-summary-v1",
+      "output_schema_version": "simulation-summary-v1",
+      "endpoint_definition_version": "toxicity-signal-v1",
+      "parameter_definitions": [
+        {"name": "liver_toxicity_signal_0_1", "unit": "dimensionless", "evidence_status": "HEURISTIC"}
+      ],
+      "entry_point": "twin_engine.toxicity_dynamics.compute_toxicity_dynamics",
+      "model_card": "twin_engine/model_references.json",
+      "compatible_major_versions": [1],
+      "invalidated_prior_versions": []
+    },
+    {
+      "model_id": "neutropenia_signal_model",
+      "model_version": "toxicity-prototype-v1",
+      "input_schema_version": "simulation-summary-v1",
+      "output_schema_version": "simulation-summary-v1",
+      "endpoint_definition_version": "toxicity-signal-v1",
+      "parameter_definitions": [
+        {"name": "neutropenia_signal_0_1", "unit": "dimensionless", "evidence_status": "HEURISTIC"}
+      ],
+      "entry_point": "twin_engine.toxicity_dynamics.compute_toxicity_dynamics",
+      "model_card": "twin_engine/model_references.json",
+      "compatible_major_versions": [1],
+      "invalidated_prior_versions": []
+    },
+    {
+      "model_id": "counterfactual_model",
+      "model_version": "research-twin-v1",
+      "input_schema_version": "intervention-v1",
+      "output_schema_version": "comparison-metrics-v1",
+      "endpoint_definition_version": "mechanistic-counterfactual-v1",
+      "parameter_definitions": [
+        {"name": "horizon_days", "unit": "day", "evidence_status": "USER_PROVIDED"},
+        {"name": "random_seed", "unit": "integer", "evidence_status": "USER_PROVIDED"}
+      ],
+      "entry_point": "twin_engine.counterfactual.run_counterfactual",
+      "model_card": "twin_engine/model_references.json",
+      "compatible_major_versions": [1],
+      "invalidated_prior_versions": []
+    },
+    {
+      "model_id": "therapy_design_toy_model",
+      "model_version": "therapy-design-toy-v1",
+      "input_schema_version": "intervention-v1",
+      "output_schema_version": "simulation-summary-v1",
+      "endpoint_definition_version": "toy-design-endpoints-v1",
+      "parameter_definitions": [
+        {"name": "antigen_density", "unit": "arbitrary_unit", "evidence_status": "HYPOTHETICAL"},
+        {"name": "toxicity", "unit": "normalized_score", "evidence_status": "HEURISTIC"}
+      ],
+      "entry_point": "simulator.design.reporting.run_design_report",
+      "model_card": "twin_engine/model_references.json",
+      "compatible_major_versions": [1],
+      "invalidated_prior_versions": []
+    }
+  ]
+}

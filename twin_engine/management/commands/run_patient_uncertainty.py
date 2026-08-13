@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from clinic.models import Patient
 from twin_engine.models import CounterfactualRun
-from twin_engine.provenance import CURRENT_MODEL_VERSION, record_simulation_metadata
+from twin_engine.provenance import record_simulation_metadata
 from twin_engine.uncertainty import UncertaintyConfig, run_counterfactual_uncertainty
 
 
@@ -40,17 +40,13 @@ class Command(BaseCommand):
         results = []
         for run in runs:
             uncertainty = run_counterfactual_uncertainty(patient, run.base_twin_state, run.intervention_definition or {}, options["horizon_days"], config)
-            metrics = dict(run.comparison_metrics or {})
-            metrics["uncertainty"] = uncertainty
-            run.comparison_metrics = metrics
-            run.save(update_fields=["comparison_metrics"])
             metadata = record_simulation_metadata(
                 counterfactual_run=run,
                 twin_state=run.base_twin_state,
-                model_version=CURRENT_MODEL_VERSION,
+                model_id="counterfactual_model",
                 solver_name="counterfactual_uncertainty",
                 input_payload={"counterfactual_run_id": run.id, "horizon_days": options["horizon_days"], "samples": options["samples"], "seed": options["seed"]},
-                solver_parameters={"diagnostic_summary": {"status": uncertainty.get("status"), "metric_summaries": uncertainty.get("metric_summaries") or {}}},
+                solver_parameters={"diagnostic_summary": uncertainty},
                 output_payload=uncertainty,
                 random_seed=options["seed"],
             )

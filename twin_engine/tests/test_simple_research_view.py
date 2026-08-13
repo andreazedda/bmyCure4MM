@@ -67,9 +67,9 @@ class SimpleResearchViewTests(TestCase):
             },
             comparison_metrics={
                 "research_utility_v2": 1.1,
-                "tumor_reduction": {"baseline": 0.2, "alternative": 0.4},
-                "healthy_loss": {"baseline": 0.2, "alternative": 0.25},
-                "durability_index": {"baseline": 0.2, "alternative": 0.3},
+                "tumor_reduction": {"baseline": 0.2, "alternative": 0.4, "delta": 0.2},
+                "healthy_loss": {"baseline": 0.2, "alternative": 0.25, "delta": 0.05},
+                "durability_index": {"baseline": 0.2, "alternative": 0.3, "delta": 0.1},
             },
             status=CounterfactualRun.STATUS_COMPLETED,
             created_by=self.owner,

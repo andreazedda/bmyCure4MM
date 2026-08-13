@@ -21,6 +21,7 @@ from twin_engine.input_contract import (
     build_twin_lineage,
     computational_input_sha256,
 )
+from twin_engine.contracts import LEGACY_CONTRACT_VERSION
 from twin_engine.models import (
     LongitudinalLabResult,
     ObservationResidual,
@@ -402,6 +403,10 @@ class ComputationalInputContractTests(
                 config_hash=(
                     baseline.config_hash
                 ),
+                state_vector_schema_version=LEGACY_CONTRACT_VERSION,
+                parameters_schema_version=LEGACY_CONTRACT_VERSION,
+                parameter_uncertainty_schema_version=LEGACY_CONTRACT_VERSION,
+                lineage_schema_version=LEGACY_CONTRACT_VERSION,
             )
         )
 
@@ -443,6 +448,10 @@ class ComputationalInputContractTests(
                 config_hash=(
                     baseline.config_hash
                 ),
+                state_vector_schema_version=LEGACY_CONTRACT_VERSION,
+                parameters_schema_version=LEGACY_CONTRACT_VERSION,
+                parameter_uncertainty_schema_version=LEGACY_CONTRACT_VERSION,
+                lineage_schema_version=LEGACY_CONTRACT_VERSION,
             )
         )
 

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bmycure4mm.local/schemas/intervention-v1.json",
+  "title": "Mechanistic intervention definition v1",
+  "type": "object",
+  "properties": {
+    "label": {"type": "string"},
+    "classification": {"type": "string"},
+    "drug_doses": {"type": "object", "additionalProperties": {"type": "number", "minimum": 0}},
+    "start_day": {"type": "integer", "minimum": 0},
+    "duration_days": {"type": "integer", "minimum": 1},
+    "schedule": {"type": "object"},
+    "parameter_overrides": {"type": "object"},
+    "random_seed": {"type": "integer"},
+    "alternative_regimen_id": {"type": ["integer", "null"], "minimum": 1},
+    "intervention": {"type": "object"},
+    "causal_graph": {"type": ["object", "null"]},
+    "adjustment_set": {"type": ["array", "null"]},
+    "identification_status": {"type": ["string", "null"]},
+    "comparison": {"type": "object"},
+    "outcomes": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true
+    },
+    "notes": {"type": "string"}
+  },
+  "additionalProperties": false
+}

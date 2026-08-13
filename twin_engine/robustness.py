@@ -102,7 +102,7 @@ def compute_robust_scenario_ranking(runs) -> dict[str, Any]:
 
 def _extract_scenario_payload(run) -> dict[str, Any] | None:
     comparison_metrics = getattr(run, "comparison_metrics", {}) or {}
-    uncertainty = comparison_metrics.get("uncertainty") or {}
+    uncertainty = _latest_uncertainty(run) or comparison_metrics.get("uncertainty") or {}
     if uncertainty.get("status") != COMPLETED_STATUS:
         return None
     metric_summary = (uncertainty.get("metric_summaries") or {}).get("research_utility_v2") or {}
@@ -125,6 +125,16 @@ def _extract_scenario_payload(run) -> dict[str, Any] | None:
         "p95": metric_summary.get("p95"),
         "sample_utilities": sample_utilities,
     }
+
+
+def _latest_uncertainty(run) -> dict[str, Any]:
+    metadata_records = getattr(run, "metadata_records", None)
+    if metadata_records is None:
+        return {}
+    record = metadata_records.filter(solver_name="counterfactual_uncertainty").order_by("-created_at").first()
+    if record is None:
+        return {}
+    return dict((record.solver_parameters or {}).get("diagnostic_summary") or {})
 
 
 def _interval_overlap(current: dict[str, Any], next_item: dict[str, Any] | None) -> float:

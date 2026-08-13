@@ -140,9 +140,12 @@ Rules:
 
 ## Reproducibility And Provenance Contract
 
-Implemented in `twin_engine.provenance` and `twin_engine.models.SimulationRunMetadata`.
+Implemented in `twin_engine.provenance`, `twin_engine.run_manifest`, and the
+`ResearchRunManifest` / `SimulationRunMetadata` models. See
+`docs/research/RUN_MANIFESTS.md` for the full contract.
 
-Every recorded research run captures:
+Every recorded research run captures the complete immutable version vector,
+including:
 
 - input hash
 - output hash
@@ -154,6 +157,10 @@ Every recorded research run captures:
 - solver parameters
 - random seed when provided
 - timestamp via model creation time
+- application, API, database-schema, dataset/subset, model-card, evidence-graph,
+  validation-protocol, report-template, dependency-lock, registry, intended-use,
+  and epistemic identities
+- a matching manifest artifact and hashes for every persisted artifact
 
 ## How To Run Commands
 

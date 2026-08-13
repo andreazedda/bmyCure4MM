@@ -28,6 +28,12 @@ class ReleaseClaimsContractTests(TestCase):
         )
         self.assertEqual(manifest["causal_effect_identified"], governance.CAUSAL_EFFECT_IDENTIFIED)
         self.assertEqual(manifest["model_version"], governance.CURRENT_RESEARCH_MODEL_VERSION)
+        self.assertEqual(manifest["app_version"], governance.APP_VERSION)
+        self.assertEqual(manifest["api_version"], governance.API_VERSION)
+        self.assertEqual(manifest["model_card_version"], governance.MODEL_CARD_VERSION)
+        self.assertEqual(manifest["evidence_graph_version"], governance.EVIDENCE_GRAPH_VERSION)
+        self.assertEqual(manifest["validation_protocol_version"], governance.VALIDATION_PROTOCOL_VERSION)
+        self.assertEqual(manifest["report_template_version"], governance.REPORT_TEMPLATE_VERSION)
         self.assertEqual(
             manifest["epistemic_labels"],
             [label.value for label in governance.EpistemicLabel],

@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from clinic.models import Patient
 from twin_engine.management.commands.run_patient_uncertainty import _latest_runs_by_label
-from twin_engine.provenance import CURRENT_MODEL_VERSION, record_simulation_metadata
+from twin_engine.provenance import record_simulation_metadata
 from twin_engine.sensitivity import run_counterfactual_sensitivity
 
 
@@ -28,14 +28,10 @@ class Command(BaseCommand):
         results = []
         for run in runs:
             sensitivity = run_counterfactual_sensitivity(patient, run.base_twin_state, run.intervention_definition or {}, options["horizon_days"])
-            metrics = dict(run.comparison_metrics or {})
-            metrics["sensitivity"] = sensitivity
-            run.comparison_metrics = metrics
-            run.save(update_fields=["comparison_metrics"])
             metadata = record_simulation_metadata(
                 counterfactual_run=run,
                 twin_state=run.base_twin_state,
-                model_version=CURRENT_MODEL_VERSION,
+                model_id="counterfactual_model",
                 solver_name="counterfactual_sensitivity",
                 input_payload={"counterfactual_run_id": run.id, "horizon_days": options["horizon_days"]},
                 solver_parameters={"diagnostic_summary": {"status": sensitivity.get("status"), "top_drivers": sensitivity.get("top_drivers") or []}},

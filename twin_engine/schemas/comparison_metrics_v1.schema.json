@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bmycure4mm.local/schemas/comparison-metrics-v1.json",
+  "title": "Comparison metrics v1",
+  "type": "object",
+  "$defs": {
+    "comparison": {
+      "type": "object",
+      "required": ["baseline", "alternative", "delta"],
+      "properties": {
+        "baseline": {"type": ["number", "null"]},
+        "alternative": {"type": ["number", "null"]},
+        "delta": {"type": ["number", "null"]}
+      },
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "tumor_reduction": {"$ref": "#/$defs/comparison"},
+    "healthy_loss": {"$ref": "#/$defs/comparison"},
+    "time_to_recurrence": {"$ref": "#/$defs/comparison"},
+    "durability_index": {"$ref": "#/$defs/comparison"},
+    "predicted_biomarkers": {
+      "type": "object",
+      "additionalProperties": {"$ref": "#/$defs/comparison"}
+    },
+    "toxicity_constraint_penalty": {"type": "number"},
+    "research_utility": {"type": "number"},
+    "research_utility_v2": {"type": "number"},
+    "toxicity_prototype_penalty": {"type": "number"},
+    "utility_formula": {"type": "string"},
+    "utility_validity": {"type": "string"},
+    "toxicity_prototype_status": {"type": "string"},
+    "utility_v2_formula": {"type": "string"},
+    "utility_v2_weights": {"type": "object"},
+    "utility_v2_validity": {"type": "string"},
+    "baseline_toxicity_model_status": {"type": "string"},
+    "schedule_comparison": {"type": "object"},
+    "uncertainty": {"type": "object"},
+    "sensitivity": {"type": "object"},
+    "robustness": {"type": "object"}
+  },
+  "additionalProperties": false
+}

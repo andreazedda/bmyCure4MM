@@ -10,7 +10,7 @@ from django.db import transaction
 from .input_contract import build_twin_lineage
 from .models import ObservationResidual, PatientTwinState
 from .observation_model import compute_residuals, observed_from_assessment, predict_biomarkers
-from .provenance import CURRENT_MODEL_VERSION, collect_twin_config_hash
+from .provenance import CURRENT_MODEL_VERSION, collect_twin_config_hash, record_simulation_metadata
 from .simulation_bridge import run_patient_simulation
 from .therapy_schedule import build_therapy_schedule
 
@@ -140,6 +140,35 @@ def calibrate_patient_parameters(patient, start_state, assessments, therapies, b
             twin_state=calibrated_state,
             residual_entries=chosen_diagnostics["residuals"],
             stage=ObservationResidual.STAGE_POST_CALIBRATION,
+        )
+        record_simulation_metadata(
+            twin_state=calibrated_state,
+            model_id="observation_model",
+            solver_name="calibration_optimizer_sequence",
+            input_payload={
+                "parent_computational_input_sha256": (
+                    (start_state.lineage or {}).get("computational_input") or {}
+                ).get("sha256"),
+                "calibration_computational_input_sha256": calibration_lineage["computational_input"]["sha256"],
+                "assessment_dates": [item.date.isoformat() for item in assessments],
+            },
+            solver_parameters={
+                "parameter_bounds": parameter_bounds,
+                "optimizer": optimizer_name,
+                "scientific_status": optimizer_status,
+            },
+            output_payload={
+                "parameters": chosen_parameters,
+                "parameter_uncertainty": diagnostics_payload,
+                "objective_before": baseline_diagnostics["objective"],
+                "objective_after": chosen_diagnostics["objective"],
+                "rmse_before": baseline_diagnostics["rmse"],
+                "rmse_after": chosen_diagnostics["rmse"],
+                "mae_before": baseline_diagnostics["mae"],
+                "mae_after": chosen_diagnostics["mae"],
+                "scientific_status": optimizer_status,
+            },
+            random_seed=17,
         )
 
     return {

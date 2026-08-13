@@ -28,8 +28,13 @@ from .cockpit import (
 )
 from .counterfactual import run_counterfactual
 from .models import CausalAssumptionSet, CounterfactualRun, ObservationResidual, SimulationRunMetadata
-from .provenance import CURRENT_MODEL_VERSION, hash_json, record_simulation_metadata
+from .provenance import (
+    hash_json,
+    prepare_simulation_identity,
+    record_simulation_metadata,
+)
 from .report_builder import write_json_artifact
+from .run_manifest import verify_manifest_artifacts
 from .simulation_bridge import run_patient_simulation
 from .simple_view import build_simple_patient_story
 from .state_model import get_current_twin_state, initialize_from_assessment, serialize_state
@@ -163,6 +168,19 @@ def run_patient_simulation_view(request: HttpRequest, patient_id: int) -> HttpRe
 
     run_token = int(timezone.now().timestamp())
     patient_reference = hash_json({"patient_id": patient.id})[:12]
+    input_payload = {
+        "patient_id": patient.id,
+        "base_state_id": base_state.id,
+        "horizon_days": horizon_days,
+        "therapy_schedule": therapy_schedule,
+    }
+    prepared_identity = prepare_simulation_identity(
+        model_id="patient_twin_state_model",
+        solver_name="MathematicalModel",
+        input_payload=input_payload,
+        solver_parameters=simulation_result["solver_inputs"]["raw_parameters"],
+        twin_state=base_state,
+    )
     report_payload = {
         "label": "research simulation",
         "counterfactual_type": "mechanistic model counterfactual",
@@ -174,10 +192,13 @@ def run_patient_simulation_view(request: HttpRequest, patient_id: int) -> HttpRe
         "toxicity_constraints": toxicity_constraints,
         "solver_inputs": simulation_result["solver_inputs"]["raw_parameters"],
         "missing_doses": simulation_result["solver_inputs"]["missing_doses"],
-        "generated_at": timezone.now().isoformat(),
-        "user_id": request.user.id,
+        "generated_at": prepared_identity.version_vector["created_at"],
+        "run_identity": {
+            "run_id": prepared_identity.run_id,
+            "version_vector": prepared_identity.version_vector,
+        },
     }
-    artifact_url, _ = write_json_artifact(
+    artifact_url, artifact_path = write_json_artifact(
         "patient_simulation",
         report_payload,
         patient_id=patient.id,
@@ -186,19 +207,16 @@ def run_patient_simulation_view(request: HttpRequest, patient_id: int) -> HttpRe
     )
     metadata = record_simulation_metadata(
         twin_state=base_state,
-        model_version=CURRENT_MODEL_VERSION,
+        model_id="patient_twin_state_model",
         solver_name="MathematicalModel",
-        input_payload={
-            "patient_id": patient.id,
-            "base_state_id": base_state.id,
-            "horizon_days": horizon_days,
-            "therapy_schedule": therapy_schedule,
-        },
+        input_payload=input_payload,
         solver_parameters=simulation_result["solver_inputs"]["raw_parameters"],
         output_payload={
             "artifact_url": artifact_url,
             "summary": simulation_result["summary"],
         },
+        prepared_identity=prepared_identity,
+        artifact_paths=[("patient_simulation_report", "output", artifact_path)],
     )
 
     context = _build_research_context(patient)
@@ -252,11 +270,24 @@ def counterfactual_report_view(request: HttpRequest, patient_id: int, run_id: in
         pk=run_id,
         patient=patient,
     )
+    metadata = (
+        counterfactual_run.metadata_records.select_related("manifest")
+        .filter(manifest__isnull=False)
+        .order_by("-created_at")
+        .first()
+    )
+    run_manifest = metadata.manifest if metadata is not None else None
+    if run_manifest is not None:
+        try:
+            verify_manifest_artifacts(run_manifest)
+        except ValidationError:
+            return HttpResponse("ARTIFACT_INTEGRITY_FAILED", status=409)
     report_payload = _load_json_artifact(counterfactual_run.report_artifact) or counterfactual_run.simulation_summary
     context = {
         "patient": patient,
         "counterfactual_run": counterfactual_run,
         "report_payload": report_payload,
+        "run_manifest": run_manifest,
         "toxicity_constraints": (report_payload or {}).get("toxicity_constraints") or (counterfactual_run.simulation_summary or {}).get("toxicity_constraints") or {},
     }
     return render(request, "twin_engine/counterfactual_report.html", context)

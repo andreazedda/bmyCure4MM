@@ -1,7 +1,22 @@
 from __future__ import annotations
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
+
+from .contracts import (
+    COMPARISON_METRICS_SCHEMA_VERSION,
+    INTERVENTION_SCHEMA_VERSION,
+    LINEAGE_SCHEMA_VERSION,
+    OBSERVATION_RESIDUAL_SCHEMA_VERSION,
+    PARAMETERS_SCHEMA_VERSION,
+    PARAMETER_UNCERTAINTY_SCHEMA_VERSION,
+    SIMULATION_SUMMARY_SCHEMA_VERSION,
+    STATE_VECTOR_SCHEMA_VERSION,
+    validate_counterfactual_contracts,
+    validate_residual_contract,
+    validate_twin_contracts,
+)
 
 
 class PatientTwinState(models.Model):
@@ -32,8 +47,20 @@ class PatientTwinState(models.Model):
     state_date = models.DateField()
     is_current = models.BooleanField(default=False)
     state_vector = models.JSONField(default=dict, blank=True)
+    state_vector_schema_version = models.CharField(
+        max_length=64,
+        default=STATE_VECTOR_SCHEMA_VERSION,
+    )
     parameters = models.JSONField(default=dict, blank=True)
+    parameters_schema_version = models.CharField(
+        max_length=64,
+        default=PARAMETERS_SCHEMA_VERSION,
+    )
     parameter_uncertainty = models.JSONField(default=dict, blank=True)
+    parameter_uncertainty_schema_version = models.CharField(
+        max_length=64,
+        default=PARAMETER_UNCERTAINTY_SCHEMA_VERSION,
+    )
     risk_score = models.FloatField(null=True, blank=True)
     method = models.CharField(
         max_length=64,
@@ -43,6 +70,10 @@ class PatientTwinState(models.Model):
     model_version = models.CharField(max_length=64)
     config_hash = models.CharField(max_length=128)
     lineage = models.JSONField(default=dict, blank=True)
+    lineage_schema_version = models.CharField(
+        max_length=64,
+        default=LINEAGE_SCHEMA_VERSION,
+    )
     source_assessments = models.ManyToManyField(
         "clinic.Assessment",
         related_name="twin_state_sources",
@@ -69,6 +100,22 @@ class PatientTwinState(models.Model):
 
     def __str__(self) -> str:
         return f"Twin state patient={self.patient_id} date={self.state_date}"
+
+    def validate_scientific_contracts(self) -> None:
+        validate_twin_contracts(
+            state_vector=self.state_vector,
+            state_vector_schema_version=self.state_vector_schema_version,
+            parameters=self.parameters,
+            parameters_schema_version=self.parameters_schema_version,
+            parameter_uncertainty=self.parameter_uncertainty,
+            parameter_uncertainty_schema_version=self.parameter_uncertainty_schema_version,
+            lineage=self.lineage,
+            lineage_schema_version=self.lineage_schema_version,
+        )
+
+    def save(self, *args, **kwargs) -> None:
+        self.validate_scientific_contracts()
+        super().save(*args, **kwargs)
 
 
 class ObservationResidual(models.Model):
@@ -108,6 +155,10 @@ class ObservationResidual(models.Model):
     rmse = models.FloatField(null=True, blank=True)
     mae = models.FloatField(null=True, blank=True)
     biomarker_weights = models.JSONField(default=dict, blank=True)
+    payload_schema_version = models.CharField(
+        max_length=64,
+        default=OBSERVATION_RESIDUAL_SCHEMA_VERSION,
+    )
     stage = models.CharField(max_length=32, choices=STAGE_CHOICES, default=STAGE_UNKNOWN)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -116,6 +167,10 @@ class ObservationResidual(models.Model):
 
     def __str__(self) -> str:
         return f"Observation residual patient={self.patient_id} twin_state={self.twin_state_id} stage={self.stage}"
+
+    def save(self, *args, **kwargs) -> None:
+        validate_residual_contract(self)
+        super().save(*args, **kwargs)
 
 
 class LongitudinalLabResult(models.Model):
@@ -362,8 +417,20 @@ class CounterfactualRun(models.Model):
     )
     alternative_parameters = models.JSONField(default=dict, blank=True)
     intervention_definition = models.JSONField(default=dict, blank=True)
+    intervention_schema_version = models.CharField(
+        max_length=64,
+        default=INTERVENTION_SCHEMA_VERSION,
+    )
     simulation_summary = models.JSONField(default=dict, blank=True)
+    simulation_summary_schema_version = models.CharField(
+        max_length=64,
+        default=SIMULATION_SUMMARY_SCHEMA_VERSION,
+    )
     comparison_metrics = models.JSONField(default=dict, blank=True)
+    comparison_metrics_schema_version = models.CharField(
+        max_length=64,
+        default=COMPARISON_METRICS_SCHEMA_VERSION,
+    )
     trajectory_artifact = models.TextField(blank=True)
     report_artifact = models.TextField(blank=True)
     status = models.CharField(max_length=16, choices=STATUS_CHOICES, default=STATUS_DRAFT)
@@ -382,6 +449,47 @@ class CounterfactualRun(models.Model):
 
     def __str__(self) -> str:
         return f"Counterfactual run patient={self.patient_id} state={self.base_twin_state_id}"
+
+    def _assert_not_completed_mutation(self) -> None:
+        if not self.pk:
+            return
+        previous = type(self).objects.filter(pk=self.pk).first()
+        if previous is None or previous.status != self.STATUS_COMPLETED:
+            return
+        immutable_fields = (
+            "patient_id",
+            "base_twin_state_id",
+            "actual_therapy_id",
+            "alternative_regimen_id",
+            "alternative_parameters",
+            "intervention_definition",
+            "intervention_schema_version",
+            "simulation_summary",
+            "simulation_summary_schema_version",
+            "comparison_metrics",
+            "comparison_metrics_schema_version",
+            "trajectory_artifact",
+            "report_artifact",
+            "status",
+            "error_message",
+            "created_by_id",
+        )
+        changed = [name for name in immutable_fields if getattr(previous, name) != getattr(self, name)]
+        if changed:
+            raise ValidationError(
+                "Completed counterfactual runs are immutable; create a new run. "
+                f"Changed fields: {', '.join(changed)}"
+            )
+
+    def save(self, *args, **kwargs) -> None:
+        validate_counterfactual_contracts(self)
+        self._assert_not_completed_mutation()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if self.status == self.STATUS_COMPLETED:
+            raise ValidationError("Completed counterfactual runs cannot be deleted")
+        return super().delete(*args, **kwargs)
 
 
 class CausalAssumptionSet(models.Model):
@@ -433,7 +541,146 @@ class CausalAssumptionSet(models.Model):
         return self.name
 
 
+class ResearchRunManifest(models.Model):
+    STATUS_COMPLETED = "completed"
+    STATUS_FAILED = "failed"
+    STATUS_CHOICES = [
+        (STATUS_COMPLETED, "Completed"),
+        (STATUS_FAILED, "Failed"),
+    ]
+
+    run_id = models.CharField(max_length=192, unique=True)
+    contract_version = models.CharField(max_length=64, default="research-run-manifest-v1")
+    status = models.CharField(max_length=16, choices=STATUS_CHOICES)
+    app_version = models.CharField(max_length=64)
+    api_version = models.CharField(max_length=64)
+    db_schema_version = models.CharField(max_length=128)
+    dataset_id = models.CharField(max_length=255)
+    dataset_version = models.CharField(max_length=128)
+    dataset_sha256 = models.CharField(max_length=128)
+    record_subset_sha256 = models.CharField(max_length=128)
+    model_id = models.CharField(max_length=128)
+    model_version = models.CharField(max_length=128)
+    model_card_version = models.CharField(max_length=128)
+    configuration_sha256 = models.CharField(max_length=128)
+    evidence_graph_version = models.CharField(max_length=128)
+    validation_protocol_version = models.CharField(max_length=128)
+    report_template_version = models.CharField(max_length=128)
+    git_sha = models.CharField(max_length=128)
+    container_digest = models.CharField(max_length=255)
+    dependency_lock_sha256 = models.CharField(max_length=128)
+    model_registry_sha256 = models.CharField(max_length=128)
+    random_seed = models.IntegerField()
+    intended_use_level = models.CharField(max_length=128)
+    epistemic_label = models.CharField(max_length=64)
+    artifact_manifest = models.JSONField(default=list)
+    manifest_artifact_uri = models.TextField()
+    manifest_sha256 = models.CharField(max_length=128)
+    created_at = models.DateTimeField()
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return self.run_id
+
+    def version_vector(self) -> dict[str, object]:
+        fields = (
+            "app_version",
+            "api_version",
+            "db_schema_version",
+            "dataset_id",
+            "dataset_version",
+            "dataset_sha256",
+            "record_subset_sha256",
+            "model_id",
+            "model_version",
+            "model_card_version",
+            "configuration_sha256",
+            "evidence_graph_version",
+            "validation_protocol_version",
+            "report_template_version",
+            "git_sha",
+            "container_digest",
+            "dependency_lock_sha256",
+            "model_registry_sha256",
+            "random_seed",
+            "intended_use_level",
+            "epistemic_label",
+        )
+        payload = {name: getattr(self, name) for name in fields}
+        payload["created_at"] = self.created_at.isoformat()
+        return payload
+
+    def save(self, *args, **kwargs) -> None:
+        if self.pk:
+            raise ValidationError("Research run manifests are immutable")
+        from .run_manifest import validate_manifest_instance
+
+        validate_manifest_instance(self)
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Research run manifests cannot be deleted")
+
+
+class ResearchRunInvalidation(models.Model):
+    CHANGE_CLINICAL_VALUE = "clinical_value"
+    CHANGE_DATASET = "dataset"
+    CHANGE_UNIT_MAPPING = "unit_mapping"
+    CHANGE_MODEL = "model"
+    CHANGE_PARAMETER_DEFAULT = "parameter_default"
+    CHANGE_DEPENDENCY = "dependency"
+    CHANGE_CONFIGURATION = "configuration"
+    CHANGE_CHOICES = [
+        (CHANGE_CLINICAL_VALUE, "Clinical value"),
+        (CHANGE_DATASET, "Dataset"),
+        (CHANGE_UNIT_MAPPING, "Unit mapping"),
+        (CHANGE_MODEL, "Model"),
+        (CHANGE_PARAMETER_DEFAULT, "Parameter default"),
+        (CHANGE_DEPENDENCY, "Dependency"),
+        (CHANGE_CONFIGURATION, "Configuration"),
+    ]
+
+    manifest = models.ForeignKey(
+        ResearchRunManifest,
+        on_delete=models.PROTECT,
+        related_name="invalidations",
+    )
+    change_kind = models.CharField(max_length=32, choices=CHANGE_CHOICES)
+    previous_identity = models.CharField(max_length=255)
+    replacement_identity = models.CharField(max_length=255)
+    change_sha256 = models.CharField(max_length=128)
+    reason = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["created_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["manifest", "change_kind", "change_sha256"],
+                name="unique_run_invalidation_change",
+            )
+        ]
+
+    def save(self, *args, **kwargs) -> None:
+        if self.pk:
+            raise ValidationError("Research run invalidations are immutable")
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Research run invalidations cannot be deleted")
+
+
 class SimulationRunMetadata(models.Model):
+    contract_version = models.CharField(max_length=64, default="simulation-metadata-v1")
+    manifest = models.OneToOneField(
+        ResearchRunManifest,
+        on_delete=models.PROTECT,
+        related_name="simulation_metadata",
+        null=True,
+        blank=True,
+    )
     simulation_attempt = models.ForeignKey(
         "simulator.SimulationAttempt",
         on_delete=models.SET_NULL,
@@ -471,3 +718,15 @@ class SimulationRunMetadata(models.Model):
 
     def __str__(self) -> str:
         return f"Simulation metadata model={self.model_version} created={self.created_at:%Y-%m-%d}"
+
+    def save(self, *args, **kwargs) -> None:
+        if self.pk:
+            previous = type(self).objects.filter(pk=self.pk).values_list("manifest_id", flat=True).first()
+            if previous is not None:
+                raise ValidationError("Manifest-bound simulation metadata is immutable")
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if self.manifest_id is not None:
+            raise ValidationError("Manifest-bound simulation metadata cannot be deleted")
+        return super().delete(*args, **kwargs)
