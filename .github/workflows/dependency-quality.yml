@@ -74,8 +74,10 @@ jobs:
         with:
           context: .
           push: false
+          load: true
           tags: bmycure4mm:dependency-gate
       - name: Record image digest
-        env:
-          IMAGE_DIGEST: ${{ steps.build.outputs.digest }}
-        run: echo "container_digest=${IMAGE_DIGEST}" >> "$GITHUB_STEP_SUMMARY"
+        run: |
+          image_id="$(docker image inspect --format '{{.Id}}' bmycure4mm:dependency-gate)"
+          test -n "$image_id"
+          echo "container_image_id=${image_id}" >> "$GITHUB_STEP_SUMMARY"
