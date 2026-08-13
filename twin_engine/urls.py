@@ -7,6 +7,7 @@ app_name = "twin_engine"
 
 
 urlpatterns = [
+    path("", views.research_home_view, name="research_home"),
     path("developer/", views.developer_console_view, name="developer_console"),
     path("glossary/", views.research_glossary_view, name="research_glossary"),
     path("patient/<int:patient_id>/simple/", views.simple_research_view, name="simple_research_view"),

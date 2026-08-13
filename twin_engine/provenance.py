@@ -6,10 +6,12 @@ import subprocess
 from pathlib import Path
 from typing import Any
 
+from mmportal.governance import CURRENT_RESEARCH_MODEL_VERSION
+
 from .models import SimulationRunMetadata
 
 
-CURRENT_MODEL_VERSION = "research-twin-v1"
+CURRENT_MODEL_VERSION = CURRENT_RESEARCH_MODEL_VERSION
 
 
 def hash_json(payload: Any) -> str:

@@ -28,6 +28,8 @@ from django.apps import apps
 
 from django.core.exceptions import PermissionDenied
 
+from mmportal.governance import EpistemicLabel, governance_metadata
+
 Regimen = apps.get_model("clinic", "Regimen")
 
 from . import explain, forms, models, optim
@@ -313,7 +315,6 @@ def simulate_scenario(request: HttpRequest, pk: int) -> HttpResponse:
         return HttpResponseBadRequest("Invalid request method.")
     scenario = get_object_or_404(models.Scenario, pk=pk, active=True)
     form = forms.SimulationParameterForm(request.POST, user=request.user)
-    game_mode = request.POST.get("game_mode") == "1"
 
     def _profile_with_ranges(drug: str):
         profile = pharmaco_registry.get_drug_profile(drug)
@@ -344,7 +345,6 @@ def simulate_scenario(request: HttpRequest, pk: int) -> HttpResponse:
                 "helptext_en": forms.SIMULATION_FORM_HELP_TEXT_EN,
                 "is_editor": is_editor(request.user),
                 "preset_descriptions": _preset_descriptions(),
-                "game_mode": game_mode,
             },
             request=request,
         )
@@ -391,12 +391,7 @@ def simulate_scenario(request: HttpRequest, pk: int) -> HttpResponse:
         "results": attempt.results,
         "warnings": parameter_warnings + summary_warnings,
         "kpi": explain.KPI,
-        "game_mode": game_mode,
     }
-    if game_mode:
-        from .game import compute_game_metrics
-
-        context["game"] = compute_game_metrics(attempt.results_summary)
     html = render_to_string("simulator/_simulation_results.html", context, request=request)
     return HttpResponse(html)
 
@@ -407,6 +402,10 @@ def export_attempt(request: HttpRequest, pk: int) -> HttpResponse:
     if attempt.user_id and attempt.user_id != request.user.id and not is_editor(request.user):
         return HttpResponseForbidden("Not allowed")
     payload = {
+        "governance": governance_metadata(
+            epistemic_label=EpistemicLabel.SIMULATED,
+            output_kind="simulation_attempt_export",
+        ),
         "id": attempt.pk,
         "scenario": attempt.scenario_id,
         "submitted": attempt.submitted.isoformat() if attempt.submitted else None,

@@ -47,7 +47,7 @@ DEFAULT_PD_PARAMS = {
 
 class Scenario(models.Model):
     """
-    Clinical scenarios used to practice MM treatment decision making.
+    Synthetic scenarios used to explore model behavior and data lineage.
     
     Enhanced with comprehensive clinical parameters for realistic case scenarios:
     - Cytogenetics: del(17p), t(4;14), t(14;16), 1q21 gain, hyperdiploid, t(11;14)

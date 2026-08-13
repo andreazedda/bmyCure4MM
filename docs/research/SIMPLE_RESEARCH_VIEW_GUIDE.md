@@ -128,7 +128,7 @@ The simple page uses the phrase **uncertainty range** instead of dense diagnosti
 
 ## What Conclusions Are Forbidden
 
-- This is the best treatment.
+- A model comparison identifies a clinically preferred treatment.
 - This proves clinical superiority.
 - This estimates a causal effect.
 

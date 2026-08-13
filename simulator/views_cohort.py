@@ -10,22 +10,22 @@ from typing import Any, Dict
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.cache import cache
-from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.views.generic import TemplateView
 
-from . import cohort, forms, models
-from .permissions import is_editor
+from mmportal.governance import EpistemicLabel, governance_metadata
+
+from . import cohort, models
 
 
 class CohortView(LoginRequiredMixin, TemplateView):
     """
-    Virtual cohort runner interface.
-    
-    Allows users to configure and run in-silico clinical trials
-    with synthetic patient populations.
+    Synthetic model-cohort runner interface.
+
+    Allows users to configure exploratory simulations with sampled model
+    instances. It does not represent a clinical trial or patient population.
     """
     template_name = "simulator/cohort.html"
     
@@ -112,6 +112,10 @@ def cohort_run(request: HttpRequest) -> HttpResponse:
         "result": result,
         "n_patients": n_patients,
         "regimen_params": regimen_params,
+        "cohort_governance": governance_metadata(
+            epistemic_label=EpistemicLabel.SIMULATED,
+            output_kind="synthetic_model_cohort",
+        ),
     }
     
     html = render_to_string("simulator/_cohort_results.html", context, request=request)
@@ -137,6 +141,15 @@ def cohort_export(request: HttpRequest, cohort_id: str) -> HttpResponse:
     writer = csv.writer(output)
     
     # Header
+    metadata = governance_metadata(
+        epistemic_label=EpistemicLabel.SIMULATED,
+        output_kind="synthetic_model_cohort_csv",
+    )
+    writer.writerow(["intended_use_level", metadata["intended_use_level"]])
+    writer.writerow(["epistemic_label", metadata["epistemic_label"]])
+    writer.writerow(["model_version", metadata["model_version"]])
+    writer.writerow(["claims_policy_version", metadata["claims_policy_version"]])
+    writer.writerow([])
     writer.writerow([
         "patient_id",
         "tumor_reduction",
@@ -146,7 +159,7 @@ def cohort_export(request: HttpRequest, cohort_id: str) -> HttpResponse:
         "auc_bortezomib",
         "auc_daratumumab",
         "auc_total",
-        "effective",
+        "model_threshold_flag",
     ])
     
     # Patient rows
@@ -189,5 +202,7 @@ def cohort_export(request: HttpRequest, cohort_id: str) -> HttpResponse:
     # Build response
     response = HttpResponse(output.getvalue(), content_type="text/csv")
     response["Content-Disposition"] = f'attachment; filename="cohort_{cohort_id}.csv"'
+    response["X-bmyCure4MM-Intended-Use"] = metadata["intended_use_level"]
+    response["X-bmyCure4MM-Model-Version"] = metadata["model_version"]
     
     return response

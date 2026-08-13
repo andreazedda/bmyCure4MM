@@ -282,7 +282,7 @@ class AssessmentForm(BootstrapValidationMixin, forms.ModelForm):
         label="R-ISS Stage",
         required=False,
         choices=[("", "Not assessed")] + list(models.Assessment.R_ISS_CHOICES),
-        help_text="Revised International Staging System: I (best), II (intermediate), III (worst)",
+        help_text="Revised International Staging System population-risk strata: I (lower), II (intermediate), III (higher)",
         widget=forms.Select(attrs={"class": "form-select"})
     )
     

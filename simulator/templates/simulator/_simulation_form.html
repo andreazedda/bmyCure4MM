@@ -15,19 +15,6 @@
           hx-indicator="#simulation-indicator"
           hx-disabled-elt="button, input, select, textarea">
         {% csrf_token %}
-        {% if game_mode %}
-            <input type="hidden" name="game_mode" value="1">
-            <div class="alert alert-dark mb-3" role="alert">
-                <strong>🎮 <span class="t-en">Game Mode</span><span class="t-it">Modalità Gioco</span></strong>
-                <div class="small">
-                    <span class="t-en">Goal: maximize tumor reduction while keeping healthy loss low. Each run updates your score.</span>
-                    <span class="t-it">Obiettivo: massimizza la riduzione tumorale mantenendo bassa la perdita di cellule sane. Ogni run aggiorna il punteggio.</span>
-                </div>
-            </div>
-        {% endif %}
-        {% if game_mode %}
-            <input type="hidden" name="game_mode" value="1">
-        {% endif %}
         {% if warnings %}
             <div class="alert alert-warning" role="alert">
                 {% for warning in warnings %}
@@ -353,8 +340,8 @@
                 <span class="t-it">🚀 Principiante: esegui in 1 click</span>
             </div>
             <div class="small mb-2">
-                <span class="t-en">This fills a safe preset and runs immediately. Use it to experiment quickly, then tweak one field at a time.</span>
-                <span class="t-it">Compila un preset sicuro ed esegue subito. Usalo per sperimentare rapidamente, poi modifica un campo alla volta.</span>
+                <span class="t-en">This fills a hypothetical research preset and runs immediately. Preset values are not clinical safety limits.</span>
+                <span class="t-it">Compila un preset ipotetico di ricerca ed esegue subito. I valori non sono limiti di sicurezza clinica.</span>
             </div>
             <div class="d-flex flex-wrap gap-2">
                 <button type="button" class="btn btn-sm btn-primary" data-quick-preset="VRd">
@@ -549,8 +536,8 @@
     };
     const DOSE_BADGE_COPY = {
         safe: {
-            en: 'Within preset guardrail.',
-            it: 'Entro il guardrail del preset.',
+            en: 'Within configured model-input range.',
+            it: 'Entro l\'intervallo configurato degli input del modello.',
         },
         warn: {
             en: 'Near the limit — review parameter range. {help}',
@@ -567,8 +554,8 @@
     };
     const INTERACTION_COPY = {
         safe: {
-            en: 'Coupling within safe band.',
-            it: 'Accoppiamento entro la banda sicura.',
+            en: 'Coupling within configured model-input band.',
+            it: 'Accoppiamento entro la banda configurata degli input del modello.',
         },
         warn: {
             en: 'Borderline interaction zone — inspect simulated healthy-cell impact. {help}',
@@ -643,25 +630,10 @@
         input.classList.add('dose-input');
         input.classList.remove('zone-safe', 'zone-caution', 'zone-danger', 'zone-optimal');
 
-        // Check if value is optimal dose (within 5% tolerance)
-        const optimalDose = parseFloat(profile.optimal_dose);
-        if (Number.isFinite(optimalDose) && Math.abs(value - optimalDose) / optimalDose < 0.05) {
-            input.classList.add('zone-optimal');
-            return;
-        }
-
-        const rangeSize = max - min;
-        const safeThreshold = min + rangeSize * 0.80;  // 0-80% of range = safe (green)
-        const cautionThreshold = min + rangeSize * 0.95; // 80-95% = caution (yellow)
-
         if (value < min || value > max) {
-            input.classList.add('zone-danger');  // Outside preset range = danger (red)
-        } else if (value <= safeThreshold) {
-            input.classList.add('zone-safe');    // 0-80% = safe (green)
-        } else if (value <= cautionThreshold) {
-            input.classList.add('zone-caution'); // 80-95% = caution (yellow)
+            input.classList.add('zone-danger');
         } else {
-            input.classList.add('zone-danger');  // 95-100% = danger (red)
+            input.classList.add('zone-safe');
         }
     };
 
@@ -683,9 +655,9 @@
         setContextBadge(interactionField.id, status, html);
         if (interactionBadge) {
             const textMap = {
-                safe: { en: 'Safe', it: 'Sicuro' },
-                warn: { en: 'Borderline', it: 'Attenzione' },
-                danger: { en: 'Unsafe', it: 'Rischioso' },
+                safe: { en: 'Within model range', it: 'Entro il range del modello' },
+                warn: { en: 'Near model boundary', it: 'Vicino al limite del modello' },
+                danger: { en: 'Outside research domain', it: 'Fuori dal dominio di ricerca' },
             };
             interactionBadge.className = `badge ${STATUS_CLASSES[status] || 'bg-secondary'}`;
             interactionBadge.textContent = (textMap[status] || textMap.safe)[lang];

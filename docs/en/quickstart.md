@@ -1,21 +1,19 @@
-# Predictive Lab Quickstart
+# Research simulation quickstart
 
-## Goal & Constraints
-- Enable non-experts to simulate MM regimens safely under preset guardrails
-- Respect preset dose ranges, toxicity limits (healthy_loss ≤ 0.25), reproducible seeds
+## Scope
 
-## Guided Steps
-1. **Select scenario** – review patient summary, R-ISS, labs.
-2. **Enable Patient Twin** – keeps biology synced with LDH/β2M/FLC.
-3. **Pick preset** – VRd, Dara-Rd, KRd; presets lock safe dose bounds.
-4. **Adjust doses/schedules** – stay within displayed ranges and scheduling patterns.
-5. **Choose horizon + cohort** – default 84 days, cohort 1; increase cohort (10/50/200) to expose uncertainty bands.
-6. **Run simulation** – watch spinner + toast, then inspect KPIs with tooltips.
-7. **Interpret KPIs** – tumor reduction ≥90% and healthy loss ≤25% = strong response.
-8. **Launch Optimization Lab** – MOTPE search with toxicity constraint, then re-simulate Pareto candidates.
-9. **Iterate** – tweak inputs, rerun; export CSV/Plot for audit.
+This workflow produces a mechanistic hypothetical result. Displayed input
+bounds are numerical/model-domain constraints, not clinical safety limits.
 
-## FAQ
-- **AUC vs toxicity?** Higher AUC (drug exposure) often correlates with immunosuppression; keep low while maintaining efficacy.
-- **Healthy loss threshold?** Guardrail at 0.25 (25%). Yellow badges warn at 0.2; red at 0.3.
-- **When to increase cohort size?** Use 10 for sensitivity analysis, 50+ when presenting uncertainty bands to stakeholders.
+1. Select a synthetic scenario.
+2. Classify each input as scenario-defined, user-provided, observed, derived,
+   or heuristic.
+3. Select a model preset or record a hypothetical configuration.
+4. Record a random seed, horizon, schedule, and cohort size.
+5. Run the model.
+6. Inspect model version, configuration, lineage, warnings, and artifacts.
+7. Label output metrics `SIMULATED` and report uncertainty and limitations.
+8. Compare configurations only as model-relative trajectories.
+
+Do not translate a model-relative comparison into a patient-specific treatment
+or dose instruction.

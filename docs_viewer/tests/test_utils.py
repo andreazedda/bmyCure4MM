@@ -21,7 +21,7 @@ class PathSecurityTests(SimpleTestCase):
     def test_safe_path_allows_whitelisted_files(self):
         """Whitelist files should be accessible."""
         self.assertTrue(is_safe_path("README.md"))
-        self.assertTrue(is_safe_path("docs/development/IMPLEMENTATION_LOG.md"))
+        self.assertTrue(is_safe_path("docs/governance/INTENDED_USE.md"))
     
     def test_safe_path_rejects_path_traversal(self):
         """Path traversal attempts should be blocked."""

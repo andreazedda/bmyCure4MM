@@ -1,5 +1,5 @@
 site_name: bmyCure4MM Docs
-site_description: Decision support + simulation + chemtools (Django)
+site_description: E1 reproducible Multiple Myeloma computational research prototype
 site_url: https://andreazedda.github.io/bmyCure4MM/
 repo_url: https://github.com/andreazedda/bmyCure4MM
 repo_name: andreazedda/bmyCure4MM
@@ -8,6 +8,10 @@ edit_uri: edit/master/docs/
 nav:
   - Home: index.md
   - Start Here:
+      - Canonical Intended Use: governance/INTENDED_USE.md
+      - Claims Policy: governance/CLAIMS_POLICY.md
+      - Epistemic Labels: governance/EPISTEMIC_LABELS.md
+      - Model Output Language: governance/MODEL_OUTPUT_LANGUAGE.md
       - Learning Path: guides/learning_path.md
       - Tutorial (EN): en/TUTORIAL_FIRST_RUN.md
       - Tutorial (IT): it/TUTORIAL_PRIMO_USO.md
@@ -22,17 +26,14 @@ nav:
               - Italiano: guides/mathematical_models.md
               - English: guides/mathematical_models_en.md
           - Optimization Theory: guides/optimization_theory.md
-          - Difficulty Scoring: guides/difficulty_scoring.md
-          - Prognosis: guides/prognosis.md
           - Virtual Patients: guides/virtual_patients.md
-      - Decision Support:
-          - Regimen Suggester: guides/regimen_suggester.md
-          - Decision Algorithm: guides/decision_algorithm.md
+      - Exploratory Research Context:
+          - Regimen Context: guides/regimen_suggester.md
+          - Model-relative Thresholds: guides/decision_algorithm.md
       - Docs:
           - Glossary: guides/glossary.md
           - Simulations Gallery: guides/simulations_gallery.md
           - Simulator KPIs (How to Read): guides/simulator_kpis.md
-          - Molecule → Simulation (Bridge): guides/molecule_to_simulation_bridge.md
           - Custom drug (experimental): guides/custom_drug_experimental.md
           - Doc Coverage (Gaps): guides/gaps.md
           - Documentation Standard: guides/documentation_standard.md
@@ -63,27 +64,21 @@ nav:
       - Simulator:
           - Twin In-App Guidance: IN_APP_GUIDANCE_TWIN_SIMULATOR_REGIMENS_THERAPIES.md
           - Patient Twin (As Built): development/PATIENT_TWIN_AS_BUILT.md
-          - MM Efficacy Estimation: MM_EFFICACY_ESTIMATION.md
-          - MM Efficacy Visual Guide: MM_EFFICACY_VISUAL_GUIDE.md
-          - Survival + Toxicity Estimation: SURVIVAL_TOXICITY_ESTIMATION.md
       - ChemTools:
           - 3D Viewer Styling: 3D_VIEWER_STYLING.md
       - Product:
           - Before/After Comparison: BEFORE_AFTER_COMPARISON.md
       - Development Logs:
           - Embed Debug Guide: development/EMBED_DEBUG_GUIDE.md
-          - Implementation Log: development/IMPLEMENTATION_LOG.md
           - Implementation Summary: development/IMPLEMENTATION_SUMMARY.md
       - Features:
-          - Decision Support System: features/DECISION_SUPPORT_SYSTEM.md
           - Docs Viewer (Complete): features/DOCS_VIEWER_COMPLETE.md
-          - Form Enhancements Summary: features/FORM_ENHANCEMENTS_SUMMARY.md
-          - Patient Journey Enhancement: features/PATIENT_JOURNEY_ENHANCEMENT.md
           - ChemTools Testing Summary: features/CHEMTOOLS_TESTING_SUMMARY.md
-          - Mathematical Models (Long): features/MATHEMATICAL_MODELS_DOCUMENTATION.md
           - Testing Report: features/TESTING_REPORT.md
-      - Learning (IT):
-          - Guida apprendimento: it/GUIDA_APPRENDIMENTO.md
+      - Archive:
+          - Legacy Prescriptive Outputs: archive/LEGACY_PRESCRIPTIVE_OUTPUTS.md
+          - Legacy Unvalidated Model Outputs: archive/LEGACY_UNVALIDATED_MODEL_OUTPUTS.md
+          - Legacy Twin Architecture: archive/PATIENT_TWIN_TARGET_ARCHITECTURE_PRE_E1.md
   - EN:
       - Quickstart: en/quickstart.md
       - Simulator: en/simulator.md

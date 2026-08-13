@@ -6,7 +6,7 @@
         <div class="card shadow-sm">
             <div class="card-body">
                 <h1 class="h4 mb-3">{{ is_create|yesno:"Create Scenario,Update Scenario" }}</h1>
-                <p class="text-muted">Define the clinical context, guidance, and recommended regimens available to learners.</p>
+                <p class="text-muted">Define synthetic context, research notes, and regimen references available for model exploration.</p>
                 <form method="post" novalidate>
                     {% csrf_token %}
                     {% if form.non_field_errors %}

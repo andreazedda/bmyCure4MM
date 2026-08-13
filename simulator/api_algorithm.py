@@ -12,6 +12,7 @@ from django.http import JsonResponse, HttpRequest
 from django.views.decorators.http import require_GET
 
 from .decision_algorithm import get_algorithm, evaluate_metrics, get_applicable_rules
+from mmportal.governance import EpistemicLabel, governance_metadata
 
 
 @require_GET
@@ -66,6 +67,10 @@ def decision_algorithm_api(request: HttpRequest) -> JsonResponse:
         )
         
         return JsonResponse({
+            "governance": governance_metadata(
+                epistemic_label=EpistemicLabel.HEURISTIC,
+                output_kind="model_relative_threshold_evaluation",
+            ),
             "input": {
                 "tumor_reduction": tumor_reduction,
                 "healthy_loss": healthy_loss,
@@ -80,6 +85,10 @@ def decision_algorithm_api(request: HttpRequest) -> JsonResponse:
     # Summary format - just thresholds and rule names
     if fmt == "summary":
         summary = {
+            "governance": governance_metadata(
+                epistemic_label=EpistemicLabel.HEURISTIC,
+                output_kind="model_relative_threshold_catalog",
+            ),
             "version": algorithm.get("version"),
             "last_updated": algorithm.get("last_updated"),
             "thresholds": algorithm.get("thresholds"),

@@ -38,9 +38,9 @@
 
     ## Difficulty / prognosis (stima)
 
-    - **Difficulty score (0–100)**: score composito che stima “quanto è difficile” trattare uno scenario; vedi `Guides → Difficulty Scoring`.
+    - **Difficulty score (0–100)**: trasformazione euristica legacy, non un output clinico validato; vedi `Archive → Legacy Unvalidated Model Outputs`.
     - **Frailty (frailty score)**: proxy di tollerabilità del paziente (età, ECOG, comorbidità, funzione renale, albumina).
-    - **PFS / OS**: *Progression-Free Survival* / *Overall Survival*; vedi `Guides → Prognosis`.
+    - **PFS / OS**: endpoint clinici non stimati dall'attuale interfaccia E1 per il singolo paziente.
 
     ## Ottimizzazione
 
@@ -101,9 +101,9 @@
 
     ## Difficulty / prognosis (estimation)
 
-    - **Difficulty score (0–100)**: composite score estimating how hard a scenario is to treat; see `Guides → Difficulty Scoring`.
+    - **Difficulty score (0–100)**: legacy heuristic transform, not a validated clinical output; see `Archive → Legacy Unvalidated Model Outputs`.
     - **Frailty (frailty score)**: tolerance proxy (age, ECOG, comorbidities, renal function, albumin).
-    - **PFS / OS**: *Progression-Free Survival* / *Overall Survival*; see `Guides → Prognosis`.
+    - **PFS / OS**: clinical endpoints not estimated for an individual by the current E1 interface.
 
     ## Optimization
 

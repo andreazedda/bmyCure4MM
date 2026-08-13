@@ -1,18 +1,19 @@
 """
-Virtual Patient Generator with Precisely Defined Clinical Archetypes.
+Synthetic State Generator with Heuristic Research Archetypes.
 
-This module creates realistic virtual patients for in-silico clinical trials
-based on well-defined clinical archetypes with mathematically specified
-parameter distributions.
+This module creates synthetic model states from mathematically specified
+parameter distributions. It does not create validated virtual patients or
+patient-specific predictions.
 
 Each archetype represents a distinct clinical phenotype with:
 - Specific R-ISS stage distribution
 - Cytogenetic risk profile
 - Age/frailty characteristics
 - Tumor biology parameters
-- Expected treatment response patterns
+- Heuristic model-response assumptions
 
-All distributions are based on published clinical trial data and registry studies.
+Evidence provenance is incomplete; distributions are `HEURISTIC` until each
+parameter is source-verified.
 """
 from __future__ import annotations
 
@@ -31,8 +32,7 @@ class PatientArchetype(Enum):
     """
     Well-defined clinical archetypes for virtual patients.
     
-    Each archetype represents a clinically distinct population with
-    specific characteristics and prognosis.
+    Each archetype is a heuristic population context for synthetic sampling.
     """
     NEWLY_DIAGNOSED_STANDARD_RISK = "nd_standard"
     NEWLY_DIAGNOSED_HIGH_RISK = "nd_high_risk"
@@ -144,8 +144,8 @@ class ArchetypeDefinition:
     - Patient fitness (ECOG, comorbidities)
     - Laboratory parameters
     
-    All distributions are mathematically specified and validated against
-    published population data.
+    Distributions are mathematically specified heuristic inputs. Their
+    population validity is not established by this module.
     """
     name: str
     description: str
@@ -202,11 +202,10 @@ def get_archetype_library() -> Dict[PatientArchetype, ArchetypeDefinition]:
     """
     Get the complete library of patient archetypes.
     
-    All distributions are based on:
-    - SEER database statistics
-    - Clinical trial inclusion criteria
-    - Published population pharmacokinetics
-    - Real-world evidence studies
+    These synthetic distributions contain heuristic, literature-informed
+    assumptions whose source-level provenance and external validity require
+    separate verification. They must not be interpreted as patient-specific
+    predictions or as a representative clinical cohort.
     
     Returns:
         Dictionary mapping archetype enum to definition
@@ -218,11 +217,10 @@ def get_archetype_library() -> Dict[PatientArchetype, ArchetypeDefinition]:
     # NEWLY DIAGNOSED STANDARD RISK
     # -------------------------------------------------------------------------
     # Young, fit, favorable cytogenetics, typical presentation
-    # Expected median OS: 8-10 years
     # -------------------------------------------------------------------------
     library[PatientArchetype.NEWLY_DIAGNOSED_STANDARD_RISK] = ArchetypeDefinition(
         name="Newly Diagnosed Standard Risk",
-        description="Younger transplant-eligible patients with standard-risk cytogenetics and good performance status. Excellent prognosis with modern therapy.",
+        description="Synthetic lower-constraint context with standard-risk cytogenetic and performance-state inputs.",
         prevalence=0.25,  # ~25% of MM patients
         
         age_distribution=ParameterDistribution(
@@ -319,11 +317,10 @@ def get_archetype_library() -> Dict[PatientArchetype, ArchetypeDefinition]:
     # NEWLY DIAGNOSED HIGH RISK
     # -------------------------------------------------------------------------
     # High-risk cytogenetics, higher burden, R-ISS III
-    # Expected median OS: 3-4 years
     # -------------------------------------------------------------------------
     library[PatientArchetype.NEWLY_DIAGNOSED_HIGH_RISK] = ArchetypeDefinition(
         name="Newly Diagnosed High Risk",
-        description="Patients with high-risk cytogenetic abnormalities (del17p, t(4;14), t(14;16)) and/or R-ISS stage III. Aggressive disease requiring intensive treatment.",
+        description="Synthetic higher-constraint context with high-risk cytogenetic or R-ISS III inputs.",
         prevalence=0.15,
         
         age_distribution=ParameterDistribution(
@@ -418,11 +415,10 @@ def get_archetype_library() -> Dict[PatientArchetype, ArchetypeDefinition]:
     # FRAIL ELDERLY
     # -------------------------------------------------------------------------
     # Age >75, multiple comorbidities, reduced functional status
-    # Expected median OS: 3-5 years
     # -------------------------------------------------------------------------
     library[PatientArchetype.FRAIL_ELDERLY] = ArchetypeDefinition(
         name="Frail Elderly",
-        description="Older patients (>75 years) with reduced performance status and multiple comorbidities. Require dose-reduced or less intensive therapy.",
+        description="Synthetic older-adult context with reduced performance status and multiple modeled constraints.",
         prevalence=0.20,
         
         age_distribution=ParameterDistribution(
@@ -518,8 +514,7 @@ def get_archetype_library() -> Dict[PatientArchetype, ArchetypeDefinition]:
     # -------------------------------------------------------------------------
     # RELAPSED/REFRACTORY
     # -------------------------------------------------------------------------
-    # Failed ≥2 prior lines, resistant clones, poor prognosis
-    # Expected median OS: 1-2 years
+    # Synthetic prior-exposure and resistance context.
     # -------------------------------------------------------------------------
     library[PatientArchetype.RELAPSED_REFRACTORY] = ArchetypeDefinition(
         name="Relapsed/Refractory",
@@ -618,11 +613,10 @@ def get_archetype_library() -> Dict[PatientArchetype, ArchetypeDefinition]:
     # SMOLDERING MYELOMA
     # -------------------------------------------------------------------------
     # Asymptomatic, low burden, indolent, watch & wait
-    # Expected median time to progression: 2-5 years
     # -------------------------------------------------------------------------
     library[PatientArchetype.SMOLDERING_MYELOMA] = ArchetypeDefinition(
         name="Smoldering Myeloma",
-        description="Asymptomatic patients with clonal plasma cells ≥10% but no end-organ damage (CRAB criteria). Observation or clinical trial only.",
+        description="Synthetic asymptomatic context with clonal plasma-cell and no-CRAB input assumptions.",
         prevalence=0.10,
         
         age_distribution=ParameterDistribution(
@@ -730,8 +724,8 @@ class VirtualPatient:
     Contains all parameters needed for:
     - Difficulty score calculation
     - ODE simulation
-    - Treatment response prediction
-    - Toxicity assessment
+    - Simulated model-response exploration
+    - Simulated healthy-cell-state exploration
     """
     # Identifiers
     patient_id: str

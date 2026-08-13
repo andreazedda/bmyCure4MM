@@ -1,5 +1,9 @@
 # Simulations & Visuals (gallery)
 
+> **E1 research-prototype boundary:** every figure is illustrative or
+> model-relative. No figure establishes clinical efficacy, safety, prognosis,
+> patient benefit, or a causal treatment effect.
+
 === "IT"
     Questa pagina raccoglie esempi **visivi** (grafici + mappe) per capire rapidamente cosa fa il sistema.
 
@@ -16,7 +20,7 @@
     | teoria modelli | `Guides → Mathematical Models` |
     | come leggere i KPI | `Guides → Docs → Simulator KPIs (How to Read)` |
     | ottimizzazione e Pareto | `Guides → Optimization Theory` |
-    | difficulty/prognosis theory | `Guides → Difficulty Scoring` + `Guides → Prognosis` |
+    | historical unvalidated transforms | `Deep Dives → Archive → Legacy Unvalidated Model Outputs` |
 
     !!! tip
         Clicca qualsiasi diagramma Mermaid per **zoom/pan**.
@@ -43,7 +47,8 @@
 
     ![Coupled dynamics](../assets/images/models/coupled_dynamics.svg)
 
-    **Cosa mostra**: la terapia riduce \(T(t)\), ma può anche ridurre \(H(t)\) (tossicità).
+    **Cosa mostra**: l'effetto configurato del modello modifica \(T(t)\) e può
+    modificare \(H(t)\); non è una previsione clinica di efficacia o tossicità.
 
     ## 5) Incertezza (coorte) — bande p05/p95 (toy)
 
@@ -67,14 +72,14 @@
       B --> C["Simulator: Scenario + Params"]
       C --> D["ODE solve"]
       D --> E["KPI + artifacts (CSV/Plot)"]
-      E --> F["UI: charts + decision rules"]
+      E --> F["UI: charts + model-relative diagnostics"]
     ```
 
     ## 7b) Output simulazione — esempio reale (da test automatici)
 
-    !!! tip "Strutture molecolari + efficacia (ChemTools) vs KPI simulati"
-      Se vuoi collegare **strutture molecolari / binding + profili evidence-based** (ChemTools) con i **KPI della simulazione** (Simulator), vedi la guida ponte:
-      `Guides → Docs → Molecule → Simulation (Bridge)`.
+    !!! warning "Strutture molecolari e KPI simulati"
+      ChemTools espone contesto molecolare e di database. Non emette stime
+      validate di efficacia, sopravvivenza, tossicità o rischio-beneficio.
 
     !!! tip "Farmaco non in preset (Custom drug)"
       Per simulare un agente non presente nei preset YAML (modalità sperimentale editor-only), vedi:
@@ -104,7 +109,8 @@
 
     ![Survival vs difficulty](../assets/images/models/difficulty_survival_vs_score.svg)
 
-    **Cosa mostra**: curve illustrative per capire come uno score composito può essere trasformato in stime “toy” (non cliniche).
+    **Cosa mostra**: trasformazioni storiche illustrative di uno score
+    composito. Non sono output prognostici validati né output correnti autorizzati.
 
     ## 9) Prognosis — baseline OS per R-ISS (toy)
 
@@ -128,7 +134,7 @@
     | model theory | `Guides → Mathematical Models` |
     | how to read KPIs | `Guides → Docs → Simulator KPIs (How to Read)` |
     | optimization and Pareto | `Guides → Optimization Theory` |
-    | difficulty/prognosis theory | `Guides → Difficulty Scoring` + `Guides → Prognosis` |
+    | historical unvalidated transforms | `Deep Dives → Archive → Legacy Unvalidated Model Outputs` |
 
     !!! tip
         Click any Mermaid diagram to **zoom/pan**.
@@ -165,14 +171,14 @@
       B --> C["Simulator: Scenario + Params"]
       C --> D["ODE solve"]
       D --> E["KPIs + artifacts (CSV/Plot)"]
-      E --> F["UI: charts + decision rules"]
+      E --> F["UI: charts + model-relative diagnostics"]
     ```
 
     ## 7b) Simulation output — real example (from automated tests)
 
-    !!! tip "Molecular structures + evidence (ChemTools) vs simulated KPIs"
-      To connect **molecular structures / binding + evidence-based profiles** (ChemTools) with **simulation KPIs** (Simulator), see:
-      `Guides → Docs → Molecule → Simulation (Bridge)`.
+    !!! warning "Molecular structures and simulated KPIs"
+      ChemTools exposes molecular and database context. It does not emit
+      validated efficacy, survival, toxicity, or risk-benefit estimates.
 
     !!! tip "Non-preset agent (Custom drug)"
       To simulate an agent not present in YAML presets (experimental editor-only mode), see:
@@ -201,6 +207,9 @@
     ![Toxicity risk vs difficulty](../assets/images/models/difficulty_toxicity_risk.svg)
 
     ![Survival vs difficulty](../assets/images/models/difficulty_survival_vs_score.svg)
+
+    These plots preserve historical illustrative transforms. They are not
+    validated prognosis outputs or authorized current prediction interfaces.
 
     ## 9) Prognosis — baseline OS by R-ISS (toy)
 

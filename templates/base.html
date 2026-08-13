@@ -18,8 +18,8 @@
                 <span style="font-size:1.4rem;">🧬</span>
                 bmyCure4MM
                 <span class="badge bg-light text-primary ms-1 d-none d-md-inline" style="font-size: 0.55rem; vertical-align: middle;">
-                    <span class="t-en">MM Treatment Platform</span>
-                    <span class="t-it">Piattaforma MM</span>
+                    <span class="t-en">E1 Research Prototype</span>
+                    <span class="t-it">Prototipo di Ricerca E1</span>
                 </span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,10 +44,10 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link fw-bold" href="{% url 'simulator:scenario_list' %}" 
+                        <a class="nav-link fw-bold" href="{% url 'learn:scenario_list' %}"
                            data-bs-toggle="tooltip" 
                            title="Test drug combinations on virtual patients">
-                            🧪 Simulator
+                            🧪 <span class="t-en">Learn</span><span class="t-it">Impara</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -56,10 +56,15 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-warning fw-bold" href="{% url 'simulator:interactive_tutorial' %}" 
+                        <a class="nav-link text-warning fw-bold" href="{% url 'learn:interactive_tutorial' %}"
                            data-bs-toggle="tooltip" 
                            title="Step-by-step interactive tutorial">
                             🎓 <span class="t-en">Tutorial</span><span class="t-it">Tutorial</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'twin_engine:research_home' %}">
+                            🔬 <span class="t-en">Research</span><span class="t-it">Ricerca</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -108,6 +113,19 @@
     </nav>
 
     <div class="container my-4 sticky-offset">
+        <div class="alert alert-secondary py-2" role="note" data-testid="intended-use-banner">
+            <div class="d-flex flex-wrap justify-content-between gap-2 align-items-center">
+                <div class="small">
+                    <strong>{{ governance.intended_use_level }}</strong> ·
+                    <span class="t-en">Research prototype only; not clinical decision support. Outputs do not authorize treatment or dose changes.</span>
+                    <span class="t-it">Solo prototipo di ricerca; non è supporto alle decisioni cliniche. Gli output non autorizzano modifiche di trattamento o dose.</span>
+                </div>
+                <div class="small text-nowrap">
+                    <span class="badge bg-secondary">{{ governance.epistemic_label }}</span>
+                    <span class="badge bg-dark">{{ governance.model_version }}</span>
+                </div>
+            </div>
+        </div>
         {% if messages %}
             <div class="messages">
                 {% for message in messages %}
@@ -201,8 +219,8 @@
                 <div class="col-md-8">
                     <p class="mb-1 text-muted small">
                         <i class="bi bi-shield-check me-1"></i>
-                        <span class="t-en">This portal is a research simulation and future decision-copilot prototype. It is not a diagnostic device and is not clinically validated.</span>
-                        <span class="t-it">Questo portale è una simulazione di ricerca e un prototipo di futuro copilot decisionale. Non è un dispositivo diagnostico e non è clinicamente validato.</span>
+                        <span class="t-en">E1 research prototype. Clinical decision support: false. Patient-specific prediction validated: false. Causal effect identified: false.</span>
+                        <span class="t-it">Prototipo di ricerca E1. Supporto decisionale clinico: falso. Previsione specifica validata: falso. Effetto causale identificato: falso.</span>
                     </p>
                 </div>
                 <div class="col-md-4 text-md-end">
@@ -250,7 +268,6 @@
     </div>
 
     <script src="{% static 'app/js/badges.js' %}"></script>
-    <script src="{% static 'app/js/sandbox-hints.js' %}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/htmx.org@1.9.12"></script>
     <script>
@@ -301,94 +318,81 @@
         kpi: '📈',
     };
     const GLOSSARY = {
-        // 🎯 Disease Staging & Risk Assessment
         riss: {
-            en: '🎯 R-ISS Stage (I–III): Think of it as a "difficulty level" for the disease. Stage I is "easier to treat" (like tutorial mode), Stage III is "advanced" (hard mode). Combines β2M, albumin, LDH and genetics to predict prognosis.',
-            it: '🎯 Stadio R-ISS (I–III): Pensalo come un "livello di difficoltà" della malattia. Stadio I è "più facile da trattare" (modalità tutorial), Stadio III è "avanzato" (modalità difficile). Combina β2M, albumina, LDH e genetica per predire la prognosi.',
+            en: 'R-ISS is a recorded or user-provided staging field. Its use in this prototype is model context, not a patient-specific prognosis.',
+            it: 'R-ISS è un campo di stadiazione registrato o fornito dall\'utente. In questo prototipo è contesto del modello, non una prognosi specifica del paziente.',
         },
-        
-        // 📊 Biomarkers - "Health Meters"
         ldh: {
-            en: '📊 LDH (Lactate Dehydrogenase): Imagine it as an "alarm bell" 🔔. High LDH = tumor cells are very active and aggressive. Normal range: 140-280 U/L. Think of it like a speedometer showing how fast the disease is "driving".',
-            it: '📊 LDH (Lattato Deidrogenasi): Immaginalo come una "campana d\'allarme" 🔔. LDH alto = le cellule tumorali sono molto attive e aggressive. Range normale: 140-280 U/L. Pensalo come un tachimetro che mostra quanto veloce la malattia sta "correndo".',
+            en: 'LDH is an observed laboratory analyte (U/L). Interpretation requires date, assay context, reference range, and uncertainty.',
+            it: 'LDH è un analita di laboratorio osservato (U/L). L\'interpretazione richiede data, contesto del test, intervallo di riferimento e incertezza.',
         },
         b2m: {
-            en: '📊 β2M (Beta-2 Microglobulin): Your "tumor load gauge" 📈. Higher values = more cancer cells present. Also indicates kidney function. Like a fuel gauge, but for cancer cells. Normal: <3.5 mg/L.',
-            it: '📊 β2M (Beta-2 Microglobulina): Il tuo "indicatore di carico tumorale" 📈. Valori più alti = più cellule cancerose presenti. Indica anche la funzione renale. Come un indicatore di carburante, ma per le cellule cancerose. Normale: <3.5 mg/L.',
+            en: 'β2M is an observed laboratory analyte (mg/L). It is not identical to tumor burden and can reflect multiple processes.',
+            it: 'β2M è un analita osservato (mg/L). Non coincide con il carico tumorale e può riflettere processi diversi.',
         },
         flc: {
-            en: '📊 FLC Ratio (κ/λ): The "balance meter" ⚖️ of proteins. Normal is ~1.0. Imbalanced? Cancer cells are producing abnormal proteins. Think of it like checking if your recipe has the right ingredient proportions.',
-            it: '📊 Rapporto FLC (κ/λ): Il "metro di equilibrio" ⚖️ delle proteine. Normale è ~1.0. Sbilanciato? Le cellule cancerose stanno producendo proteine anomale. Pensalo come verificare se la tua ricetta ha le giuste proporzioni degli ingredienti.',
+            en: 'FLC ratio is an observed or derived biomarker. It is not treated as a direct identity for disease burden.',
+            it: 'Il rapporto FLC è un biomarcatore osservato o derivato. Non è considerato identico al carico di malattia.',
         },
-        
-        // 💊 Pharmacology Concepts
         auc: {
-            en: '💊 AUC (Area Under Curve): Total drug exposure over time ⏱️. Think of it like "total sunshine hours" in a day. Higher AUC = more drug effect, but also more side effects. It\'s about finding the sweet spot! 🎯',
-            it: '💊 AUC (Area Sotto la Curva): Esposizione totale al farmaco nel tempo ⏱️. Pensalo come le "ore totali di sole" in un giorno. AUC più alto = più effetto del farmaco, ma anche più effetti collaterali. Si tratta di trovare il punto giusto! 🎯',
+            en: 'AUC is a derived exposure summary. Its meaning depends on the documented PK model, schedule, units, and assumptions.',
+            it: 'AUC è una misura derivata dell\'esposizione. Dipende da modello PK, calendario, unità e assunzioni documentate.',
         },
         nadir: {
-            en: '🎢 Nadir: The "lowest valley" in the tumor burden curve. Like the lowest point on a rollercoaster 🎢 before going back up. It\'s our goal - make the tumor as small as possible before it tries to regrow.',
-            it: '🎢 Nadir: La "valle più bassa" nella curva del carico tumorale. Come il punto più basso su una montagna russa 🎢 prima di risalire. È il nostro obiettivo - rendere il tumore il più piccolo possibile prima che provi a ricrescere.',
+            en: 'Nadir is the minimum value of a simulated trajectory over the reported horizon.',
+            it: 'Il nadir è il valore minimo di una traiettoria simulata nell\'orizzonte riportato.',
         },
-        
-        // 🏥 Patient Parameters
         creatinine: {
-            en: '🏥 Creatinine Clearance: Your "kidney power meter" 💪. Measures how well kidneys filter waste. >60 = good, <30 = weak kidneys (need dose adjustments!). Like checking engine oil before a race.',
-            it: '🏥 Clearance della Creatinina: Il tuo "metro di potenza renale" 💪. Misura quanto bene i reni filtrano i rifiuti. >60 = buono, <30 = reni deboli (serve aggiustare le dosi!). Come controllare l\'olio del motore prima di una gara.',
+            en: 'Creatinine clearance is a user-provided renal-state input. Configured thresholds are research-domain constraints, not dose instructions.',
+            it: 'La clearance della creatinina è un input sullo stato renale. Le soglie configurate sono vincoli di ricerca, non istruzioni di dose.',
         },
         anc: {
-            en: '🛡️ ANC (Absolute Neutrophil Count): Your "immune defense force" 🛡️. Neutrophils are like soldiers fighting infections. <500 = dangerously low (infection risk!). >1500 = safe zone. Keep your army strong!',
-            it: '🛡️ ANC (Conta Assoluta dei Neutrofili): La tua "forza di difesa immunitaria" 🛡️. I neutrofili sono come soldati che combattono le infezioni. <500 = pericolosamente basso (rischio infezioni!). >1500 = zona sicura. Mantieni forte il tuo esercito!',
+            en: 'ANC is a user-provided laboratory input. Low-value flags only delimit the configured research domain.',
+            it: 'ANC è un input di laboratorio fornito dall\'utente. I segnali sui valori bassi delimitano solo il dominio di ricerca.',
         },
         platelets: {
-            en: '🩹 Platelets: Your "repair crew" 🔧. They stop bleeding and fix injuries. <50k = high bleeding risk. >100k = safe. Like having enough workers to fix road damages quickly.',
-            it: '🩹 Piastrine: La tua "squadra di riparazione" 🔧. Fermano i sanguinamenti e riparano le lesioni. <50k = alto rischio emorragico. >100k = sicuro. Come avere abbastanza operai per riparare i danni stradali velocemente.',
+            en: 'Platelet count is a user-provided laboratory input. The simulator does not infer a clinical action from it.',
+            it: 'La conta piastrinica è un input di laboratorio. Il simulatore non ne deduce un\'azione clinica.',
         },
         neuropathy: {
-            en: '⚡ Neuropathy Grade: "Nerve damage level" 🎮. Grade 0 = no damage (perfect!), Grade 4 = severe (can\'t move). Some drugs damage nerves like overheating a circuit board. Monitor carefully!',
-            it: '⚡ Grado di Neuropatia: "Livello di danno nervoso" 🎮. Grado 0 = nessun danno (perfetto!), Grado 4 = grave (impossibile muoversi). Alcuni farmaci danneggiano i nervi come surriscaldare un circuito. Monitora attentamente!',
+            en: 'Neuropathy grade is a user-provided constraint input; it is not diagnosed by this prototype.',
+            it: 'Il grado di neuropatia è un input di vincolo fornito dall\'utente; il prototipo non formula diagnosi.',
         },
-        
-        // 💉 Drug Mechanisms
         lenalidomide: {
-            en: '💉 Lenalidomide: The "immune booster" 🚀. Wakes up your immune system to attack cancer cells AND directly kills them. Oral pill, easier than injections! Dose: 5-25 mg/day. Main risk: low blood counts.',
-            it: '💉 Lenalidomide: Il "potenziatore immunitario" 🚀. Sveglia il tuo sistema immunitario per attaccare le cellule cancerose E le uccide direttamente. Pillola orale, più facile delle iniezioni! Dose: 5-25 mg/die. Rischio principale: conta sanguigna bassa.',
+            en: 'Lenalidomide is represented by a simplified hypothetical exposure input; no clinical schedule is selected.',
+            it: 'Lenalidomide è rappresentata da un input semplificato di esposizione ipotetica; non viene scelto un calendario clinico.',
         },
         bortezomib: {
-            en: '💉 Bortezomib: The "protein shredder" ✂️. Blocks proteasomes (cancer\'s recycling centers), making cells die from their own garbage. Injection 1-2x/week. Watch out for nerve damage (neuropathy)!',
-            it: '💉 Bortezomib: Il "tritaproteine" ✂️. Blocca i proteasomi (centri di riciclaggio del cancro), facendo morire le cellule dai loro stessi rifiuti. Iniezione 1-2 volte/settimana. Attenzione al danno nervoso (neuropatia)!',
+            en: 'Bortezomib is represented by a simplified hypothetical exposure input with incomplete PK/PD context.',
+            it: 'Bortezomib è rappresentato da un input semplificato di esposizione ipotetica con contesto PK/PD incompleto.',
         },
         daratumumab: {
-            en: '💉 Daratumumab: The "guided missile" 🎯. Antibody that specifically targets CD38 on cancer cells. IV infusion. Very effective but takes hours to infuse. Like sending special forces vs. carpet bombing.',
-            it: '💉 Daratumumab: Il "missile guidato" 🎯. Anticorpo che colpisce specificamente CD38 sulle cellule cancerose. Infusione IV. Molto efficace ma richiede ore per l\'infusione. Come inviare forze speciali vs. bombardamento a tappeto.',
+            en: 'Daratumumab is represented by a simplified hypothetical exposure input with incomplete PK/PD context.',
+            it: 'Daratumumab è rappresentato da un input semplificato di esposizione ipotetica con contesto PK/PD incompleto.',
         },
-        
-        // 🎮 Simulation Parameters
         tumor_cells: {
-            en: '🎮 Tumor Cells: The "enemy army size" 👾. Starting number of cancer cells. Higher = harder challenge. Range: 1M to 1B cells. Your goal: reduce this number as much as possible!',
-            it: '🎮 Cellule Tumorali: La "dimensione dell\'esercito nemico" 👾. Numero iniziale di cellule cancerose. Più alto = sfida più difficile. Range: 1M a 1B cellule. Il tuo obiettivo: ridurre questo numero il più possibile!',
+            en: 'Tumor cells is a model state initialized from a scenario assumption; it is not a measured patient cell count.',
+            it: 'Le cellule tumorali sono uno stato del modello inizializzato da un\'assunzione; non sono una conta misurata del paziente.',
         },
         healthy_cells: {
-            en: '🎮 Healthy Cells: Your "health bar" ❤️. Normal bone marrow cells we want to protect. Keep above 50% to avoid complications! Balance is key - kill cancer, protect healthy.',
-            it: '🎮 Cellule Sane: La tua "barra della salute" ❤️. Cellule normali del midollo osseo che vogliamo proteggere. Mantieni sopra il 50% per evitare complicazioni! L\'equilibrio è la chiave - uccidi il cancro, proteggi le sane.',
+            en: 'Healthy cells is a simplified model state and is not a validated marrow-reserve endpoint.',
+            it: 'Le cellule sane sono uno stato semplificato del modello, non un endpoint validato della riserva midollare.',
         },
         interaction_strength: {
-            en: '🎮 Drug Interaction: How much drugs "interfere" with each other ⚠️. 0.0 = no interaction (safe), 0.5 = strong interaction (danger!). Like mixing chemicals - sometimes they amplify effects.',
-            it: '🎮 Interazione Farmaci: Quanto i farmaci "interferiscono" tra loro ⚠️. 0.0 = nessuna interazione (sicuro), 0.5 = forte interazione (pericolo!). Come mescolare sostanze chimiche - a volte amplificano gli effetti.',
+            en: 'Interaction strength is a dimensionless model parameter. It does not establish a biological or causal interaction.',
+            it: 'La forza di interazione è un parametro adimensionale. Non stabilisce un\'interazione biologica o causale.',
         },
         time_horizon: {
-            en: '⏰ Time Horizon: Your "campaign duration" 📅. How many days to simulate treatment? 30 days = short (preview), 365 days = full year (complete picture). Longer = see full cycle of response.',
-            it: '⏰ Orizzonte Temporale: La "durata della campagna" 📅. Quanti giorni simulare il trattamento? 30 giorni = breve (anteprima), 365 giorni = anno completo (quadro completo). Più lungo = vedi il ciclo completo della risposta.',
+            en: 'Time horizon is the duration of the numerical simulation. Longer horizons require stronger numerical checks.',
+            it: 'L\'orizzonte temporale è la durata della simulazione numerica. Orizzonti lunghi richiedono controlli numerici più forti.',
         },
-        
-        // 🏆 Success Metrics
         response_rate: {
-            en: '🏆 Response Rate: Your "success score" 🎯. % of tumor reduction. >90% = excellent response! 50-90% = partial response. <50% = minimal response. Aim for the high score!',
-            it: '🏆 Tasso di Risposta: Il tuo "punteggio di successo" 🎯. % di riduzione tumorale. >90% = risposta eccellente! 50-90% = risposta parziale. <50% = risposta minima. Punta al punteggio alto!',
+            en: 'The displayed response metric is model-relative and simulated; it is not a validated clinical response rate.',
+            it: 'La metrica di risposta mostrata è relativa al modello e simulata; non è un tasso di risposta clinico validato.',
         },
         toxicity: {
-            en: '⚠️ Toxicity: The "side effect level" 💊. Grade 1-2 = mild (manageable), Grade 3-4 = severe (hospitalization risk). Like video game damage - don\'t let it get too high!',
-            it: '⚠️ Tossicità: Il "livello di effetti collaterali" 💊. Grado 1-2 = lieve (gestibile), Grado 3-4 = grave (rischio ospedalizzazione). Come il danno nei videogiochi - non lasciare che salga troppo!',
+            en: 'The displayed healthy-cell impact is a simulated proxy, not a validated clinical toxicity endpoint.',
+            it: 'L\'impatto sulle cellule sane è un proxy simulato, non un endpoint clinico validato di tossicità.',
         },
     };
 

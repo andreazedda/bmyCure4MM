@@ -7,6 +7,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_GET
 
+from mmportal.governance import EpistemicLabel, governance_metadata
+
 from . import forms, models
 from .tasks import (
     run_binding_viz_job,
@@ -170,7 +172,7 @@ def similarity(request: HttpRequest) -> HttpResponse:
 
 @login_required
 def retry_job(request: HttpRequest, pk: int) -> HttpResponse:
-    job = get_object_or_404(models.ChemJob, pk=pk)
+    job = get_object_or_404(models.ChemJob, pk=pk, user=request.user)
     if job.kind == models.ChemJob.PARAM:
         queued, failed = _enqueue(
             run_drug_params_job,
@@ -200,7 +202,7 @@ def retry_job(request: HttpRequest, pk: int) -> HttpResponse:
 @login_required
 @require_GET
 def job_status(request: HttpRequest, pk: int) -> JsonResponse:
-    job = get_object_or_404(models.ChemJob, pk=pk)
+    job = get_object_or_404(models.ChemJob, pk=pk, user=request.user)
     status_text, status_variant = job.status_label()
     data = {
         "status": status_text,
@@ -212,6 +214,10 @@ def job_status(request: HttpRequest, pk: int) -> JsonResponse:
         "thumbnail_url": job.thumbnail_url(),
         "progress_percent": job.progress_percent,
         "progress_message": job.progress_message,
+        "governance": governance_metadata(
+            epistemic_label=EpistemicLabel.DERIVED,
+            output_kind="chemistry_job_status",
+        ),
     }
     return JsonResponse(data)
 
@@ -330,6 +336,11 @@ def job_enriched_data(request: HttpRequest, pk: int) -> HttpResponse:
     
     # Return only the data needed for dynamic sections
     response_data = {
+        'governance': governance_metadata(
+            epistemic_label=EpistemicLabel.DERIVED,
+            output_kind='molecular_database_context',
+        ),
+        'unsupported_scientific_estimators': enriched_data.get('unsupported_scientific_estimators'),
         'mm_efficacy_profile': enriched_data.get('mm_efficacy_profile'),
         'survival_impact': enriched_data.get('survival_impact'),
         'toxicity_profile': enriched_data.get('toxicity_profile'),

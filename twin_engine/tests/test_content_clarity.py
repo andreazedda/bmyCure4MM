@@ -102,7 +102,7 @@ class ResearchContentClarityTests(TestCase):
             "This page is for data navigation.",
             "Use Simple Research View to understand the data and model.",
             "Use Scientific Cockpit for technical details.",
-            "Recommended next step",
+            "Research workflow next step",
             "Research simulation only",
             "not clinically validated",
             "Twin Inputs (over time)",

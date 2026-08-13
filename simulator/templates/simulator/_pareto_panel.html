@@ -12,7 +12,7 @@
             <p class="text-muted">
                 Found <strong>{{ pareto_solutions|length }}</strong> non-dominated solution(s) 
                 from <strong>{{ result.n_trials }}</strong> trial(s). 
-                Each row represents an optimal trade-off between efficacy, safety, and exposure.
+                Each row is non-dominated for the configured model objectives. Pareto status is not clinical optimality, efficacy, or safety evidence.
             </p>
 
             <div class="table-responsive">
@@ -21,11 +21,11 @@
                         <tr>
                             <th scope="col" style="width: 5%;">#</th>
                             <th scope="col" style="width: 12%;">
-                                Efficacy ↑
+                                Simulated tumor-state objective ↑
                                 <br><small class="text-muted fw-normal">Tumor Reduction</small>
                             </th>
                             <th scope="col" style="width: 12%;">
-                                Safety ↑
+                                Simulated healthy-cell objective ↑
                                 <br><small class="text-muted fw-normal">Healthy Preserved</small>
                             </th>
                             <th scope="col" style="width: 12%;">
@@ -103,8 +103,9 @@
                 <small>
                     <strong>Legend:</strong>
                     <ul class="mb-0">
-                        <li><strong>Efficacy ↑</strong>: Higher is better (tumor shrinkage relative to initial burden)</li>
-                        <li><strong>Safety ↑</strong>: Higher is better (1 - healthy_loss, so closer to 1 means less toxicity)</li>
+                        <li><strong>Simulated tumor-state objective ↑</strong>: model-relative endpoint change.</li>
+                        <li><strong>Simulated healthy-cell objective ↑</strong>: 1 - modeled healthy-cell-state loss.</li>
+                        <li>Neither objective is a validated clinical endpoint.</li>
                         <li><strong>Exposure ↓</strong>: Lower is better (cumulative drug AUC)</li>
                         <li>Click <strong>Simulate</strong> to run full dynamics with this parameter set</li>
                     </ul>

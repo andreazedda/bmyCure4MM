@@ -1,0 +1,29 @@
+{
+  "schema": "bmycure4mm-release-claims-v1",
+  "claims_policy_version": "claims-policy-v1",
+  "intended_use_level": "E1_research_prototype",
+  "clinical_decision_support": false,
+  "patient_specific_prediction_validated": false,
+  "causal_effect_identified": false,
+  "model_version": "research-twin-v1",
+  "epistemic_labels": [
+    "UNKNOWN",
+    "NEEDS_EVIDENCE",
+    "OBSERVED",
+    "DERIVED",
+    "USER_PROVIDED",
+    "SIMULATED",
+    "HEURISTIC",
+    "LITERATURE_INFORMED",
+    "HYPOTHETICAL",
+    "VALIDATED_EXTERNAL"
+  ],
+  "forbidden_claim_codes": [
+    "recommended_or_best_treatment",
+    "patient_specific_dose_instruction",
+    "predicted_patient_benefit",
+    "clinically_superior_regimen",
+    "identified_causal_treatment_effect",
+    "validated_patient_prognosis_without_governed_evidence"
+  ]
+}

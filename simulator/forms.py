@@ -12,18 +12,18 @@ from . import models
 from .presets import PRESETS
 
 SIMULATION_FORM_HELP_TEXT_EN = {
-    "preset": "Clinical preset with guardrailed defaults for common regimens.",
-    "creatinine_clearance": "Renal function estimate driving lenalidomide adjustments (thresholds at 60 and 30 ml/min).",
-    "neuropathy_grade": "CTCAE sensory neuropathy grade (0–3). Grades ≥2 restrict bortezomib to ≤1.0 mg/m².",
-    "anc": "ANC <1.0 ×10⁹/L blocks the simulation because of neutropenia.",
-    "platelets": "Platelets <75 ×10⁹/L block the simulation (bleeding risk).",
-    "pregnancy": "Pregnancy is a contraindication for IMiDs; simulations are blocked when flagged.",
+    "preset": "Research preset containing hypothetical model inputs and schedules.",
+    "creatinine_clearance": "User-provided renal-state input used by configured model rules.",
+    "neuropathy_grade": "User-provided CTCAE neuropathy grade used by configured model constraints.",
+    "anc": "User-provided ANC; configured low-value constraints may block a research run.",
+    "platelets": "User-provided platelet count; configured low-value constraints may block a research run.",
+    "pregnancy": "User-provided flag used by configured research constraints.",
     "baseline_tumor_cells": "Estimated malignant plasma cell burden (cells).",
     "baseline_healthy_cells": "Approximate pool of normal plasma cells (cells).",
-    "lenalidomide_dose": "Standard induction dose: 25 mg/day (21 days on, 7 off). Adjustments are limited to preset bounds.",
-    "bortezomib_dose": "Typical SC dosing 1.3 mg/m² on scheduled days; stay within ±20% to avoid toxicity.",
-    "daratumumab_dose": "Loading dose 16 mg/kg; higher exposure raises immunosuppression risk.",
-    "carfilzomib_dose": "Second-generation proteasome inhibitor (often 20–56 mg/m²). Dose changes impact cardiovascular/renal toxicity risk.",
+    "lenalidomide_dose": "Hypothetical lenalidomide model input constrained to the configured research range.",
+    "bortezomib_dose": "Hypothetical bortezomib model input constrained to the configured research range.",
+    "daratumumab_dose": "Hypothetical daratumumab model input constrained to the configured research range.",
+    "carfilzomib_dose": "Hypothetical carfilzomib model input constrained to the configured research range.",
     "time_horizon": "Length of the virtual treatment window (days). Longer horizons increase numerical stiffness.",
     "tumor_growth_rate": "Logistic growth rate of malignant plasma cells. Values >0.05 day⁻¹ are rare.",
     "healthy_growth_rate": "Marrow recovery kinetics for healthy plasma cells (≈0.01–0.02 day⁻¹).",
@@ -41,18 +41,18 @@ SIMULATION_FORM_HELP_TEXT_EN = {
 }
 
 SIMULATION_FORM_HELP_TEXT_IT = {
-    "preset": "Preset clinico con default protetti per i regimi più comuni.",
-    "creatinine_clearance": "Stima della funzione renale che guida gli aggiustamenti di lenalidomide (soglie a 60 e 30 ml/min).",
-    "neuropathy_grade": "Grado di neuropatia sensitiva CTCAE (0–3). Gradi ≥2 limitano bortezomib a ≤1.0 mg/m².",
-    "anc": "ANC <1.0 ×10⁹/L indica neutropenia clinicamente significativa e blocca la simulazione.",
-    "platelets": "Piastrine <75 ×10⁹/L rappresentano un alto rischio emorragico e bloccano la simulazione.",
-    "pregnancy": "La gravidanza è una controindicazione per gli IMiD; le prove virtuali vengono bloccate quando selezionata.",
+    "preset": "Preset di ricerca con input e calendari ipotetici del modello.",
+    "creatinine_clearance": "Input sullo stato renale fornito dall'utente e usato dalle regole del modello.",
+    "neuropathy_grade": "Grado CTCAE fornito dall'utente e usato dai vincoli del modello.",
+    "anc": "ANC fornito dall'utente; vincoli configurati possono bloccare la simulazione.",
+    "platelets": "Piastrine fornite dall'utente; vincoli configurati possono bloccare la simulazione.",
+    "pregnancy": "Flag fornito dall'utente e usato dai vincoli di ricerca configurati.",
     "baseline_tumor_cells": "Stima del carico di cellule plasmatiche maligne (cellule).",
     "baseline_healthy_cells": "Pool approssimativo di cellule plasmatiche sane (cellule).",
-    "lenalidomide_dose": "Dose standard: 25 mg/die (21 giorni su 28). Il preset limita l’aggiustamento controllato.",
-    "bortezomib_dose": "Dose SC tipica 1.3 mg/m² nei giorni programmati; restare entro ±20% evita tossicità.",
-    "daratumumab_dose": "Dose di carico 16 mg/kg; variazioni maggiori aumentano il rischio d’immunosoppressione.",
-    "carfilzomib_dose": "Inibitore del proteasoma di 2ª generazione (spesso 20–56 mg/m²). Aumenti di dose possono aumentare rischio cardio-renale.",
+    "lenalidomide_dose": "Input ipotetico di lenalidomide limitato all'intervallo di ricerca configurato.",
+    "bortezomib_dose": "Input ipotetico di bortezomib limitato all'intervallo di ricerca configurato.",
+    "daratumumab_dose": "Input ipotetico di daratumumab limitato all'intervallo di ricerca configurato.",
+    "carfilzomib_dose": "Input ipotetico di carfilzomib limitato all'intervallo di ricerca configurato.",
     "time_horizon": "Durata della finestra terapeutica virtuale (giorni). Orizzonti lunghi aumentano l’incertezza.",
     "tumor_growth_rate": "Velocità logistica di crescita del tumore. Valori >0.05 day⁻¹ sono rari.",
     "healthy_growth_rate": "Cinetica di recupero per le cellule sane. Tipicamente 0.01–0.02 day⁻¹.",
@@ -72,13 +72,10 @@ SIMULATION_FORM_HELP_TEXT_IT = {
 
 class RegimenForm(BootstrapValidationMixin, forms.ModelForm):
     """
-    Enhanced editor form for maintaining regimens with dosing validation.
+    Editor form for recording research regimen metadata.
     
-    This form enforces meaningful data entry by:
-    - Validating drug dosing within safe clinical ranges
-    - Checking for contraindications and interactions
-    - Providing educational warnings with clinical rationale
-    - Suggesting standard dosing regimens
+    Numeric checks below enforce configured research-input ranges only. They do
+    not validate clinical safety or provide patient-specific instructions.
     
     Components field format: "Drug1: dose units, Drug2: dose units, ..."
     Examples:
@@ -110,7 +107,7 @@ class RegimenForm(BootstrapValidationMixin, forms.ModelForm):
         }),
         help_text=(
             "List drugs with dosing. Format: 'Drug: dose schedule'. "
-            "Standard dosing examples: Lenalidomide 25mg, Bortezomib 1.3mg/m², "
+            "Example research inputs: Lenalidomide 25mg, Bortezomib 1.3mg/m², "
             "Daratumumab 16mg/kg, Carfilzomib 20-56mg/m², Dexamethasone 20-40mg"
         )
     )
@@ -145,8 +142,8 @@ class RegimenForm(BootstrapValidationMixin, forms.ModelForm):
             "standard": 25,
             "unit": "mg",
             "warnings": {
-                "max_exceeded": "⚠️ Lenalidomide >25mg/day significantly increases neutropenia and VTE risk. Standard dose is 25mg days 1-21.",
-                "adjust_renal": "💡 Lenalidomide requires dose reduction for CrCl <60: CrCl 30-60 → 10mg, CrCl <30 → 15mg every other day.",
+                "max_exceeded": "Research input is above the configured lenalidomide range; the value is not clinically validated.",
+                "adjust_renal": "Renal-state assumptions and units must be reported with this hypothetical input.",
             }
         },
         "bortezomib": {
@@ -155,9 +152,9 @@ class RegimenForm(BootstrapValidationMixin, forms.ModelForm):
             "standard": 1.3,
             "unit": "mg/m²",
             "warnings": {
-                "max_exceeded": "⚠️ Bortezomib >1.3mg/m² increases peripheral neuropathy risk. Standard is 1.3mg/m² twice weekly.",
-                "neuropathy": "💡 For neuropathy grade ≥2: reduce to 1.0mg/m² or switch to weekly dosing.",
-                "subcutaneous": "💡 Subcutaneous administration reduces neuropathy vs IV (preferred route).",
+                "max_exceeded": "Research input is above the configured bortezomib range; the value is not clinically validated.",
+                "neuropathy": "Neuropathy is a user-provided constraint input; no patient action is inferred.",
+                "subcutaneous": "Administration route is not identified by this research form.",
             }
         },
         "daratumumab": {
@@ -166,8 +163,8 @@ class RegimenForm(BootstrapValidationMixin, forms.ModelForm):
             "standard": 16,
             "unit": "mg/kg",
             "warnings": {
-                "max_exceeded": "⚠️ Daratumumab >16mg/kg not recommended. Standard is 16mg/kg weekly ×8, then Q2W ×16, then Q4W.",
-                "infusion_reactions": "💡 Premedicate with antihistamines, acetaminophen, corticosteroids. Monitor for infusion reactions (first dose).",
+                "max_exceeded": "Research input is above the configured daratumumab range; the value is not clinically validated.",
+                "infusion_reactions": "Infusion management is outside this research prototype's intended use.",
             }
         },
         "carfilzomib": {
@@ -176,9 +173,9 @@ class RegimenForm(BootstrapValidationMixin, forms.ModelForm):
             "standard": 27,  # 20/27 or 20/56 dosing
             "unit": "mg/m²",
             "warnings": {
-                "max_exceeded": "⚠️ Carfilzomib >56mg/m² exceeds FDA-approved dosing. Standard: 20mg/m² cycle 1 day 1-2, then 27 or 56mg/m².",
-                "cardiac": "⚠️ Monitor cardiac function. Carfilzomib increases cardiac events (HF, HTN). Baseline ECHO recommended.",
-                "hydration": "💡 IV hydration (250-500mL pre/post) reduces renal toxicity.",
+                "max_exceeded": "Research input is above the configured carfilzomib range; the value is not clinically validated.",
+                "cardiac": "Cardiac state is not sufficiently represented for a clinical conclusion.",
+                "hydration": "Supportive-care instructions are outside this research prototype's intended use.",
             }
         },
         "dexamethasone": {
@@ -187,9 +184,9 @@ class RegimenForm(BootstrapValidationMixin, forms.ModelForm):
             "standard": 40,
             "unit": "mg",
             "warnings": {
-                "max_exceeded": "⚠️ Dexamethasone >40mg/week increases infection, hyperglycemia, psychiatric effects. Consider 20mg for elderly/frail.",
-                "elderly": "💡 For age >75 or frail: reduce to 20mg weekly to minimize toxicity.",
-                "monitoring": "💡 Monitor glucose, blood pressure, mood. Prophylaxis for PCP if prolonged high-dose use.",
+                "max_exceeded": "Research input is above the configured dexamethasone range; the value is not clinically validated.",
+                "elderly": "Age and frailty are incompletely represented research covariates.",
+                "monitoring": "Monitoring instructions are outside this research prototype's intended use.",
             }
         },
         "pomalidomide": {
@@ -198,8 +195,8 @@ class RegimenForm(BootstrapValidationMixin, forms.ModelForm):
             "standard": 4,
             "unit": "mg",
             "warnings": {
-                "max_exceeded": "⚠️ Pomalidomide >4mg/day not recommended. Standard: 4mg days 1-21 every 28 days.",
-                "adjust_renal": "💡 No dose reduction for renal impairment, but monitor closely if CrCl <45.",
+                "max_exceeded": "Research input is above the configured pomalidomide range; the value is not clinically validated.",
+                "adjust_renal": "Renal-state assumptions must be reported with this hypothetical input.",
             }
         },
         "cyclophosphamide": {
@@ -208,8 +205,8 @@ class RegimenForm(BootstrapValidationMixin, forms.ModelForm):
             "standard": 300,
             "unit": "mg/m²",
             "warnings": {
-                "max_exceeded": "⚠️ Cyclophosphamide >500mg/m²/week increases myelosuppression. Typical: 300mg/m² weekly.",
-                "hydration": "💡 Ensure adequate hydration to prevent hemorrhagic cystitis. Consider mesna for high doses.",
+                "max_exceeded": "Research input is above the configured cyclophosphamide range; the value is not clinically validated.",
+                "hydration": "Supportive-care instructions are outside this research prototype's intended use.",
             }
         },
         "melphalan": {
@@ -218,8 +215,8 @@ class RegimenForm(BootstrapValidationMixin, forms.ModelForm):
             "standard": 9,  # oral dosing
             "unit": "mg/m²",
             "warnings": {
-                "high_dose": "⚠️ Melphalan >40mg/m² is high-dose (HDM) requiring stem cell support. Typical oral: 9mg/m² days 1-4.",
-                "myelosuppression": "⚠️ Melphalan causes profound myelosuppression. Monitor CBC closely.",
+                "high_dose": "Research input is above the configured melphalan exploratory threshold.",
+                "myelosuppression": "Clinical monitoring instructions are outside this research prototype's intended use.",
             }
         },
     }
@@ -279,20 +276,17 @@ class RegimenForm(BootstrapValidationMixin, forms.ModelForm):
         
         if has_imid and not has_dex:
             warnings.append(
-                "💡 IMiD regimens typically include dexamethasone for synergy. "
-                "Consider adding dexamethasone 40mg weekly (20mg for elderly)."
+                "The research regimen metadata omits a component used by the legacy heuristic rule."
             )
         
         if has_imid and has_pi and has_dara:
             warnings.append(
-                "⚠️ Quad-therapy (IMiD + PI + Daratumumab + Dex) is intensive. "
-                "Reserve for high-risk or aggressive disease. Monitor toxicity closely."
+                "This multi-component research scenario requires explicit assumptions and uncertainty reporting."
             )
         
         if has_imid:
             warnings.append(
-                "⚠️ IMiDs (lenalidomide, pomalidomide) increase VTE risk. "
-                "Thromboprophylaxis required: aspirin 81-325mg or LMWH for high-risk patients."
+                "Supportive-care and patient-management instructions are outside this research prototype."
             )
         
         # Store warnings for display
@@ -311,17 +305,17 @@ class RegimenForm(BootstrapValidationMixin, forms.ModelForm):
         # Validate intent matches components
         if intent == "maintenance" and "daratumumab" in components:
             self.add_warning(
-                "⚠️ Daratumumab maintenance is not standard. Consider lenalidomide maintenance (10-15mg days 1-21)."
+                "The selected intent/component combination is an unvalidated research scenario."
             )
         
         if intent == "maintenance" and "bortezomib" in components:
             self.add_warning(
-                "💡 Bortezomib maintenance is typically weekly SC at reduced dose (1.3mg/m² every 2 weeks)."
+                "The selected intent/component combination is an unvalidated research scenario."
             )
         
         if intent == "curative" and "cyclophosphamide" in components and "melphalan" not in components:
             self.add_warning(
-                "💡 For transplant-eligible patients, avoid melphalan before stem cell collection (stem cell toxicity)."
+                "Transplant sequencing is outside this research prototype's intended use."
             )
         
         # Add component warnings to form errors
@@ -340,18 +334,20 @@ class RegimenForm(BootstrapValidationMixin, forms.ModelForm):
 
 class ScenarioForm(BootstrapValidationMixin, forms.ModelForm):
     """
-    Enhanced editor form for scenarios with comprehensive clinical validation.
+    Editor form for synthetic and research scenarios.
     
     This form enforces meaningful data entry by:
     - Validating physiological ranges for all laboratory values
     - Enforcing logical relationships between clinical parameters
-    - Providing educational error messages with clinical rationale
+    - Reporting model-input validation without clinical instructions
     - Calculating difficulty scores automatically
     """
 
     recommended_regimens = forms.ModelMultipleChoiceField(
+        label="Associated exploratory regimen references",
         queryset=Regimen.objects.order_by("name"),
         required=False,
+        help_text="Catalog links for research comparison; not patient-specific selections.",
         widget=forms.SelectMultiple(attrs={"class": "form-select", "size": "8"}),
     )
 
@@ -436,6 +432,8 @@ class ScenarioForm(BootstrapValidationMixin, forms.ModelForm):
         expected_field = self.fields["expected_response"]
         expected_field.choices = [("", "Select response...")] + list(Assessment.RESPONSE_CHOICES)
         expected_field.widget.attrs.setdefault("class", "form-select")
+        expected_field.label = "Stored synthetic response label"
+        expected_field.help_text = "Optional scenario metadata; not a patient prediction."
         
         # Make calculated fields display-only
         self.fields["difficulty_score"].required = False
@@ -447,15 +445,15 @@ class ScenarioForm(BootstrapValidationMixin, forms.ModelForm):
         if age is not None:
             if age < 18:
                 raise forms.ValidationError(
-                    "⚠️ Age must be at least 18 years. Multiple myeloma typically affects adults aged 65+."
+                    "Age must be at least 18 years for this configured synthetic-scenario domain."
                 )
             if age > 120:
                 raise forms.ValidationError(
-                    "⚠️ Age must be 120 years or less. Please verify patient demographics."
+                    "Age must be 120 years or less for this configured synthetic-scenario domain."
                 )
             if age > 100:
                 self.add_warning(
-                    "⚠️ Age >100 is extremely rare. Please double-check this value."
+                    "Age >100 activates a synthetic-input verification flag."
                 )
         return age
     
@@ -465,17 +463,15 @@ class ScenarioForm(BootstrapValidationMixin, forms.ModelForm):
         if count is not None:
             if count < 1e6:
                 raise forms.ValidationError(
-                    "💡 Tumor cell count must be at least 1×10⁶ cells. "
-                    "Try: 1e6 for minimal disease, 1e9 for smoldering MM, 1e10 for newly diagnosed MM, 1e11+ for advanced disease."
+                    "Tumor-state input must be at least 1×10⁶ cells in this model."
                 )
             if count > 1e13:
                 raise forms.ValidationError(
-                    "⚠️ Tumor cell count exceeds physiological maximum (~10¹³ cells). "
-                    "This would exceed total body cell count. Please verify."
+                    "Tumor-state input exceeds the configured model maximum (10¹³ cells)."
                 )
             if count > 1e12:
                 self.add_warning(
-                    "⚠️ Very high tumor burden (>10¹² cells). Consider plasma cell leukemia or aggressive disease."
+                    "Very high model input (>10¹² cells); record the assumption and test sensitivity."
                 )
         return count
     
@@ -485,13 +481,11 @@ class ScenarioForm(BootstrapValidationMixin, forms.ModelForm):
         if rate is not None:
             if rate < 0.001:
                 raise forms.ValidationError(
-                    "💡 Growth rate too low (<0.001/day). "
-                    "Try: 0.005 for indolent, 0.01 for typical MM, 0.05 for aggressive disease."
+                    "Growth-rate input is below the configured model domain (0.001/day)."
                 )
             if rate > 0.1:
                 raise forms.ValidationError(
-                    "⚠️ Growth rate exceeds maximum observed in myeloma (>0.1/day). "
-                    "Even aggressive disease rarely exceeds 0.05/day."
+                    "Growth-rate input exceeds the configured model domain (0.1/day)."
                 )
         return rate
     
@@ -501,16 +495,15 @@ class ScenarioForm(BootstrapValidationMixin, forms.ModelForm):
         if crcl is not None:
             if crcl < 5:
                 raise forms.ValidationError(
-                    "⚠️ Creatinine clearance <5 mL/min indicates end-stage renal disease requiring dialysis. "
-                    "IMiD dosing must be significantly adjusted."
+                    "Creatinine clearance <5 mL/min is outside the configured research domain."
                 )
             if crcl < 30:
                 self.add_warning(
-                    "💡 Severe renal impairment (CrCl <30). Lenalidomide dose should not exceed 15mg every other day."
+                    "CrCl <30 activates an unvalidated renal-state constraint flag."
                 )
             elif crcl < 60:
                 self.add_warning(
-                    "💡 Moderate renal impairment (CrCl 30-60). Consider lenalidomide dose reduction to 10-15mg daily."
+                    "CrCl 30-60 activates an unvalidated renal-state watch flag."
                 )
         return crcl
     
@@ -520,11 +513,11 @@ class ScenarioForm(BootstrapValidationMixin, forms.ModelForm):
         if albumin is not None:
             if albumin < 1.0:
                 raise forms.ValidationError(
-                    "⚠️ Severe hypoalbuminemia (<1.0 g/dL) indicates critical illness or synthetic liver dysfunction."
+                    "Albumin input below 1.0 g/dL is outside the configured research domain."
                 )
             if albumin < 3.0:
                 self.add_warning(
-                    "💡 Low albumin (<3.0 g/dL) affects ISS staging and prognosis. Consider nutritional support."
+                    "Albumin <3.0 g/dL changes the model's derived risk context."
                 )
         return albumin
     
@@ -534,7 +527,7 @@ class ScenarioForm(BootstrapValidationMixin, forms.ModelForm):
         if b2m is not None:
             if b2m > 10.0:
                 self.add_warning(
-                    "⚠️ Very elevated β2M (>10 mg/L) indicates ISS stage III and poor prognosis."
+                    "β2M >10 mg/L activates a high-value input verification flag."
                 )
             elif b2m > 5.5:
                 self.add_warning(
@@ -548,11 +541,11 @@ class ScenarioForm(BootstrapValidationMixin, forms.ModelForm):
         if hgb is not None:
             if hgb < 6.0:
                 self.add_warning(
-                    "⚠️ Severe anemia (Hgb <6 g/dL). Transfusion support typically required."
+                    "Hgb <6 g/dL is outside the calibrated domain of this research prototype."
                 )
             elif hgb < 10.0:
                 self.add_warning(
-                    "💡 Anemia (Hgb <10 g/dL) is common in MM. Consider erythropoietin if symptomatic."
+                    "Hgb <10 g/dL activates a descriptive host-state flag."
                 )
         return hgb
     
@@ -562,11 +555,11 @@ class ScenarioForm(BootstrapValidationMixin, forms.ModelForm):
         if ca is not None:
             if ca > 14.0:
                 self.add_warning(
-                    "⚠️ Severe hypercalcemia (>14 mg/dL) requires immediate intervention: IV fluids, bisphosphonates, calcitonin."
+                    "Calcium >14 mg/dL is outside the configured research domain and requires source verification before simulation."
                 )
             elif ca > 11.5:
                 self.add_warning(
-                    "💡 Moderate hypercalcemia (>11.5 mg/dL). Ensure adequate hydration and consider bisphosphonates."
+                    "Calcium >11.5 mg/dL activates a descriptive host-state flag."
                 )
         return ca
     
@@ -585,7 +578,7 @@ class ScenarioForm(BootstrapValidationMixin, forms.ModelForm):
         if high_risk_count >= 2:
             self.add_warning(
                 "⚠️ Multiple high-risk cytogenetic abnormalities detected. "
-                "Consider quad-therapy (e.g., Dara-VRd) or clinical trial enrollment."
+                "This combination activates a high-risk research-context flag."
             )
         
         # Validate R-ISS staging consistency with labs
@@ -620,7 +613,7 @@ class ScenarioForm(BootstrapValidationMixin, forms.ModelForm):
             if ecog >= 3 and charlson <= 1:
                 self.add_warning(
                     "⚠️ High ECOG score (≥3) but low comorbidity index (≤1) is unusual. "
-                    "Consider if MM-related disability vs comorbidities."
+                    "The model cannot distinguish disease-related disability from comorbidity."
                 )
         
         # Calculate difficulty score if tumor parameters are present
@@ -695,7 +688,7 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
 
     PRESET_CHOICES = [(key, value["label"]) for key, value in PRESETS.items()]
 
-    preset = forms.ChoiceField(choices=PRESET_CHOICES, required=False, label="Treatment preset")
+    preset = forms.ChoiceField(choices=PRESET_CHOICES, required=False, label="Hypothetical model preset")
 
     creatinine_clearance = forms.FloatField(
         required=False,
@@ -710,14 +703,14 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
             }
         ),
         label="Creatinine clearance (ml/min)",
-        help_text="Renal function estimate driving lenalidomide dose adjustments (thresholds at 60 and 30 ml/min).",
+        help_text="User-provided renal-state input used by configured model rules.",
     )
     neuropathy_grade = forms.ChoiceField(
         required=False,
         choices=[(str(i), f"Grade {i}") for i in range(0, 4)],
         label="Peripheral neuropathy (grade)",
         widget=forms.Select(attrs={"class": "form-select"}),
-        help_text="CTCAE sensory neuropathy grade (0–3). Grades ≥2 restrict bortezomib to ≤1.0 mg/m².",
+        help_text="User-provided CTCAE grade (0–3); configured combinations may be outside the research domain.",
     )
     anc = forms.FloatField(
         required=False,
@@ -732,7 +725,7 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
             }
         ),
         label="Absolute neutrophil count (×10⁹/L)",
-        help_text="ANC <1.0 ×10⁹/L indicates clinically significant neutropenia and blocks simulation.",
+        help_text="ANC <1.0 ×10⁹/L is outside the configured research domain and blocks simulation.",
     )
     platelets = forms.FloatField(
         required=False,
@@ -747,13 +740,13 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
             }
         ),
         label="Platelets (×10⁹/L)",
-        help_text="Platelets <75 ×10⁹/L represent high bleeding risk and block simulation.",
+        help_text="Platelets <75 ×10⁹/L are outside the configured research domain and block simulation.",
     )
     pregnancy = forms.BooleanField(
         required=False,
         widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
         label="Pregnancy flagged",
-        help_text="Pregnancy is a contraindication for IMiDs; simulation runs are blocked when flagged.",
+        help_text="The configured research protocol excludes this input state and blocks simulation when flagged.",
     )
 
     baseline_tumor_cells = forms.FloatField(
@@ -769,7 +762,7 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
             }
         ),
         label="Initial tumor cells",
-        help_text="Estimated malignant plasma cell burden (cells). Newly diagnosed cases often present with 10⁹–10¹² cells.",
+        help_text="Heuristic initial malignant-cell model state (cells); not a measured patient count.",
     )
     baseline_healthy_cells = forms.FloatField(
         min_value=1e8,
@@ -784,7 +777,7 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
             }
         ),
         label="Initial healthy plasma cells",
-        help_text="Approximate pool of normal plasma cells (cells). Typical range ≈10¹¹–10¹².",
+        help_text="Heuristic initial healthy-cell model state (cells); not a validated marrow endpoint.",
     )
     lenalidomide_dose = forms.FloatField(
         min_value=0.0,
@@ -799,7 +792,7 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
             }
         ),
         label="Lenalidomide daily dose (mg)",
-        help_text="Standard induction dose: 25 mg/day (21 days on, 7 off). Preset tweaks limited to ±20%.",
+        help_text="Hypothetical exposure input constrained to the configured research range.",
     )
     bortezomib_dose = forms.FloatField(
         min_value=0.0,
@@ -814,7 +807,7 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
             }
         ),
         label="Bortezomib weekly dose (mg/m²)",
-        help_text="Typical SC dosing 1.3 mg/m² on specified days; slider allows controlled ±20% adjustment.",
+        help_text="Hypothetical bortezomib input constrained to the configured research range.",
     )
     daratumumab_dose = forms.FloatField(
         min_value=0.0,
@@ -829,7 +822,7 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
             }
         ),
         label="Daratumumab dose (mg/kg)",
-        help_text="Anti-CD38 monoclonal antibody loading dose 16 mg/kg; slider extends within investigational bounds.",
+        help_text="Hypothetical exposure input constrained to the configured research range.",
     )
     carfilzomib_dose = forms.FloatField(
         required=False,
@@ -846,7 +839,7 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
             }
         ),
         label="Carfilzomib dose (mg/m²)",
-        help_text="Second-generation proteasome inhibitor dosing often 20–56 mg/m²; slider keeps within modeled bounds.",
+        help_text="Hypothetical exposure input constrained to the configured research range.",
     )
     time_horizon = forms.FloatField(
         min_value=7.0,
@@ -861,7 +854,7 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
             }
         ),
         label="Simulation horizon (days)",
-        help_text="Length of the virtual treatment window (days). Limits ensure numerical stability and clinical realism.",
+        help_text="Length of the virtual model window (days); bounds support numerical stability only.",
     )
     cohort_size = forms.TypedChoiceField(
         choices=[(1, "1"), (10, "10"), (50, "50"), (200, "200")],
@@ -901,7 +894,7 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
             }
         ),
         label="Healthy growth rate (day⁻¹)",
-        help_text="Marrow recovery kinetics for healthy plasma cells. Typical range 0.01–0.02 day⁻¹.",
+        help_text="Heuristic recovery rate for the simplified healthy-cell state.",
     )
     interaction_strength = forms.FloatField(
         min_value=0.0,
@@ -1322,33 +1315,23 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
         # 🎓 Educational error messages with explanations
         if len_dose > 50:
             errors["lenalidomide_dose"] = ValidationError(
-                "Lenalidomide dose must be ≤ 50 mg/day. "
-                "💡 Why? Doses >50mg cause severe neutropenia (low white blood cells) in most patients. "
-                "Try the standard dose of 25mg/day used in clinical trials."
+                "Lenalidomide input exceeds the configured research maximum (50 mg/day)."
             )
         if bor_dose > 2:
             errors["bortezomib_dose"] = ValidationError(
-                "Bortezomib dose must be ≤ 2 mg/m² per week. "
-                "💡 Why? Higher doses dramatically increase peripheral neuropathy risk (nerve damage). "
-                "Standard dosing is 1.3 mg/m² which balances efficacy and safety."
+                "Bortezomib input exceeds the configured research maximum (2 mg/m²)."
             )
         if dara_dose > 20:
             errors["daratumumab_dose"] = ValidationError(
-                "Daratumumab dose must be ≤ 20 mg/kg. "
-                "💡 Why? Doses beyond 20mg/kg don't improve outcomes but increase infusion reactions. "
-                "Clinical trials use 16 mg/kg loading dose."
+                "Daratumumab input exceeds the configured research maximum (20 mg/kg)."
             )
         if carf_dose > 70:
             errors["carfilzomib_dose"] = ValidationError(
-                "Carfilzomib dose must be ≤ 70 mg/m². "
-                "💡 Why? Higher doses increase cardiovascular and renal toxicity risk. "
-                "Typical modeled dosing is ≤56 mg/m²."
+                "Carfilzomib input exceeds the configured research maximum (70 mg/m²)."
             )
         if time_horizon > 365:
             errors["time_horizon"] = ValidationError(
-                "Simulation horizon is limited to 365 days. "
-                "💡 Why? Long-term predictions become unreliable beyond 1 year due to disease evolution. "
-                "Try 180 days (6 months) for a realistic treatment cycle."
+                "Simulation horizon exceeds the configured research maximum (365 days)."
             )
         if tumor_growth > 0.1:
             errors["tumor_growth_rate"] = ValidationError(
@@ -1372,56 +1355,45 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
         if creatinine is not None:
             if creatinine < 30 and len_dose > 10:
                 errors["lenalidomide_dose"] = ValidationError(
-                    "Creatinine clearance <30 ml/min requires lenalidomide dose ≤10 mg. "
-                    "💡 Why? Kidneys eliminate lenalidomide—poor kidney function causes drug accumulation and toxicity. "
-                    "Dose reduction prevents life-threatening side effects."
+                    "The input combination crosses an unvalidated renal-state research constraint."
                 )
             elif creatinine < 60 and len_dose > 15:
                 errors["lenalidomide_dose"] = ValidationError(
-                    "Creatinine clearance <60 ml/min requires lenalidomide dose ≤15 mg. "
-                    "💡 Why? Moderately impaired kidneys need dose adjustment to avoid myelosuppression."
+                    "The input combination crosses an unvalidated renal-state research constraint."
                 )
 
         if neuropathy >= 2 and bor_dose > 1.0:
             errors["bortezomib_dose"] = ValidationError(
-                "Peripheral neuropathy grade ≥2 mandates bortezomib dose ≤1.0 mg/m². "
-                "💡 Why? Bortezomib causes nerve damage—continuing high doses with existing neuropathy leads to irreversible disability. "
-                "Dose reduction or drug holiday preserves quality of life."
+                "The input combination crosses an unvalidated neuropathy research constraint."
             )
 
         if anc is not None and anc < 1.0:
             raise ValidationError(
-                "Simulation blocked: absolute neutrophil count <1.0 ×10⁹/L (myelosuppression). "
-                "💡 Why? Dangerously low white blood cells mean infection risk is too high to start treatment. "
-                "Use growth factors (G-CSF) to raise counts first."
+                "Simulation blocked: ANC input is below the configured research domain."
             )
         if platelets is not None and platelets < 75:
             raise ValidationError(
-                "Simulation blocked: platelets <75 ×10⁹/L (thrombocytopenia). "
-                "💡 Why? Low platelets cause bleeding risk—treatment would worsen this. "
-                "Wait for platelet recovery >75 or use platelet transfusion."
+                "Simulation blocked: platelet input is below the configured research domain."
             )
 
         if len_dose > 40 and bor_dose > 1.5:
             raise ValidationError(
-                "Combined high doses of lenalidomide (>40 mg) and bortezomib (>1.5 mg/m²) may exceed safe toxicity bounds. "
-                "💡 Why? Both drugs suppress bone marrow—combining high doses compounds neutropenia and thrombocytopenia risk. "
-                "Reduce at least one drug to stay within safe margins."
+                "Combined inputs exceed the configured research domain."
             )
 
 
         if interaction_strength > 0.15:
-            self.warnings.append("Interaction strength above 0.15 implies potent synergy—monitor toxicity closely.")
+            self.warnings.append("Interaction strength above 0.15 activates an unvalidated model constraint flag.")
         if 35 < len_dose <= 40:
             self.warnings.append("Lenalidomide dose is near the upper investigational range (>35 mg).")
         if 1.3 < bor_dose <= 1.5:
-            self.warnings.append("Bortezomib dose exceeds standard 1.3 mg/m²—evaluate neuropathy risk.")
+            self.warnings.append("Bortezomib input exceeds the configured reference value.")
         if 16 < dara_dose <= 20:
-            self.warnings.append("Daratumumab dose beyond typical loading (16 mg/kg) may increase immunosuppression.")
+            self.warnings.append("Daratumumab input exceeds the configured reference value.")
         if 56 < carf_dose <= 70:
-            self.warnings.append("Carfilzomib dose above 56 mg/m² is high-intensity—monitor cardio-renal toxicity closely.")
+            self.warnings.append("Carfilzomib input exceeds the configured reference value.")
         if time_horizon >= 300:
-            self.warnings.append("Long simulation horizon (>300 days) may magnify numerical stiffness; consider shorter intervals.")
+            self.warnings.append("Long horizon (>300 days) may magnify numerical stiffness; report solver sensitivity.")
 
         if errors:
             raise ValidationError(errors)
@@ -1477,13 +1449,13 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
 
         return cleaned
 class SimulationAttemptForm(BootstrapValidationMixin, forms.ModelForm):
-    """Form used for clinician responses within a scenario."""
+    """Form used to record a learner's research hypothesis."""
 
     selected_regimen = forms.ModelChoiceField(
-        label="Chosen regimen",
+        label="Exploratory regimen hypothesis",
         queryset=Regimen.objects.all(),
         required=False,
-        help_text="Select the primary regimen you would start for this case.",
+        help_text="Optional catalog reference for a synthetic learning comparison.",
         widget=forms.Select(attrs={"class": "form-select"}),
     )
     predicted_response = forms.ChoiceField(
@@ -1496,13 +1468,13 @@ class SimulationAttemptForm(BootstrapValidationMixin, forms.ModelForm):
         min_value=0,
         max_value=100,
         initial=70,
-        help_text="How confident are you in this plan? (%)",
+        help_text="Confidence in this research hypothesis (%).",
         widget=forms.NumberInput(attrs={"class": "form-control", "min": "0", "max": "100"}),
     )
     notes = forms.CharField(
         widget=forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
         required=False,
-        label="Clinical reasoning",
+        label="Research reasoning",
     )
 
     class Meta:
