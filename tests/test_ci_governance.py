@@ -8,7 +8,6 @@ import tempfile
 from pathlib import Path
 from unittest import TestCase
 
-
 ROOT = Path(__file__).resolve().parents[1]
 SAFETY_SCRIPT = ROOT / "scripts" / "pre_push_research_safety_check.sh"
 REQUIRED_WRAPPER = ROOT / "scripts" / "ci" / "run_required_checks.sh"
@@ -44,6 +43,10 @@ class SafetyDiffModeTests(TestCase):
 
     def _run_safety(self, *, base: str | None = None, head: str | None = None):
         env = os.environ.copy()
+        # Each fixture chooses its own mode. Do not inherit the outer CI job's
+        # candidate refs when exercising the local staged-diff contract.
+        env.pop("BMYCURE4MM_SAFETY_BASE_REF", None)
+        env.pop("BMYCURE4MM_SAFETY_HEAD_REF", None)
         env.update(
             {
                 "BMYCURE4MM_SAFETY_SCAN_ONLY": "1",
