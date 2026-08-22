@@ -24,6 +24,7 @@ class CISettingsTests(SimpleTestCase):
             script = """
 from pathlib import Path
 from mmportal import settings_ci, settings_ci_deploy
+from mmportal import settings as base_settings
 
 assert settings_ci.SECRET_KEY == settings_ci.CI_SYNTHETIC_SECRET_KEY
 assert settings_ci.SECRET_KEY != "external-production-secret-must-not-be-imported"
@@ -34,6 +35,13 @@ assert settings_ci_deploy.SECURE_SSL_REDIRECT is True
 assert Path(settings_ci.DATABASES["default"]["NAME"]).is_relative_to(settings_ci.CI_TEMP_ROOT)
 assert Path(settings_ci.MEDIA_ROOT).is_relative_to(settings_ci.CI_TEMP_ROOT)
 assert Path(settings_ci.LOGS_DIR).is_relative_to(settings_ci.CI_TEMP_ROOT)
+file_handler_paths = [
+    Path(handler["filename"])
+    for handler in base_settings.LOGGING["handlers"].values()
+    if "filename" in handler
+]
+assert file_handler_paths
+assert all(path.is_relative_to(settings_ci.CI_TEMP_ROOT) for path in file_handler_paths)
 """
             result = subprocess.run(
                 [sys.executable, "-c", script],

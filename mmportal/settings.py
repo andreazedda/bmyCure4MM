@@ -239,12 +239,12 @@ LOGGING = {
         },
         "file": {
             "class": "logging.FileHandler",
-            "filename": os.path.join(BASE_DIR, "logs", "django.log"),
+            "filename": str(LOGS_DIR / "django.log"),
             "formatter": "verbose",
         },
         "celery_file": {
             "class": "logging.FileHandler",
-            "filename": os.path.join(BASE_DIR, "logs", "celery_tasks.log"),
+            "filename": str(LOGS_DIR / "celery_tasks.log"),
             "formatter": "verbose",
         },
     },
