@@ -7,9 +7,10 @@ import subprocess
 import sys
 
 # Django 4.2.30 is the final required 4.2-series baseline for issue #15. These
-# advisories have no 4.2 patch. They are low/medium, and their affected APIs are
+# advisories have no 4.2 patch. They are low/moderate, and their affected APIs are
 # absent from this repository; see docs/operations/DEPENDENCY_AUDIT_TRIAGE.md.
 TRIAGED_DJANGO_42_ADVISORIES = (
+    "PYSEC-2026-3717",
     "GHSA-923m-gv2p-w5qp",
     "GHSA-h7pc-vwp9-298g",
     "GHSA-8cjm-8mp7-r2xf",

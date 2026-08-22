@@ -1,343 +1,173 @@
 # Contributing to bmyCure4MM
 
-Thank you for your interest in contributing to bmyCure4MM! This document provides guidelines and instructions for contributing to the project.
+bmyCure4MM is an `E1_research_prototype`. Contributions must preserve the
+distinction between education, research simulation, validated prediction,
+causal inference, and clinical decision-making. Passing CI is necessary
+software evidence; it is not proof of model validity or clinical utility.
 
-## 🌟 Ways to Contribute
+## Privacy and safety boundary
 
-- 🐛 **Report bugs** - Submit detailed bug reports
-- ✨ **Suggest features** - Propose new functionality
-- 📖 **Improve documentation** - Fix typos, add examples, clarify concepts
-- 🔧 **Submit code** - Fix bugs or implement features
-- 🧪 **Add tests** - Improve test coverage
-- 🎨 **Enhance UI/UX** - Improve the web interface
+Never commit or attach:
 
-## 🚀 Getting Started
+- PHI, direct identifiers, patient records, or source clinical documents;
+- private research datasets or payloads from `local_private/`;
+- databases, media, logs, generated reports, or raw request payloads;
+- credentials, private keys, `.env` files, or production secrets.
 
-### 1. Fork and Clone
+Use synthetic fixtures and public sources only. Screenshots must contain
+synthetic data. Report security or privacy vulnerabilities through the private
+security-advisory link in the issue chooser, not a public issue.
+
+## Supported environment
+
+The supported Python versions are 3.11 and 3.12. `uv==0.12.3` is required,
+`uv.lock` is authoritative, and stale or unlocked dependency graphs are not
+accepted.
 
 ```bash
-# Fork the repository on GitHub, then:
-git clone https://github.com/YOUR_USERNAME/bmyCure4MM.git
-cd bmyCure4MM
-```
-
-### 2. Set Up Development Environment
-
-```bash
-# Bootstrap the required resolver and install the frozen graph
 python3.11 -m pip install uv==0.12.3
 uv sync --frozen --extra chemistry
-
-# Apply migrations
 uv run python manage.py migrate
-
-# Create superuser (optional)
-uv run python manage.py createsuperuser
 ```
 
-### 3. Install Redis (for Celery tasks)
+Do not install ad hoc packages to make a check pass. Dependency changes must be
+declared in `pyproject.toml`, resolved into `uv.lock`, and justified in the pull
+request.
 
-**macOS:**
-```bash
-brew install redis
-brew services start redis
-```
+## Pull-request-only workflow
 
-**Linux:**
-```bash
-sudo apt-get install redis-server
-sudo systemctl start redis
-```
-
-**Windows:**
-Download Redis from https://github.com/microsoftarchive/redis/releases
-
-### 4. Run Development Server
+`master` is governed through pull requests. Do not push directly to `master`.
 
 ```bash
-# Option 1: All services with one command
-./start_dev.sh
-
-# Option 2: Manual start (without Celery)
-export CELERY_TASK_ALWAYS_EAGER=True
-python manage.py runserver 8001
+git switch master
+git pull --ff-only origin master
+git switch -c <type>/<short-description>
 ```
 
-Visit http://127.0.0.1:8001 to see the app running.
+Keep the branch bounded to one linked issue. The pull-request template requires
+the source of truth, scope, risk classification, scientific and operational
+impact, migrations, numerical changes, privacy/authorization impact, test
+evidence, rollback, and known limitations.
 
-## 📝 Development Workflow
+## Local checks
 
-### 1. Create a Branch
+For a fast formatting, lint, and typing pass:
 
 ```bash
-git checkout -b feature/your-feature-name
-# or
-git checkout -b fix/bug-description
+bash scripts/ci/run_required_checks.sh quality
 ```
 
-Use prefixes:
-- `feature/` - New functionality
-- `fix/` - Bug fixes
-- `docs/` - Documentation changes
-- `test/` - Test additions/improvements
-- `refactor/` - Code refactoring
-
-### 2. Make Your Changes
-
-- Write clear, readable code
-- Follow existing code style (PEP 8 for Python)
-- Add docstrings to functions and classes
-- Update tests if needed
-- Update documentation if needed
-
-### 3. Test Your Changes
+For the complete provider-independent required gate, including Docker:
 
 ```bash
-# Run all tests
-python manage.py test
-
-# Run specific app tests
-python manage.py test simulator
-python manage.py test chemtools
-
-# Run with verbose output
-python manage.py test -v 2
-
-# Check code style (optional)
-ruff check .
+bash scripts/ci/run_required_checks.sh
 ```
 
-### 4. Commit Your Changes
+Before committing, stage only the intended files and run the local safety mode:
 
 ```bash
-git add .
-git commit -m "Brief description of changes"
+git add <intended-files>
+bash scripts/pre_push_research_safety_check.sh
+git diff --check
+git status --short
 ```
 
-**Good commit messages:**
-- `Add drug dosing validation to RegimenForm`
-- `Fix calculation error in PKPD model`
-- `Update installation docs for macOS`
-- `Add tests for patient twin functionality`
+The safety script scans the staged diff plus repository-wide tracked-file
+invariants. CI supplies explicit base/head SHAs and scans the exact candidate
+diff. Invalid refs fail closed. Matched sensitive content is not printed, and
+ignored `local_private/` content is never traversed.
 
-**Avoid:**
-- `Update`
-- `Fix stuff`
-- `Changes`
+Detailed phases, CI-only settings, the immutable action inventory, and
+diagnostic commands are documented in
+[Testing and M0-R CI Operations](docs/operations/TESTING.md).
 
-### 5. Push and Create Pull Request
+## Required GitHub status
+
+The mandatory workflow is `M0-R CI`. Its jobs are:
+
+- `repository-hygiene`;
+- `quality`;
+- `django-integrity` on Python 3.11 and 3.12;
+- `scientific-regression`;
+- `dependency-security`;
+- `container-build`;
+- final `required` aggregation.
+
+The stable branch-protection status is:
+
+```text
+M0-R CI / required
+```
+
+Do not merge a red, cancelled, skipped, or pending required status.
+
+## Change-specific evidence
+
+### Scientific model or numerical changes
+
+Declare changes to equations, mechanisms, coefficients, parameters, solver
+behavior, tolerances, units, observation semantics, epistemic language, and
+comparability. Include:
+
+- scientific question and public evidence provenance;
+- model/version decision;
+- deterministic before/after numerical diff;
+- uncertainty, validation, and falsification plan;
+- impact on historical runs and invalidation;
+- allowed and forbidden conclusions.
+
+Do not update the golden numerical baseline merely to make CI pass.
+
+### Schema and migrations
+
+Declare whether migrations are absent, included, or intentionally deferred.
+Every pull request must pass:
 
 ```bash
-git push origin feature/your-feature-name
+uv run python manage.py makemigrations --check --dry-run --settings=mmportal.settings_ci
 ```
 
-Then create a Pull Request on GitHub with:
-- Clear title describing the change
-- Description explaining what and why
-- Reference any related issues (`Fixes #123`)
-- Screenshots for UI changes
+Schema changes require forward evidence, cardinality/constraint checks where
+relevant, and a rollback path or an explicit irreversibility statement. Do not
+silently reinterpret stored scientific data.
 
-## 🧪 Testing Guidelines
+### Data, importers, and evidence
 
-### Writing Tests
+State dataset identity, schema version, provenance, units, missingness behavior,
+idempotence, and invalidation impact. Tests and examples must use synthetic or
+public fixtures. Claims and epistemic labels must remain consistent with the
+canonical intended-use governance.
 
-```python
-from django.test import TestCase
-from simulator.models import Scenario
+### Security and authorization
 
-class ScenarioTests(TestCase):
-    def setUp(self):
-        """Set up test fixtures."""
-        self.scenario = Scenario.objects.create(
-            title="Test Scenario",
-            patient_age=65,
-            # ... other required fields
-        )
-    
-    def test_difficulty_calculation(self):
-        """Test that difficulty score is calculated correctly."""
-        self.assertIsNotNone(self.scenario.difficulty_score)
-        self.assertGreaterEqual(self.scenario.difficulty_score, 0)
-        self.assertLessEqual(self.scenario.difficulty_score, 100)
+Describe object ownership, roles, denial behavior, secret handling, and artifact
+access. Authorization failures must not disclose whether another user's object
+exists. High-severity dependency findings cannot be suppressed without an
+explicit reviewed exception and documented mitigation.
+
+## Numerical-drift policy
+
+The governed command is:
+
+```bash
+uv run python -m scripts.check_numerical_baseline
 ```
 
-### Test Coverage
+Unexpected drift is blocking. An intentional change requires reviewed output
+evidence and a model-version decision before the fixture can change. CI success
+does not convert a simulated, heuristic, literature-informed, or hypothetical
+result into an externally validated result.
 
-- Aim for >80% coverage on new code
-- Test edge cases and error conditions
-- Include integration tests for complex features
-- Test form validation thoroughly
+## Commits and review
 
-## 📖 Documentation Guidelines
+Use concise English commit messages such as:
 
-### Code Documentation
-
-```python
-def calculate_clearance(creatinine, age, weight, is_female=False):
-    """
-    Calculate creatinine clearance using Cockcroft-Gault equation.
-    
-    Args:
-        creatinine (float): Serum creatinine in mg/dL
-        age (int): Patient age in years
-        weight (float): Body weight in kg
-        is_female (bool): True if patient is female
-        
-    Returns:
-        float: Creatinine clearance in mL/min
-        
-    Raises:
-        ValueError: If any parameter is out of valid range
-        
-    Example:
-        >>> calculate_clearance(1.2, 65, 70, is_female=False)
-        72.5
-    """
-    if creatinine <= 0 or age <= 0 or weight <= 0:
-        raise ValueError("Parameters must be positive")
-    
-    clearance = ((140 - age) * weight) / (72 * creatinine)
-    if is_female:
-        clearance *= 0.85
-    
-    return clearance
+```text
+ci: add mandatory M0-R quality gate
+test: preserve public ChemTools privacy contract
+docs: document numerical drift review
 ```
 
-### Markdown Documentation
-
-- Use clear headings and structure
-- Include code examples
-- Add screenshots for UI features
-- Keep language simple and accessible
-- Use bullet points and tables for clarity
-
-## 🎨 Code Style
-
-### Python Style (PEP 8)
-
-```python
-# Good
-def calculate_auc(concentrations, times):
-    """Calculate area under curve using trapezoidal rule."""
-    return np.trapz(concentrations, times)
-
-# Avoid
-def calc_auc(c,t): return np.trapz(c,t)
-```
-
-### Django Best Practices
-
-- Use model validation in `clean()` methods
-- Keep views simple, move logic to models/utils
-- Use class-based views when appropriate
-- Follow REST conventions for API endpoints
-
-### JavaScript Style
-
-```javascript
-// Good
-const fetchSimulationResults = async (simulationId) => {
-    const response = await fetch(`/api/simulations/${simulationId}/`);
-    return response.json();
-};
-
-// Avoid
-function fetch_sim_res(id){return fetch('/api/simulations/'+id+'/')}
-```
-
-## 🐛 Reporting Bugs
-
-### Before Submitting
-
-1. Check existing issues to avoid duplicates
-2. Verify it's reproducible on latest version
-3. Gather relevant information
-
-### Bug Report Template
-
-```markdown
-**Description**
-Clear description of the bug.
-
-**To Reproduce**
-Steps to reproduce:
-1. Go to '...'
-2. Click on '...'
-3. See error
-
-**Expected Behavior**
-What should happen.
-
-**Actual Behavior**
-What actually happens.
-
-**Environment**
-- OS: [e.g., macOS 14.0]
-- Python: [e.g., 3.11.5]
-- Django: [e.g., 4.2.7]
-- Browser: [e.g., Chrome 120]
-
-**Additional Context**
-Screenshots, logs, error messages, etc.
-```
-
-## ✨ Feature Requests
-
-### Feature Request Template
-
-```markdown
-**Problem Statement**
-What problem does this solve?
-
-**Proposed Solution**
-How should it work?
-
-**Alternatives Considered**
-What other approaches were considered?
-
-**Use Cases**
-Who would benefit and how?
-
-**Additional Context**
-Mockups, references, examples, etc.
-```
-
-## 📚 Resources
-
-- **Documentation**: `/docs/` folder
-- **Development Guide**: `/docs/development/DEVELOPMENT.md`
-- **API Docs**: `/docs/api.md`
-- **Mathematical Models**: `/docs/features/MATHEMATICAL_MODELS_DOCUMENTATION.md`
-
-## 🤝 Code of Conduct
-
-### Our Pledge
-
-We are committed to providing a welcoming and inspiring community for all. We pledge to:
-- Use welcoming and inclusive language
-- Respect differing viewpoints and experiences
-- Accept constructive criticism gracefully
-- Focus on what's best for the community
-- Show empathy towards others
-
-### Unacceptable Behavior
-
-- Harassment or discriminatory language
-- Personal attacks or trolling
-- Publishing others' private information
-- Other unprofessional conduct
-
-## 📧 Contact
-
-For questions or discussions:
-- **Issues**: Use GitHub Issues for bugs and features
-- **Security**: Report security issues privately (see SECURITY.md)
-- **General**: Start a discussion in GitHub Discussions
-
-## 📄 License
-
-By contributing, you agree that your contributions will be licensed under the MIT License.
-
----
-
-**Thank you for contributing to bmyCure4MM!** 🎉
+Resolve review conversations, keep the branch current with `master`, and rerun
+the safety gate after the final staged change. Prefer a reversible rollback and
+state residual risk honestly.

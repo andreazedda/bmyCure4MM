@@ -29,7 +29,7 @@ flowchart TD
 3. **Compila i campi minimi:**
    - Nome: `Mario`
    - Cognome: `Rossi`
-   - Data di nascita: `1960-01-15`
+   - Synthetic age band: `60-69 years`
    - Sesso: `M`
 4. **Salva**
 

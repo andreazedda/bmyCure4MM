@@ -10,8 +10,8 @@ from django.contrib.messages import constants as django_messages
 
 # Build paths inside the project like this: BASE_DIR / "subdir".
 BASE_DIR = Path(__file__).resolve().parent.parent
-LOGS_DIR = BASE_DIR / "logs"
-LOGS_DIR.mkdir(exist_ok=True)
+LOGS_DIR = Path(os.environ.get("DJANGO_LOGS_ROOT", BASE_DIR / "logs"))
+LOGS_DIR.mkdir(parents=True, exist_ok=True)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
@@ -315,4 +315,3 @@ CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", CELERY_BROKER_UR
 # Set CELERY_TASK_ALWAYS_EAGER=1 in environment or uncomment below:
 # CELERY_TASK_ALWAYS_EAGER = True
 # CELERY_TASK_EAGER_PROPAGATES = True
-

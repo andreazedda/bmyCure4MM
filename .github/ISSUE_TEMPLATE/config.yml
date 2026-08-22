@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Private security or privacy report
+    url: https://github.com/andreazedda/bmyCure4MM/security/advisories/new
+    about: Report vulnerabilities privately. Never include PHI, patient data, credentials, or private payloads in a public issue.

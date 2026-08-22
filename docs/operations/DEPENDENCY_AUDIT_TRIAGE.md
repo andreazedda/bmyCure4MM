@@ -1,15 +1,19 @@
 # Dependency Audit Triage
 
-Audit date: 2026-08-13
+Audit date: 2026-08-22
 
 The broad legacy environment had 161 findings in 25 packages. The canonical
-locked environment removes 155 findings. `pip-audit` reports six remaining
-Django advisories; all are low or medium severity and none has a Django 4.2
-patch. Issue #15 requires one consistent Django 4.2 series, so Django is pinned
-to the final 4.2.30 release and each exception is narrowly allowlisted by ID.
+locked environment removed 155 findings. The 2026-08-22 audit also identified
+four high-severity `sqlparse` advisories; `sqlparse` is therefore upgraded to
+the patched `0.6.0` release. `pip-audit` reports seven remaining Django
+advisories; all are low or moderate severity, none has a Django 4.2 patch, and
+their affected APIs are absent. Issue #15 requires one consistent Django 4.2
+series, so Django remains pinned to the final 4.2.30 release and each exception
+is narrowly allowlisted by ID pending the governed Django 5.2 migration.
 
 | Advisory | Severity | Affected surface | Repository evidence / mitigation |
 | --- | --- | --- | --- |
+| [CVE-2026-15830](https://www.djangoproject.com/weblog/2026/aug/04/security-releases/) (`PYSEC-2026-3717`) | moderate | deeply nested GeoDjango `GEOMETRYCOLLECTION` parsing | `django.contrib.gis`, spatial fields, GEOS, and GDAL are neither declared nor imported. |
 | [GHSA-923m-gv2p-w5qp](https://github.com/advisories/GHSA-923m-gv2p-w5qp) | low | `has_vary_header` whitespace caching | No project call and no Django cache middleware. |
 | [GHSA-h7pc-vwp9-298g](https://github.com/advisories/GHSA-h7pc-vwp9-298g) | low | signed-cookie salt collision | Database sessions are used; no signed-cookie session backend. |
 | [GHSA-8cjm-8mp7-r2xf](https://github.com/advisories/GHSA-8cjm-8mp7-r2xf) | low | `UpdateCacheMiddleware` header handling | Cache update middleware is absent. |
@@ -25,7 +29,10 @@ CI runners or single-user development machines; untrusted users must not share
 that host. Remove the exception as soon as pytest-playwright supports patched
 pytest 9.
 
-There are no ignored critical or high findings. `scripts/audit_dependencies.py`
+There are no ignored critical or high findings. The high-severity
+[`sqlparse` ReDoS advisory](https://github.com/andialbrecht/sqlparse/security/advisories/GHSA-prg7-hcfm-mfcr)
+and the other `sqlparse` findings are remediated by the locked `0.6.0` release.
+`scripts/audit_dependencies.py`
 ignores only these exact identifiers, so any new advisory fails CI. A future
 Django 5.2 migration must remove the Django exceptions and rerun authorization,
 migration, template, numerical, and output-language regression suites.

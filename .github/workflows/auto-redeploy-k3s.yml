@@ -12,10 +12,11 @@ permissions:
 jobs:
   redeploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     if: github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Deploy to k3s cluster
         env:
