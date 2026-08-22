@@ -1,19 +1,10 @@
-"""End-to-end smoke test against the running dev server."""
-import requests
+"""Manual end-to-end smoke check against a running development server."""
+
 from html.parser import HTMLParser
 
+import requests
+
 BASE = "http://127.0.0.1:8000"
-session = requests.Session()
-
-# 1) Anon should be redirected
-routes_anon = ["/", "/patients/", "/patients/new/"]
-for r in routes_anon:
-    resp = session.get(BASE + r, allow_redirects=False)
-    assert resp.status_code in (301, 302), f"FAIL: {r} returned {resp.status_code}"
-    print(f"  [PASS] Anon {r} -> redirect {resp.status_code}")
-
-# 2) Login
-login_page = session.get(BASE + "/admin/login/")
 
 class CSRFParser(HTMLParser):
     csrf = ""
@@ -22,35 +13,52 @@ class CSRFParser(HTMLParser):
         if d.get("name") == "csrfmiddlewaretoken":
             self.csrf = d.get("value", "")
 
-p = CSRFParser()
-p.feed(login_page.text)
-resp = session.post(
-    BASE + "/admin/login/",
-    data={
-        "csrfmiddlewaretoken": p.csrf,
-        "username": "admin",
-        "password": "admin",
-        "next": "/",
-    },
-    headers={"Referer": BASE + "/admin/login/"},
-)
-assert resp.status_code in (200, 302), f"Login failed: {resp.status_code}"
-print("  [PASS] Admin login OK")
 
-# 3) Authenticated routes
-authed_routes = [
-    ("/", 200),
-    ("/patients/", 200),
-    ("/patients/new/", 200),
-    ("/regimens/", 200),
-    ("/regimens/new/", 200),
-    ("/chem/", 200),
-    ("/docs/", 200),
-]
-for path, expected in authed_routes:
-    resp = session.get(BASE + path)
-    assert resp.status_code == expected, f"FAIL: {path} returned {resp.status_code}"
-    print(f"  [PASS] {path} -> {resp.status_code}")
+def main() -> None:
+    session = requests.Session()
 
-print()
-print("All end-to-end checks passed!")
+    routes_anon = ["/", "/patients/", "/patients/new/"]
+    for route in routes_anon:
+        response = session.get(BASE + route, allow_redirects=False)
+        assert response.status_code in (301, 302), (
+            f"FAIL: {route} returned {response.status_code}"
+        )
+        print(f"  [PASS] Anon {route} -> redirect {response.status_code}")
+
+    login_page = session.get(BASE + "/admin/login/")
+    parser = CSRFParser()
+    parser.feed(login_page.text)
+    response = session.post(
+        BASE + "/admin/login/",
+        data={
+            "csrfmiddlewaretoken": parser.csrf,
+            "username": "admin",
+            "password": "admin",
+            "next": "/",
+        },
+        headers={"Referer": BASE + "/admin/login/"},
+    )
+    assert response.status_code in (200, 302), f"Login failed: {response.status_code}"
+    print("  [PASS] Admin login OK")
+
+    authed_routes = [
+        ("/", 200),
+        ("/patients/", 200),
+        ("/patients/new/", 200),
+        ("/regimens/", 200),
+        ("/regimens/new/", 200),
+        ("/chem/", 200),
+        ("/docs/", 200),
+    ]
+    for route, expected in authed_routes:
+        response = session.get(BASE + route)
+        assert response.status_code == expected, (
+            f"FAIL: {route} returned {response.status_code}"
+        )
+        print(f"  [PASS] {route} -> {response.status_code}")
+
+    print("\nAll end-to-end checks passed!")
+
+
+if __name__ == "__main__":
+    main()

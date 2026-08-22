@@ -1,0 +1,56 @@
+name: Bug report
+description: Report a reproducible software defect using synthetic or public data only.
+title: "[BUG] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not submit PHI, direct identifiers, patient records, credentials,
+        private datasets, databases, logs containing private content, or source
+        clinical documents. Use synthetic minimal examples.
+  - type: textarea
+    id: description
+    attributes:
+      label: Defect
+      description: What happened, and what should have happened?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Synthetic reproduction
+      description: Provide deterministic steps and a synthetic fixture.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Commit SHA, Python version, uv version, OS, and relevant configuration without secrets.
+    validations:
+      required: true
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Suspected impact
+      options:
+        - Software behavior only
+        - Numerical or scientific output
+        - Schema or migration
+        - Privacy, security, or authorization
+        - Documentation or evidence claim
+        - Unknown
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Privacy-safe evidence
+      description: Include concise errors or screenshots made only with synthetic data.
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy confirmation
+      options:
+        - label: I confirm that this issue contains no private patient data, direct identifiers, credentials, or private payloads.
+          required: true

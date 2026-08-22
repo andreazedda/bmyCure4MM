@@ -26,8 +26,13 @@ COPY . .
 # Create necessary directories
 RUN mkdir -p logs media static
 
-# Collect static files (for production)
-RUN python manage.py collectstatic --noinput
+# Collect static files without baking a build-time log or fallback secret into
+# the image. These values exist only for this deterministic build command.
+RUN DJANGO_DEBUG=0 \
+    DJANGO_SECRET_KEY=container-build-only-synthetic-secret \
+    DJANGO_LOGS_ROOT=/tmp/bmycure4mm-build-logs \
+    python manage.py collectstatic --noinput \
+    && rm -rf /tmp/bmycure4mm-build-logs
 
 EXPOSE 8001
 

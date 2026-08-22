@@ -1,0 +1,74 @@
+name: Scientific model change
+description: Propose a governed change to equations, mechanisms, parameters, or scientific interpretation.
+title: "[MODEL] "
+labels: ["track:scientific"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use public literature and synthetic examples only. Never submit PHI,
+        patient records, private datasets, credentials, or source clinical documents.
+  - type: textarea
+    id: question
+    attributes:
+      label: Scientific question
+    validations:
+      required: true
+  - type: textarea
+    id: mechanism
+    attributes:
+      label: Equations or mechanism
+      description: Define the proposed mechanism, equations, assumptions, and boundaries.
+    validations:
+      required: true
+  - type: textarea
+    id: inputs
+    attributes:
+      label: Inputs, outputs, and units
+    validations:
+      required: true
+  - type: textarea
+    id: provenance
+    attributes:
+      label: Parameter and evidence provenance
+      description: Cite public sources and distinguish measured, derived, literature-informed, and hypothetical values.
+    validations:
+      required: true
+  - type: textarea
+    id: comparators
+    attributes:
+      label: Comparators and baselines
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: Validation and falsification plan
+      description: Define tests, tolerances, failure criteria, and evidence that would reject the change.
+    validations:
+      required: true
+  - type: textarea
+    id: uncertainty
+    attributes:
+      label: Uncertainty and non-identifiability
+    validations:
+      required: true
+  - type: textarea
+    id: versioning
+    attributes:
+      label: Version, comparability, and invalidation impact
+    validations:
+      required: true
+  - type: textarea
+    id: claims
+    attributes:
+      label: Allowed and forbidden conclusions
+    validations:
+      required: true
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy confirmation
+      options:
+        - label: I confirm that this proposal uses no private patient data, direct identifiers, credentials, or private payloads.
+          required: true

@@ -220,11 +220,14 @@ class RetryJobViewTests(TestCase):
 class ChemToolsSecurityTests(TestCase):
     """Test security and access control for chemtools."""
     
-    def test_tools_home_requires_login(self) -> None:
-        """Test that tools home requires authentication."""
+    def test_public_tools_home_does_not_disclose_private_jobs(self) -> None:
+        """The public landing page must not disclose another user's jobs."""
+        owner = get_user_model().objects.create_user("owner", password="pass123")
+        models.ChemJob.objects.create(kind=models.ChemJob.SIM, input_a="PRIVATE-MARKER", user=owner)
+
         response = self.client.get(reverse("chemtools:tools_home"))
-        self.assertEqual(response.status_code, 302)
-        self.assertIn("/admin/login/", response.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "PRIVATE-MARKER")
         
     def test_user_can_only_see_own_jobs(self) -> None:
         """Test that users can only see their own jobs."""

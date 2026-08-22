@@ -1,6 +1,7 @@
 .env
 .env.*
 !.env.example
+.git
 
 # Venvs
 .venv
@@ -19,6 +20,13 @@ __pycache__
 # Logs & runtime data
 logs
 *.log
+artifacts
+data
+local_private
+outputs
+uploads
+pipelines/data/logs
+pipelines/data/outputs
 
 # Local DB/media/static artifacts
 *.sqlite3

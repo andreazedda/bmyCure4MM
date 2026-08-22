@@ -1,0 +1,59 @@
+name: Implementation or change request
+description: Propose a bounded implementation, operational, documentation, or governance change.
+title: "[CHANGE] "
+body:
+  - type: markdown
+    attributes:
+      value: Do not include PHI, patient data, credentials, private datasets, or source clinical documents.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and source of truth
+      description: Define the problem and cite the governing issue, contract, or document.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope and non-goals
+      description: State what is included and explicitly excluded.
+    validations:
+      required: true
+  - type: checkboxes
+    id: classification
+    attributes:
+      label: Change classification
+      options:
+        - label: Code
+        - label: Schema or migration
+        - label: Data or provenance
+        - label: Evidence or intended-use claim
+        - label: Security, privacy, or authorization
+        - label: Documentation or operations
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance and falsification criteria
+      description: Define measurable completion and stop conditions.
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: Validation plan
+      description: Include tests, numerical comparison, migration evidence, and privacy checks as applicable.
+    validations:
+      required: true
+  - type: textarea
+    id: rollback
+    attributes:
+      label: Rollback and residual risk
+    validations:
+      required: true
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy confirmation
+      options:
+        - label: I confirm that this request contains no private patient data, direct identifiers, credentials, or private payloads.
+          required: true

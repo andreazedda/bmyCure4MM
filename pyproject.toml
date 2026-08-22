@@ -23,7 +23,7 @@ dependencies = [
   "requests==2.33.0",
   "scipy==1.13.1",
   # Security floors for transitive runtime dependencies.
-  "sqlparse==0.5.4",
+  "sqlparse==0.6.0",
   "urllib3==2.7.0",
 ]
 
