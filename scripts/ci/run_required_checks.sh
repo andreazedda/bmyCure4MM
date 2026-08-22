@@ -114,12 +114,28 @@ run_container_build() {
     --label "org.opencontainers.image.revision=$git_sha" \
     --tag "$image_tag" \
     .
-  test "$(docker image inspect --format '{{ index .Config.Labels "org.opencontainers.image.revision" }}' "$image_tag")" = "$git_sha"
+  local actual_revision actual_source
+  actual_revision="$(docker image inspect --format '{{ index .Config.Labels "org.opencontainers.image.revision" }}' "$image_tag")"
+  actual_source="$(docker image inspect --format '{{ index .Config.Labels "org.opencontainers.image.source" }}' "$image_tag")"
+  [[ "$actual_revision" == "$git_sha" ]] || {
+    echo "ERROR: container revision label does not match the candidate commit." >&2
+    return 1
+  }
+  [[ "$actual_source" == "$source_label" ]] || {
+    echo "ERROR: container source label does not match the canonical repository." >&2
+    return 1
+  }
   docker run --rm --entrypoint sh "$image_tag" -c '
-    test ! -e /app/local_private
-    test ! -e /app/db.sqlite3
-    test ! -e /app/.env
-    test -z "$(find /app/media /app/logs -type f -print -quit)"
+    for forbidden_path in /app/local_private /app/db.sqlite3 /app/.env; do
+      if test -e "$forbidden_path"; then
+        echo "ERROR: prohibited path exists in the container image." >&2
+        exit 1
+      fi
+    done
+    if test -n "$(find /app/media /app/logs -type f -print -quit)"; then
+      echo "ERROR: generated media or log content exists in the container image." >&2
+      exit 1
+    fi
   '
   docker run --rm \
     --entrypoint python \
