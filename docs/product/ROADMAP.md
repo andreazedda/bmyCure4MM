@@ -4,7 +4,7 @@ status: CANONICAL_STRATEGY
 owner: Andrea Zedda
 audience: maintainers, contributors and collaborators
 last_verified_at: 2026-08-24
-last_verified_git_sha: bf097810b337dc6b766cda04497005670cd96513
+last_verified_git_sha: a33418fb8ae9cb9fd05832dd9bc1cb0778e08533
 canonical_execution_tracker: https://github.com/andreazedda/bmyCure4MM/issues/31
 ---
 
@@ -16,12 +16,10 @@ GitHub issues and milestones are the execution control plane. This page explains
 
 ```text
 COMPLETED:
-#11 → #12 → #15 → #19
+#11 → #12 → #15 → #19 → #69 → #70
 
 CURRENT:
 #14 documentation/source of truth
-+ #69 immediate dependency-advisory remediation
-→ #70 supported Django 5.2 LTS baseline
 → #13 mandatory CI and PR governance
 → #23 minimum QA invariants
 → #26 close M0-R
@@ -30,9 +28,9 @@ NEXT:
 #32 → #33 → #34 → #35 → #36 → #18
 ```
 
-## Current supply-chain condition
+## Current dependency and framework baseline
 
-The deterministic lock currently pins unsupported Django 4.2.30 and sqlparse 0.5.4. Newly disclosed advisory data makes the dependency audit red. Issue `#69` owns the immediate sqlparse upgrade and exact triage; issue `#70` owns the durable Django 5.2 LTS migration. This condition is independent of documentation PR `#68`, which did not modify dependency files.
+The deterministic lock now uses Django 5.2.17 LTS and sqlparse 0.6.0. Merged PRs `#71` and `#72` removed the current sqlparse findings and all Django 4.2 advisory exceptions while preserving Python 3.11/3.12, numerical and container evidence. The remaining exact development-tool advisory decision is documented in the dependency triage record.
 
 ## Milestones
 
@@ -49,7 +47,7 @@ The deterministic lock currently pins unsupported Django 4.2.30 and sqlparse 0.5
 
 ## Controlled parallelism
 
-Private read-only source verification for M1 issue `#32` may prepare while M0-R closes. It may not promote a new canonical dataset, calibration, what-if result or project claim before protected documentation, dependency, CI and QA gates exist.
+Private read-only source verification for M1 issue `#32` may prepare while M0-R closes. It may not promote a new canonical dataset, calibration, what-if result or project claim before protected documentation, CI and QA gates exist.
 
 ## Decision rule
 
