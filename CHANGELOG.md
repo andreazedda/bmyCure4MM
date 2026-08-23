@@ -10,7 +10,7 @@ All current release claims are governed by [`docs/governance/CLAIMS_POLICY.md`](
 - Separated current verified architecture from the target virtual-laboratory architecture.
 - Added a current model-status catalog with formulas, units, examples, code mappings and falsification boundaries.
 - Added source-of-truth and documentation-governance policies plus a corpus inventory.
-- Reconciled GitHub roadmap/tracker state and Notion project state at canonical `master` `bf097810...`.
+- Reconciled GitHub roadmap/tracker state and Notion project state against canonical `master` `a33418fb...`.
 - Added strict MkDocs validation to documentation pull requests without deploying PR content.
 
 ### Scientific identity and reproducibility
@@ -20,7 +20,10 @@ All current release claims are governed by [`docs/governance/CLAIMS_POLICY.md`](
 - Added immutable research run manifests and a governed model registry.
 - Added typed scientific payload contracts, artifact integrity checks, direct-comparability rules and append-only invalidation.
 - Locked the dependency graph with `uv.lock`, Python 3.11/3.12 support and numerical/repository/dependency checks.
-- Recorded newly disclosed Django/sqlparse advisories as a blocking current condition under issues `#69` and `#70`; no dependency fix or audit bypass is claimed by this documentation change.
+- Upgraded sqlparse to 0.6.0 and recorded exact dependency-audit decisions through merged PR `#71`.
+- Migrated the unsupported Django 4.2 baseline to Django 5.2.17 LTS through merged PR `#72`.
+- Removed all Django 4.2 advisory exceptions; ordinary/deploy checks, disposable migrations, authorization-sensitive regressions, dependency audit, numerical baseline and Docker evidence passed.
+- Added a stable protected `required` dependency/reproducibility result after detecting a mismatch between branch protection and workflow status names.
 
 ### Intended use and language
 
