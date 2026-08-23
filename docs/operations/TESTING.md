@@ -49,7 +49,7 @@ Documentation PR `#68` added strict MkDocs validation on pull requests without d
 
 ## Current recorded PR evidence
 
-At PR `#68` head `b8bc4abc...`:
+At PR `#68` head `3bc54788...`:
 
 ```text
 strict MkDocs: PASS
