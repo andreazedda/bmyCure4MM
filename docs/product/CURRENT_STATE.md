@@ -81,7 +81,7 @@ Known authorization gaps are tracked in GitHub issue `#8`. Admin access or tempo
 
 GitHub Actions already exist for dependency/reproducibility checks, documentation deployment, secret scanning, image build/publish, UI screenshots and automatic redeployment.
 
-On documentation PR `#68`, current evidence at head `b8bc4abc...` is:
+On documentation PR `#68`, current evidence at head `3bc54788...` is:
 
 ```text
 strict MkDocs build: PASS
