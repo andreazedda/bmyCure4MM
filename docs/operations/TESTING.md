@@ -4,7 +4,7 @@ status: CURRENT_PARTIAL
 owner: Andrea Zedda
 audience: contributors and reviewers
 last_verified_at: 2026-08-24
-last_verified_git_sha: bf097810b337dc6b766cda04497005670cd96513
+last_verified_git_sha: a33418fb8ae9cb9fd05832dd9bc1cb0778e08533
 ---
 
 # Testing and verification
@@ -43,29 +43,43 @@ Use the dependency groups documented in `DEPENDENCIES.md`; core-only and optiona
 
 ## Current GitHub Actions
 
-Current workflows cover dependency/reproducibility checks, docs deployment, secret scanning, image workflows, UI screenshots and redeployment. Issue `#13` will rationalize them into one stable protected aggregate gate and add exact pull-request safety behavior.
+Current workflows cover dependency/reproducibility checks, strict documentation validation, secret scanning, Django 5.2 compatibility, image workflows, UI screenshots and redeployment.
 
-Documentation PR `#68` added strict MkDocs validation on pull requests without deploying PR content. This is a bounded prerequisite for `#13`, not the final aggregate CI design.
+Merged PR `#71` added the stable protected `required` result over locked quality, the Python 3.11/3.12 core matrix and Docker build. This repaired a verified mismatch between branch protection and workflow status names.
 
-## Current recorded PR evidence
+Issue `#13` remains open because the final CI contract still requires:
 
-At PR `#68` head `3bc54788...`:
+- immutable commit-SHA pinning for external Actions;
+- exact base/head pull-request safety mode;
+- documentation status/path checks;
+- PR and issue templates;
+- CODEOWNERS;
+- privacy-safe artifact retention;
+- final workflow rationalization and branch-protection re-read.
+
+## Current recorded baseline evidence
+
+Merged PRs `#71` and `#72` recorded:
 
 ```text
-strict MkDocs: PASS
-secret scan: PASS
-Ruff: PASS
-format: PASS
-mypy: PASS
+Django 5.2.17 and sqlparse 0.6.0 identity: PASS
+uv lock --check and frozen sync: PASS
+dependency audit: PASS
+Ruff, format and mypy: PASS
 repository hygiene: PASS
-numerical baseline: PASS / unchanged
+ordinary and synthetic deploy checks: PASS
+migration drift: zero
+disposable migrations: PASS
 Python 3.11 core check/tests: PASS
 Python 3.12 core check/tests: PASS
+authorization-sensitive compatibility subset: PASS
+numerical baseline: PASS / unchanged
+Secret Scan: PASS
 Docker locked build: PASS
-dependency audit: FAIL
+protected required result: PASS
 ```
 
-The audit failure is not caused by the documentation diff. It identifies newly disclosed advisories in the unchanged canonical dependency graph and is governed by `#69` and `#70`.
+Documentation PR `#68` separately established strict MkDocs validation on pull requests. It must be revalidated on the current master baseline before merge.
 
 ## Research safety gate
 
@@ -80,15 +94,15 @@ The numerical baseline detects unreviewed output drift. A baseline update requir
 - an invalidation decision for prior runs;
 - updated documentation when endpoint interpretation changes.
 
-The current documentation PR produced no numerical differences.
+The dependency and Django 5.2 migrations produced no numerical differences.
 
 ## Dependency security
 
-- `#69` owns immediate sqlparse remediation and exact current advisory triage.
-- `#70` owns migration from unsupported Django 4.2 to Django 5.2 LTS.
-- a temporary advisory exception must be exact, evidence-backed, owned and expiring;
+- canonical runtime: Django 5.2.17 LTS and sqlparse 0.6.0;
+- no Django advisory exception remains in the audit wrapper;
+- one exact development-only pytest advisory decision remains documented;
 - high findings cannot be globally ignored;
-- shared/production promotion remains prohibited on an unsupported or untriaged framework baseline.
+- a green dependency audit does not by itself establish production security.
 
 ## Test data
 
