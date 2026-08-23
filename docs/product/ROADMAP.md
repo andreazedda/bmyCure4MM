@@ -20,6 +20,8 @@ COMPLETED:
 
 CURRENT:
 #14 documentation/source of truth
++ #69 immediate dependency-advisory remediation
+→ #70 supported Django 5.2 LTS baseline
 → #13 mandatory CI and PR governance
 → #23 minimum QA invariants
 → #26 close M0-R
@@ -28,11 +30,15 @@ NEXT:
 #32 → #33 → #34 → #35 → #36 → #18
 ```
 
+## Current supply-chain condition
+
+The deterministic lock currently pins unsupported Django 4.2.30 and sqlparse 0.5.4. Newly disclosed advisory data makes the dependency audit red. Issue `#69` owns the immediate sqlparse upgrade and exact triage; issue `#70` owns the durable Django 5.2 LTS migration. This condition is independent of documentation PR `#68`, which did not modify dependency files.
+
 ## Milestones
 
 | Milestone | Purpose | Exit emphasis |
 |---|---|---|
-| M0-R — Canonical Scientific Baseline | One technical and scientific source of truth | Documentation, protected CI, minimum contracts and privacy invariants |
+| M0-R — Canonical Scientific Baseline | One technical and scientific source of truth | Documentation, supported/security-triaged dependencies, protected CI, minimum contracts and privacy invariants |
 | M0-S — Safe Shared Research Platform | Safe multi-user/external research operation | Product auth, object authorization, RBAC, security, quotas, runtime, API and observability |
 | M1 — Real-Patient Research Loop v0.1 | First source-verified lineage-bound longitudinal loop | Observation, calibration decision, exposure, toxicity attribution, temporal backtest and immutable report |
 | M2 — Measurement & Evidence Layer v0.2 | Define what inputs and outputs mean | Evidence registry, biomarker semantics, genomic risk, MRD, imaging, functional outcomes and cards |
@@ -43,7 +49,7 @@ NEXT:
 
 ## Controlled parallelism
 
-Private read-only source verification for M1 issue `#32` may prepare while M0-R closes. It may not promote a new canonical dataset, calibration, what-if result or project claim before protected documentation/CI/QA gates exist.
+Private read-only source verification for M1 issue `#32` may prepare while M0-R closes. It may not promote a new canonical dataset, calibration, what-if result or project claim before protected documentation, dependency, CI and QA gates exist.
 
 ## Decision rule
 

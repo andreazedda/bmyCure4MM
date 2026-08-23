@@ -11,6 +11,7 @@ All current release claims are governed by [`docs/governance/CLAIMS_POLICY.md`](
 - Added a current model-status catalog with formulas, units, examples, code mappings and falsification boundaries.
 - Added source-of-truth and documentation-governance policies plus a corpus inventory.
 - Reconciled GitHub roadmap/tracker state and Notion project state at canonical `master` `bf097810...`.
+- Added strict MkDocs validation to documentation pull requests without deploying PR content.
 
 ### Scientific identity and reproducibility
 
@@ -19,6 +20,7 @@ All current release claims are governed by [`docs/governance/CLAIMS_POLICY.md`](
 - Added immutable research run manifests and a governed model registry.
 - Added typed scientific payload contracts, artifact integrity checks, direct-comparability rules and append-only invalidation.
 - Locked the dependency graph with `uv.lock`, Python 3.11/3.12 support and numerical/repository/dependency checks.
+- Recorded newly disclosed Django/sqlparse advisories as a blocking current condition under issues `#69` and `#70`; no dependency fix or audit bypass is claimed by this documentation change.
 
 ### Intended use and language
 

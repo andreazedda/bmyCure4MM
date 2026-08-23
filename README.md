@@ -37,10 +37,14 @@ Current M0-R path:
 
 ```text
 #14 documentation/source of truth
++ #69 immediate dependency-advisory remediation
+→ #70 supported Django 5.2 LTS baseline
 → #13 mandatory CI aggregate gate and PR governance
 → #23 minimum scientific/privacy invariants
 → #26 close M0-R
 ```
+
+The current lock remains deterministic, but the security audit now detects newly disclosed advisories in Django 4.2.30 and sqlparse 0.5.4. The durable Django migration is tracked in `#70`; no red dependency gate may be relabelled green through blanket suppression.
 
 ## Current capabilities
 
@@ -72,7 +76,7 @@ uv run python manage.py check
 uv run python manage.py runserver
 ```
 
-Omit `--extra chemistry` for core work that does not require RDKit. Dependency operations are documented in [Dependency Operations](docs/operations/DEPENDENCIES.md).
+Omit `--extra chemistry` for core work that does not require RDKit. Dependency operations are documented in [Dependency Operations](docs/operations/DEPENDENCIES.md). The current Django 4.2 lock is unsupported and must not be promoted to a shared/production baseline before issues `#69` and `#70` are resolved.
 
 ## Verification and safety
 
@@ -91,7 +95,7 @@ uv run python -m scripts.audit_dependencies
 bash scripts/pre_push_research_safety_check.sh
 ```
 
-Current test boundaries and CI limitations are documented in [Testing](docs/operations/TESTING.md).
+Current test boundaries, the active dependency blocker and CI limitations are documented in [Testing](docs/operations/TESTING.md) and [Dependency Audit Triage](docs/operations/DEPENDENCY_AUDIT_TRIAGE.md).
 
 ## Privacy
 

@@ -45,6 +45,28 @@ Use the dependency groups documented in `DEPENDENCIES.md`; core-only and optiona
 
 Current workflows cover dependency/reproducibility checks, docs deployment, secret scanning, image workflows, UI screenshots and redeployment. Issue `#13` will rationalize them into one stable protected aggregate gate and add exact pull-request safety behavior.
 
+Documentation PR `#68` added strict MkDocs validation on pull requests without deploying PR content. This is a bounded prerequisite for `#13`, not the final aggregate CI design.
+
+## Current recorded PR evidence
+
+At PR `#68` head `b8bc4abc...`:
+
+```text
+strict MkDocs: PASS
+secret scan: PASS
+Ruff: PASS
+format: PASS
+mypy: PASS
+repository hygiene: PASS
+numerical baseline: PASS / unchanged
+Python 3.11 core check/tests: PASS
+Python 3.12 core check/tests: PASS
+Docker locked build: PASS
+dependency audit: FAIL
+```
+
+The audit failure is not caused by the documentation diff. It identifies newly disclosed advisories in the unchanged canonical dependency graph and is governed by `#69` and `#70`.
+
 ## Research safety gate
 
 The current local safety script is designed around staged changes. Until issue `#13` adds a verified base/head CI mode, do not assume that merely invoking the script in a pull-request runner checks the exact proposed diff.
@@ -57,6 +79,16 @@ The numerical baseline detects unreviewed output drift. A baseline update requir
 - a model/version decision;
 - an invalidation decision for prior runs;
 - updated documentation when endpoint interpretation changes.
+
+The current documentation PR produced no numerical differences.
+
+## Dependency security
+
+- `#69` owns immediate sqlparse remediation and exact current advisory triage.
+- `#70` owns migration from unsupported Django 4.2 to Django 5.2 LTS.
+- a temporary advisory exception must be exact, evidence-backed, owned and expiring;
+- high findings cannot be globally ignored;
+- shared/production promotion remains prohibited on an unsupported or untriaged framework baseline.
 
 ## Test data
 

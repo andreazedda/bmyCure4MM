@@ -45,7 +45,9 @@ This page describes the repository state at the SHA above. Later changes require
 - Immutable research run manifests and version vectors.
 - Governed model registry and versioned scientific JSON contracts.
 - Artifact hashing, direct-comparability rules and append-only invalidation semantics.
-- Numerical baseline and repository/dependency checks.
+- Numerical baseline and repository/dependency-check infrastructure.
+
+The lock is deterministic but is **not currently security-green**: newly disclosed advisories affect the pinned Django 4.2.30 and sqlparse 0.5.4 graph. Django 4.2 is outside upstream extended support. Immediate triage is tracked in `#69`; migration to Django 5.2 LTS is tracked in `#70`.
 
 ## Current registered models
 
@@ -67,7 +69,7 @@ Detailed status and formula mappings are in [Current model registry](../models/R
 
 The repository can persist structured longitudinal entities, construct lineage-bound Twin states, execute mechanistic simulations, create immutable run identity and compare hypothetical configurations. It also has residual/calibration, uncertainty, sensitivity, robustness and temporal-diagnostic infrastructure.
 
-It has **not** yet demonstrated a source-verified, leakage-free, identifiable and out-of-sample-valid patient-specific Research Loop. M1 remains blocked until the M0-R documentation, CI and minimum QA baseline closes.
+It has **not** yet demonstrated a source-verified, leakage-free, identifiable and out-of-sample-valid patient-specific Research Loop. M1 remains blocked until the M0-R documentation, supported dependency, CI and minimum QA baseline closes.
 
 ## Current authentication and authorization boundary
 
@@ -75,9 +77,26 @@ Verified current behavior includes public documentation and public simulator sur
 
 Known authorization gaps are tracked in GitHub issue `#8`. Admin access or temporary smoke-user creation must not be interpreted as successful normal-user product authentication.
 
-## Current CI state
+## Current CI evidence
 
-GitHub Actions already exist for dependency/reproducibility checks, documentation deployment, secret scanning, image build/publish, UI screenshots and automatic redeployment. They are not yet consolidated into one stable mandatory aggregate gate, and external Actions are not yet uniformly pinned to immutable commit SHAs. That work is tracked in `#13` after documentation paths stabilize.
+GitHub Actions already exist for dependency/reproducibility checks, documentation deployment, secret scanning, image build/publish, UI screenshots and automatic redeployment.
+
+On documentation PR `#68`, current evidence at head `b8bc4abc...` is:
+
+```text
+strict MkDocs build: PASS
+secret scan: PASS
+Ruff and format: PASS
+mypy: PASS
+repository hygiene: PASS
+numerical baseline: PASS / unchanged
+Python 3.11 core check/tests: PASS
+Python 3.12 core check/tests: PASS
+Docker locked build: PASS
+dependency audit: FAIL on newly disclosed advisories
+```
+
+The workflows are not yet consolidated into one stable mandatory aggregate gate, and external Actions are not yet uniformly pinned to immutable commit SHAs. That work is tracked in `#13` after `#14`, `#69` and `#70` establish canonical paths and a supported dependency baseline.
 
 ## Privacy boundary
 
@@ -87,6 +106,8 @@ Private patient documents, direct identifiers, source excerpts and private datas
 
 ```text
 #14 documentation/source-of-truth baseline
++ #69 immediate dependency-advisory remediation
+→ #70 supported Django 5.2 LTS baseline
 → #13 mandatory CI aggregate gate and PR governance
 → #23 minimum M0-R scientific/privacy invariants
 → #26 close M0-R

@@ -73,7 +73,10 @@ computation completed
 - normal product authentication and least-privilege roles are incomplete;
 - object-level authorization remains inconsistent in some patient-derived web/aggregate paths;
 - CI is present but not yet a single protected required gate;
-- documentation has historical debt and is being reconciled under issue `#14`;
+- documentation baseline exists in draft PR `#68` and is not yet canonical on `master`;
+- Django 4.2.30 is outside upstream extended support;
+- the current dependency audit is red for newly disclosed Django/sqlparse advisories under `#69`;
+- durable migration to Django 5.2 LTS is required under `#70`;
 - production runtime, PostgreSQL, storage, observability, quotas and backup/restore remain governed by M0-S rather than assumed complete.
 
 ## Falsification triggers
@@ -86,4 +89,5 @@ A current capability claim must be downgraded if:
 - numerical identity changes without a version/output-diff decision;
 - an artifact hash cannot be verified;
 - a current document describes a target model as implemented;
-- source-level evidence does not support a patient-derived input.
+- source-level evidence does not support a patient-derived input;
+- a required security/dependency gate is red or covered only by an expired risk decision.

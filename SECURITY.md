@@ -9,6 +9,7 @@ production_security_certified: false
 clinical_use_supported: false
 product_auth_model_complete: false
 object_authorization_complete: false
+dependency_security_green: false
 ```
 
 No current version is represented as production-certified or suitable for clinical deployment. Security fixes are handled on the active `master` research line, subject to maintainer capacity and explicit verification.
@@ -50,6 +51,15 @@ These controls do not prove complete application security.
 
 ## Known open security gaps
 
+### Dependency and framework support
+
+The deterministic lock currently pins unsupported Django 4.2.30 and sqlparse 0.5.4. Newly disclosed advisories make the dependency audit red.
+
+- issue `#69` tracks immediate sqlparse upgrade and exact advisory triage;
+- issue `#70` tracks durable migration to Django 5.2 LTS;
+- shared/production promotion is prohibited while the framework baseline is unsupported or security findings remain untriaged;
+- blanket audit suppression is prohibited.
+
 ### Product authentication
 
 Documentation and selected simulator surfaces are public, while clinic/research/simulator-management/API surfaces are protected. `LOGIN_URL` currently targets the Django admin login and there is no reviewed normal-user product-login and role contract.
@@ -86,7 +96,7 @@ Use synthetic/demo fixtures in tests and CI. Security evidence must identify fin
 
 ## Deployment boundary
 
-The repository may contain deployment automation, but a successful image build or running deployment does not establish production security. A deployment must separately prove configuration, database, storage, backup/restore, observability, access control and incident-response requirements.
+The repository may contain deployment automation, but a successful image build or running deployment does not establish production security. A deployment must separately prove configuration, supported dependencies, database, storage, backup/restore, observability, access control and incident-response requirements.
 
 ## Security-related issues
 
