@@ -9,10 +9,12 @@ production_security_certified: false
 clinical_use_supported: false
 product_auth_model_complete: false
 object_authorization_complete: false
-dependency_security_green: false
+dependency_security_green: true
 ```
 
-No current version is represented as production-certified or suitable for clinical deployment. Security fixes are handled on the active `master` research line, subject to maintainer capacity and explicit verification.
+The canonical research dependency baseline uses Django 5.2.17 LTS and sqlparse 0.6.0. Dependency audit, synthetic deployment checks, migration evidence, Python 3.11/3.12 suites, numerical identity, Secret Scan, Docker build and the protected `required` result passed in merged PRs `#71` and `#72`.
+
+This does not make the application production-certified or suitable for clinical deployment. Production security also depends on authentication, object authorization, settings, TLS/proxy behavior, storage, backup/restore, quotas, observability and incident response.
 
 ## Reporting a vulnerability
 
@@ -38,27 +40,21 @@ Acknowledgment and remediation timing are targets, not a contractual SLA. Disclo
 
 ## Verified current controls
 
+- supported Django 5.2 LTS dependency baseline and deterministic `uv.lock`;
+- repository-native dependency audit with exact documented development-tool triage only;
 - environment-based secret-key configuration and weak/default-key rejection;
 - Django password hashing and CSRF protections;
 - selected authenticated views and global DRF `IsAuthenticated` default;
 - secret-scanning workflow;
-- repository hygiene and dependency-audit tooling;
-- research safety checks for staged sensitive files and PHI-like markers;
+- repository hygiene and research safety tooling;
 - ignored `local_private/` boundary for private research material;
-- temporary M0 smoke identities are constrained to non-staff, non-superuser accounts with no groups or direct permissions.
+- temporary M0 smoke identities constrained to non-staff, non-superuser accounts with no groups or direct permissions;
+- synthetic CI deployment check and disposable migration evidence;
+- protected `required` dependency/reproducibility result.
 
 These controls do not prove complete application security.
 
 ## Known open security gaps
-
-### Dependency and framework support
-
-The deterministic lock currently pins unsupported Django 4.2.30 and sqlparse 0.5.4. Newly disclosed advisories make the dependency audit red.
-
-- issue `#69` tracks immediate sqlparse upgrade and exact advisory triage;
-- issue `#70` tracks durable migration to Django 5.2 LTS;
-- shared/production promotion is prohibited while the framework baseline is unsupported or security findings remain untriaged;
-- blanket audit suppression is prohibited.
 
 ### Product authentication
 
@@ -80,7 +76,11 @@ GitHub issue `#10` tracks request throttling, job quotas, concurrency, timeout, 
 
 ### CI and branch protection
 
-GitHub issue `#13` tracks consolidation of existing workflows into one mandatory protected scientific gate, exact-PR safety behavior, immutable Action pinning and PR governance.
+A protected `required` status exists. GitHub issue `#13` still tracks immutable Action pinning, exact base/head PR safety mode, documentation contracts, PR templates, CODEOWNERS, privacy-safe artifact retention, final workflow rationalization and branch-protection re-read.
+
+### Remaining development-tool advisory decision
+
+The dependency audit contains one exact development-only pytest advisory decision, documented in `docs/operations/DEPENDENCY_AUDIT_TRIAGE.md`. It is not a runtime-framework exception and must be removed when the browser-test toolchain supports the patched pytest line.
 
 ## Data-safety rules
 
