@@ -1,0 +1,83 @@
+name: Issue 70 — Refresh Django 5.2 lock
+
+on:
+  push:
+    branches:
+      - security/issue-70-django-52-lts-20260824
+    paths:
+      - pyproject.toml
+      - scripts/audit_dependencies.py
+      - tests/test_dependency_reproducibility.py
+      - docs/operations/DEPENDENCY_AUDIT_TRIAGE.md
+      - .github/workflows/issue-70-refresh-lock.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: issue-70-lock-refresh
+  cancel-in-progress: true
+
+jobs:
+  refresh:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout issue branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up governed uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: '0.12.3'
+          enable-cache: true
+
+      - name: Refresh Django and sqlparse lock
+        shell: bash
+        run: |
+          set -euo pipefail
+          uv lock --upgrade-package django --upgrade-package sqlparse
+          uv lock --check
+          python - <<'PY'
+          from pathlib import Path
+
+          pyproject = Path('pyproject.toml').read_text(encoding='utf-8')
+          lock = Path('uv.lock').read_text(encoding='utf-8')
+          assert 'django==5.2.17' in pyproject
+          assert 'sqlparse==0.6.0' in pyproject
+          assert 'name = "django"' in lock
+          assert 'version = "5.2.17"' in lock
+          assert 'name = "sqlparse"' in lock
+          assert 'version = "0.6.0"' in lock
+          print('DJANGO_LOCK_IDENTITY=5.2.17')
+          print('SQLPARSE_LOCK_IDENTITY=0.6.0')
+          PY
+
+      - name: Upload generated lock evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-70-django-lock-evidence
+          path: uv.lock
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Commit generated lock and remove one-shot workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm .github/workflows/issue-70-refresh-lock.yml
+          git add uv.lock
+          git diff --cached --check
+          git commit -m 'chore(deps): refresh lock for Django 5.2.17 LTS'
+          git push origin "HEAD:${GITHUB_REF_NAME}"
