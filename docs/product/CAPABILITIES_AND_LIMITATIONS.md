@@ -4,7 +4,7 @@ status: CURRENT_VERIFIED
 owner: Andrea Zedda
 audience: users, reviewers and contributors
 last_verified_at: 2026-08-24
-last_verified_git_sha: bf097810b337dc6b766cda04497005670cd96513
+last_verified_git_sha: a33418fb8ae9cb9fd05832dd9bc1cb0778e08533
 ---
 
 # Capabilities and limitations
@@ -72,12 +72,11 @@ computation completed
 
 - normal product authentication and least-privilege roles are incomplete;
 - object-level authorization remains inconsistent in some patient-derived web/aggregate paths;
-- CI is present but not yet a single protected required gate;
+- a protected `required` dependency/reproducibility gate exists, but the complete #13 workflow rationalization, immutable Action pinning, exact base/head safety mode, PR templates and CODEOWNERS remain open;
 - documentation baseline exists in draft PR `#68` and is not yet canonical on `master`;
-- Django 4.2.30 is outside upstream extended support;
-- the current dependency audit is red for newly disclosed Django/sqlparse advisories under `#69`;
-- durable migration to Django 5.2 LTS is required under `#70`;
 - production runtime, PostgreSQL, storage, observability, quotas and backup/restore remain governed by M0-S rather than assumed complete.
+
+The supported dependency baseline is now Django 5.2.17 LTS with sqlparse 0.6.0. Merged PRs `#71` and `#72` passed the repository dependency audit, Python 3.11/3.12 suites, numerical baseline, Secret Scan and Docker build. This does not by itself establish production security.
 
 ## Falsification triggers
 
