@@ -9,97 +9,82 @@ last_verified_git_sha: bf097810b337dc6b766cda04497005670cd96513
 
 # Dependency audit triage
 
-## Current decision — issue #69
+## Issue #70 migration candidate
 
 ```text
-LOCK_REFRESH_REQUIRED = true
-SQLPARSE_TARGET = 0.6.0
-DJANGO_42_EXCEPTION = exact_and_temporary
-DJANGO_42_EXCEPTION_EXPIRY = 2026-09-30
-DURABLE_FRAMEWORK_TARGET = Django 5.2 LTS under issue #70
-SHARED_OR_PRODUCTION_PROMOTION = prohibited
+DJANGO_TARGET = 5.2.17 LTS
+SQLPARSE = 0.6.0
+DJANGO_ADVISORY_EXCEPTIONS = zero
+TEST_TOOL_EXCEPTION = GHSA-6w46-j5rx-g56g only
+SHARED_OR_PRODUCTION_PROMOTION = pending full #70 validation
 ```
 
-The deterministic lock at canonical `master` was not changed by documentation PR #68. New advisory data nevertheless made the repository-native audit fail. This issue-69 branch raises the explicit sqlparse floor to 0.6.0 and adds an exact, expiring Django 4.2 exception while the durable 5.2 LTS migration is executed under #70.
+This branch migrates from unsupported Django 4.2.30 to Django 5.2.17 LTS and removes all Django 4.2 advisory exceptions from `scripts/audit_dependencies.py`.
 
-## Current findings
+The candidate is not canonical until its dedicated pull request passes the full compatibility, migration, authorization, numerical and container evidence required by #70.
 
-### Django
-
-| Package | Advisory | Severity | Affected component | Decision |
-|---|---|---:|---|---|
-| Django 4.2.30 | `PYSEC-2026-3717` / `CVE-2026-15830` | medium | GeoDjango `GEOSGeometry` / spatial geometry parsing | Temporary exact exception only after no-GIS evidence; expires 2026-09-30. Migrate under #70. |
-
-Initial repository search found no direct `django.contrib.gis`, `GEOSGeometry` or GIS-field use. A clean-checkout scan and settings/runtime review remain part of the PR evidence. Absence of a current code path does not make Django 4.2 supported.
-
-Django 4.2.30 was the final 4.2 release and reached end of extended support on 7 April 2026. The durable target is a current Django 5.2 LTS security patch.
+## Resolved immediate findings
 
 ### sqlparse
 
-| Package | Advisory | Severity | Patched version | Decision |
-|---|---|---:|---:|---|
-| sqlparse 0.5.4 | `PYSEC-2026-3696` / `CVE-2026-59894` | moderate | 0.6.0 | Upgrade required |
-| sqlparse 0.5.4 | `PYSEC-2026-3697` / `CVE-2026-71491` | high | 0.6.0 | Upgrade required |
-| sqlparse 0.5.4 | `PYSEC-2026-3698` / `CVE-2026-59893` | high | 0.6.0 | Upgrade required |
-| sqlparse 0.5.4 | `PYSEC-2026-3699` / `CVE-2026-54284` | high | 0.6.0 | Upgrade required |
-
-Repository search finds no direct sqlparse call outside dependency/lock declarations. Django and tooling may still invoke parsing paths; absence of direct calls is not a risk-acceptance basis.
-
-## Temporary Django 4.2 exception
-
-`scripts/audit_dependencies.py` enumerates exact advisory IDs and refuses to run them after 2026-09-30.
-
-The exception means only:
+Issue #69 upgraded the direct and locked security floor to `sqlparse 0.6.0`, addressing:
 
 ```text
-current affected GeoDjango path is not known to be exposed
+PYSEC-2026-3696 / CVE-2026-59894
+PYSEC-2026-3697 / CVE-2026-71491
+PYSEC-2026-3698 / CVE-2026-59893
+PYSEC-2026-3699 / CVE-2026-54284
 ```
 
-It does not mean:
+### Django
+
+The previous candidate used an exact temporary exception for:
 
 ```text
-Django 4.2 is supported
-production security is certified
-shared deployment is approved
-issue #70 may be deferred indefinitely
+PYSEC-2026-3717 / CVE-2026-15830
 ```
 
-The exception is removed when #70 merges.
+because the affected GeoDjango path was not found in repository code. That exception was never a supported-framework claim and carried an expiry of 2026-09-30.
 
-## Previous 13 August triage
+The #70 candidate removes the exception entirely by moving to Django 5.2.17 LTS, the patched supported line identified for the advisory at implementation time.
 
-The earlier locked baseline removed 155 of 161 broad-environment findings and narrowly triaged six then-current Django advisories plus one development-only pytest advisory:
+## Remaining exact development-tool decision
 
 ```text
-GHSA-923m-gv2p-w5qp
-GHSA-h7pc-vwp9-298g
-GHSA-8cjm-8mp7-r2xf
-GHSA-3h9f-r86x-qvjx
-GHSA-crhf-3pfg-w68w
-GHSA-8qcx-xf44-272x
 GHSA-6w46-j5rx-g56g
 ```
 
-Those are retained as exact temporary decisions; they do not cover newly published IDs and now share the hard Django 4.2 expiry.
+This pytest temporary-directory advisory requires a malicious local user on a shared UNIX host. The compatible `pytest-playwright==0.7.1` release still constrains pytest below the patched major line. Tests run on isolated CI runners or single-user development machines. This exception remains exact and must be removed when the toolchain supports the patched pytest line.
 
-## Required evidence before #69 can close
+## Required #70 evidence
 
 ```text
-pyproject and uv.lock diff
+Django 5.2.17 and sqlparse 0.6.0 in pyproject and uv.lock
 uv lock --check
-pip-audit before/after
-no-GIS code/settings scan
-Python 3.11 and 3.12 core tests
-Django check and migration drift
+pip-audit through scripts.audit_dependencies
+Django check
+synthetic manage.py check --deploy
+migration drift
+migration graph and disposable forward evidence
+Python 3.11 and 3.12 full core suites
+authentication and authorization regressions
 numerical baseline unchanged
-Docker build
-exact exception/expiry test
-linked #70 migration plan
+run/artifact/comparability contracts
+optional chemistry environment
+strict MkDocs
+secret and PHI safety
+Docker locked build
 ```
+
+## Historical decisions
+
+Django 4.2.30 was the final 4.2 release and reached end of extended support on 7 April 2026. It is not an acceptable durable M0-R framework baseline.
+
+The earlier exact Django exceptions remain visible in Git history and issue #69 evidence; they are deliberately absent from the #70 audit script.
 
 ## Required record fields
 
-Every exception or fix records:
+Every future exception or fix records:
 
 ```text
 advisory ID
@@ -116,7 +101,7 @@ fix issue/PR/commit
 ## Current execution
 
 ```text
-#69 sqlparse 0.6.0 lock refresh and immediate exact advisory decision
-→ #70 Django 5.2 LTS migration and removal of Django 4.2 exceptions
+#69 immediate sqlparse/advisory remediation
+→ #70 Django 5.2 LTS migration candidate
 → #13 protected aggregate CI
 ```
