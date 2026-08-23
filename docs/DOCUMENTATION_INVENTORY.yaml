@@ -1,0 +1,173 @@
+inventory_version: documentation-inventory-v1
+verified_at: 2026-08-24
+verified_git_sha: bf097810b337dc6b766cda04497005670cd96513
+owner: Andrea Zedda
+classification_resolution: first_matching_rule
+unmatched_classification: UNCLASSIFIED_REQUIRES_REVIEW
+navigation_policy:
+  allowed:
+    - CANONICAL
+    - CURRENT_SUPPORTING
+    - TARGET_SUPPORTING
+  forbidden:
+    - HISTORICAL_ARCHIVE
+    - DUPLICATE
+    - DELETE_CANDIDATE
+    - UNCLASSIFIED_REQUIRES_REVIEW
+explicit_entries:
+  - path: README.md
+    classification: CANONICAL
+    audience: all
+    replacement_or_parent: docs/index.md
+    reason: repository landing page
+  - path: CHANGELOG.md
+    classification: CANONICAL
+    audience: maintainers
+    replacement_or_parent: null
+    reason: current release history governed by claims policy
+  - path: SECURITY.md
+    classification: CANONICAL
+    audience: security reporters and deployers
+    replacement_or_parent: docs/operations/AUTHENTICATION_AND_ACCESS.md
+    reason: public security boundary and reporting path
+  - path: CONTRIBUTING.md
+    classification: CURRENT_SUPPORTING
+    audience: contributors
+    replacement_or_parent: docs/governance/DOCUMENTATION_POLICY.md
+    reason: contributor workflow; CI details updated under issue 13
+  - path: RELEASE_PREPARATION.md
+    classification: HISTORICAL_ARCHIVE
+    audience: historical
+    replacement_or_parent: docs/archive/releases/RELEASE_PREPARATION_2024.md
+    reason: obsolete 2024 release and coverage claims
+  - path: docs/index.md
+    classification: CANONICAL
+    audience: all
+    replacement_or_parent: null
+    reason: documentation landing page
+  - path: docs/guides/architecture.md
+    classification: CURRENT_SUPPORTING
+    audience: existing links
+    replacement_or_parent: docs/architecture/CURRENT_SYSTEM.md
+    reason: compatibility pointer, not separate architecture truth
+rules:
+  - glob: docs/product/**
+    classification: CANONICAL
+    reason: mission, current state, capabilities and roadmap
+  - glob: docs/architecture/CURRENT_SYSTEM.md
+    classification: CANONICAL
+    reason: verified current architecture
+  - glob: docs/architecture/TARGET_VIRTUAL_LAB.md
+    classification: TARGET_SUPPORTING
+    reason: approved target architecture, explicitly non-current
+  - glob: docs/models/**
+    classification: CANONICAL
+    reason: current model mapping and status
+  - glob: docs/governance/INTENDED_USE.md
+    classification: CANONICAL
+    reason: intended-use authority
+  - glob: docs/governance/CLAIMS_POLICY.md
+    classification: CANONICAL
+    reason: claims authority
+  - glob: docs/governance/EPISTEMIC_LABELS.md
+    classification: CANONICAL
+    reason: epistemic label authority
+  - glob: docs/governance/MODEL_OUTPUT_LANGUAGE.md
+    classification: CANONICAL
+    reason: output-language authority
+  - glob: docs/governance/SOURCE_OF_TRUTH.md
+    classification: CANONICAL
+    reason: conflict-resolution authority
+  - glob: docs/governance/DOCUMENTATION_POLICY.md
+    classification: CANONICAL
+    reason: documentation governance
+  - glob: docs/research/STRUCTURED_DATASET_CONTRACT_V0_1.md
+    classification: CANONICAL
+    reason: dataset contract
+  - glob: docs/research/RUN_MANIFESTS.md
+    classification: CANONICAL
+    reason: run identity and artifact contract
+  - glob: docs/research/NUMERICAL_REPRODUCIBILITY.md
+    classification: CANONICAL
+    reason: numerical policy
+  - glob: docs/research/VALIDATION_UNCERTAINTY_PROTOCOL.md
+    classification: CURRENT_SUPPORTING
+    reason: current validation protocol; maturity limits apply
+  - glob: docs/research/REAL_PATIENT_WHATIF_ARCHITECTURE.md
+    classification: CURRENT_SUPPORTING
+    reason: research workflow design with current/target distinctions
+  - glob: docs/research/**
+    classification: CURRENT_SUPPORTING
+    reason: research documentation requiring status metadata review
+  - glob: docs/operations/DEPENDENCIES.md
+    classification: CANONICAL
+    reason: dependency operations
+  - glob: docs/operations/DEPENDENCY_AUDIT_TRIAGE.md
+    classification: CURRENT_SUPPORTING
+    reason: current audit record
+  - glob: docs/operations/**
+    classification: CURRENT_SUPPORTING
+    reason: current operations documentation
+  - glob: docs/reference/**
+    classification: CURRENT_SUPPORTING
+    reason: generated or manually maintained reference; code consistency required
+  - glob: docs/guides/mathematical_models*.md
+    classification: CURRENT_SUPPORTING
+    reason: current runtime formula guide; registry governs status
+  - glob: docs/guides/glossary.md
+    classification: CURRENT_SUPPORTING
+    reason: learning support
+  - glob: docs/guides/learning_path.md
+    classification: CURRENT_SUPPORTING
+    reason: learning support
+  - glob: docs/guides/simulator_kpis.md
+    classification: CURRENT_SUPPORTING
+    reason: KPI interpretation support
+  - glob: docs/guides/decision_algorithm.md
+    classification: CURRENT_SUPPORTING
+    reason: model-relative thresholds only
+  - glob: docs/guides/**
+    classification: UNCLASSIFIED_REQUIRES_REVIEW
+    reason: mixed generations; excluded from canonical navigation until reviewed
+  - glob: docs/development/DEVELOPMENT.md
+    classification: CURRENT_SUPPORTING
+    reason: development setup
+  - glob: docs/development/TROUBLESHOOTING.md
+    classification: CURRENT_SUPPORTING
+    reason: troubleshooting
+  - glob: docs/development/**SUMMARY*.md
+    classification: HISTORICAL_ARCHIVE
+    reason: implementation history
+  - glob: docs/development/**LOG*.md
+    classification: HISTORICAL_ARCHIVE
+    reason: implementation history
+  - glob: docs/development/**
+    classification: UNCLASSIFIED_REQUIRES_REVIEW
+    reason: mixed current and historical content
+  - glob: docs/features/**
+    classification: HISTORICAL_ARCHIVE
+    reason: feature implementation history, not current source of truth
+  - glob: docs/archive/**
+    classification: HISTORICAL_ARCHIVE
+    reason: explicit archive
+  - glob: docs/en/**
+    classification: UNCLASSIFIED_REQUIRES_REVIEW
+    reason: translation/content consistency review required
+  - glob: docs/it/**
+    classification: UNCLASSIFIED_REQUIRES_REVIEW
+    reason: translation/content consistency review required
+  - glob: docs/API_*.md
+    classification: HISTORICAL_ARCHIVE
+    reason: historical API implementation narratives
+  - glob: docs/*SUMMARY*.md
+    classification: HISTORICAL_ARCHIVE
+    reason: historical implementation summary
+  - glob: docs/*ROADMAP*.md
+    classification: HISTORICAL_ARCHIVE
+    reason: superseded by product roadmap and GitHub issue 31
+  - glob: docs/*.md
+    classification: UNCLASSIFIED_REQUIRES_REVIEW
+    reason: root documentation requires explicit review
+  - glob: '*.md'
+    classification: HISTORICAL_ARCHIVE
+    reason: root implementation/debug narrative unless explicitly overridden
