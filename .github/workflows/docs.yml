@@ -1,8 +1,27 @@
-name: Deploy Docs (MkDocs)
+name: Docs Build and Deploy (MkDocs)
 
 on:
+  pull_request:
+    paths:
+      - "docs/**"
+      - "README.md"
+      - "CHANGELOG.md"
+      - "SECURITY.md"
+      - "mkdocs.yml"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/docs.yml"
   push:
     branches: [master, main]
+    paths:
+      - "docs/**"
+      - "README.md"
+      - "CHANGELOG.md"
+      - "SECURITY.md"
+      - "mkdocs.yml"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/docs.yml"
   workflow_dispatch:
 
 permissions:
@@ -11,12 +30,14 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
-  cancel-in-progress: false
+  group: docs-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
+    name: strict-build
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
@@ -32,15 +53,17 @@ jobs:
       - name: Install docs dependencies
         run: uv sync --frozen --no-default-groups --group docs
 
-      - name: Build site
+      - name: Build site in strict mode
         run: uv run --frozen --no-default-groups --group docs mkdocs build --strict
 
       - name: Upload Pages artifact
+        if: github.event_name == 'push'
         uses: actions/upload-pages-artifact@v3
         with:
           path: site
 
   deploy:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     needs: build
     environment:
