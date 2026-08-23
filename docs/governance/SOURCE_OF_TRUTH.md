@@ -4,7 +4,7 @@ status: CANONICAL
 owner: Andrea Zedda
 audience: all contributors
 last_verified_at: 2026-08-24
-last_verified_git_sha: bf097810b337dc6b766cda04497005670cd96513
+last_verified_git_sha: a33418fb8ae9cb9fd05832dd9bc1cb0778e08533
 ---
 
 # Source of truth
@@ -74,5 +74,5 @@ Every major component/model must be marked `CURRENT`, `PARTIAL`, `TARGET`, `HYPO
 ```text
 repository = andreazedda/bmyCure4MM
 branch = master
-verified_head = bf097810b337dc6b766cda04497005670cd96513
+verified_head = a33418fb8ae9cb9fd05832dd9bc1cb0778e08533
 ```
