@@ -30,6 +30,6 @@ The original bytes remain recoverable from Git history at `RELEASE_PREPARATION.m
 - [Mission and north star](../../product/MISSION_AND_NORTH_STAR.md)
 - [Current verified state](../../product/CURRENT_STATE.md)
 - [Capabilities and limitations](../../product/CAPABILITIES_AND_LIMITATIONS.md)
-- [Security policy](../../../SECURITY.md)
-- [Changelog](../../../CHANGELOG.md)
+- [Security policy on GitHub](https://github.com/andreazedda/bmyCure4MM/blob/master/SECURITY.md)
+- [Changelog on GitHub](https://github.com/andreazedda/bmyCure4MM/blob/master/CHANGELOG.md)
 - [Documentation policy](../../governance/DOCUMENTATION_POLICY.md)
