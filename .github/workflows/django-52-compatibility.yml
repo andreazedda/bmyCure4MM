@@ -1,0 +1,95 @@
+name: Django 5.2 Compatibility Gate
+
+on:
+  pull_request:
+    paths:
+      - pyproject.toml
+      - uv.lock
+      - mmportal/**
+      - clinic/**
+      - simulator/**
+      - twin_engine/**
+      - docs_viewer/**
+      - tests/**
+      - .github/workflows/django-52-compatibility.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: django-52-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  compatibility:
+    name: django-52-compatibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      DJANGO_DEBUG: "0"
+      DJANGO_SECRET_KEY: "ci-only-not-a-production-secret-9f9637e3993f4bb8a2d826701b9535f8"
+      DJANGO_ALLOWED_HOSTS: "ci.invalid"
+      DJANGO_CSRF_TRUSTED_ORIGINS: "https://ci.invalid"
+      DJANGO_SETTINGS_MODULE: "mmportal.settings_ci_deploy"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.12.3"
+          enable-cache: true
+
+      - name: Install the frozen chemistry graph
+        run: uv sync --frozen --extra chemistry
+
+      - name: Verify locked framework identity
+        run: |
+          uv run python - <<'PY'
+          import django
+          import sqlparse
+
+          assert django.get_version() == "5.2.17", django.get_version()
+          assert sqlparse.__version__ == "0.6.0", sqlparse.__version__
+          print(f"DJANGO_VERSION={django.get_version()}")
+          print(f"SQLPARSE_VERSION={sqlparse.__version__}")
+          PY
+
+      - name: Run ordinary Django integrity checks
+        run: uv run python manage.py check --settings=mmportal.settings
+        env:
+          DJANGO_DEBUG: "1"
+          DJANGO_SETTINGS_MODULE: "mmportal.settings"
+
+      - name: Run synthetic deployment checks
+        run: uv run python manage.py check --deploy --settings=mmportal.settings_ci_deploy
+
+      - name: Prove no migration drift
+        run: uv run python manage.py makemigrations --check --dry-run --settings=mmportal.settings_ci_deploy
+
+      - name: Apply migrations to a disposable database
+        run: |
+          export DJANGO_SQLITE_PATH="${RUNNER_TEMP}/bmycure4mm-django52.sqlite3"
+          uv run python manage.py migrate --noinput --settings=mmportal.settings_ci_deploy
+          uv run python manage.py showmigrations --plan --settings=mmportal.settings_ci_deploy > "${RUNNER_TEMP}/django52-migration-plan.txt"
+          test -s "${RUNNER_TEMP}/django52-migration-plan.txt"
+
+      - name: Run authorization-sensitive regression subsets
+        run: >-
+          uv run python manage.py test
+          mmportal.tests
+          clinic.tests
+          simulator.tests.test_twin_pr1_integration
+          twin_engine.tests
+          --settings=mmportal.settings
+          --verbosity 1
+        env:
+          DJANGO_DEBUG: "1"
+          DJANGO_SETTINGS_MODULE: "mmportal.settings"
+
+      - name: Reconfirm numerical identity
+        run: uv run python -m scripts.check_numerical_baseline

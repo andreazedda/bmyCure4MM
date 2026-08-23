@@ -81,3 +81,27 @@ jobs:
           image_id="$(docker image inspect --format '{{.Id}}' bmycure4mm:dependency-gate)"
           test -n "$image_id"
           echo "container_image_id=${image_id}" >> "$GITHUB_STEP_SUMMARY"
+
+  required:
+    name: required
+    if: ${{ always() }}
+    needs:
+      - locked-quality
+      - core-without-chemistry
+      - docker-lock
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enforce the protected aggregate result
+        env:
+          LOCKED_QUALITY_RESULT: ${{ needs.locked-quality.result }}
+          CORE_RESULT: ${{ needs.core-without-chemistry.result }}
+          DOCKER_RESULT: ${{ needs.docker-lock.result }}
+        run: |
+          set -euo pipefail
+          printf 'locked-quality=%s\n' "$LOCKED_QUALITY_RESULT"
+          printf 'core-without-chemistry=%s\n' "$CORE_RESULT"
+          printf 'docker-lock=%s\n' "$DOCKER_RESULT"
+          test "$LOCKED_QUALITY_RESULT" = "success"
+          test "$CORE_RESULT" = "success"
+          test "$DOCKER_RESULT" = "success"
+          echo "M0_R_REQUIRED_GATE=PASS" >> "$GITHUB_STEP_SUMMARY"
