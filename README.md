@@ -1,7 +1,6 @@
 # bmyCure4MM
 
-bmyCure4MM is an **E1 research prototype** for reproducible Multiple Myeloma
-computational research.
+bmyCure4MM is an **E1 research prototype** whose north-star is a virtual and reproducible Multiple Myeloma research laboratory.
 
 ```yaml
 intended_use_level: E1_research_prototype
@@ -10,118 +9,104 @@ patient_specific_prediction_validated: false
 causal_effect_identified: false
 ```
 
-The platform supports mechanistic simulation, structured research data,
-lineage-bound patient-twin experiments, exploratory scenario comparison, and
-scientific QA. It does not choose treatment, issue patient-specific dose or
-schedule instructions, predict patient benefit, or identify causal treatment
-effects.
+The platform currently provides governed structured research data, lineage-bound Patient Twin infrastructure, mechanistic PK/PD and schedule-aware simulation, model-relative counterfactual research, immutable run identity, artifact integrity and scientific QA foundations.
 
-The canonical policy is [Canonical Intended Use](docs/governance/INTENDED_USE.md).
+It does **not** choose treatment, issue patient-specific dose or schedule instructions, predict validated patient benefit or identify causal treatment effects.
+
+## Start here
+
+- [Mission and north star](docs/product/MISSION_AND_NORTH_STAR.md)
+- [Current verified state](docs/product/CURRENT_STATE.md)
+- [Capabilities and limitations](docs/product/CAPABILITIES_AND_LIMITATIONS.md)
+- [Canonical intended use](docs/governance/INTENDED_USE.md)
+- [Source-of-truth policy](docs/governance/SOURCE_OF_TRUTH.md)
+- [Current architecture](docs/architecture/CURRENT_SYSTEM.md)
+- [Target virtual laboratory](docs/architecture/TARGET_VIRTUAL_LAB.md)
+- [Current model registry and formulas](docs/models/REGISTRY.md)
+- [Project roadmap](docs/product/ROADMAP.md)
+
+## Current verified baseline
+
+```text
+repository = andreazedda/bmyCure4MM
+branch = master
+verified_head = a33418fb8ae9cb9fd05832dd9bc1cb0778e08533
+```
+
+Current M0-R path:
+
+```text
+#14 documentation/source of truth
+→ #13 mandatory CI aggregate gate and PR governance
+→ #23 minimum scientific/privacy invariants
+→ #26 close M0-R
+```
+
+The canonical dependency baseline now uses Django 5.2.17 LTS and sqlparse 0.6.0. Dependency audit, Django compatibility/deploy checks, disposable migrations, Python 3.11/3.12 suites, numerical identity, Secret Scan, Docker build and the protected `required` gate passed in PRs #71 and #72.
 
 ## Current capabilities
 
-- versioned structured research-dataset import with content hashes;
-- mechanistic PK/PD and tumor/healthy-cell simulation;
-- lineage-bound research twin initialization and calibration infrastructure;
-- model-relative diagnostic flags with explicit epistemic labels;
-- time-respecting research diagnostics, uncertainty, sensitivity, robustness,
-  and backtesting prototypes;
-- molecular research utilities, with RDKit-dependent features optional;
-- separate educational (`/learn/`), research (`/research/`), and administrative
-  (`/admin/`) surfaces.
+- versioned Structured Research Dataset Contract and idempotent import infrastructure;
+- content-addressed computational-input and Twin lineage;
+- persistent Twin states, residuals and calibration infrastructure;
+- logistic tumour/healthy-cell and PK/PD research simulation;
+- day-resolved administered-dose profiles and schedule identity;
+- heuristic hepatic and neutropenia risk signals;
+- mechanistic baseline/alternative counterfactual runs;
+- immutable run manifests, model registry, artifact hashes, comparability and invalidation;
+- uncertainty, sensitivity, robustness and backtesting prototypes;
+- optional molecular research utilities;
+- separate learning, research and administration surfaces.
 
-All scientific results require interpretation in model and data context.
-Negative and inconclusive results are valid research outcomes.
+See [Capabilities and limitations](docs/product/CAPABILITIES_AND_LIMITATIONS.md) before interpreting any result.
 
 ## Local setup
 
-Python 3.11 and 3.12 are supported. `uv.lock` is the sole dependency lock;
-`uv` 0.12.3 is required and refuses a stale lock.
+Python 3.11 and 3.12 are supported. `uv.lock` is the sole dependency lock and `uv` 0.12.3 is required.
 
 ```bash
 git clone https://github.com/andreazedda/bmyCure4MM.git
 cd bmyCure4MM
-python3.11 -m pip install uv==0.12.3  # one-time bootstrap
+python3.11 -m pip install uv==0.12.3
 uv sync --frozen --extra chemistry
 uv run python manage.py migrate
 uv run python manage.py check
 uv run python manage.py runserver
 ```
 
-Omit `--extra chemistry` for core work that does not use RDKit or the molecular
-pipelines. Dependency groups, lock updates, audits, and deterministic numerical
-checks are documented in [Dependency Operations](docs/operations/DEPENDENCIES.md).
+Omit `--extra chemistry` for core work that does not require RDKit. Dependency operations are documented in [Dependency Operations](docs/operations/DEPENDENCIES.md).
 
-Do not use production secrets or private patient payloads in development
-commands, fixtures, tests, or Git.
-
-## Tests and safety gate
+## Verification and safety
 
 ```bash
+uv lock --check
+uv sync --frozen --extra chemistry
 uv run python manage.py check
 uv run python manage.py makemigrations --check --dry-run
 uv run python manage.py test
 uv run ruff check .
 uv run ruff format --check .
 uv run mypy
+uv run python -m scripts.check_repository_hygiene
 uv run python -m scripts.check_numerical_baseline
 uv run python -m scripts.audit_dependencies
-scripts/pre_push_research_safety_check.sh
+bash scripts/pre_push_research_safety_check.sh
 ```
 
-The safety script checks ignored private paths, staged sensitive files,
-PHI-like markers, Django configuration, twin-engine tests, and selected
-authorization/simulation tests.
-
-## Scientific identity
-
-The current research model identifier is `research-twin-v1`. Twin states may
-bind model/config/Git identity, dataset identity, and a content-addressed
-computational-input hash. Historical states without lineage remain explicitly
-unbound; they are not silently reinterpreted.
-
-Every persisted scientific execution now creates an immutable run manifest
-containing the mandatory model/data/code/configuration version vector and
-artifact hashes. The governed model registry, direct-comparison rules, and
-append-only invalidation semantics are documented in
-[Research run manifests](docs/research/RUN_MANIFESTS.md). A successful process
-exit still does not imply calibration, validation, or scientific success.
-
-## Epistemic labels
-
-Current canonical labels are:
-
-`OBSERVED`, `DERIVED`, `USER_PROVIDED`, `SIMULATED`, `HEURISTIC`,
-`LITERATURE_INFORMED`, `HYPOTHETICAL`, and `VALIDATED_EXTERNAL`.
-
-Definitions and restrictions are in
-[Epistemic Labels](docs/governance/EPISTEMIC_LABELS.md) and
-[Model Output Language](docs/governance/MODEL_OUTPUT_LANGUAGE.md).
-
-## Repository areas
-
-```text
-clinic/         structured clinical-record workspace and data navigation
-simulator/      mechanistic simulation and synthetic learning scenarios
-twin_engine/    research twin, lineage, diagnostics, and artifacts
-chemtools/      molecular research utilities
-docs/           current and archived documentation
-governance/     machine-readable release claims
-local_private/  ignored private research material (never commit)
-```
+Current test boundaries and CI limitations are documented in [Testing](docs/operations/TESTING.md) and [Dependency Audit Triage](docs/operations/DEPENDENCY_AUDIT_TRIAGE.md).
 
 ## Privacy
 
-Names, medical-record numbers, dates of birth, clinical PDFs, source excerpts,
-direct identifiers, private dataset payloads, and private artifacts must never
-enter Git. Keep private research material under ignored `local_private/` paths
-and export only explicitly validated, de-identified research artifacts.
+Names, medical-record numbers, dates of birth, clinical PDFs, source excerpts, direct identifiers, private dataset payloads and private artifacts must never enter Git. Keep private research material under ignored `local_private/` paths and export only explicitly validated, de-identified research artifacts.
 
 ## Documentation status
 
-Current governance documents are authoritative. Historical feature narratives
-live under `docs/archive/` and must not be interpreted as current behavior. A
-full documentation source-of-truth rebuild is tracked in GitHub issue #14.
+The documentation corpus is governed by:
+
+- [Documentation policy](docs/governance/DOCUMENTATION_POLICY.md)
+- [Documentation inventory](docs/DOCUMENTATION_INVENTORY.yaml)
+
+Historical feature and release narratives are retained only as archives and are not current product claims.
 
 ## License and security
 

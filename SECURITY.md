@@ -1,141 +1,103 @@
-# Security Policy
+# Security policy
 
-## Reporting a Vulnerability
+## Current support state
 
-We take security seriously. If you discover a security vulnerability in bmyCure4MM, please report it responsibly.
+bmyCure4MM is an `E1_research_prototype`.
 
-### How to Report
+```yaml
+production_security_certified: false
+clinical_use_supported: false
+product_auth_model_complete: false
+object_authorization_complete: false
+dependency_security_green: true
+```
 
-**DO NOT** create a public GitHub issue for security vulnerabilities.
+The canonical research dependency baseline uses Django 5.2.17 LTS and sqlparse 0.6.0. Dependency audit, synthetic deployment checks, migration evidence, Python 3.11/3.12 suites, numerical identity, Secret Scan, Docker build and the protected `required` result passed in merged PRs `#71` and `#72`.
 
-Instead, please send an email to:
-- **andreazedda@example.com**
+This does not make the application production-certified or suitable for clinical deployment. Production security also depends on authentication, object authorization, settings, TLS/proxy behavior, storage, backup/restore, quotas, observability and incident response.
 
-Include in your report:
-- Description of the vulnerability
-- Steps to reproduce the issue
-- Potential impact
-- Suggested fix (if any)
+## Reporting a vulnerability
 
-### What to Expect
+Do **not** disclose vulnerabilities or patient-derived information in a public issue.
 
-- **Acknowledgment**: We'll acknowledge receipt within 48 hours
-- **Assessment**: We'll assess the vulnerability and determine severity
-- **Fix**: We'll work on a fix and keep you updated on progress
-- **Disclosure**: Once fixed, we'll coordinate public disclosure
+Preferred reporting path:
 
-### Supported Versions
+1. use the repository's private GitHub Security Advisory reporting flow when available;
+2. otherwise email the repository owner at **andrea.zedda@outlook.it** with the subject `bmyCure4MM security report`.
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.0.x   | :white_check_mark: |
-| < 1.0   | :x:                |
+Do not attach real patient records, clinical PDFs, direct identifiers, credentials or production secrets. Use a minimal synthetic reproducer or offer the material through an agreed private channel.
 
-## Security Best Practices
+Include:
 
-### For Deployment
+- affected commit/version;
+- vulnerability class;
+- minimal reproduction steps;
+- potential impact;
+- whether patient-derived data, authentication, authorization or artifact access may be involved;
+- suggested mitigation, if known.
 
-1. **Environment Variables**
-   - Never commit `.env` files
-   - Use strong, random `DJANGO_SECRET_KEY`
-   - Set `DJANGO_DEBUG=0` in production
+Acknowledgment and remediation timing are targets, not a contractual SLA. Disclosure will be coordinated according to severity, exploitability and available mitigation.
 
-2. **Database**
-   - Use PostgreSQL in production
-   - Enable SSL connections
-   - Regular backups
+## Verified current controls
 
-3. **HTTPS**
-   - Always use HTTPS in production
-   - Enable HSTS headers
-   - Set secure cookie flags
+- supported Django 5.2 LTS dependency baseline and deterministic `uv.lock`;
+- repository-native dependency audit with exact documented development-tool triage only;
+- environment-based secret-key configuration and weak/default-key rejection;
+- Django password hashing and CSRF protections;
+- selected authenticated views and global DRF `IsAuthenticated` default;
+- secret-scanning workflow;
+- repository hygiene and research safety tooling;
+- ignored `local_private/` boundary for private research material;
+- temporary M0 smoke identities constrained to non-staff, non-superuser accounts with no groups or direct permissions;
+- synthetic CI deployment check and disposable migration evidence;
+- protected `required` dependency/reproducibility result.
 
-4. **Dependencies**
-   - Regularly update dependencies
-   - Monitor security advisories
-   - Use `pip-audit` or similar tools
+These controls do not prove complete application security.
 
-5. **Access Control**
-   - Implement proper authentication
-   - Use role-based permissions
-   - Enable two-factor authentication if possible
+## Known open security gaps
 
-### For Development
+### Product authentication
 
-1. **Local Setup**
-   - Keep local `.env` files secure
-   - Don't share credentials
-   - Use test databases for development
+Documentation and selected simulator surfaces are public, while clinic/research/simulator-management/API surfaces are protected. `LOGIN_URL` currently targets the Django admin login and there is no reviewed normal-user product-login and role contract.
 
-2. **Code Review**
-   - Review all security-related changes
-   - Check for SQL injection vulnerabilities
-   - Validate all user inputs
+A temporary smoke identity cannot authenticate through the admin login by design and must not be promoted to staff merely to make a smoke test pass.
 
-3. **Testing**
-   - Write security tests
-   - Test authentication flows
-   - Verify permission checks
+### Object authorization and RBAC
 
-## Known Security Considerations
+GitHub issue `#8` tracks inconsistent patient-derived queryset scoping, dashboard aggregation, duplicated policy logic, least-privilege roles and privacy-safe access auditing.
 
-### Input Validation
-- All forms use Django's built-in validation
-- Additional validation in model `clean()` methods
-- XSS prevention through template auto-escaping
+### Production security
 
-### SQL Injection
-- Protected by Django ORM
-- No raw SQL queries without parameterization
-- Queryset filtering uses safe methods
+GitHub issue `#9` tracks fail-closed production settings, proxy/TLS behavior, HSTS, CSP, cookies, deployment checks and resource-specific framing policy.
 
-### CSRF Protection
-- Enabled by default in Django
-- All forms include CSRF tokens
-- API endpoints use token authentication
+### Rate and resource controls
 
-### Authentication
-- Built on Django's authentication system
-- Passwords hashed with PBKDF2
-- Session security configured
+GitHub issue `#10` tracks request throttling, job quotas, concurrency, timeout, deduplication and cost controls.
 
-## Security Features
+### CI and branch protection
 
-### Current Implementation
-- ✅ CSRF protection
-- ✅ XSS prevention
-- ✅ SQL injection protection
-- ✅ Secure password hashing
-- ✅ Session security
-- ✅ Environment-based secrets
+A protected `required` status exists. GitHub issue `#13` still tracks immutable Action pinning, exact base/head PR safety mode, documentation contracts, PR templates, CODEOWNERS, privacy-safe artifact retention, final workflow rationalization and branch-protection re-read.
 
-### Recommended Additions
-- [ ] Rate limiting
-- [ ] Two-factor authentication
-- [ ] Security headers (django-csp)
-- [ ] IP whitelisting for admin
-- [ ] Audit logging
-- [ ] Intrusion detection
+### Remaining development-tool advisory decision
 
-## Vulnerability Disclosure Timeline
+The dependency audit contains one exact development-only pytest advisory decision, documented in `docs/operations/DEPENDENCY_AUDIT_TRIAGE.md`. It is not a runtime-framework exception and must be removed when the browser-test toolchain supports the patched pytest line.
 
-1. **Day 0**: Vulnerability reported
-2. **Day 1-2**: Acknowledgment sent
-3. **Day 3-7**: Assessment and severity determination
-4. **Day 7-30**: Fix development and testing
-5. **Day 30**: Coordinated public disclosure
+## Data-safety rules
 
-## Attribution
+Never commit:
 
-Security researchers who responsibly disclose vulnerabilities will be credited in:
-- Release notes
-- Security advisories
-- Project documentation (with permission)
+- names, medical-record numbers or dates of birth;
+- clinical PDFs or source excerpts;
+- private longitudinal dataset payloads;
+- database files, media uploads or generated private artifacts;
+- `.env`, keys, credentials or tokens.
 
-## Questions?
+Use synthetic/demo fixtures in tests and CI. Security evidence must identify findings without unnecessarily printing sensitive matched content.
 
-For security questions that aren't vulnerabilities, please:
-- Open a GitHub Discussion
-- Contact maintainers via email
+## Deployment boundary
 
-Thank you for helping keep bmyCure4MM secure!
+The repository may contain deployment automation, but a successful image build or running deployment does not establish production security. A deployment must separately prove configuration, supported dependencies, database, storage, backup/restore, observability, access control and incident-response requirements.
+
+## Security-related issues
+
+Use public issues only for non-sensitive hardening tasks after removing exploit details and private data. Use private reporting for vulnerabilities.

@@ -1,5 +1,5 @@
 site_name: bmyCure4MM Docs
-site_description: E1 reproducible Multiple Myeloma computational research prototype
+site_description: E1 Multiple Myeloma computational research prototype; target E2 reproducible research
 site_url: https://andreazedda.github.io/bmyCure4MM/
 repo_url: https://github.com/andreazedda/bmyCure4MM
 repo_name: andreazedda/bmyCure4MM
@@ -8,101 +8,68 @@ edit_uri: edit/master/docs/
 nav:
   - Home: index.md
   - Start Here:
-      - Canonical Intended Use: governance/INTENDED_USE.md
+      - Mission and North Star: product/MISSION_AND_NORTH_STAR.md
+      - Current Verified State: product/CURRENT_STATE.md
+      - Capabilities and Limitations: product/CAPABILITIES_AND_LIMITATIONS.md
+      - Intended Use: governance/INTENDED_USE.md
+      - Source of Truth: governance/SOURCE_OF_TRUTH.md
+      - Roadmap: product/ROADMAP.md
+  - Architecture:
+      - Current System: architecture/CURRENT_SYSTEM.md
+      - Target Virtual Laboratory: architecture/TARGET_VIRTUAL_LAB.md
+      - Compatibility Architecture Link: guides/architecture.md
+  - Models:
+      - Current Registry and Formulas: models/REGISTRY.md
+      - Runtime Mathematical Models — IT: guides/mathematical_models.md
+      - Runtime Mathematical Models — EN: guides/mathematical_models_en.md
+      - Numerical Reproducibility: research/NUMERICAL_REPRODUCIBILITY.md
+  - Research Contracts:
+      - Structured Dataset Contract: research/STRUCTURED_DATASET_CONTRACT_V0_1.md
+      - Twin Lineage: research/TWIN_LINEAGE.md
+      - Run Manifests: research/RUN_MANIFESTS.md
+      - Comparability and Invalidation: research/COMPARABILITY_AND_INVALIDATION.md
+      - Real-Patient Research Loop: research/RESEARCH_LOOP.md
+      - Validation and Uncertainty: research/VALIDATION_UNCERTAINTY_PROTOCOL.md
+      - Real-Patient What-if Architecture: research/REAL_PATIENT_WHATIF_ARCHITECTURE.md
+      - Research Cockpit Guide: research/RESEARCH_COCKPIT_USER_GUIDE.md
+  - Operations:
+      - Authentication and Access: operations/AUTHENTICATION_AND_ACCESS.md
+      - Testing: operations/TESTING.md
+      - Dependencies: operations/DEPENDENCIES.md
+      - Dependency Audit Triage: operations/DEPENDENCY_AUDIT_TRIAGE.md
+      - Development: development/DEVELOPMENT.md
+      - Troubleshooting: development/TROUBLESHOOTING.md
+  - Governance:
       - Claims Policy: governance/CLAIMS_POLICY.md
       - Epistemic Labels: governance/EPISTEMIC_LABELS.md
       - Model Output Language: governance/MODEL_OUTPUT_LANGUAGE.md
-      - Learning Path: guides/learning_path.md
-      - Tutorial (EN): en/TUTORIAL_FIRST_RUN.md
-      - Tutorial (IT): it/TUTORIAL_PRIMO_USO.md
-  - Guides:
-      - Core:
-          - Architecture: guides/architecture.md
-          - Architecture Deep Dive: guides/architecture_deep_dive.md
-          - Database: guides/database.md
-          - Operations: guides/operations.md
-      - Modeling:
-          - Mathematical Models:
-              - Italiano: guides/mathematical_models.md
-              - English: guides/mathematical_models_en.md
-          - Optimization Theory: guides/optimization_theory.md
-          - Virtual Patients: guides/virtual_patients.md
-      - Exploratory Research Context:
-          - Regimen Context: guides/regimen_suggester.md
-          - Model-relative Thresholds: guides/decision_algorithm.md
-      - Docs:
-          - Glossary: guides/glossary.md
-          - Simulations Gallery: guides/simulations_gallery.md
-          - Simulator KPIs (How to Read): guides/simulator_kpis.md
-          - Custom drug (experimental): guides/custom_drug_experimental.md
-          - Doc Coverage (Gaps): guides/gaps.md
-          - Documentation Standard: guides/documentation_standard.md
-          - Documentation Roadmap: guides/documentation_roadmap.md
-      - Development: development/DEVELOPMENT.md
-      - Troubleshooting: development/TROUBLESHOOTING.md
-  - Reproducibility:
-      - Dependency Operations: operations/DEPENDENCIES.md
-      - Dependency Audit Triage: operations/DEPENDENCY_AUDIT_TRIAGE.md
-      - Numerical Policy: research/NUMERICAL_REPRODUCIBILITY.md
+      - Documentation Policy: governance/DOCUMENTATION_POLICY.md
+      - Documentation Inventory: product/DOCUMENTATION_INVENTORY.md
   - Reference:
       - Configuration: reference/configuration.md
       - Database Objects: reference/database_objects.md
       - Simulator Parameters: reference/simulator_parameters.md
       - Endpoints: reference/endpoints.md
       - Scripts: reference/scripts.md
-      - Repo Docs README: repo_readme.md
       - Apps:
           - Clinic: reference/apps/clinic.md
           - Simulator: reference/apps/simulator.md
           - ChemTools: reference/apps/chemtools.md
           - Docs Viewer: reference/apps/docs_viewer.md
-  - Deep Dives:
-      - Data:
-          - Dynamic Data Architecture: dynamic_data_architecture.md
-      - API:
-          - API Integration Summary: api_integration_summary.md
-          - API Integration Guide: API_INTEGRATION_GUIDE.md
-          - API Data Sources Quickref: API_DATA_SOURCES_QUICKREF.md
-          - API Enhancement Summary: API_ENHANCEMENT_SUMMARY.md
-          - MM API Selection Guide: MM_API_SELECTION_GUIDE.md
-      - Simulator:
-          - Twin In-App Guidance: IN_APP_GUIDANCE_TWIN_SIMULATOR_REGIMENS_THERAPIES.md
-          - Patient Twin (As Built): development/PATIENT_TWIN_AS_BUILT.md
-      - ChemTools:
-          - 3D Viewer Styling: 3D_VIEWER_STYLING.md
-      - Product:
-          - Before/After Comparison: BEFORE_AFTER_COMPARISON.md
-      - Development Logs:
-          - Embed Debug Guide: development/EMBED_DEBUG_GUIDE.md
-          - Implementation Summary: development/IMPLEMENTATION_SUMMARY.md
-      - Features:
-          - Docs Viewer (Complete): features/DOCS_VIEWER_COMPLETE.md
-          - ChemTools Testing Summary: features/CHEMTOOLS_TESTING_SUMMARY.md
-          - Testing Report: features/TESTING_REPORT.md
-      - Archive:
-          - Legacy Prescriptive Outputs: archive/LEGACY_PRESCRIPTIVE_OUTPUTS.md
-          - Legacy Unvalidated Model Outputs: archive/LEGACY_UNVALIDATED_MODEL_OUTPUTS.md
-          - Legacy Twin Architecture: archive/PATIENT_TWIN_TARGET_ARCHITECTURE_PRE_E1.md
-  - EN:
-      - Quickstart: en/quickstart.md
-      - Simulator: en/simulator.md
-      - Optimization Lab: en/optimization_lab.md
-      - Patient Twin: en/patient_twin.md
-      - PK/PD Presets: en/pkpd_presets.md
-      - Pipelines: en/pipelines.md
-      - API: en/api.md
-  - IT:
-      - Avvio rapido: it/avvio_rapido.md
-      - Simulatore: it/simulatore.md
-      - Optimization Lab: it/optimization_lab.md
-      - Gemello Paziente: it/gemello_paziente.md
-      - Preset PK/PD: it/pkpd_preset.md
-      - Pipeline: it/pipeline.md
-      - API: it/api.md
+  - Learning:
+      - Learning Path: guides/learning_path.md
+      - Glossary: guides/glossary.md
+      - Simulator KPIs: guides/simulator_kpis.md
+      - Model-relative Thresholds: guides/decision_algorithm.md
+  - Archive:
+      - Legacy Prescriptive Outputs: archive/LEGACY_PRESCRIPTIVE_OUTPUTS.md
+      - Legacy Unvalidated Outputs: archive/LEGACY_UNVALIDATED_MODEL_OUTPUTS.md
+      - Legacy Twin Architecture: archive/PATIENT_TWIN_TARGET_ARCHITECTURE_PRE_E1.md
+      - 2024 Release Preparation: archive/releases/RELEASE_PREPARATION_2024.md
 
 theme:
   name: material
-  language: it
+  language: en
   features:
     - navigation.tabs
     - navigation.sections

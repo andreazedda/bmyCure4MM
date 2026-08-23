@@ -1,40 +1,50 @@
+---
+title: bmyCure4MM Documentation
+status: CANONICAL
+owner: Andrea Zedda
+last_verified_at: 2026-08-24
+last_verified_git_sha: bf097810b337dc6b766cda04497005670cd96513
+---
+
 # bmyCure4MM documentation
 
-bmyCure4MM is an `E1_research_prototype` for reproducible computational
-multiple-myeloma research. It stores structured research records, constructs
-versioned model state, and runs mechanistic hypothetical scenarios.
+bmyCure4MM is an `E1_research_prototype` for Multiple Myeloma computational research. Its target is a virtual and reproducible laboratory for virtual patients, current and experimental therapy hypotheses, falsification, reproducible protocols and an interdisciplinary Knowledge Commons.
 
-It is not clinical decision support. Patient-specific prediction is not
-validated, and causal treatment effects are not identified.
+It is not clinical decision support. Patient-specific prediction is not validated and causal treatment effects are not identified.
 
-## Start with governance
+## First reading
 
-1. [Canonical intended use](governance/INTENDED_USE.md)
-2. [Claims policy](governance/CLAIMS_POLICY.md)
-3. [Epistemic labels](governance/EPISTEMIC_LABELS.md)
-4. [Model output language](governance/MODEL_OUTPUT_LANGUAGE.md)
+1. [Mission and north star](product/MISSION_AND_NORTH_STAR.md)
+2. [Current verified state](product/CURRENT_STATE.md)
+3. [Capabilities and limitations](product/CAPABILITIES_AND_LIMITATIONS.md)
+4. [Canonical intended use](governance/INTENDED_USE.md)
+5. [Source-of-truth hierarchy](governance/SOURCE_OF_TRUTH.md)
 
-## Current research surfaces
+## Architecture
 
-- **Clinic** records pseudonymized structured inputs and dated observations.
-- **Research Twin** stores model state and lineage to its input snapshot.
-- **Simulator** evaluates hypothetical mechanistic configurations.
-- **Scientific Cockpit** exposes diagnostics, assumptions, and provenance.
-- **ChemTools** is an optional exploratory cheminformatics surface.
+- [Current system](architecture/CURRENT_SYSTEM.md)
+- [Target virtual laboratory](architecture/TARGET_VIRTUAL_LAB.md)
+- [Current model registry and formulas](models/REGISTRY.md)
 
-Every displayed simulation must be read as `SIMULATED` or `HYPOTHETICAL` and
-must retain its stated model version and limitations. A successful process exit
-means computation completed; it does not establish scientific or clinical
-validity.
+Current and target architecture are deliberately separated. A target component is not an implemented capability.
 
-## Contributor path
+## Research contracts
 
-- [Architecture](guides/architecture.md)
-- [Database](guides/database.md)
-- [Operations](guides/operations.md)
-- [Development](development/DEVELOPMENT.md)
-- [Research simulator](en/simulator.md)
+- [Structured dataset contract](research/STRUCTURED_DATASET_CONTRACT_V0_1.md)
+- [Twin lineage](research/TWIN_LINEAGE.md)
+- [Immutable run manifests](research/RUN_MANIFESTS.md)
+- [Comparability and invalidation](research/COMPARABILITY_AND_INVALIDATION.md)
+- [Real-patient Research Loop](research/RESEARCH_LOOP.md)
+- [Validation and uncertainty](research/VALIDATION_UNCERTAINTY_PROTOCOL.md)
 
-Historical material with superseded claims is isolated under
-[`archive/`](archive/LEGACY_PRESCRIPTIVE_OUTPUTS.md) and is not a source of
-current product claims.
+## Governance and operations
+
+- [Claims policy](governance/CLAIMS_POLICY.md)
+- [Epistemic labels](governance/EPISTEMIC_LABELS.md)
+- [Model output language](governance/MODEL_OUTPUT_LANGUAGE.md)
+- [Documentation policy](governance/DOCUMENTATION_POLICY.md)
+- [Authentication and access](operations/AUTHENTICATION_AND_ACCESS.md)
+- [Testing](operations/TESTING.md)
+- [Dependency operations](operations/DEPENDENCIES.md)
+
+A successful process exit means computation completed. It does not establish scientific validity, external validity or clinical utility.
