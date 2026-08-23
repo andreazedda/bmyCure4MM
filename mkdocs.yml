@@ -44,7 +44,7 @@ nav:
       - Epistemic Labels: governance/EPISTEMIC_LABELS.md
       - Model Output Language: governance/MODEL_OUTPUT_LANGUAGE.md
       - Documentation Policy: governance/DOCUMENTATION_POLICY.md
-      - Documentation Inventory: DOCUMENTATION_INVENTORY.yaml
+      - Documentation Inventory: product/DOCUMENTATION_INVENTORY.md
   - Reference:
       - Configuration: reference/configuration.md
       - Database Objects: reference/database_objects.md

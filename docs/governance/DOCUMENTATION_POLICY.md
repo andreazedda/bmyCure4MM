@@ -14,6 +14,8 @@ last_verified_git_sha: bf097810b337dc6b766cda04497005670cd96513
 Every governed document must use one status:
 
 ```text
+CANONICAL
+CANONICAL_STRATEGY
 CURRENT_VERIFIED
 CURRENT_PARTIAL
 CURRENT_HEURISTIC_PROTOTYPE
@@ -25,6 +27,12 @@ DEFERRED
 REJECTED
 HISTORICAL_ARCHIVE
 ```
+
+- `CANONICAL` governs a current policy or source-of-truth contract.
+- `CANONICAL_STRATEGY` governs the approved mission or roadmap while keeping target capabilities separate from current implementation.
+- `CURRENT_*` content maps to present repository behavior at a verified SHA.
+- `TARGET_APPROVED` content is approved design, not current implementation.
+- `RESEARCH_HYPOTHESIS` content requires competing hypotheses and a falsification path.
 
 ## Required metadata
 
@@ -49,7 +57,7 @@ Fields that do not apply may be omitted, but `status`, `owner`, `last_verified_a
 - `CURRENT_*` content must map to an existing code/schema/registry entry point.
 - `TARGET_APPROVED` content must state prerequisites and acceptance evidence.
 - `RESEARCH_HYPOTHESIS` content must include competing hypotheses and a falsification path.
-- historical content must begin with an archive banner and must not appear in current navigation.
+- historical content must begin with an archive banner and must not appear in current navigation except inside the explicit Archive section.
 
 ## Formula standard
 
@@ -94,6 +102,8 @@ Current documents inherit `INTENDED_USE.md` and `CLAIMS_POLICY.md`. Archived cla
 
 ## Inventory and navigation
 
-`docs/DOCUMENTATION_INVENTORY.yaml` classifies the documentation corpus. Only `CANONICAL`, `CURRENT_SUPPORTING` and explicitly selected `TARGET_SUPPORTING` documents may appear in current MkDocs navigation.
+`docs/DOCUMENTATION_INVENTORY.yaml` classifies the documentation corpus. [Documentation Inventory](../product/DOCUMENTATION_INVENTORY.md) explains how to read the machine-readable file.
+
+Only `CANONICAL`, `CURRENT_SUPPORTING` and explicitly selected `TARGET_SUPPORTING` inventory classifications may appear in current MkDocs navigation. Historical files may appear only in the explicit Archive section.
 
 Unmatched files resolve to `UNCLASSIFIED_REQUIRES_REVIEW` and must stay outside current navigation until reviewed.
