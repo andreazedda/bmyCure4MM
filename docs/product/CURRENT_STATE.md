@@ -4,7 +4,7 @@ status: CURRENT_VERIFIED
 owner: Andrea Zedda
 audience: all contributors
 last_verified_at: 2026-08-24
-last_verified_git_sha: bf097810b337dc6b766cda04497005670cd96513
+last_verified_git_sha: a33418fb8ae9cb9fd05832dd9bc1cb0778e08533
 source_of_truth: code, registries, schemas, migrations and current validation evidence
 ---
 
@@ -15,7 +15,7 @@ source_of_truth: code, registries, schemas, migrations and current validation ev
 ```yaml
 repository: andreazedda/bmyCure4MM
 branch: master
-verified_head: bf097810b337dc6b766cda04497005670cd96513
+verified_head: a33418fb8ae9cb9fd05832dd9bc1cb0778e08533
 intended_use_level: E1_research_prototype
 clinical_decision_support: false
 patient_specific_prediction_validated: false
@@ -41,13 +41,13 @@ This page describes the repository state at the SHA above. Later changes require
 - Structured Research Dataset Contract v0.1 and generic idempotent importer.
 - Content-addressed computational-input and Twin-lineage contracts.
 - Canonical E1 intended use and non-prescriptive model-output language.
-- Deterministic `uv.lock` dependency graph and supported Python 3.11/3.12 tooling.
+- Deterministic `uv.lock` dependency graph using Django 5.2.17 LTS, sqlparse 0.6.0 and supported Python 3.11/3.12 tooling.
 - Immutable research run manifests and version vectors.
 - Governed model registry and versioned scientific JSON contracts.
 - Artifact hashing, direct-comparability rules and append-only invalidation semantics.
-- Numerical baseline and repository/dependency-check infrastructure.
-
-The lock is deterministic but is **not currently security-green**: newly disclosed advisories affect the pinned Django 4.2.30 and sqlparse 0.5.4 graph. Django 4.2 is outside upstream extended support. Immediate triage is tracked in `#69`; migration to Django 5.2 LTS is tracked in `#70`.
+- Numerical baseline, repository hygiene and dependency-audit infrastructure.
+- Synthetic Django deployment checks, migration-drift checks and disposable migration evidence.
+- A stable protected `required` result over locked quality, Python matrix and Docker build.
 
 ## Current registered models
 
@@ -69,7 +69,7 @@ Detailed status and formula mappings are in [Current model registry](../models/R
 
 The repository can persist structured longitudinal entities, construct lineage-bound Twin states, execute mechanistic simulations, create immutable run identity and compare hypothetical configurations. It also has residual/calibration, uncertainty, sensitivity, robustness and temporal-diagnostic infrastructure.
 
-It has **not** yet demonstrated a source-verified, leakage-free, identifiable and out-of-sample-valid patient-specific Research Loop. M1 remains blocked until the M0-R documentation, supported dependency, CI and minimum QA baseline closes.
+It has **not** yet demonstrated a source-verified, leakage-free, identifiable and out-of-sample-valid patient-specific Research Loop. M1 remains blocked until the M0-R documentation, final CI-governance and minimum QA baseline closes.
 
 ## Current authentication and authorization boundary
 
@@ -79,24 +79,26 @@ Known authorization gaps are tracked in GitHub issue `#8`. Admin access or tempo
 
 ## Current CI evidence
 
-GitHub Actions already exist for dependency/reproducibility checks, documentation deployment, secret scanning, image build/publish, UI screenshots and automatic redeployment.
+GitHub Actions cover dependency/reproducibility checks, documentation, secret scanning, image workflows, Django 5.2 compatibility, UI screenshots and redeployment.
 
-On documentation PR `#68`, current evidence at head `3bc54788...` is:
+Merged PRs `#71` and `#72` established:
 
 ```text
-strict MkDocs build: PASS
-secret scan: PASS
-Ruff and format: PASS
-mypy: PASS
-repository hygiene: PASS
+Django 5.2.17 LTS and sqlparse 0.6.0 identity: PASS
+dependency audit: PASS
+ordinary and synthetic deploy checks: PASS
+migration drift and disposable migrations: PASS
+Ruff, format, mypy and repository hygiene: PASS
 numerical baseline: PASS / unchanged
 Python 3.11 core check/tests: PASS
 Python 3.12 core check/tests: PASS
+authorization-sensitive compatibility subset: PASS
+Secret Scan: PASS
 Docker locked build: PASS
-dependency audit: FAIL on newly disclosed advisories
+protected required result: PASS
 ```
 
-The workflows are not yet consolidated into one stable mandatory aggregate gate, and external Actions are not yet uniformly pinned to immutable commit SHAs. That work is tracked in `#13` after `#14`, `#69` and `#70` establish canonical paths and a supported dependency baseline.
+The workflows are not yet fully rationalized: external Actions remain tag-pinned rather than immutable-SHA-pinned, the research safety script lacks verified base/head PR mode, and PR templates/CODEOWNERS/final branch-protection evidence remain under issue `#13`.
 
 ## Privacy boundary
 
@@ -106,8 +108,6 @@ Private patient documents, direct identifiers, source excerpts and private datas
 
 ```text
 #14 documentation/source-of-truth baseline
-+ #69 immediate dependency-advisory remediation
-→ #70 supported Django 5.2 LTS baseline
 → #13 mandatory CI aggregate gate and PR governance
 → #23 minimum M0-R scientific/privacy invariants
 → #26 close M0-R
