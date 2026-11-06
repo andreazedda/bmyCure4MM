@@ -1,6 +1,6 @@
 {% extends 'base.html' %}{% load static account_ui %}
 {% block title %}{{ title }}{% endblock %}
-{% block extra_head %}<script defer src="{% static 'accounts/access.js' %}"></script>{% endblock %}
+{% block extra_head %}<script defer src="{% static 'accounts/access.js' %}?v={{ asset_version }}"></script>{% endblock %}
 {% block content %}
 <div class="row justify-content-center"><section class="col-lg-7"><div class="card"><div class="card-body p-4">
   <h1 class="h3">{% if title_it %}<span class="t-en">{{ title }}</span><span class="t-it">{{ title_it }}</span>{% else %}{{ title|account_label }}{% endif %}</h1>

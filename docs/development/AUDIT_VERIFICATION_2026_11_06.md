@@ -5,7 +5,7 @@ status: CURRENT_VERIFIED
 owner: Andrea Zedda
 audience: maintainers and reviewers
 last_verified_at: 2026-11-06
-last_verified_git_sha: fa9c35473302debf3c9a289d5f34f0bc7f771dbd
+last_verified_git_sha: 313e2e4d8a839b9c14a8d853d1f008071a6cb013
 ---
 
 # Developer audit verification — 2026-11-06
@@ -15,7 +15,7 @@ This record covers the source/documentation audit and executable developer exerc
 ## Source, environment and evidence boundary
 
 - Audited baseline: `fa9c35473302debf3c9a289d5f34f0bc7f771dbd`; source anchors in the inventory are pinned to that commit.
-- Corrections and exercises were run in the audit working tree based on that commit. Final protected-CI and release SHAs belong to the dated PR/release ledger; this page does not invent a hash for uncommitted edits.
+- Original corrections and exercises were run in the audit working tree based on that commit. Final protected PR #86 head is `49d1a89b12cd0508e8c6aba2340cb193a31eed11`, merged source `313e2e4d8a839b9c14a8d853d1f008071a6cb013`; immutable inventory source anchors deliberately retain the audited baseline.
 - Local environment: macOS ARM64, Python 3.11, frozen project dependencies, disposable SQLite, independent synthetic fixtures, null test logging and local-memory email.
 - `UV_NO_SYNC=1` was used while executing `uv run` against the already synchronized environment so concurrent verification would not change shared dependencies. The clean-environment procedure explicitly performs `uv sync --frozen` first.
 - The application database, patient media, owner password/MFA and email capabilities were not copied or printed.
@@ -53,16 +53,61 @@ These counts are the observed command results for this audit, not the total appl
 
 The exact walkthrough labels and inline failure/restore commands are maintained in [manual diagnosis](TROUBLESHOOTING.md). Tests used dedicated `/tmp/bmy-doc-audit-*` roots; path names are examples, not required shared directories. Reproduce with a fresh `mktemp` root and retain only sanitized outcomes.
 
+## Final PR #86 and target-image verification
+
+This section adds PR #86 evidence without rewriting earlier focused test
+measurements. The browser cache finding below prevents treating that
+intermediate deployment as completed UX acceptance.
+
+| Check / identity | Observed outcome |
+| --- | --- |
+| Protected PR | [#86](https://github.com/andreazedda/bmyCure4MM/pull/86); tested head `49d1a89b12cd0508e8c6aba2340cb193a31eed11`; merged source `313e2e4d8a839b9c14a8d853d1f008071a6cb013` |
+| Whole local suite | PASS: 473 discovered Django tests on disposable SQLite, macOS ARM64 / Python 3.11 |
+| Combined account/docs browser suites | PASS: two tests in 38.646s; real local HTTP forms, isolated synthetic users and SMTP sink, desktop/mobile views |
+| Frozen numerical baseline | PASS: zero differences; no golden-output update |
+| Protected and publication gates | PASS: required CI, post-merge checks, GitHub Pages and GHCR |
+| Published image | Index digest `sha256:0d707ef6c20ee3f6cc4650730610ee045af56955130ab28a5bb98b7bdccfc405`; OCI source label and image environment match merged source |
+| Actual target disposable test Job | `ux-verify-313e2e4` PASS: 83 tests (34 accounts, 46 docs, three learning-entry tests), 38.559s tests / 96.69s runner, peak RSS 269340 KiB; existing NFS PVC and disposable SQLite, unchanged 1 CPU / 512 MiB ceiling |
+| Target SMTP/TLS connectivity | PASS for connectivity/TLS only; no new authenticated send or received message claimed |
+| Controlled backup/bootstrap/catalogue/static Job | `accounts-release-313e2e4` PASS: matching source, backup restore `quick_check=ok`, ACTIVE owner/MFA and open request/activation gates preserved, static assets present, empty catalogue initialized with one active synthetic scenario |
+| Web/worker runtime identity and route probes | PASS: web and both workers report PR #86 source/digest, 1 CPU / 1 GiB ceilings; owner/MFA/gates/catalogue preserved; 20 public route/asset probes passed |
+| Returning-browser static-cache gate | Historical FAIL for intermediate PR #86: unversioned CSS remained cached up to 14400 seconds despite correct collected files; PR #87 adds source-versioned asset URLs |
+| Corrected-image acceptance contract | Require protected checks, exact published source/digest, controlled rollout/readback and returning-browser asset verification; record the result and asset hashes in the dated release-evidence comment in [GitHub #79](https://github.com/andreazedda/bmyCure4MM/issues/79), linked to PR #87 |
+
+The dated #79 release-evidence comment is the final operational ledger for the
+current deployed version and cache outcome. This source snapshot deliberately
+preserves the intermediate PR #86 measurements and operator acceptance contract;
+it does not invent a future build SHA or assert a PR #87 merge/deployment before
+verification. The historical cache failure is not a permanent statement about
+runtime after a subsequent verified release.
+
+Final review also reproduced an internal symlink allowlist bypass with a
+synthetic temporary file, then verified its rejection: documentation page/raw
+returned 404 and search omitted the link. The 46 documentation tests passed.
+Registered-user clinical assessment choices are now excluded before lookup,
+and forged Twin context is rejected across the three simulator aliases;
+nonstaff owner behavior is covered separately. Revoked accounts cannot be moved
+to suspended and renewed. These safeguards are bounded to the existing member
+entry path and do not close broad legacy-clinic authorization issue #8.
+
+The controlled release initializes only a wholly empty existing `Scenario`
+catalogue using `ensure_learning_example`; reruns preserve all existing and
+inactive examples. It does not create another application, patient fixtures,
+per-user provisioning or a computation worker. Rollback to the previous image
+requires suspending external members and closing registration/activation gates
+before reverting security fixes. Preserve schema/PVCs and use a separate
+old-image collectstatic Job, because the previous image lacks this command.
+
 ## Available checks and acceptance that remain distinct
 
 | Check / acceptance | How to reproduce or obtain it | Current claim |
 | --- | --- | --- |
-| Full Django suite and migration drift | Handbook verification command matrix | Final audit PR records the executed whole-tree result; do not replace it with the 45 focused tests above |
+| Full Django suite and migration drift | Handbook verification command matrix | Final whole-tree result above and PR #86; original focused exercises alone are not whole-tree acceptance |
 | Real browser forms/CSRF/QR/two users/results/tickets | Explicit `accounts.tests.browser_journey` command with SMTP sink | Browser audit evidence is separate from the local-memory walkthrough |
 | Frozen scientific regression baseline | `python -m scripts.check_numerical_baseline` | Preserves governed outputs; not efficacy/calibration validation |
 | Strict docs build | `uv run --frozen --no-default-groups --group docs mkdocs build --strict` | Required before merging; a successful build does not prove source statements or UI rendering |
 | Python 3.12, frozen image, secret/dependency gates | Protected `required` GitHub workflow and companion docs/secret workflows | Use exact PR head and conclusion; local Python 3.11 is not a substitute |
-| Production source/digest/assets/mail/rollout | Governed existing-cluster release runbook | Not inferred from a local test or healthy HTML response |
+| Production source/digest/assets/mail/rollout | Governed existing-cluster release runbook | Intermediate PR #86 readback passed; current version and corrected-image cache outcome belong to the dated #79 release-evidence comment, not an anticipated hash in this source snapshot |
 | Independent maintainer no-AI exercise | Human follows two walkthroughs, expected failure and recovery, records own result | PENDING_USER_ACTION; no automated run can certify another person's understanding |
 | First real researcher acceptance (#78) | Owner explicitly authorizes a person and collects actual feedback | Separate gate; no synthetic user stands in for it |
 

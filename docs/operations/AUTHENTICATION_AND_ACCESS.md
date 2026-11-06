@@ -1,5 +1,6 @@
 ---
 title: Authentication and Access
+language: en
 status: CURRENT_PARTIAL
 owner: Andrea Zedda
 audience: users, maintainers and operators
@@ -10,9 +11,9 @@ last_verified_at: 2026-11-06
 
 ## Scope and verified production boundary
 
-Registration and private suggestion tickets extend the existing Django application and user model. They use the existing navigation, getting-started guide and learning scenarios. There is no additional demo portal, scenario provisioning, simulation worker or parallel quota system. Scientific equations, parameters, solver, manifests and intended use remain unchanged: E1 research only, never clinical decision support.
+Registration and private suggestion tickets extend the existing Django application and user model. They use the existing navigation, getting-started guide and learning scenarios. There is no additional demo portal, per-user scenario provisioning, simulation worker or parallel quota system. The controlled release can initialize an entirely empty learning catalogue with one independent synthetic example in the existing `Scenario` model; existing or intentionally inactive catalogues are preserved. Scientific equations, parameters, solver, manifests and intended use remain unchanged: E1 research only, never clinical decision support.
 
-The verified production origin is **https://bmycure4mm.clusterlab.uk**, namespace `bmycure4mm`, deployments `web` and `celery`. On 2026-11-06, before this release, both ran source `2c60b63dfb3d42ee573d749c23cf5033aabdbc68` and image digest `sha256:a87b1118813ebf2c1fea827dc9d5038595b4abe2420ba362acc87865f7606626`. Product login was absent. Runtime uses SQLite `/data/db.sqlite3` on the existing NFS PVC, not PostgreSQL. Static files already have a separate service and PVC; adding middleware is unnecessary.
+The verified production origin is **https://bmycure4mm.clusterlab.uk**, namespace `bmycure4mm`, deployments `web` and `celery`. On 2026-11-06, before the initial registration release, both ran source `2c60b63dfb3d42ee573d749c23cf5033aabdbc68` and image digest `sha256:a87b1118813ebf2c1fea827dc9d5038595b4abe2420ba362acc87865f7606626`; product login was absent at that point. The dated release ledger below records subsequent source/digest changes. Runtime uses SQLite `/data/db.sqlite3` on the existing NFS PVC, not PostgreSQL. Static files already have a separate service and PVC; adding middleware is unnecessary.
 
 Implementation and local tests do not prove a production rollout or email receipt. See the release evidence below for the current verified state. Broad clinical authorization work (#8), resource governance and the real researcher pilot (#78) remain separate and open.
 
@@ -31,7 +32,7 @@ Access initially expires after the 1–14 days assigned by Andrea. Existing simu
 
 Use `/accounts/login/`, then `/accounts/security/` to enroll/confirm a time-based authenticator. Management sessions require a fresh code every 15 minutes. Keep the authenticator key private and retain recovery access through the governed cluster operator. Existing administrators are preserved; new registrants remain `is_staff=false`, `is_superuser=false`.
 
-- `/manage/access-requests/`: verified requests, approve/reject, choose initial expiry, reissue pending activation, renew/restore suspended or expired access, suspend/revoke, and failed email retry. Revoked access cannot be renewed.
+- `/manage/access-requests/`: verified requests, approve/reject, choose initial expiry, reissue pending activation, renew/restore suspended or expired access, suspend/revoke, and failed email retry. Revocation requires an explicit confirmation and cannot be undone by suspending and then renewing the account. Requests and failed-notification lists have independent pagination that preserves the other list's page.
 - `/manage/users/`: registered users and expiry/status; link back to access controls.
 - `/manage/feedback/`: classify, reply and close private tickets. Publishing a reply sends a generic notification without the ticket body.
 - Registration controls independently pause requests and activations. Owner access remains available while these gates are closed.
@@ -87,9 +88,9 @@ After restoring a backup, **before exposing traffic**, run `python manage.py qua
 1. Verify SSH target, namespace, current web/worker digest, persistence, and restore capability. The historical local kubeconfig is not authoritative. Do not bypass certificate errors or touch other projects' routing/PVCs.
 2. Test migrations against an isolated equivalent database. Create a private online SQLite backup on the existing data volume and validate restore with `PRAGMA quick_check`; keep disaster backup/mirror separate. Save current deployment/config metadata privately.
 3. Publish only reviewed source through protected PR checks. Use a digest for both web and Celery. The old automatic mutable-`latest` restart has been replaced by an explicit digest release workflow, which requires these operator preflight steps.
-4. For initial onboarding keep gates closed. On routine releases preserve the owner’s current gate choices unless a migration needs a documented pause. Run migrations and idempotent owner bootstrap in a controlled one-shot Job; collect static files to the existing static PVC. Set secure cookies and the verified proxy/HTTPS configuration. Do not reset any existing owner's password.
+4. For initial onboarding keep gates closed. On routine releases preserve the owner’s current gate choices unless a migration needs a documented pause. Run migrations and idempotent owner bootstrap in a controlled one-shot Job, then `ensure_learning_example` and collect static files to the existing static PVC. The catalogue command creates one synthetic `Scenario` only if no scenario exists, uses the existing shared policy lock and changes no patients, scientific defaults or existing records. Require its sanitized catalogue count in release evidence. Set secure cookies and the verified proxy/HTTPS configuration. Do not reset any existing owner's password.
 5. Roll out web and Celery by the same digest, verify readiness, source identity, ordinary routes, local JS and admin CSS, email acceptance/receipt separately, permissions and persistence. Open gates only when the owner can govern access.
-6. Rollback: close request/activation gates; set both deployments back to the recorded previous digest and check rollout/readiness. Leave additive account tables/index intact. Do not downgrade schema or restore an older clinical database merely to undo application code. Choose the previous clean product image when available. The pre-registration image does not offer product login; disclose that outage if used.
+6. Rollback: close request/activation gates and suspend externally approved member access before reverting security fixes; closing gates alone does not invalidate existing member sessions. Set web, Celery and notification maintenance back to the recorded previous digest and check rollout/readiness. Restore matching static assets through a separate bounded `collectstatic` Job using the old image; do not run the new release Job against an image without `ensure_learning_example`. Leave additive account tables/index, secrets, MFA and PVCs intact. Do not downgrade schema or restore an older clinical database merely to undo application code. The pre-registration image does not offer product login; disclose that outage if used.
 
 ## Requirements and verification evidence
 
@@ -106,7 +107,61 @@ Run disposable backend tests with `BMY_TEST_ROOT=/tmp/bmy-registration-check DJA
 
 ## Verified runtime evidence — 2026-11-06
 
-### Latest verified application release: PR #84
+### Intermediate PR #86 deployment — static-cache acceptance failed
+
+The protected UX/developer-audit PR [#86](https://github.com/andreazedda/bmyCure4MM/pull/86)
+was tested at head `49d1a89b12cd0508e8c6aba2340cb193a31eed11` and merged as source
+`313e2e4d8a839b9c14a8d853d1f008071a6cb013`. Required CI, post-merge checks,
+GitHub Pages publication and GHCR publication passed. The published image index is
+`sha256:0d707ef6c20ee3f6cc4650730610ee045af56955130ab28a5bb98b7bdccfc405`;
+OCI source labels and image environment identify the same merged source.
+
+Local verification passed **473 discovered Django tests** on disposable SQLite
+and **two combined browser tests in 38.646 seconds** with isolated synthetic
+users and mail sink. The frozen numerical baseline had zero differences.
+These are automated local/CI results, not production mail receipt or independent
+human acceptance. The developer exercises and bounded claims are recorded in the
+[verification record](../development/AUDIT_VERIFICATION_2026_11_06.md).
+
+Target verification Job `ux-verify-313e2e4` passed **83 tests** (34 accounts,
+46 docs, three learning-entry tests) on disposable SQLite on the actual NFS PVC:
+38.559 seconds tests / 96.69 seconds runner, peak RSS 269340 KiB, with an unchanged
+1 CPU / 512 MiB ceiling. Target SMTP/TLS connectivity passed; this is not evidence
+of a new authenticated send or received email. Controlled release Job
+`accounts-release-313e2e4` passed: private online backup restored with
+`quick_check=ok`, owner remained ACTIVE with confirmed MFA, and both
+owner-selected request/activation gates remained open. Static assets were
+present and the previously empty learning catalogue now contains one active
+synthetic scenario. Web and both worker pods report the expected source/digest,
+with unchanged 1 CPU / 1 GiB ceilings; owner/MFA, gates and the scenario persisted.
+All 20 public route/asset probes passed.
+
+**This intermediate deployment failed the static-cache acceptance gate.** A real-browser check found stale
+unversioned CSS cached for up to 14400 seconds despite correct files after
+collectstatic. Successful HTML/asset probes did not establish that returning
+browsers received the new styles. The static-cache gate is **FAIL** for this
+intermediate deployment. PR #87 adds source-versioned asset URLs. Accept that
+correction only after its protected checks and published image identity pass,
+the controlled rollout completes and a returning browser receives the new
+assets. Record a fresh notification-maintenance outcome separately; this entry
+claims no new email receipt.
+
+The **dated release-evidence comment in [GitHub #79](https://github.com/andreazedda/bmyCure4MM/issues/79)**
+is the canonical final readback ledger for the current deployed source, digest,
+asset hashes and browser outcome. Operators update it after deployment, with
+the corresponding PR #87 evidence. This source snapshot preserves the observed
+PR #86 intermediate result and the acceptance procedure; it does not claim a
+future PR #87 image hash, merge or rollout, and its historical FAIL must not be
+read as the current runtime status after a later verified release.
+
+Rollback target for PR #86 is source `abbb98f8bb5c0f121d9469a19bee36a5e3e2a5a8`,
+digest `sha256:47bb2811561bd34a385df91e3bdb942576ddb07940951e36b3ea317929465d66`.
+That image predates the terminal-revocation, registered-user assessment-lookup
+and documentation-path fixes. Close request/activation gates and suspend external
+members in the owner console before reverting; verify denied sessions/downloads.
+Use the [bounded rollback procedure](https://github.com/andreazedda/bmyCure4MM/blob/master/deploy/k8s/DEPLOY_K3S.md#5-acceptance-and-rollback).
+
+### Previous verified application release: PR #84
 
 The deployed application source is `abbb98f8bb5c0f121d9469a19bee36a5e3e2a5a8`,
 image index `sha256:47bb2811561bd34a385df91e3bdb942576ddb07940951e36b3ea317929465d66`.
@@ -137,7 +192,8 @@ long-term infrastructure or Redis/broker health.
 Rollback target is the previous clean product source `55a556b0c5cf4b8dc95ef6be6d0a6bc873cc1a3c`,
 digest `sha256:56a4beb7e54153f7cba30af4de3e5240feb2f23265e9702b33f0f7e19c43f80d`.
 Preserve additive schema, secrets, MFA and PVCs. The earlier release history below
-remains for traceability; the current image is the PR #84 digest above. Visual
+remains for traceability; the intermediate PR #86 deployment and its outstanding
+static-cache gate are recorded above. Visual
 captures from PR #82 still describe the unchanged UI/email templates. Pages
 publication recovered after the two earlier provider failures and passed on
 source `abbb98f`.
@@ -157,6 +213,10 @@ HTTPS login and assets return successful responses, HTTP redirects to HTTPS, CSR
 The initial release passed 307 local Django tests and 25 account tests against a disposable SQLite database on the actual NFS target (80.46 seconds total; peak RSS 236024 KiB). Later hardening passed its protected CI and real browser forms/CSRF/password/TOTP with two synthetic users and an isolated SMTP sink. The UX follow-up also runs the wider discovered suite and actual browser calculations/exports. Detailed UX findings and bounded verification are in the [audit](UX_AUDIT_2026_11_06.md).
 
 An online SQLite backup was restored into memory on the target and passed `quick_check`; this is not a complete disaster-recovery drill. Release incident: the previous mutable-latest deployment rescheduled during a pre-existing NotReady-node problem and applied additive migrations through old startup flags before the controlled Job. Gates stayed closed at that time and backups existed. Subsequent deployments use explicit digests and controlled Jobs. No clinical restore, schema downgrade or PVC deletion occurred.
+
+The following access-lifecycle table preserves evidence from the completed
+PR #80–84 deliveries. It is not a fresh PR #86 deployment or tracker-sync claim;
+use the latest release entry above for that boundary.
 
 | Delivery control | Status | Scope of evidence |
 | --- | --- | --- |
