@@ -66,6 +66,9 @@ def dependency_lock_sha256() -> str:
 
 
 def current_git_sha() -> str:
+    image_sha = os.environ.get("BMY_SOURCE_SHA", "")
+    if image_sha:
+        return image_sha if re.fullmatch(r"[0-9a-f]{40}", image_sha) else UNAVAILABLE
     try:
         completed = subprocess.run(
             ["git", "rev-parse", "HEAD"],

@@ -3,9 +3,10 @@
 import json
 import time
 from datetime import timedelta
+from urllib.parse import urlsplit
 
 from django.conf import settings
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMultiAlternatives
 from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
@@ -17,6 +18,7 @@ from .services import (
     cipher,
     locked_policy,
     notify,
+    public_base,
 )
 
 
@@ -37,6 +39,7 @@ def dispatch_notification():
     )
     if not item:
         return False
+    capability = None
     if item.deduplication_key.startswith("capability:"):
         capability = Capability.objects.filter(pk=int(item.deduplication_key.split(":", 1)[1])).first()
         if (
@@ -79,13 +82,18 @@ def dispatch_notification():
     item.attempts += 1
     try:
         payload = json.loads(cipher().decrypt(item.encrypted_payload.encode(), ttl=86400))
-        message = EmailMessage(
-            subject=f"bmyCure4MM — {item.kind.replace('_', ' ')}",
-            body=payload["body"],
-            from_email=settings.DEFAULT_FROM_EMAIL,
+        from .emails import presentation
+
+        subject, plain, html, sender = presentation(item, payload, capability)
+        message = EmailMultiAlternatives(
+            subject=subject,
+            body=plain,
+            from_email=sender,
             to=[item.identity.email],
-            headers={"Message-ID": f"<{item.pk}@bmycure4mm.invalid>"},
+            reply_to=[sender],
+            headers={"Message-ID": f"<{item.pk}@{urlsplit(public_base()).hostname}>"},
         )
+        message.attach_alternative(html, "text/html")
         if message.send(fail_silently=False) != 1:
             raise RuntimeError("MAIL_NOT_ACCEPTED")
     except Exception:

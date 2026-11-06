@@ -56,6 +56,15 @@ def manager_required(view):
 
 @sensitive_post_parameters()
 def request_access(request):
+    if not AccessPolicy.objects.get(pk=1).requests_open:
+        return render(
+            request,
+            "accounts/message.html",
+            {
+                "title": "Registration is temporarily paused",
+                "text": "New access requests are currently paused. No verification email is sent while registration is paused. Please try again later. Existing accounts can still sign in.",
+            },
+        )
     form = forms.RequestForm(request.POST or None)
     if request.method == "POST":
         throttle = limited(request, "request", request.POST.get("email", "").strip().lower(), 5)
@@ -370,11 +379,12 @@ def manage_feedback(request):
                 for key in ("category", "reply", "internal_note", "status")
             )
             if changed:
+                previous_reply = ticket.reply
                 for key in ("category", "reply", "internal_note", "status"):
                     setattr(ticket, key, form.cleaned_data[key])
                 ticket.save()
                 services.audit("feedback_updated", ticket.identity, request.user)
-                if ticket.reply:
+                if ticket.reply and ticket.reply != previous_reply:
                     services.notify(
                         ticket.identity,
                         "feedback_reply",
@@ -396,7 +406,7 @@ def owner_security(request):
     profile = services.require_manager(request.user)
     import time
 
-    from .security import confirm_owner_code, owner_secret
+    from .security import confirm_owner_code, owner_secret, owner_setup_qr
 
     form = forms.OTPForm(request.POST or None)
     secret = owner_secret(profile)
@@ -412,5 +422,9 @@ def owner_security(request):
     return render(
         request,
         "accounts/security.html",
-        {"form": form, "setup_secret": secret if not profile.totp_confirmed else None},
+        {
+            "form": form,
+            "setup_secret": secret if not profile.totp_confirmed else None,
+            "setup_qr": owner_setup_qr(profile, secret) if not profile.totp_confirmed else None,
+        },
     )

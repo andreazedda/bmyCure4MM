@@ -1,6 +1,9 @@
+import base64
+import io
 import time
 
 import pyotp
+import qrcode
 from django.db import transaction
 
 from .models import AccessProfile
@@ -15,6 +18,14 @@ def mfa_current(request):
         and request.session.get("owner_mfa_version") == profile.session_version
         and request.session.get("owner_mfa_at", 0) > time.time() - 900
     )
+
+
+def owner_setup_qr(profile, secret):
+    """Render locally; authenticator secrets never leave this authenticated response."""
+    uri = pyotp.TOTP(secret).provisioning_uri(name=profile.email, issuer_name="bmyCure4MM")
+    output = io.BytesIO()
+    qrcode.make(uri, box_size=6, border=4).save(output, format="PNG")
+    return "data:image/png;base64," + base64.b64encode(output.getvalue()).decode("ascii")
 
 
 @transaction.atomic

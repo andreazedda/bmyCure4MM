@@ -1,5 +1,6 @@
 """Real forms, sessions and SMTP in a disposable database; no production identities."""
 
+import io
 import re
 import secrets
 import socket
@@ -7,10 +8,12 @@ from concurrent.futures import ThreadPoolExecutor
 from email import message_from_bytes
 
 import pyotp
+import zxingcpp
 from aiosmtpd.controller import Controller
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.db import connection
 from django.test import override_settings
+from PIL import Image
 from playwright.sync_api import expect, sync_playwright
 
 from accounts import services
@@ -31,7 +34,8 @@ class MailSink:
     def link(self, email, path):
         for recipients, message in reversed(self.messages):
             if email in recipients:
-                body = message.get_payload(decode=True).decode()
+                plain = next(p for p in message.walk() if p.get_content_type() == "text/plain")
+                body = plain.get_payload(decode=True).decode(plain.get_content_charset() or "utf-8")
                 match = re.search(r"http://127\.0\.0\.1:\d+" + path + r"#token=[A-Za-z0-9_-]+", body)
                 if match:
                     return match.group()
@@ -115,9 +119,22 @@ class RegistrationBrowserJourney(StaticLiveServerTestCase):
                     login(owner_page, TEST_SETTINGS["PLATFORM_OWNER_EMAIL"])
                     owner_page.goto(self.live_server_url + "/manage/access-requests/")
                     expect(owner_page.get_by_role("heading", name="Owner security")).to_be_visible()
-                    key = owner_page.locator("code").inner_text()
-                    owner_page.get_by_label("Code", exact=True).fill(pyotp.TOTP(key).now())
+                    decoded_uris = []
+                    for size in ({"width": 1280, "height": 900}, {"width": 390, "height": 844}):
+                        owner_page.set_viewport_size(size)
+                        qr = owner_page.get_by_alt_text("Authenticator setup QR code")
+                        expect(qr).to_be_visible()
+                        decoded = zxingcpp.read_barcodes(Image.open(io.BytesIO(qr.screenshot())))
+                        self.assertEqual(len(decoded), 1)
+                        decoded_uris.append(decoded[0].text)
+                    self.assertTrue(
+                        decoded_uris[0] == decoded_uris[1], "Setup identity changed between viewports"
+                    )
+                    authenticator = pyotp.parse_uri(decoded_uris[0])
+                    self.assertEqual(authenticator.issuer, "bmyCure4MM")
+                    owner_page.get_by_label("Code", exact=True).fill(authenticator.now())
                     owner_page.get_by_role("button", name="Confirm authenticator code").click()
+                    owner_page.set_viewport_size({"width": 1280, "height": 900})
                     expect(
                         owner_page.get_by_role("heading", name="Access requests", exact=True)
                     ).to_be_visible()

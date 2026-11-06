@@ -75,6 +75,17 @@ class ExistingSiteTests(LifecycleMixin, TestCase):
         for path in ("/patients/", "/research/", "/api/patients/"):
             self.assertIn(self.client.get(path).status_code, (403, 404), path)
 
+    def test_documentation_navigation_is_not_shared_between_accounts(self):
+        self.alice.nickname = "PrivateAliceNavigation"
+        self.alice.save()
+        self.sign_in(self.alice)
+        first = self.client.get("/docs/")
+        self.assertContains(first, self.alice.nickname)
+        self.assertIn("no-store", first["Cache-Control"])
+        self.client.post("/accounts/logout/")
+        self.sign_in(self.bob)
+        self.assertNotContains(self.client.get("/docs/"), self.alice.nickname)
+
     def test_registered_user_runs_existing_engine_and_cannot_export_another_users_run(self):
         from django.urls import reverse
 

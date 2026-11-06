@@ -217,6 +217,41 @@ class AccessLifecycleTests(LifecycleMixin, TestCase):
         self.assertNotContains(response, identity.nickname)
         self.assertContains(response, "only in the browser")
 
+    def test_paused_registration_explains_that_no_email_is_sent(self):
+        self.policy.requests_open = False
+        self.policy.save()
+        for response in (
+            self.client.get("/access/request/"),
+            self.client.post("/access/request/", {"email": "paused@example.test"}),
+        ):
+            self.assertContains(response, "No verification email is sent")
+            self.assertNotContains(response, 'name="email"')
+        self.assertFalse(Identity.objects.filter(email="paused@example.test").exists())
+
+    @override_settings(ACCOUNT_EMAIL_LANGUAGE="it")
+    def test_transactional_email_has_clear_action_and_escaped_private_content(self):
+        identity = services.request_access(
+            {
+                "email": "mail@example.test",
+                "nickname": "<script>test</script>",
+                "reason": "Private request details",
+            }
+        )
+        Notification.objects.exclude(identity=identity).update(attempts=5)
+        raw = token_for(identity, "verify")
+        self.assertTrue(dispatch_notification())
+        message = mail.outbox[0]
+        self.assertEqual(message.subject, "Conferma la tua email · bmyCure4MM")
+        self.assertTrue(message.from_email.startswith("bmyCure4MM <"))
+        self.assertTrue(raw in message.body, "Private action missing from plain email")
+        html = message.alternatives[0].content
+        self.assertTrue(raw in html, "Private action missing from HTML email")
+        self.assertIn("&lt;script&gt;", html)
+        self.assertNotIn("<script>", html)
+        self.assertNotIn("Private request details", html)
+        self.assertIn("Link personale", html)
+        self.assertIn("Solo ricerca", html)
+
     def test_owner_can_renew_suspended_access_but_cannot_restore_revocation(self):
         identity = self.make_member()
         self.sign_in(identity)
@@ -233,7 +268,9 @@ class AccessLifecycleTests(LifecycleMixin, TestCase):
     def test_email_failure_and_console_retry_do_not_activate(self):
         identity = self.make_member(activate=False)
         Notification.objects.exclude(identity=identity, kind="activate").update(attempts=5)
-        with patch("accounts.notifications.EmailMessage.send", side_effect=OSError("synthetic failure")):
+        with patch(
+            "accounts.notifications.EmailMultiAlternatives.send", side_effect=OSError("synthetic failure")
+        ):
             self.assertTrue(dispatch_notification())
         item = Notification.objects.get(identity=identity, kind="activate")
         self.assertEqual(item.state, "failed")

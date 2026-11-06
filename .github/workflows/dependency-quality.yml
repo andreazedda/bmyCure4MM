@@ -73,6 +73,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          build-args: BMY_SOURCE_SHA=${{ github.sha }}
           push: false
           load: true
           tags: bmycure4mm:dependency-gate
@@ -81,6 +82,9 @@ jobs:
           image_id="$(docker image inspect --format '{{.Id}}' bmycure4mm:dependency-gate)"
           test -n "$image_id"
           echo "container_image_id=${image_id}" >> "$GITHUB_STEP_SUMMARY"
+      - name: Verify image source identity and private metadata exclusion
+        run: |
+          docker run --rm --entrypoint python bmycure4mm:dependency-gate -c "import os,pathlib; assert not pathlib.Path('/app/.git').exists(); assert len(os.environ['BMY_SOURCE_SHA']) == 40; assert pathlib.Path('/app/staticfiles/accounts/access.js').is_file()"
 
   registration:
     runs-on: ubuntu-24.04

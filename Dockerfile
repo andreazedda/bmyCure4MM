@@ -2,6 +2,8 @@ FROM ghcr.io/astral-sh/uv:0.12.3 AS uv
 FROM python:3.11.11-slim
 
 WORKDIR /app
+ARG BMY_SOURCE_SHA=""
+ENV BMY_SOURCE_SHA=$BMY_SOURCE_SHA
 
 ENV PATH="/app/.venv/bin:$PATH" \
     UV_COMPILE_BYTECODE=1 \

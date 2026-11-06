@@ -1,0 +1,19 @@
+bmyCure4MM · {% if italian %}Piattaforma di ricerca{% else %}Research platform{% endif %}
+
+{% if italian %}Ciao{% else %}Hello{% endif %} {{ nickname }},
+
+{{ title }}
+
+{{ explanation }}
+{% if action_url %}
+{{ action_label }}:
+{{ action_url }}
+{% endif %}{% if expires_at %}
+{% if italian %}Link personale, utilizzabile una volta. Valido fino al{% else %}Personal, single-use link. Valid until{% endif %} {{ expires_at|date:"d/m/Y H:i" }} UTC.
+{% endif %}{% if access_expires_at %}
+{% if italian %}Scadenza dell'accesso{% else %}Access expiry{% endif %}: {{ access_expires_at|date:"d/m/Y H:i" }} UTC.
+{% endif %}
+{% if italian %}Solo ricerca. Non supporta decisioni cliniche. Non inserire dati di pazienti.
+Per assistenza sull'accesso puoi rispondere a questa email.{% else %}Research only. Not clinical decision support. Do not enter patient data.
+For help with access, you can reply to this email.{% endif %}
+{{ origin }}

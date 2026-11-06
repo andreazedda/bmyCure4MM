@@ -34,6 +34,8 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/${{ github.repository_owner }}/bmycure4mm
+          labels: |
+            org.opencontainers.image.description=E1 multiple-myeloma research prototype. Not clinical decision support.
           tags: |
             type=raw,value=latest
             type=sha
@@ -42,6 +44,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          build-args: BMY_SOURCE_SHA=${{ github.sha }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
