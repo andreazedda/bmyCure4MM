@@ -1,9 +1,18 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from django.utils.html import format_html
 
 from .models import SupportTicket
 from .services import normalize_email
+from .ui import bilingual, italian
+
+
+class LocalizedSelect(forms.Select):
+    def create_option(self, *args, **kwargs):
+        option = super().create_option(*args, **kwargs)
+        label = str(option["label"]).replace("Scientific_Question", "Scientific question")
+        option["label"] = label
+        option["attrs"].update({"data-option-en": label, "data-option-it": italian(label)})
+        return option
 
 
 class StrictForm(forms.Form):
@@ -17,34 +26,31 @@ class StrictForm(forms.Form):
         for name, field in self.fields.items():
             if field.label is None:
                 field.label = name.replace("_", " ").capitalize()
-        labels_it = {
-            "Email": "Email",
-            "Nickname": "Nickname",
-            "Reason": "Motivo della richiesta",
-            "Professional role": "Ruolo professionale (facoltativo)",
-            "Affiliation": "Affiliazione (facoltativa)",
-            "Password": "Password",
-            "Password confirm": "Conferma password",
-            "Code": "Codice autenticatore",
-            "I have read the privacy notice and research-only limits. I will not enter real patient data.": "Ho letto l’informativa e i limiti di ricerca. Non inserirò dati reali di pazienti.",
-        }
-        for field in self.fields.values():
-            if field.label in labels_it and field.label != labels_it[field.label]:
+        for name, field in self.fields.items():
+            label = str(field.label)
+            translated = italian(label)
+            if translated != label:
                 field.widget.attrs.update(
-                    {
-                        "aria-label": field.label,
-                        "data-label-en": field.label,
-                        "data-label-it": labels_it[field.label],
-                    }
+                    {"aria-label": label, "data-label-en": label, "data-label-it": translated}
                 )
-                field.label = format_html(
-                    '<span class="t-en">{}</span><span class="t-it">{}</span>',
-                    field.label,
-                    labels_it[field.label],
+                field.label = bilingual(label)
+            if isinstance(field.widget, forms.Select):
+                field.widget = LocalizedSelect(choices=field.choices, attrs=field.widget.attrs)
+            if field.help_text:
+                field.help_text = bilingual(field.help_text)
+            if name == "email":
+                field.widget.attrs.update(
+                    {"autocomplete": "email", "autocapitalize": "none", "spellcheck": "false"}
                 )
+            if name == "nickname":
+                field.widget.attrs["autocomplete"] = "nickname"
             field.widget.attrs.setdefault(
                 "class",
-                "form-check-input" if isinstance(field.widget, forms.CheckboxInput) else "form-control",
+                "form-check-input"
+                if isinstance(field.widget, forms.CheckboxInput)
+                else "form-select"
+                if isinstance(field.widget, forms.Select)
+                else "form-control",
             )
 
     def clean(self):
@@ -93,9 +99,14 @@ class CapabilityForm(StrictForm):
 
 class ActivationForm(CapabilityForm):
     password = forms.CharField(
-        widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}), min_length=12
+        widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
+        min_length=12,
+        help_text="Use at least 12 characters. Avoid common passwords and personal information.",
     )
-    password_confirm = forms.CharField(widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}))
+    password_confirm = forms.CharField(
+        widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
+        help_text="Repeat the same password.",
+    )
 
     def clean(self):
         cleaned = super().clean()
@@ -109,6 +120,7 @@ class DecisionForm(StrictForm):
     action = forms.ChoiceField(
         choices=[(v, v) for v in ("approve", "reject", "resend", "suspend", "revoke", "renew")]
     )
+    confirm_revoke = forms.BooleanField(required=False, widget=forms.HiddenInput)
     days = forms.IntegerField(min_value=1, max_value=14, initial=14, required=False)
 
 
@@ -125,7 +137,9 @@ class SupportTicketForm(StrictForm):
 class ReplyForm(StrictForm):
     ticket_id = forms.UUIDField(widget=forms.HiddenInput)
     category = forms.ChoiceField(choices=SupportTicket.CATEGORIES)
-    reply = forms.CharField(max_length=2000, required=False, widget=forms.Textarea(attrs={"rows": 3}))
+    reply = forms.CharField(
+        label="Reply to author", max_length=2000, required=False, widget=forms.Textarea(attrs={"rows": 3})
+    )
     internal_note = forms.CharField(max_length=1000, required=False, widget=forms.Textarea(attrs={"rows": 2}))
     status = forms.ChoiceField(choices=SupportTicket._meta.get_field("status").choices)
 

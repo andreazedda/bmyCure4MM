@@ -1,10 +1,11 @@
 ---
 title: Current System Architecture
+language: en
 status: CURRENT_VERIFIED
 owner: Andrea Zedda
 audience: engineers, researchers and reviewers
 last_verified_at: 2026-11-06
-last_verified_git_sha: 2d464f68341378186c156e413cdcafa2dbfd84cd
+last_verified_git_sha: fa9c35473302debf3c9a289d5f34f0bc7f771dbd
 source_of_truth: repository tree, Django configuration, model registry and current contracts
 ---
 
@@ -145,5 +146,7 @@ This delivery does not complete broad research RBAC issue #8 or the first extern
 - deterministic dependency lock exists;
 - several GitHub Actions workflows exist;
 - image-build and deployment automation exist;
-- branch-protected aggregate scientific CI is not yet verified;
-- production security, PostgreSQL, storage, quotas, observability and recovery must be evidenced separately under M0-S.
+- `.github/workflows/dependency-quality.yml` aggregates locked quality, core Python 3.11/3.12, frozen image and real registration-browser jobs into `required`; the protected release checks were verified before the recorded merge;
+- production source/digest, actual SQLite/NFS storage, bounded account security and backup evidence are recorded in the access runbook; PostgreSQL migration, global compute admission/cancellation, comprehensive clinical RBAC and full disaster recovery remain separate M0-S work.
+
+The [source/data atlas](../development/CODE_ATLAS.md) maps concrete functions, model fields, scientific kernel and failure domains. The [manual verification record](../development/AUDIT_VERIFICATION_2026_11_06.md) distinguishes current executed checks from historical release evidence and pending human acceptance.

@@ -1,1 +1,8 @@
-{% extends 'base.html' %}{% block title %}{{ title }}{% endblock %}{% block content %}<div class="card"><div class="card-body"><h1 class="h3">{{ title }}</h1><p role="status">{{ text }}</p>{% if status_link %}<a class="btn btn-outline-primary" href="{% url 'accounts:status' %}">View my request status</a>{% endif %}<a class="btn btn-primary" href="{% url 'accounts:login' %}">Sign in after activation</a></div></div>{% endblock %}
+{% extends 'base.html' %}{% load account_ui %}{% block title %}{{ title }}{% endblock %}
+{% block content %}<div class="card"><div class="card-body">
+<h1 class="h3">{{ title|account_label }}</h1><p role="status">{{ text|account_label }}</p>
+{% if next_step %}<p>{{ next_step|account_label }}</p>{% endif %}
+<div class="d-flex flex-wrap gap-3">
+{% if status_link %}<a class="btn btn-primary" href="{% url 'accounts:status' %}">{% ui 'View my request status' %}</a>{% endif %}
+{% if not hide_login %}<a class="btn btn-outline-primary" href="{% url 'accounts:login' %}">{% ui 'Back to sign in' %}</a>{% endif %}
+</div></div></div>{% endblock %}

@@ -103,8 +103,9 @@ jobs:
           version: "0.12.3"
           enable-cache: true
       - run: uv sync --frozen --group screenshots
+      - run: uv run --frozen python -m scripts.check_developer_atlas
       - run: uv run --frozen --group screenshots python manage.py test accounts.tests --noinput
-      - run: uv run --frozen --group screenshots python manage.py test accounts.tests.browser_journey --noinput
+      - run: uv run --frozen --group screenshots python manage.py test accounts.tests.browser_journey docs_viewer.tests.browser_audit --noinput
 
   required:
     name: required

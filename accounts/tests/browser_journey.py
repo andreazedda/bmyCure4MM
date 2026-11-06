@@ -1,12 +1,15 @@
 """Real forms, sessions and SMTP in a disposable database; no production identities."""
 
 import io
+import os
 import re
 import secrets
 import socket
 import traceback
+import uuid
 from concurrent.futures import ThreadPoolExecutor
 from email import message_from_bytes
+from pathlib import Path
 
 import pyotp
 import zxingcpp
@@ -18,7 +21,7 @@ from PIL import Image
 from playwright.sync_api import expect, sync_playwright
 
 from accounts import services
-from accounts.models import AccessProfile, Notification
+from accounts.models import AccessProfile, Notification, SupportTicket
 from accounts.notifications import dispatch_notification
 from simulator.models import Scenario, SimulationAttempt
 
@@ -58,6 +61,28 @@ class RegistrationBrowserJourney(StaticLiveServerTestCase):
         password = secrets.token_urlsafe(24)
         errors, bad_assets = [], []
         stage = "account setup"
+        capture_root = os.environ.get("BMY_AUDIT_CAPTURE_DIR")
+
+        def capture(page, name):
+            if capture_root:
+                target = Path(capture_root)
+                target.mkdir(parents=True, exist_ok=True)
+                page.screenshot(path=str(target / (name + ".png")), full_page=True, animations="disabled")
+
+        def check_accessibility(page, width):
+            self.assertLessEqual(page.evaluate("document.documentElement.scrollWidth"), width)
+            self.assertTrue(
+                page.evaluate(
+                    """() => [...document.querySelectorAll('input:not([type=hidden]),select,textarea')].filter(e=>e.getClientRects().length).every(e=>e.labels.length || e.getAttribute('aria-label'))"""
+                ),
+                "Visible field has no accessible label",
+            )
+            self.assertTrue(
+                page.evaluate(
+                    """() => [...document.querySelectorAll('[aria-describedby]')].every(e=>e.getAttribute('aria-describedby').split(/\s+/).every(id=>document.getElementById(id)))"""
+                ),
+                "Broken field description reference",
+            )
 
         def db_call(fn):
             def operation():
@@ -85,10 +110,13 @@ class RegistrationBrowserJourney(StaticLiveServerTestCase):
             page.locator("#userMenu").click()
             page.get_by_role("button", name="Log out", exact=True).click()
 
-        def set_password(page, link):
+        def set_password(page, link, capture_name=None):
             page.goto(link)
             expect(page.locator('input[name="token"]')).not_to_have_value("")
             self.assertNotIn("#", page.url)
+            if capture_name:
+                expect(page.get_by_label("Password", exact=True)).to_have_value("")
+                capture(page, capture_name)
             page.get_by_label("Password", exact=True).fill(password)
             page.get_by_label("Password confirm", exact=True).fill(password)
             page.get_by_role("button", name="Save password").click()
@@ -150,6 +178,7 @@ class RegistrationBrowserJourney(StaticLiveServerTestCase):
                         owner_page.get_by_role("heading", name="Access requests", exact=True)
                     ).to_be_visible()
 
+                    capture(owner_page, "01-owner-console-desktop")
                     first_run = None
                     for index, viewport in enumerate(
                         ({"width": 1440, "height": 1000}, {"width": 390, "height": 844})
@@ -165,6 +194,12 @@ class RegistrationBrowserJourney(StaticLiveServerTestCase):
                             else None,
                         )
                         page.goto(self.live_server_url + "/access/request/")
+                        page.keyboard.press("Tab")
+                        expect(page.locator(".skip-link")).to_be_focused()
+                        page.keyboard.press("Enter")
+                        expect(page.locator("#main-content")).to_be_focused()
+                        check_accessibility(page, viewport["width"])
+                        capture(page, f"02-request-{index}")
                         page.get_by_label("Email", exact=True).fill(email)
                         page.get_by_label("Nickname", exact=True).fill(f"Browser researcher {index}")
                         page.get_by_label("Reason", exact=True).fill(
@@ -173,6 +208,7 @@ class RegistrationBrowserJourney(StaticLiveServerTestCase):
                         page.locator('input[name="acknowledgement"]').check()
                         page.get_by_role("button", name="Send verification email").click()
                         expect(page.get_by_role("heading", name="Check your email")).to_be_visible()
+                        capture(page, f"03-submitted-{index}")
                         deliver()
                         verification = sink.link(email, "/access/verify/")
                         page.goto(verification)
@@ -182,12 +218,22 @@ class RegistrationBrowserJourney(StaticLiveServerTestCase):
                         )
                         page.get_by_role("button", name="Confirm email").click()
                         expect(page.get_by_text("Waiting for review", exact=True)).to_be_visible()
+                        capture(page, f"04-awaiting-review-{index}")
                         deliver()
                         owner_page.goto(self.live_server_url + "/manage/access-requests/")
                         card = owner_page.locator("article[data-access-request]").filter(has_text=email)
+                        capture(owner_page, f"05-owner-review-{index}")
                         card.get_by_role("button", name="Approve", exact=True).click()
                         deliver()
-                        set_password(page, sink.link(email, "/access/activate/"))
+                        set_password(
+                            page, sink.link(email, "/access/activate/"), f"06a-activation-empty-{index}"
+                        )
+                        page.get_by_label("Email", exact=True).fill(email)
+                        page.get_by_label("Password", exact=True).fill("synthetic-wrong-password")
+                        page.get_by_role("button", name="Sign in", exact=True).click()
+                        expect(page.locator("[data-error-summary]")).to_be_focused()
+                        expect(page.get_by_label("Password", exact=True)).to_have_value("")
+                        capture(page, f"11-sign-in-error-{index}")
                         login(page, email)
                         expect(page).to_have_url(self.live_server_url + "/sim/getting-started/")
                         self.assertFalse(
@@ -196,6 +242,7 @@ class RegistrationBrowserJourney(StaticLiveServerTestCase):
                         expect(
                             page.get_by_text("Explore the learning scenarios", exact=False)
                         ).to_be_visible()
+                        capture(page, f"06-getting-started-{index}")
                         stage = "real simulation and authorized artifacts"
                         page.goto(self.live_server_url + "/learn/")
                         page.get_by_role(
@@ -204,6 +251,10 @@ class RegistrationBrowserJourney(StaticLiveServerTestCase):
                         for dose in (20, 25):
                             if not page.locator("#simulateScenarioPanel").is_visible():
                                 page.get_by_role("link", name="Open simulation form", exact=True).click()
+                            check_accessibility(page, viewport["width"])
+                            expect(page.locator('[name="twin_assessment_id"]')).to_have_count(0)
+                            expect(page.locator('[name="use_twin"]')).to_have_count(0)
+                            expect(page.get_by_text("Load demo data (DEMO)", exact=False)).to_have_count(0)
                             page.locator('[name="lenalidomide_dose"]').fill(str(dose))
                             page.locator('[name="time_horizon"]').fill("30")
                             with page.expect_response(
@@ -213,6 +264,7 @@ class RegistrationBrowserJourney(StaticLiveServerTestCase):
                             self.assertEqual(computed.value.status, 200)
                             expect(page.get_by_role("link", name="Export study", exact=True)).to_be_visible()
                             page.reload()
+                        capture(page, f"07-results-{index}")
                         runs = db_call(
                             lambda: list(
                                 SimulationAttempt.objects.filter(user__email=email, scenario_id=scenario_id)
@@ -249,6 +301,7 @@ class RegistrationBrowserJourney(StaticLiveServerTestCase):
                         else:
                             first_run = runs[0]["pk"]
                         page.goto(self.live_server_url + "/feedback/")
+                        capture(page, f"08-feedback-{index}")
                         page.get_by_label("Category", exact=True).select_option("usability")
                         message = f"Synthetic suggestion {index}: make the first steps clearer."
                         page.get_by_label("Message", exact=True).fill(message)
@@ -258,6 +311,8 @@ class RegistrationBrowserJourney(StaticLiveServerTestCase):
                             expect(page.get_by_text("Synthetic suggestion 0:", exact=False)).to_have_count(0)
                         owner_page.goto(self.live_server_url + "/manage/feedback/")
                         ticket = owner_page.locator("article").filter(has_text=message)
+                        check_accessibility(owner_page, 1280)
+                        capture(owner_page, f"09-owner-ticket-{index}")
                         ticket.get_by_label("Reply to author").fill(
                             "Thank you. Your suggestion has been received."
                         )
@@ -269,6 +324,7 @@ class RegistrationBrowserJourney(StaticLiveServerTestCase):
                             page.get_by_text("Thank you. Your suggestion has been received.", exact=True)
                         ).to_be_visible()
                         expect(page.get_by_text("Private operator note", exact=True)).to_have_count(0)
+                        capture(page, f"15-user-ticket-reply-{index}")
                         self.assertLessEqual(
                             page.evaluate("document.documentElement.scrollWidth"), viewport["width"]
                         )
@@ -278,6 +334,7 @@ class RegistrationBrowserJourney(StaticLiveServerTestCase):
                         expect(page.get_by_text(message, exact=True)).to_be_visible()
                         self.assertEqual(page.goto(self.live_server_url + "/patients/").status, 403)
                         logout(page)
+                        capture(page, f"16-logged-out-{index}")
                         context.close()
                     owner_page.set_viewport_size({"width": 390, "height": 844})
                     owner_page.goto(self.live_server_url + "/manage/feedback/")
@@ -285,6 +342,37 @@ class RegistrationBrowserJourney(StaticLiveServerTestCase):
                         owner_page.get_by_role("heading", name="User tickets and suggestions")
                     ).to_be_visible()
                     self.assertLessEqual(owner_page.evaluate("document.documentElement.scrollWidth"), 390)
+                    capture(owner_page, "10-owner-tickets-mobile")
+                    owner_page.get_by_role("button", name="IT", exact=True).click()
+                    expect(
+                        owner_page.get_by_role("heading", name="Ticket e suggerimenti degli utenti")
+                    ).to_be_visible()
+                    expect(owner_page.get_by_label("Risposta all’autore").first).to_be_visible()
+                    expect(owner_page.locator("select[name=status] option:checked").first).to_have_text(
+                        "Con risposta"
+                    )
+                    check_accessibility(owner_page, 390)
+                    capture(owner_page, "12-owner-tickets-mobile-italian")
+                    owner_page.get_by_role("button", name="EN", exact=True).click()
+                    stage = "paginated ticket history"
+                    db_call(
+                        lambda: SupportTicket.objects.bulk_create(
+                            [
+                                SupportTicket(
+                                    identity=AccessProfile.objects.get(email="browser0@example.test"),
+                                    category="bug",
+                                    message=f"Synthetic pagination ticket {i}",
+                                    submission_key=uuid.uuid4(),
+                                )
+                                for i in range(21)
+                            ]
+                        )
+                    )
+                    owner_page.goto(self.live_server_url + "/manage/feedback/")
+                    owner_page.get_by_role("link", name="Next", exact=True).click()
+                    expect(owner_page.get_by_text("Synthetic suggestion 0:", exact=False)).to_be_visible()
+                    check_accessibility(owner_page, 390)
+                    capture(owner_page, "14-owner-pagination-mobile")
                     stage = "documentation and localized forms"
                     for width in (1280, 390):
                         docs_context = browser.new_context(viewport={"width": width, "height": 844})
@@ -294,6 +382,13 @@ class RegistrationBrowserJourney(StaticLiveServerTestCase):
                         expect(docs_page.locator(".mermaid svg").first).to_be_visible(timeout=20000)
                         expect(docs_page.locator("mjx-container").first).to_be_visible(timeout=20000)
                         expect(docs_page.get_by_role("button", name="Copy code").first).to_be_visible()
+                        if width == 390:
+                            self.assertFalse(docs_page.locator(".doc-navigation").evaluate("e=>e.open"))
+                            self.assertLess(docs_page.locator(".doc-content h1").bounding_box()["y"], 900)
+                        docs_page.get_by_role("button", name="Copy code").first.click()
+                        expect(docs_page.locator("#live-region")).to_contain_text(
+                            re.compile("Copied|Code selected")
+                        )
                         self.assertTrue(
                             docs_page.evaluate(
                                 "[...document.querySelectorAll('.doc-content img')].every(i=>i.complete && i.naturalWidth>0)"
@@ -304,11 +399,33 @@ class RegistrationBrowserJourney(StaticLiveServerTestCase):
                         )
                         docs_page.goto(self.live_server_url + "/accounts/login/")
                         docs_page.get_by_role("button", name="IT", exact=True).click()
+                        expect(docs_page.locator("#lang-it")).to_have_attribute("aria-pressed", "true")
                         expect(docs_page.get_by_role("heading", name="Accedi", exact=True)).to_be_visible()
                         expect(docs_page.get_by_label("Email", exact=True)).to_be_visible()
                         docs_page.get_by_role("link", name="Richiedi accesso", exact=True).click()
                         expect(docs_page.get_by_label("Motivo della richiesta", exact=True)).to_be_visible()
                         self.assertEqual(docs_page.locator("html").get_attribute("lang"), "it")
+                        expect(
+                            docs_page.locator('select[name="professional_role"] option[value="student"]')
+                        ).to_have_text("Studente")
+                        docs_page.locator("#lang-it").focus()
+                        docs_page.keyboard.press("Control+k")
+                        expect(docs_page.locator("#cmdk")).to_be_focused()
+                        docs_page.locator("#cmdk").fill("no-such-synthetic-help-key")
+                        expect(docs_page.locator("#cmdkResults")).to_contain_text("Nessuna voce trovata")
+                        docs_page.route(
+                            "**/api/help/search/**",
+                            lambda route: route.fulfill(status=503, body="Unavailable"),
+                        )
+                        docs_page.locator("#cmdk").fill("test service failure")
+                        expect(docs_page.locator("#cmdkResults")).to_contain_text(
+                            "Aiuto temporaneamente non disponibile"
+                        )
+                        docs_page.unroute("**/api/help/search/**")
+                        docs_page.keyboard.press("Escape")
+                        expect(docs_page.locator("#lang-it")).to_be_focused()
+                        check_accessibility(docs_page, width)
+                        capture(docs_page, f"13-request-italian-{width}")
                         self.assertLessEqual(
                             docs_page.evaluate("document.documentElement.scrollWidth"), width
                         )

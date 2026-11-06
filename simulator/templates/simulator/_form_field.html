@@ -1,14 +1,14 @@
 {% load simulator_extras %}
 <div class="mb-3">
     <label class="form-label" for="{{ field.id_for_label }}">
-        {{ label|default:field.label }}
+        <span class="t-en">{{ label|default:field.label }}</span><span class="t-it">{{ field|italian_field_label }}</span>
         {% if unit %}
             <small class="text-muted ms-1">{{ unit }}</small>
         {% endif %}
-        {% if help_slug %}
-            <button type="button" class="btn btn-link btn-sm p-0 align-baseline help-inline" data-testid="help-open-{{ help_slug }}" data-help="{{ help_slug }}" aria-label="Help" aria-controls="helpDrawer">?</button>
-        {% endif %}
     </label>
+    {% if help_slug %}
+        <button type="button" class="btn btn-link btn-sm help-inline" data-testid="help-open-{{ help_slug }}" data-help="{{ help_slug }}" aria-controls="helpDrawer"><span class="t-en">Help: {{ field.label }}</span><span class="t-it">Aiuto: {{ field|italian_field_label }}</span></button>
+    {% endif %}
     {{ field }}
     {% if append_en or append_it %}
         <small class="text-muted d-block mt-1">
@@ -21,17 +21,19 @@
     {% endif %}
     {% with help_en=help_en|default_if_none:"" help_it=help_it|default_if_none:"" %}
         {% if help_en or help_it %}
-            <div class="form-text">
+            <div class="form-text" id="{{ field.id_for_label }}_helptext">
                 {% if help_en %}<span class="t-en">{{ help_en }}</span>{% endif %}
                 {% if help_it %}<span class="t-it">{{ help_it }}</span>{% endif %}
             </div>
+        {% elif field.help_text %}
+            <div class="form-text" id="{{ field.id_for_label }}_helptext">{{ field.help_text }}</div>
         {% endif %}
     {% endwith %}
     {% if add_badge %}
         <div class="context-badge small mt-1" id="badge-{{ field.id_for_label }}" data-testid="badge-{{ field.id_for_label }}"></div>
     {% endif %}
     {% if field.errors %}
-        <div class="invalid-feedback d-block">{{ field.errors|striptags }}</div>
+        <div class="invalid-feedback d-block" id="{{ field.id_for_label }}_error">{{ field.errors|striptags }}</div>
         {% if help_slug %}
             <a href="#" class="small" data-help="{{ help_slug }}">
                 <span class="t-en">Why?</span><span class="t-it">Perché?</span>

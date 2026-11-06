@@ -1,4 +1,19 @@
+---
+title: Configuration and Runtime Settings
+language: en
+status: CURRENT_PARTIAL
+owner: Andrea Zedda
+audience: developers and operators
+last_verified_at: 2026-11-06
+---
+
 # Configuration (env, settings, runtime)
+
+The tables below are a quick reference, not the complete runtime configuration. The [current account/SMTP contract](../operations/AUTHENTICATION_AND_ACCESS.md#runtime-configuration-and-email), [actual architecture](../architecture/CURRENT_SYSTEM.md) and [disposable handbook setup](../development/DEVELOPMENT.md) govern onboarding and operations.
+
+`DJANGO_ALLOWED_HOSTS` and `DJANGO_CSRF_TRUSTED_ORIGINS` are the preferred environment names; legacy `ALLOWED_HOSTS` / `CSRF_TRUSTED_ORIGINS` are accepted fallbacks. The actual cluster uses SQLite on its data PVC. `BMY_SOURCE_SHA` identifies the image source and `CONTAINER_IMAGE_DIGEST` its immutable artifact; neither is the same as the local checkout HEAD. Never print the full environment to diagnose a mismatch.
+
+`CELERY_TASK_ALWAYS_EAGER` is not parsed as a production environment switch. Test settings set it explicitly in Python; see [manual troubleshooting](../development/TROUBLESHOOTING.md).
 
 === "IT"
     ## Variabili d’ambiente principali

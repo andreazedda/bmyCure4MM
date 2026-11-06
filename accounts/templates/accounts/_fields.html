@@ -1,0 +1,13 @@
+{% load account_ui %}
+{% include 'accounts/_errors.html' %}
+{% for field in form %}
+  {% if field.is_hidden %}{{ field }}{% else %}
+  <div class="mb-3{% if field.widget_type == 'checkbox' %} form-check{% endif %}">
+    {% if field.widget_type == 'checkbox' %}{{ field }}{% endif %}
+    <label class="{% if field.widget_type == 'checkbox' %}form-check-label{% else %}form-label{% endif %}" for="{{ field.id_for_label }}">{{ field.label }}</label>
+    {% if field.widget_type != 'checkbox' %}{{ field }}{% endif %}
+    {% if field.help_text %}<div class="form-text" id="{{ field.auto_id }}_helptext">{{ field.help_text }}</div>{% endif %}
+    {% if field.errors %}<ul class="text-danger mt-1" id="{{ field.auto_id }}_error">{% for error in field.errors %}<li>{{ error|account_label }}</li>{% endfor %}</ul>{% endif %}
+  </div>
+  {% endif %}
+{% endfor %}

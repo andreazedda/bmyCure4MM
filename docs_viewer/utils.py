@@ -11,7 +11,8 @@ import markdown
 from markdown.extensions import Extension
 from markdown.treeprocessors import Treeprocessor
 from django.templatetags.static import static
-from urllib.parse import urlsplit, urlunsplit, unquote
+from urllib.parse import urlsplit, urlunsplit, unquote, quote
+import yaml
 from pymdownx.superfences import fence_div_format
 
 
@@ -22,6 +23,7 @@ ALLOWED_DOC_PATHS = [
     'README.md',
     'IMPLEMENTATION_LOG.md',
     'IMPLEMENTATION_SUMMARY.md',
+    'deploy/k8s/DEPLOY_K3S.md',
 ]
 
 
@@ -50,9 +52,17 @@ def is_safe_path(path: str) -> bool:
     if not allowed:
         return False
     
-    # Check file exists
+    # Resolve symlinks before checking the destination against the same whitelist.
+    # Staying within BASE_DIR alone would permit docs/link.md -> private.md.
     full_path = os.path.join(settings.BASE_DIR, normalized)
-    if not Path(full_path).resolve().is_relative_to(Path(settings.BASE_DIR).resolve()):
+    try:
+        resolved = Path(full_path).resolve().relative_to(Path(settings.BASE_DIR).resolve()).as_posix()
+    except (OSError, RuntimeError, ValueError):
+        return False
+    if Path(resolved).suffix.lower() not in {'.md', '.markdown'} or not any(
+        (resolved.startswith(allowed_path) if allowed_path.endswith('/') else resolved == allowed_path)
+        for allowed_path in ALLOWED_DOC_PATHS
+    ):
         return False
     if not os.path.exists(full_path):
         return False
@@ -73,7 +83,8 @@ def get_allowed_doc_paths() -> List[str]:
         full_path = os.path.join(base_dir, allowed_path)
         
         if os.path.isfile(full_path):
-            docs.append(allowed_path)
+            if is_safe_path(allowed_path):
+                docs.append(allowed_path)
         elif os.path.isdir(full_path):
             # Recursively find markdown files
             for root, dirs, files in os.walk(full_path):
@@ -83,9 +94,58 @@ def get_allowed_doc_paths() -> List[str]:
                             os.path.join(root, file),
                             base_dir
                         )
-                        docs.append(rel_path)
+                        if is_safe_path(rel_path):
+                            docs.append(rel_path)
     
     return sorted(docs)
+
+
+def document_metadata(content: str) -> dict:
+    """Expose authored status/date without interpreting missing metadata as approval."""
+    if not content.startswith('---\n'):
+        return {}
+    closing = content.find('\n---', 4)
+    if closing < 0:
+        return {}
+    try:
+        data = yaml.safe_load(content[4:closing])
+    except yaml.YAMLError:
+        return {}
+    if not isinstance(data, dict):
+        return {}
+    return {key: str(data[key])[:200] for key in ('status', 'last_verified_at', 'audience', 'language', 'lang') if data.get(key)}
+
+
+def document_language(content: str, path: str) -> str:
+    """Prefer declared language; do not guess a single language for mixed documents."""
+    metadata = document_metadata(content)
+    declared = metadata.get('language') or metadata.get('lang', '')
+    if re.fullmatch(r'(?:en|it)(?:-[A-Za-z]{2,8})?', declared):
+        return declared
+    if path.startswith('docs/it/') or path.endswith('_it.md') or path == 'docs/guides/mathematical_models.md':
+        return 'it'
+    if path.startswith(('docs/en/', 'docs/development/')) or path.endswith('_en.md'):
+        return 'en'
+    if path in {'docs/architecture/CURRENT_SYSTEM.md', 'docs/operations/AUTHENTICATION_AND_ACCESS.md',
+                'docs/operations/UX_AUDIT_2026_11_06.md', 'deploy/k8s/DEPLOY_K3S.md'}:
+        return 'en'
+    return ''
+
+
+def repository_source_url(path: str) -> str:
+    """Link known source types to this image's public revision; never serve code/files."""
+    roots = ('accounts/', 'simulator/', 'mmportal/', 'docs_viewer/', 'twin_engine/',
+             'clinic/', 'chemtools/', 'api/', 'scripts/', 'tests/', 'deploy/', '.github/')
+    root_files = {'pyproject.toml', 'uv.lock', 'Dockerfile', 'manage.py', 'mkdocs.yml'}
+    candidate = Path(settings.BASE_DIR, path)
+    if (path not in root_files and not (path.startswith(roots) and candidate.suffix in {'.py', '.toml', '.yaml', '.yml', '.md'})):
+        return ''
+    if not candidate.is_file() or not candidate.resolve().is_relative_to(Path(settings.BASE_DIR).resolve()):
+        return ''
+    revision = os.environ.get('BMY_SOURCE_SHA', '')
+    if not re.fullmatch(r'[a-f0-9]{40}', revision):
+        revision = 'master'
+    return 'https://github.com/andreazedda/bmyCure4MM/blob/' + revision + '/' + quote(path, safe='/')
 
 
 class DocumentationReferences(Treeprocessor):
@@ -105,6 +165,8 @@ class DocumentationReferences(Treeprocessor):
             resolved = posixpath.normpath(posixpath.join(posixpath.dirname(self.source_path), unquote(parts.path)))
             if attribute == 'href' and is_safe_path(resolved):
                 element.set(attribute, urlunsplit(('', '', '/docs/view/' + resolved, parts.query, parts.fragment)))
+            elif attribute == 'href' and repository_source_url(resolved):
+                element.set(attribute, repository_source_url(resolved) + ('#' + parts.fragment if parts.fragment else ''))
             elif attribute == 'src' and resolved.startswith('docs/assets/images/'):
                 image_root = Path(settings.BASE_DIR, 'docs/assets/images').resolve()
                 image = Path(settings.BASE_DIR, resolved).resolve()

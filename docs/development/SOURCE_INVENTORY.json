@@ -1,0 +1,2318 @@
+{
+  "schema": "bmy-critical-source-inventory-v1",
+  "source_sha": "fa9c35473302debf3c9a289d5f34f0bc7f771dbd",
+  "scope": "Critical application boundaries; not every helper function. Static AST inventory, no database contents. Source URLs are immutable audit-baseline anchors.",
+  "reviewed_on": "2026-11-06",
+  "modules": [
+    {
+      "path": "accounts/services.py",
+      "symbols": [
+        {
+          "name": "normalize_email",
+          "kind": "function",
+          "signature": "normalize_email(value)",
+          "line": 32,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/accounts/services.py#L32"
+        },
+        {
+          "name": "locked_policy",
+          "kind": "function",
+          "signature": "locked_policy()",
+          "line": 44,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/accounts/services.py#L44"
+        },
+        {
+          "name": "request_access",
+          "kind": "function",
+          "signature": "request_access(data)",
+          "line": 151,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/accounts/services.py#L151"
+        },
+        {
+          "name": "bootstrap_owner",
+          "kind": "function",
+          "signature": "bootstrap_owner()",
+          "line": 197,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/accounts/services.py#L197"
+        },
+        {
+          "name": "confirm_capability",
+          "kind": "function",
+          "signature": "confirm_capability(raw, purpose, password=None)",
+          "line": 257,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/accounts/services.py#L257"
+        },
+        {
+          "name": "decide_request",
+          "kind": "function",
+          "signature": "decide_request(actor, identity_id, *, approve, days=14)",
+          "line": 310,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/accounts/services.py#L310"
+        },
+        {
+          "name": "change_access",
+          "kind": "function",
+          "signature": "change_access(actor, identity_id, state)",
+          "line": 359,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/accounts/services.py#L359"
+        },
+        {
+          "name": "rate_limit",
+          "kind": "function",
+          "signature": "rate_limit(scope, request, identity_key='', limit=10, seconds=3600)",
+          "line": 421,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/accounts/services.py#L421"
+        },
+        {
+          "name": "submit_feedback",
+          "kind": "function",
+          "signature": "submit_feedback(identity, data, key)",
+          "line": 444,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/accounts/services.py#L444"
+        }
+      ]
+    },
+    {
+      "path": "accounts/backends.py",
+      "symbols": [
+        {
+          "name": "VerifiedEmailBackend",
+          "kind": "class",
+          "signature": "VerifiedEmailBackend",
+          "line": 8,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/accounts/backends.py#L8",
+          "methods": [
+            {
+              "name": "authenticate",
+              "signature": "authenticate(self, request, email=None, password=None, **kwargs)",
+              "line": 9
+            },
+            {
+              "name": "get_user",
+              "signature": "get_user(self, user_id)",
+              "line": 26
+            }
+          ],
+          "declared_fields": []
+        }
+      ]
+    },
+    {
+      "path": "accounts/middleware.py",
+      "symbols": [
+        {
+          "name": "ProductAccessMiddleware",
+          "kind": "class",
+          "signature": "ProductAccessMiddleware",
+          "line": 10,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/accounts/middleware.py#L10",
+          "methods": [
+            {
+              "name": "process_view",
+              "signature": "process_view(self, request, view_func, args, kwargs)",
+              "line": 11
+            },
+            {
+              "name": "process_response",
+              "signature": "process_response(self, request, response)",
+              "line": 75
+            }
+          ],
+          "declared_fields": []
+        }
+      ]
+    },
+    {
+      "path": "accounts/notifications.py",
+      "symbols": [
+        {
+          "name": "dispatch_notification",
+          "kind": "function",
+          "signature": "dispatch_notification()",
+          "line": 26,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/accounts/notifications.py#L26"
+        },
+        {
+          "name": "housekeeping",
+          "kind": "function",
+          "signature": "housekeeping()",
+          "line": 110,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/accounts/notifications.py#L110"
+        }
+      ]
+    },
+    {
+      "path": "simulator/models.py",
+      "symbols": [
+        {
+          "name": "Scenario",
+          "kind": "class",
+          "signature": "Scenario",
+          "line": 48,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/simulator/models.py#L48",
+          "methods": [
+            {
+              "name": "lab_items",
+              "signature": "lab_items(self)",
+              "line": 282
+            }
+          ],
+          "declared_fields": [
+            {
+              "name": "title",
+              "declaration": "models.CharField(max_length=200)"
+            },
+            {
+              "name": "clinical_stage",
+              "declaration": "models.CharField(max_length=32, choices=STAGE_CHOICES, default='newly_diagnosed')"
+            },
+            {
+              "name": "summary",
+              "declaration": "models.TextField(help_text='Concise description of the case including age, stage and key features.')"
+            },
+            {
+              "name": "risk_stratification",
+              "declaration": "models.CharField(max_length=128, blank=True, help_text='e.g., High-risk cytogenetics, R-ISS II.')"
+            },
+            {
+              "name": "lab_snapshot",
+              "declaration": "models.JSONField(blank=True, default=dict, help_text='Dictionary of key laboratory values shown to the learner.')"
+            },
+            {
+              "name": "recommended_regimens",
+              "declaration": "models.ManyToManyField('clinic.Regimen', related_name='training_scenarios', blank=True)"
+            },
+            {
+              "name": "guideline_notes",
+              "declaration": "models.TextField(blank=True, help_text='Rationale, supporting evidence or pearls displayed after completion.')"
+            },
+            {
+              "name": "expected_response",
+              "declaration": "models.CharField(max_length=4, choices=IMWG_RESPONSE_CHOICES, blank=True, help_text='Target IMWG response. Optional; used for feedback.')"
+            },
+            {
+              "name": "patient_age",
+              "declaration": "models.IntegerField(null=True, blank=True, help_text='Patient age in years. Range: 18-120')"
+            },
+            {
+              "name": "ecog_performance_status",
+              "declaration": "models.IntegerField(null=True, blank=True, choices=ECOG_CHOICES, help_text='ECOG Performance Status (0-4)')"
+            },
+            {
+              "name": "charlson_comorbidity_index",
+              "declaration": "models.IntegerField(null=True, blank=True, help_text='Charlson Comorbidity Index. Range: 0-10. Low: 0-1, Moderate: 2-3, High: \u22654')"
+            },
+            {
+              "name": "patient_archetype",
+              "declaration": "models.CharField(max_length=32, blank=True, default='', choices=ARCHETYPE_CHOICES, help_text='Patient archetype from virtual patient generator')"
+            },
+            {
+              "name": "del17p",
+              "declaration": "models.BooleanField(default=False, help_text='TP53 deletion - high risk', verbose_name='del(17p)')"
+            },
+            {
+              "name": "t_4_14",
+              "declaration": "models.BooleanField(default=False, help_text='Translocation (4;14) - high risk', verbose_name='t(4;14)')"
+            },
+            {
+              "name": "t_14_16",
+              "declaration": "models.BooleanField(default=False, help_text='Translocation (14;16) - very high risk', verbose_name='t(14;16)')"
+            },
+            {
+              "name": "gain_1q21",
+              "declaration": "models.BooleanField(default=False, help_text='1q21 gain/amplification - proliferation advantage', verbose_name='1q21 gain')"
+            },
+            {
+              "name": "hyperdiploid",
+              "declaration": "models.BooleanField(default=False, help_text='Hyperdiploid karyotype - standard risk', verbose_name='Hyperdiploid')"
+            },
+            {
+              "name": "t_11_14",
+              "declaration": "models.BooleanField(default=False, help_text='Translocation (11;14) - standard risk, better prognosis', verbose_name='t(11;14)')"
+            },
+            {
+              "name": "tumor_cell_count",
+              "declaration": "models.FloatField(null=True, blank=True, help_text='Tumor cell count (cells). Range: 1e6-1e12. Typical newly diagnosed: 1e10')"
+            },
+            {
+              "name": "tumor_growth_rate",
+              "declaration": "models.FloatField(null=True, blank=True, help_text='Tumor growth rate (per day). Range: 0.001-0.1. Typical: 0.01')"
+            },
+            {
+              "name": "carrying_capacity",
+              "declaration": "models.FloatField(null=True, blank=True, help_text='Maximum tumor burden (cells). Range: 1e11-1e13. Default: 1e12')"
+            },
+            {
+              "name": "creatinine_clearance",
+              "declaration": "models.FloatField(null=True, blank=True, help_text='Creatinine clearance (mL/min). Normal: >60, Moderate renal impairment: 30-60, Severe: <30')"
+            },
+            {
+              "name": "albumin",
+              "declaration": "models.FloatField(null=True, blank=True, help_text='Serum albumin (g/dL). Normal: 3.5-5.0')"
+            },
+            {
+              "name": "beta2_microglobulin",
+              "declaration": "models.FloatField(null=True, blank=True, help_text='\u03b22-microglobulin (mg/L). Normal: <2, Elevated: 2-5.5, Very high: >5.5', verbose_name='\u03b22-microglobulin')"
+            },
+            {
+              "name": "ldh",
+              "declaration": "models.FloatField(null=True, blank=True, help_text='Lactate dehydrogenase (U/L). Normal: 140-280, Elevated: >280', verbose_name='LDH')"
+            },
+            {
+              "name": "hemoglobin",
+              "declaration": "models.FloatField(null=True, blank=True, help_text='Hemoglobin (g/dL). Normal: M 13-17, F 12-15. Anemia: <10')"
+            },
+            {
+              "name": "calcium",
+              "declaration": "models.FloatField(null=True, blank=True, help_text='Serum calcium (mg/dL). Normal: 8.5-10.2, Hypercalcemia: >10.5, Severe: >14')"
+            },
+            {
+              "name": "riss_stage",
+              "declaration": "models.CharField(max_length=16, blank=True, default='', choices=RISS_CHOICES, help_text='Revised International Staging System stage', verbose_name='R-ISS Stage')"
+            },
+            {
+              "name": "difficulty_score",
+              "declaration": "models.FloatField(null=True, blank=True, help_text='Calculated difficulty score (0-100). Auto-populated from difficulty scoring system.')"
+            },
+            {
+              "name": "difficulty_level",
+              "declaration": "models.CharField(max_length=16, blank=True, default='', choices=DIFFICULTY_CHOICES, help_text='Difficulty level category')"
+            },
+            {
+              "name": "created",
+              "declaration": "models.DateTimeField(auto_now_add=True)"
+            },
+            {
+              "name": "updated",
+              "declaration": "models.DateTimeField(auto_now=True)"
+            },
+            {
+              "name": "active",
+              "declaration": "models.BooleanField(default=True)"
+            }
+          ]
+        },
+        {
+          "name": "SimulationAttempt",
+          "kind": "class",
+          "signature": "SimulationAttempt",
+          "line": 287,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/simulator/models.py#L287",
+          "methods": [
+            {
+              "name": "run_model",
+              "signature": "run_model(self)",
+              "line": 333
+            },
+            {
+              "name": "_resolve_solver_inputs",
+              "signature": "_resolve_solver_inputs(cls, resolved_params: dict)",
+              "line": 743
+            },
+            {
+              "name": "_float_or_strict",
+              "signature": "_float_or_strict(value, default, name: str)",
+              "line": 844
+            },
+            {
+              "name": "_merge_twin_parameters",
+              "signature": "_merge_twin_parameters(params: dict, twin_payload: dict)",
+              "line": 855
+            },
+            {
+              "name": "_apply_guided_twin_choices",
+              "signature": "_apply_guided_twin_choices(params: dict)",
+              "line": 884
+            },
+            {
+              "name": "_float_or",
+              "signature": "_float_or(value, default)",
+              "line": 934
+            }
+          ],
+          "declared_fields": [
+            {
+              "name": "scenario",
+              "declaration": "models.ForeignKey(Scenario, on_delete=models.CASCADE, related_name='attempts')"
+            },
+            {
+              "name": "user",
+              "declaration": "models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)"
+            },
+            {
+              "name": "selected_regimen",
+              "declaration": "models.ForeignKey('clinic.Regimen', on_delete=models.SET_NULL, null=True, blank=True)"
+            },
+            {
+              "name": "predicted_response",
+              "declaration": "models.CharField(max_length=4, choices=IMWG_RESPONSE_CHOICES, blank=True)"
+            },
+            {
+              "name": "confidence",
+              "declaration": "models.PositiveSmallIntegerField(default=70, help_text='Confidence in chosen plan (0-100%).')"
+            },
+            {
+              "name": "notes",
+              "declaration": "models.TextField(blank=True)"
+            },
+            {
+              "name": "submitted",
+              "declaration": "models.DateTimeField(auto_now_add=True)"
+            },
+            {
+              "name": "is_guideline_aligned",
+              "declaration": "models.BooleanField(default=False)"
+            },
+            {
+              "name": "parameters",
+              "declaration": "models.JSONField(default=dict, blank=True)"
+            },
+            {
+              "name": "results",
+              "declaration": "models.JSONField(default=dict, blank=True)"
+            },
+            {
+              "name": "results_summary",
+              "declaration": "models.JSONField(default=dict, blank=True)"
+            },
+            {
+              "name": "seed",
+              "declaration": "models.IntegerField(null=True, blank=True)"
+            },
+            {
+              "name": "cohort_size",
+              "declaration": "models.PositiveIntegerField(default=1)"
+            },
+            {
+              "name": "artifacts",
+              "declaration": "models.JSONField(default=dict, blank=True)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "simulator/models_simulation.py",
+      "symbols": [
+        {
+          "name": "MathematicalModel",
+          "kind": "class",
+          "signature": "MathematicalModel",
+          "line": 12,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/simulator/models_simulation.py#L12",
+          "methods": [
+            {
+              "name": "simulate",
+              "signature": "simulate(self)",
+              "line": 31
+            }
+          ],
+          "declared_fields": []
+        }
+      ]
+    },
+    {
+      "path": "simulator/views_manage.py",
+      "symbols": [
+        {
+          "name": "simulate_scenario",
+          "kind": "function",
+          "signature": "simulate_scenario(request: HttpRequest, pk: int)",
+          "line": 316,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/simulator/views_manage.py#L316"
+        },
+        {
+          "name": "export_attempt",
+          "kind": "function",
+          "signature": "export_attempt(request: HttpRequest, pk: int)",
+          "line": 424,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/simulator/views_manage.py#L424"
+        },
+        {
+          "name": "attempt_plot_embed",
+          "kind": "function",
+          "signature": "attempt_plot_embed(request: HttpRequest, pk: int)",
+          "line": 454,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/simulator/views_manage.py#L454"
+        }
+      ]
+    },
+    {
+      "path": "simulator/pharmaco/registry.py",
+      "symbols": [
+        {
+          "name": "resolve",
+          "kind": "function",
+          "signature": "resolve(drug_doses: Dict[str, float], time_horizon: float, fallback_pk: Dict[str, Dict[str, float]] | None=None, fallback_pd: Dict[str, Dict[str, float]] | None=None)",
+          "line": 16,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/simulator/pharmaco/registry.py#L16"
+        },
+        {
+          "name": "get_drug_profile",
+          "kind": "function",
+          "signature": "get_drug_profile(drug: str)",
+          "line": 48,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/simulator/pharmaco/registry.py#L48"
+        },
+        {
+          "name": "list_profiles",
+          "kind": "function",
+          "signature": "list_profiles()",
+          "line": 54,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/simulator/pharmaco/registry.py#L54"
+        }
+      ]
+    },
+    {
+      "path": "clinic/models.py",
+      "symbols": [
+        {
+          "name": "Patient",
+          "kind": "class",
+          "signature": "Patient",
+          "line": 8,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/clinic/models.py#L8",
+          "methods": [
+            {
+              "name": "age",
+              "signature": "age(self)",
+              "line": 40
+            }
+          ],
+          "declared_fields": [
+            {
+              "name": "mrn",
+              "declaration": "models.CharField('MRN', max_length=32, unique=True)"
+            },
+            {
+              "name": "owner",
+              "declaration": "models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name='owned_patients', help_text='Primary owner of this patient record (minimal access control).')"
+            },
+            {
+              "name": "first_name",
+              "declaration": "models.CharField(max_length=64)"
+            },
+            {
+              "name": "last_name",
+              "declaration": "models.CharField(max_length=64)"
+            },
+            {
+              "name": "birth_date",
+              "declaration": "models.DateField()"
+            },
+            {
+              "name": "sex",
+              "declaration": "models.CharField(max_length=1, choices=SEX_CHOICES)"
+            },
+            {
+              "name": "diagnosis_date",
+              "declaration": "models.DateField()"
+            },
+            {
+              "name": "notes",
+              "declaration": "models.TextField(blank=True)"
+            }
+          ]
+        },
+        {
+          "name": "CytogeneticAbnormality",
+          "kind": "class",
+          "signature": "CytogeneticAbnormality",
+          "line": 47,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/clinic/models.py#L47",
+          "methods": [],
+          "declared_fields": [
+            {
+              "name": "code",
+              "declaration": "models.CharField(max_length=32, unique=True)"
+            },
+            {
+              "name": "description",
+              "declaration": "models.CharField(max_length=255)"
+            }
+          ]
+        },
+        {
+          "name": "PatientCytogenetics",
+          "kind": "class",
+          "signature": "PatientCytogenetics",
+          "line": 60,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/clinic/models.py#L60",
+          "methods": [],
+          "declared_fields": [
+            {
+              "name": "patient",
+              "declaration": "models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='cytogenetics')"
+            },
+            {
+              "name": "abnormality",
+              "declaration": "models.ForeignKey(CytogeneticAbnormality, on_delete=models.CASCADE, related_name='patient_records')"
+            },
+            {
+              "name": "detected_on",
+              "declaration": "models.DateField()"
+            },
+            {
+              "name": "method",
+              "declaration": "models.CharField(max_length=128, blank=True)"
+            }
+          ]
+        },
+        {
+          "name": "Assessment",
+          "kind": "class",
+          "signature": "Assessment",
+          "line": 80,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/clinic/models.py#L80",
+          "methods": [],
+          "declared_fields": [
+            {
+              "name": "patient",
+              "declaration": "models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='assessments')"
+            },
+            {
+              "name": "date",
+              "declaration": "models.DateField()"
+            },
+            {
+              "name": "m_protein_g_dl",
+              "declaration": "models.DecimalField('M-Protein (g/dL)', max_digits=5, decimal_places=2, null=True, blank=True)"
+            },
+            {
+              "name": "kappa_mg_l",
+              "declaration": "models.DecimalField('Kappa (mg/L)', max_digits=6, decimal_places=2, null=True, blank=True)"
+            },
+            {
+              "name": "lambda_mg_l",
+              "declaration": "models.DecimalField('Lambda (mg/L)', max_digits=6, decimal_places=2, null=True, blank=True)"
+            },
+            {
+              "name": "flc_ratio",
+              "declaration": "models.DecimalField('FLC Ratio', max_digits=6, decimal_places=2, null=True, blank=True)"
+            },
+            {
+              "name": "hemoglobin_g_dl",
+              "declaration": "models.DecimalField('Hemoglobin (g/dL)', max_digits=4, decimal_places=1, null=True, blank=True)"
+            },
+            {
+              "name": "calcium_mg_dl",
+              "declaration": "models.DecimalField('Calcium (mg/dL)', max_digits=4, decimal_places=1, null=True, blank=True)"
+            },
+            {
+              "name": "creatinine_mg_dl",
+              "declaration": "models.DecimalField('Creatinine (mg/dL)', max_digits=4, decimal_places=2, null=True, blank=True)"
+            },
+            {
+              "name": "beta2m_mg_l",
+              "declaration": "models.DecimalField('Beta-2 Microglobulin (mg/L)', max_digits=5, decimal_places=2, null=True, blank=True)"
+            },
+            {
+              "name": "albumin_g_dl",
+              "declaration": "models.DecimalField('Albumin (g/dL)', max_digits=4, decimal_places=1, null=True, blank=True)"
+            },
+            {
+              "name": "ldH_u_l",
+              "declaration": "models.DecimalField('LDH (U/L)', max_digits=6, decimal_places=1, null=True, blank=True)"
+            },
+            {
+              "name": "r_iss",
+              "declaration": "models.CharField('R-ISS', max_length=4, choices=R_ISS_CHOICES, blank=True)"
+            },
+            {
+              "name": "response",
+              "declaration": "models.CharField(max_length=4, choices=RESPONSE_CHOICES, blank=True)"
+            },
+            {
+              "name": "notes",
+              "declaration": "models.TextField(blank=True)"
+            }
+          ]
+        },
+        {
+          "name": "Regimen",
+          "kind": "class",
+          "signature": "Regimen",
+          "line": 123,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/clinic/models.py#L123",
+          "methods": [],
+          "declared_fields": [
+            {
+              "name": "name",
+              "declaration": "models.CharField(max_length=128)"
+            },
+            {
+              "name": "line",
+              "declaration": "models.CharField(max_length=64, help_text='Line of therapy (e.g. frontline, salvage).')"
+            },
+            {
+              "name": "components",
+              "declaration": "models.TextField(help_text='Comma-separated agents or regimen details.')"
+            },
+            {
+              "name": "intent",
+              "declaration": "models.CharField(max_length=128, blank=True)"
+            },
+            {
+              "name": "notes",
+              "declaration": "models.TextField(blank=True)"
+            }
+          ]
+        },
+        {
+          "name": "PatientTherapy",
+          "kind": "class",
+          "signature": "PatientTherapy",
+          "line": 139,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/clinic/models.py#L139",
+          "methods": [],
+          "declared_fields": [
+            {
+              "name": "patient",
+              "declaration": "models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='therapies')"
+            },
+            {
+              "name": "regimen",
+              "declaration": "models.ForeignKey(Regimen, on_delete=models.CASCADE, related_name='patient_courses')"
+            },
+            {
+              "name": "start_date",
+              "declaration": "models.DateField()"
+            },
+            {
+              "name": "end_date",
+              "declaration": "models.DateField(null=True, blank=True)"
+            },
+            {
+              "name": "outcome",
+              "declaration": "models.CharField(max_length=128, blank=True)"
+            },
+            {
+              "name": "adverse_events",
+              "declaration": "models.TextField(blank=True)"
+            },
+            {
+              "name": "doses",
+              "declaration": "models.JSONField(default=dict, blank=True)"
+            },
+            {
+              "name": "cycle_length_days",
+              "declaration": "models.IntegerField(null=True, blank=True)"
+            },
+            {
+              "name": "days_on",
+              "declaration": "models.JSONField(default=list, blank=True)"
+            },
+            {
+              "name": "schedule_notes",
+              "declaration": "models.TextField(blank=True)"
+            },
+            {
+              "name": "source_quality",
+              "declaration": "models.CharField(max_length=32, choices=SOURCE_QUALITY_CHOICES, default=SOURCE_QUALITY_UNKNOWN)"
+            },
+            {
+              "name": "provenance",
+              "declaration": "models.JSONField(default=dict, blank=True)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "clinic/views.py",
+      "symbols": [
+        {
+          "name": "can_edit_patient",
+          "kind": "function",
+          "signature": "can_edit_patient(user, patient: models.Patient)",
+          "line": 35,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/clinic/views.py#L35"
+        },
+        {
+          "name": "patient_detail",
+          "kind": "function",
+          "signature": "patient_detail(request: HttpRequest, pk: int)",
+          "line": 164,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/clinic/views.py#L164"
+        }
+      ]
+    },
+    {
+      "path": "clinic/api.py",
+      "symbols": [
+        {
+          "name": "PatientSerializer",
+          "kind": "class",
+          "signature": "PatientSerializer",
+          "line": 9,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/clinic/api.py#L9",
+          "methods": [],
+          "declared_fields": []
+        },
+        {
+          "name": "AssessmentSerializer",
+          "kind": "class",
+          "signature": "AssessmentSerializer",
+          "line": 15,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/clinic/api.py#L15",
+          "methods": [],
+          "declared_fields": []
+        },
+        {
+          "name": "PatientViewSet",
+          "kind": "class",
+          "signature": "PatientViewSet",
+          "line": 21,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/clinic/api.py#L21",
+          "methods": [
+            {
+              "name": "get_queryset",
+              "signature": "get_queryset(self)",
+              "line": 25
+            }
+          ],
+          "declared_fields": []
+        },
+        {
+          "name": "AssessmentViewSet",
+          "kind": "class",
+          "signature": "AssessmentViewSet",
+          "line": 35,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/clinic/api.py#L35",
+          "methods": [
+            {
+              "name": "get_queryset",
+              "signature": "get_queryset(self)",
+              "line": 39
+            }
+          ],
+          "declared_fields": []
+        }
+      ]
+    },
+    {
+      "path": "chemtools/models.py",
+      "symbols": [
+        {
+          "name": "ChemJob",
+          "kind": "class",
+          "signature": "ChemJob",
+          "line": 10,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/chemtools/models.py#L10",
+          "methods": [
+            {
+              "name": "media_directory",
+              "signature": "media_directory(self)",
+              "line": 52
+            },
+            {
+              "name": "thumbnail_url",
+              "signature": "thumbnail_url(self)",
+              "line": 55
+            },
+            {
+              "name": "status_label",
+              "signature": "status_label(self)",
+              "line": 61
+            },
+            {
+              "name": "update_progress",
+              "signature": "update_progress(self, percent: int, message: str='')",
+              "line": 69
+            }
+          ],
+          "declared_fields": [
+            {
+              "name": "kind",
+              "declaration": "models.CharField(max_length=10, choices=KIND_CHOICES)"
+            },
+            {
+              "name": "created",
+              "declaration": "models.DateTimeField(auto_now_add=True)"
+            },
+            {
+              "name": "input_a",
+              "declaration": "models.CharField(max_length=255, blank=True)"
+            },
+            {
+              "name": "input_b",
+              "declaration": "models.CharField(max_length=255, blank=True)"
+            },
+            {
+              "name": "out_html",
+              "declaration": "models.FileField(upload_to='chem/html/', blank=True, null=True)"
+            },
+            {
+              "name": "out_csv",
+              "declaration": "models.FileField(upload_to='chem/csv/', blank=True, null=True)"
+            },
+            {
+              "name": "log",
+              "declaration": "models.TextField(blank=True)"
+            },
+            {
+              "name": "user",
+              "declaration": "models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='chem_jobs')"
+            },
+            {
+              "name": "progress_percent",
+              "declaration": "models.IntegerField(default=0)"
+            },
+            {
+              "name": "progress_message",
+              "declaration": "models.CharField(max_length=255, blank=True)"
+            },
+            {
+              "name": "api_preferences",
+              "declaration": "models.JSONField(default=dict, blank=True)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "chemtools/views.py",
+      "symbols": [
+        {
+          "name": "_enqueue",
+          "kind": "function",
+          "signature": "_enqueue(task, job: models.ChemJob, *params)",
+          "line": 21,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/chemtools/views.py#L21"
+        },
+        {
+          "name": "job_status",
+          "kind": "function",
+          "signature": "job_status(request: HttpRequest, pk: int)",
+          "line": 204,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/chemtools/views.py#L204"
+        },
+        {
+          "name": "job_detail",
+          "kind": "function",
+          "signature": "job_detail(request: HttpRequest, pk: int)",
+          "line": 226,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/chemtools/views.py#L226"
+        }
+      ]
+    },
+    {
+      "path": "chemtools/tasks.py",
+      "symbols": [
+        {
+          "name": "run_drug_params_job",
+          "kind": "function",
+          "signature": "run_drug_params_job(job_id: int, smiles: str, cid: str)",
+          "line": 83,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/chemtools/tasks.py#L83"
+        },
+        {
+          "name": "run_binding_viz_job",
+          "kind": "function",
+          "signature": "run_binding_viz_job(job_id: int, pdb_id: str, ligand: str)",
+          "line": 122,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/chemtools/tasks.py#L122"
+        },
+        {
+          "name": "run_similarity_job",
+          "kind": "function",
+          "signature": "run_similarity_job(job_id: int, smiles: str)",
+          "line": 170,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/chemtools/tasks.py#L170"
+        }
+      ]
+    },
+    {
+      "path": "docs_viewer/views.py",
+      "symbols": [
+        {
+          "name": "docs_index",
+          "kind": "function",
+          "signature": "docs_index(request)",
+          "line": 25,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/docs_viewer/views.py#L25"
+        },
+        {
+          "name": "docs_view",
+          "kind": "function",
+          "signature": "docs_view(request, path)",
+          "line": 54,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/docs_viewer/views.py#L54"
+        },
+        {
+          "name": "docs_search",
+          "kind": "function",
+          "signature": "docs_search(request)",
+          "line": 144,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/docs_viewer/views.py#L144"
+        }
+      ]
+    },
+    {
+      "path": "docs_viewer/utils.py",
+      "symbols": [
+        {
+          "name": "is_safe_path",
+          "kind": "function",
+          "signature": "is_safe_path(path: str)",
+          "line": 28,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/docs_viewer/utils.py#L28"
+        },
+        {
+          "name": "DocumentationReferences",
+          "kind": "class",
+          "signature": "DocumentationReferences",
+          "line": 91,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/docs_viewer/utils.py#L91",
+          "methods": [
+            {
+              "name": "run",
+              "signature": "run(self, root)",
+              "line": 96
+            }
+          ],
+          "declared_fields": []
+        },
+        {
+          "name": "render_markdown",
+          "kind": "function",
+          "signature": "render_markdown(content: str, source_path: str='')",
+          "line": 124,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/docs_viewer/utils.py#L124"
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/models.py",
+      "symbols": [
+        {
+          "name": "PatientTwinState",
+          "kind": "class",
+          "signature": "PatientTwinState",
+          "line": 22,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/models.py#L22",
+          "methods": [
+            {
+              "name": "validate_scientific_contracts",
+              "signature": "validate_scientific_contracts(self)",
+              "line": 104
+            },
+            {
+              "name": "save",
+              "signature": "save(self, *args, **kwargs)",
+              "line": 116
+            }
+          ],
+          "declared_fields": [
+            {
+              "name": "patient",
+              "declaration": "models.ForeignKey('clinic.Patient', on_delete=models.CASCADE, related_name='twin_states')"
+            },
+            {
+              "name": "assessment",
+              "declaration": "models.ForeignKey('clinic.Assessment', on_delete=models.SET_NULL, related_name='primary_twin_states', null=True, blank=True)"
+            },
+            {
+              "name": "state_date",
+              "declaration": "models.DateField()"
+            },
+            {
+              "name": "is_current",
+              "declaration": "models.BooleanField(default=False)"
+            },
+            {
+              "name": "state_vector",
+              "declaration": "models.JSONField(default=dict, blank=True)"
+            },
+            {
+              "name": "state_vector_schema_version",
+              "declaration": "models.CharField(max_length=64, default=STATE_VECTOR_SCHEMA_VERSION)"
+            },
+            {
+              "name": "parameters",
+              "declaration": "models.JSONField(default=dict, blank=True)"
+            },
+            {
+              "name": "parameters_schema_version",
+              "declaration": "models.CharField(max_length=64, default=PARAMETERS_SCHEMA_VERSION)"
+            },
+            {
+              "name": "parameter_uncertainty",
+              "declaration": "models.JSONField(default=dict, blank=True)"
+            },
+            {
+              "name": "parameter_uncertainty_schema_version",
+              "declaration": "models.CharField(max_length=64, default=PARAMETER_UNCERTAINTY_SCHEMA_VERSION)"
+            },
+            {
+              "name": "risk_score",
+              "declaration": "models.FloatField(null=True, blank=True)"
+            },
+            {
+              "name": "method",
+              "declaration": "models.CharField(max_length=64, choices=METHOD_CHOICES, default=METHOD_INITIAL_RISK_MAPPING)"
+            },
+            {
+              "name": "model_version",
+              "declaration": "models.CharField(max_length=64)"
+            },
+            {
+              "name": "config_hash",
+              "declaration": "models.CharField(max_length=128)"
+            },
+            {
+              "name": "lineage",
+              "declaration": "models.JSONField(default=dict, blank=True)"
+            },
+            {
+              "name": "lineage_schema_version",
+              "declaration": "models.CharField(max_length=64, default=LINEAGE_SCHEMA_VERSION)"
+            },
+            {
+              "name": "source_assessments",
+              "declaration": "models.ManyToManyField('clinic.Assessment', related_name='twin_state_sources', blank=True)"
+            },
+            {
+              "name": "created_at",
+              "declaration": "models.DateTimeField(auto_now_add=True)"
+            },
+            {
+              "name": "created_by",
+              "declaration": "models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, related_name='created_twin_states', null=True, blank=True)"
+            }
+          ]
+        },
+        {
+          "name": "ObservationResidual",
+          "kind": "class",
+          "signature": "ObservationResidual",
+          "line": 121,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/models.py#L121",
+          "methods": [
+            {
+              "name": "save",
+              "signature": "save(self, *args, **kwargs)",
+              "line": 171
+            }
+          ],
+          "declared_fields": [
+            {
+              "name": "patient",
+              "declaration": "models.ForeignKey('clinic.Patient', on_delete=models.CASCADE, related_name='observation_residuals')"
+            },
+            {
+              "name": "twin_state",
+              "declaration": "models.ForeignKey(PatientTwinState, on_delete=models.CASCADE, related_name='residuals')"
+            },
+            {
+              "name": "assessment",
+              "declaration": "models.ForeignKey('clinic.Assessment', on_delete=models.SET_NULL, related_name='residual_records', null=True, blank=True)"
+            },
+            {
+              "name": "predicted_values",
+              "declaration": "models.JSONField(default=dict, blank=True)"
+            },
+            {
+              "name": "observed_values",
+              "declaration": "models.JSONField(default=dict, blank=True)"
+            },
+            {
+              "name": "residuals",
+              "declaration": "models.JSONField(default=dict, blank=True)"
+            },
+            {
+              "name": "normalized_residuals",
+              "declaration": "models.JSONField(default=dict, blank=True)"
+            },
+            {
+              "name": "rmse",
+              "declaration": "models.FloatField(null=True, blank=True)"
+            },
+            {
+              "name": "mae",
+              "declaration": "models.FloatField(null=True, blank=True)"
+            },
+            {
+              "name": "biomarker_weights",
+              "declaration": "models.JSONField(default=dict, blank=True)"
+            },
+            {
+              "name": "payload_schema_version",
+              "declaration": "models.CharField(max_length=64, default=OBSERVATION_RESIDUAL_SCHEMA_VERSION)"
+            },
+            {
+              "name": "stage",
+              "declaration": "models.CharField(max_length=32, choices=STAGE_CHOICES, default=STAGE_UNKNOWN)"
+            },
+            {
+              "name": "created_at",
+              "declaration": "models.DateTimeField(auto_now_add=True)"
+            }
+          ]
+        },
+        {
+          "name": "LongitudinalLabResult",
+          "kind": "class",
+          "signature": "LongitudinalLabResult",
+          "line": 176,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/models.py#L176",
+          "methods": [],
+          "declared_fields": [
+            {
+              "name": "patient",
+              "declaration": "models.ForeignKey('clinic.Patient', on_delete=models.CASCADE, related_name='longitudinal_lab_results')"
+            },
+            {
+              "name": "assessment",
+              "declaration": "models.ForeignKey('clinic.Assessment', on_delete=models.SET_NULL, related_name='longitudinal_lab_results', null=True, blank=True)"
+            },
+            {
+              "name": "date",
+              "declaration": "models.DateField()"
+            },
+            {
+              "name": "analyte",
+              "declaration": "models.CharField(max_length=32, choices=ANALYTE_CHOICES)"
+            },
+            {
+              "name": "value",
+              "declaration": "models.FloatField(null=True, blank=True)"
+            },
+            {
+              "name": "unit",
+              "declaration": "models.CharField(max_length=32, blank=True)"
+            },
+            {
+              "name": "source_quality",
+              "declaration": "models.CharField(max_length=32, choices=SOURCE_QUALITY_CHOICES, default=SOURCE_QUALITY_UNKNOWN)"
+            },
+            {
+              "name": "provenance",
+              "declaration": "models.JSONField(default=dict, blank=True)"
+            },
+            {
+              "name": "notes",
+              "declaration": "models.TextField(blank=True)"
+            },
+            {
+              "name": "created_at",
+              "declaration": "models.DateTimeField(auto_now_add=True)"
+            }
+          ]
+        },
+        {
+          "name": "TherapyInterruption",
+          "kind": "class",
+          "signature": "TherapyInterruption",
+          "line": 269,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/models.py#L269",
+          "methods": [],
+          "declared_fields": [
+            {
+              "name": "patient",
+              "declaration": "models.ForeignKey('clinic.Patient', on_delete=models.CASCADE, related_name='therapy_interruptions')"
+            },
+            {
+              "name": "patient_therapy",
+              "declaration": "models.ForeignKey('clinic.PatientTherapy', on_delete=models.SET_NULL, related_name='interruptions', null=True, blank=True)"
+            },
+            {
+              "name": "start_date",
+              "declaration": "models.DateField()"
+            },
+            {
+              "name": "end_date",
+              "declaration": "models.DateField(null=True, blank=True)"
+            },
+            {
+              "name": "drug",
+              "declaration": "models.CharField(max_length=64)"
+            },
+            {
+              "name": "reason",
+              "declaration": "models.CharField(max_length=64, choices=REASON_CHOICES, default=REASON_UNKNOWN)"
+            },
+            {
+              "name": "evidence",
+              "declaration": "models.JSONField(default=dict, blank=True)"
+            },
+            {
+              "name": "action_taken",
+              "declaration": "models.TextField(blank=True)"
+            },
+            {
+              "name": "source_quality",
+              "declaration": "models.CharField(max_length=32, default='clinical_record')"
+            },
+            {
+              "name": "created_at",
+              "declaration": "models.DateTimeField(auto_now_add=True)"
+            }
+          ]
+        },
+        {
+          "name": "AdverseEvent",
+          "kind": "class",
+          "signature": "AdverseEvent",
+          "line": 326,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/models.py#L326",
+          "methods": [],
+          "declared_fields": [
+            {
+              "name": "patient",
+              "declaration": "models.ForeignKey('clinic.Patient', on_delete=models.CASCADE, related_name='adverse_events')"
+            },
+            {
+              "name": "date",
+              "declaration": "models.DateField()"
+            },
+            {
+              "name": "event_type",
+              "declaration": "models.CharField(max_length=64, choices=EVENT_TYPE_CHOICES)"
+            },
+            {
+              "name": "grade",
+              "declaration": "models.CharField(max_length=32, blank=True)"
+            },
+            {
+              "name": "suspected_drug",
+              "declaration": "models.CharField(max_length=128, blank=True)"
+            },
+            {
+              "name": "observed_values",
+              "declaration": "models.JSONField(default=dict, blank=True)"
+            },
+            {
+              "name": "action_taken",
+              "declaration": "models.TextField(blank=True)"
+            },
+            {
+              "name": "outcome",
+              "declaration": "models.TextField(blank=True)"
+            },
+            {
+              "name": "provenance",
+              "declaration": "models.JSONField(default=dict, blank=True)"
+            },
+            {
+              "name": "created_at",
+              "declaration": "models.DateTimeField(auto_now_add=True)"
+            }
+          ]
+        },
+        {
+          "name": "CounterfactualRun",
+          "kind": "class",
+          "signature": "CounterfactualRun",
+          "line": 381,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/models.py#L381",
+          "methods": [
+            {
+              "name": "_assert_not_completed_mutation",
+              "signature": "_assert_not_completed_mutation(self)",
+              "line": 453
+            },
+            {
+              "name": "save",
+              "signature": "save(self, *args, **kwargs)",
+              "line": 484
+            },
+            {
+              "name": "delete",
+              "signature": "delete(self, *args, **kwargs)",
+              "line": 489
+            }
+          ],
+          "declared_fields": [
+            {
+              "name": "patient",
+              "declaration": "models.ForeignKey('clinic.Patient', on_delete=models.CASCADE, related_name='counterfactual_runs')"
+            },
+            {
+              "name": "base_twin_state",
+              "declaration": "models.ForeignKey(PatientTwinState, on_delete=models.CASCADE, related_name='counterfactual_runs')"
+            },
+            {
+              "name": "actual_therapy",
+              "declaration": "models.ForeignKey('clinic.PatientTherapy', on_delete=models.SET_NULL, related_name='counterfactual_actual_runs', null=True, blank=True)"
+            },
+            {
+              "name": "alternative_regimen",
+              "declaration": "models.ForeignKey('clinic.Regimen', on_delete=models.SET_NULL, related_name='counterfactual_alternatives', null=True, blank=True)"
+            },
+            {
+              "name": "alternative_parameters",
+              "declaration": "models.JSONField(default=dict, blank=True)"
+            },
+            {
+              "name": "intervention_definition",
+              "declaration": "models.JSONField(default=dict, blank=True)"
+            },
+            {
+              "name": "intervention_schema_version",
+              "declaration": "models.CharField(max_length=64, default=INTERVENTION_SCHEMA_VERSION)"
+            },
+            {
+              "name": "simulation_summary",
+              "declaration": "models.JSONField(default=dict, blank=True)"
+            },
+            {
+              "name": "simulation_summary_schema_version",
+              "declaration": "models.CharField(max_length=64, default=SIMULATION_SUMMARY_SCHEMA_VERSION)"
+            },
+            {
+              "name": "comparison_metrics",
+              "declaration": "models.JSONField(default=dict, blank=True)"
+            },
+            {
+              "name": "comparison_metrics_schema_version",
+              "declaration": "models.CharField(max_length=64, default=COMPARISON_METRICS_SCHEMA_VERSION)"
+            },
+            {
+              "name": "trajectory_artifact",
+              "declaration": "models.TextField(blank=True)"
+            },
+            {
+              "name": "report_artifact",
+              "declaration": "models.TextField(blank=True)"
+            },
+            {
+              "name": "status",
+              "declaration": "models.CharField(max_length=16, choices=STATUS_CHOICES, default=STATUS_DRAFT)"
+            },
+            {
+              "name": "error_message",
+              "declaration": "models.TextField(blank=True)"
+            },
+            {
+              "name": "created_by",
+              "declaration": "models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, related_name='created_counterfactual_runs', null=True, blank=True)"
+            },
+            {
+              "name": "created_at",
+              "declaration": "models.DateTimeField(auto_now_add=True)"
+            }
+          ]
+        },
+        {
+          "name": "CausalAssumptionSet",
+          "kind": "class",
+          "signature": "CausalAssumptionSet",
+          "line": 495,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/models.py#L495",
+          "methods": [],
+          "declared_fields": [
+            {
+              "name": "patient",
+              "declaration": "models.ForeignKey('clinic.Patient', on_delete=models.CASCADE, related_name='causal_assumption_sets', null=True, blank=True)"
+            },
+            {
+              "name": "name",
+              "declaration": "models.CharField(max_length=255)"
+            },
+            {
+              "name": "graph_definition",
+              "declaration": "models.JSONField(default=dict, blank=True)"
+            },
+            {
+              "name": "variables",
+              "declaration": "models.JSONField(default=list, blank=True)"
+            },
+            {
+              "name": "intervention",
+              "declaration": "models.JSONField(default=dict, blank=True)"
+            },
+            {
+              "name": "outcome",
+              "declaration": "models.JSONField(default=dict, blank=True)"
+            },
+            {
+              "name": "adjustment_set",
+              "declaration": "models.JSONField(default=list, blank=True)"
+            },
+            {
+              "name": "assumptions",
+              "declaration": "models.JSONField(default=dict, blank=True)"
+            },
+            {
+              "name": "identification_status",
+              "declaration": "models.CharField(max_length=48, choices=IDENTIFICATION_CHOICES, default=IDENT_MECHANISTIC_ONLY)"
+            },
+            {
+              "name": "notes",
+              "declaration": "models.TextField(blank=True)"
+            },
+            {
+              "name": "created_by",
+              "declaration": "models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, related_name='created_causal_assumption_sets', null=True, blank=True)"
+            },
+            {
+              "name": "created_at",
+              "declaration": "models.DateTimeField(auto_now_add=True)"
+            }
+          ]
+        },
+        {
+          "name": "ResearchRunManifest",
+          "kind": "class",
+          "signature": "ResearchRunManifest",
+          "line": 544,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/models.py#L544",
+          "methods": [
+            {
+              "name": "version_vector",
+              "signature": "version_vector(self)",
+              "line": 587
+            },
+            {
+              "name": "save",
+              "signature": "save(self, *args, **kwargs)",
+              "line": 615
+            },
+            {
+              "name": "delete",
+              "signature": "delete(self, *args, **kwargs)",
+              "line": 623
+            }
+          ],
+          "declared_fields": [
+            {
+              "name": "run_id",
+              "declaration": "models.CharField(max_length=192, unique=True)"
+            },
+            {
+              "name": "contract_version",
+              "declaration": "models.CharField(max_length=64, default='research-run-manifest-v1')"
+            },
+            {
+              "name": "status",
+              "declaration": "models.CharField(max_length=16, choices=STATUS_CHOICES)"
+            },
+            {
+              "name": "app_version",
+              "declaration": "models.CharField(max_length=64)"
+            },
+            {
+              "name": "api_version",
+              "declaration": "models.CharField(max_length=64)"
+            },
+            {
+              "name": "db_schema_version",
+              "declaration": "models.CharField(max_length=128)"
+            },
+            {
+              "name": "dataset_id",
+              "declaration": "models.CharField(max_length=255)"
+            },
+            {
+              "name": "dataset_version",
+              "declaration": "models.CharField(max_length=128)"
+            },
+            {
+              "name": "dataset_sha256",
+              "declaration": "models.CharField(max_length=128)"
+            },
+            {
+              "name": "record_subset_sha256",
+              "declaration": "models.CharField(max_length=128)"
+            },
+            {
+              "name": "model_id",
+              "declaration": "models.CharField(max_length=128)"
+            },
+            {
+              "name": "model_version",
+              "declaration": "models.CharField(max_length=128)"
+            },
+            {
+              "name": "model_card_version",
+              "declaration": "models.CharField(max_length=128)"
+            },
+            {
+              "name": "configuration_sha256",
+              "declaration": "models.CharField(max_length=128)"
+            },
+            {
+              "name": "evidence_graph_version",
+              "declaration": "models.CharField(max_length=128)"
+            },
+            {
+              "name": "validation_protocol_version",
+              "declaration": "models.CharField(max_length=128)"
+            },
+            {
+              "name": "report_template_version",
+              "declaration": "models.CharField(max_length=128)"
+            },
+            {
+              "name": "git_sha",
+              "declaration": "models.CharField(max_length=128)"
+            },
+            {
+              "name": "container_digest",
+              "declaration": "models.CharField(max_length=255)"
+            },
+            {
+              "name": "dependency_lock_sha256",
+              "declaration": "models.CharField(max_length=128)"
+            },
+            {
+              "name": "model_registry_sha256",
+              "declaration": "models.CharField(max_length=128)"
+            },
+            {
+              "name": "random_seed",
+              "declaration": "models.IntegerField()"
+            },
+            {
+              "name": "intended_use_level",
+              "declaration": "models.CharField(max_length=128)"
+            },
+            {
+              "name": "epistemic_label",
+              "declaration": "models.CharField(max_length=64)"
+            },
+            {
+              "name": "artifact_manifest",
+              "declaration": "models.JSONField(default=list)"
+            },
+            {
+              "name": "manifest_artifact_uri",
+              "declaration": "models.TextField()"
+            },
+            {
+              "name": "manifest_sha256",
+              "declaration": "models.CharField(max_length=128)"
+            },
+            {
+              "name": "created_at",
+              "declaration": "models.DateTimeField()"
+            }
+          ]
+        },
+        {
+          "name": "ResearchRunInvalidation",
+          "kind": "class",
+          "signature": "ResearchRunInvalidation",
+          "line": 627,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/models.py#L627",
+          "methods": [
+            {
+              "name": "save",
+              "signature": "save(self, *args, **kwargs)",
+              "line": 666
+            },
+            {
+              "name": "delete",
+              "signature": "delete(self, *args, **kwargs)",
+              "line": 671
+            }
+          ],
+          "declared_fields": [
+            {
+              "name": "manifest",
+              "declaration": "models.ForeignKey(ResearchRunManifest, on_delete=models.PROTECT, related_name='invalidations')"
+            },
+            {
+              "name": "change_kind",
+              "declaration": "models.CharField(max_length=32, choices=CHANGE_CHOICES)"
+            },
+            {
+              "name": "previous_identity",
+              "declaration": "models.CharField(max_length=255)"
+            },
+            {
+              "name": "replacement_identity",
+              "declaration": "models.CharField(max_length=255)"
+            },
+            {
+              "name": "change_sha256",
+              "declaration": "models.CharField(max_length=128)"
+            },
+            {
+              "name": "reason",
+              "declaration": "models.TextField()"
+            },
+            {
+              "name": "created_at",
+              "declaration": "models.DateTimeField(auto_now_add=True)"
+            }
+          ]
+        },
+        {
+          "name": "SimulationRunMetadata",
+          "kind": "class",
+          "signature": "SimulationRunMetadata",
+          "line": 675,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/models.py#L675",
+          "methods": [
+            {
+              "name": "save",
+              "signature": "save(self, *args, **kwargs)",
+              "line": 722
+            },
+            {
+              "name": "delete",
+              "signature": "delete(self, *args, **kwargs)",
+              "line": 729
+            }
+          ],
+          "declared_fields": [
+            {
+              "name": "contract_version",
+              "declaration": "models.CharField(max_length=64, default='simulation-metadata-v1')"
+            },
+            {
+              "name": "manifest",
+              "declaration": "models.OneToOneField(ResearchRunManifest, on_delete=models.PROTECT, related_name='simulation_metadata', null=True, blank=True)"
+            },
+            {
+              "name": "simulation_attempt",
+              "declaration": "models.ForeignKey('simulator.SimulationAttempt', on_delete=models.SET_NULL, related_name='research_metadata', null=True, blank=True)"
+            },
+            {
+              "name": "counterfactual_run",
+              "declaration": "models.ForeignKey(CounterfactualRun, on_delete=models.SET_NULL, related_name='metadata_records', null=True, blank=True)"
+            },
+            {
+              "name": "twin_state",
+              "declaration": "models.ForeignKey(PatientTwinState, on_delete=models.SET_NULL, related_name='metadata_records', null=True, blank=True)"
+            },
+            {
+              "name": "model_version",
+              "declaration": "models.CharField(max_length=64)"
+            },
+            {
+              "name": "code_commit_hash",
+              "declaration": "models.CharField(max_length=128, blank=True)"
+            },
+            {
+              "name": "twin_config_hash",
+              "declaration": "models.CharField(max_length=128, blank=True)"
+            },
+            {
+              "name": "drug_preset_hashes",
+              "declaration": "models.JSONField(default=dict, blank=True)"
+            },
+            {
+              "name": "solver_name",
+              "declaration": "models.CharField(max_length=128)"
+            },
+            {
+              "name": "solver_parameters",
+              "declaration": "models.JSONField(default=dict, blank=True)"
+            },
+            {
+              "name": "input_hash",
+              "declaration": "models.CharField(max_length=128)"
+            },
+            {
+              "name": "output_hash",
+              "declaration": "models.CharField(max_length=128, blank=True)"
+            },
+            {
+              "name": "random_seed",
+              "declaration": "models.IntegerField(null=True, blank=True)"
+            },
+            {
+              "name": "created_at",
+              "declaration": "models.DateTimeField(auto_now_add=True)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "accounts/models.py",
+      "symbols": [
+        {
+          "name": "AccessPolicy",
+          "kind": "class",
+          "signature": "AccessPolicy",
+          "line": 10,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/accounts/models.py#L10",
+          "methods": [],
+          "declared_fields": [
+            {
+              "name": "id",
+              "declaration": "models.PositiveSmallIntegerField(primary_key=True, default=1, editable=False)"
+            },
+            {
+              "name": "requests_open",
+              "declaration": "models.BooleanField(default=False)"
+            },
+            {
+              "name": "activations_open",
+              "declaration": "models.BooleanField(default=False)"
+            }
+          ]
+        },
+        {
+          "name": "AccessProfile",
+          "kind": "class",
+          "signature": "AccessProfile",
+          "line": 20,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/accounts/models.py#L20",
+          "methods": [],
+          "declared_fields": [
+            {
+              "name": "id",
+              "declaration": "models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)"
+            },
+            {
+              "name": "email",
+              "declaration": "models.EmailField(unique=True)"
+            },
+            {
+              "name": "nickname",
+              "declaration": "models.CharField(max_length=60)"
+            },
+            {
+              "name": "user",
+              "declaration": "models.OneToOneField(settings.AUTH_USER_MODEL, null=True, on_delete=models.PROTECT, related_name='community_identity')"
+            },
+            {
+              "name": "request_state",
+              "declaration": "models.CharField(max_length=32, choices=RequestState.choices, default=RequestState.UNVERIFIED)"
+            },
+            {
+              "name": "access_state",
+              "declaration": "models.CharField(max_length=24, choices=AccessState.choices, default=AccessState.PENDING)"
+            },
+            {
+              "name": "is_owner",
+              "declaration": "models.BooleanField(default=False)"
+            },
+            {
+              "name": "is_approver",
+              "declaration": "models.BooleanField(default=False)"
+            },
+            {
+              "name": "reason",
+              "declaration": "models.CharField(max_length=1000, blank=True)"
+            },
+            {
+              "name": "affiliation",
+              "declaration": "models.CharField(max_length=120, blank=True)"
+            },
+            {
+              "name": "professional_role",
+              "declaration": "models.CharField(max_length=60, blank=True)"
+            },
+            {
+              "name": "acknowledged_at",
+              "declaration": "models.DateTimeField(null=True)"
+            },
+            {
+              "name": "verified_at",
+              "declaration": "models.DateTimeField(null=True)"
+            },
+            {
+              "name": "created_at",
+              "declaration": "models.DateTimeField(auto_now_add=True)"
+            },
+            {
+              "name": "expires_at",
+              "declaration": "models.DateTimeField(null=True)"
+            },
+            {
+              "name": "session_version",
+              "declaration": "models.PositiveIntegerField(default=1)"
+            },
+            {
+              "name": "totp_secret",
+              "declaration": "models.TextField(blank=True)"
+            },
+            {
+              "name": "totp_confirmed",
+              "declaration": "models.BooleanField(default=False)"
+            },
+            {
+              "name": "totp_last_step",
+              "declaration": "models.BigIntegerField(default=-1)"
+            }
+          ]
+        },
+        {
+          "name": "Capability",
+          "kind": "class",
+          "signature": "Capability",
+          "line": 70,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/accounts/models.py#L70",
+          "methods": [],
+          "declared_fields": [
+            {
+              "name": "identity",
+              "declaration": "models.ForeignKey(AccessProfile, on_delete=models.CASCADE)"
+            },
+            {
+              "name": "purpose",
+              "declaration": "models.CharField(max_length=12, choices=Purpose.choices)"
+            },
+            {
+              "name": "digest",
+              "declaration": "models.CharField(max_length=64, unique=True)"
+            },
+            {
+              "name": "expires_at",
+              "declaration": "models.DateTimeField()"
+            },
+            {
+              "name": "consumed_at",
+              "declaration": "models.DateTimeField(null=True)"
+            },
+            {
+              "name": "revoked_at",
+              "declaration": "models.DateTimeField(null=True)"
+            },
+            {
+              "name": "created_at",
+              "declaration": "models.DateTimeField(auto_now_add=True)"
+            }
+          ]
+        },
+        {
+          "name": "Notification",
+          "kind": "class",
+          "signature": "Notification",
+          "line": 86,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/accounts/models.py#L86",
+          "methods": [],
+          "declared_fields": [
+            {
+              "name": "id",
+              "declaration": "models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)"
+            },
+            {
+              "name": "identity",
+              "declaration": "models.ForeignKey(AccessProfile, on_delete=models.CASCADE)"
+            },
+            {
+              "name": "deduplication_key",
+              "declaration": "models.CharField(max_length=160, unique=True)"
+            },
+            {
+              "name": "kind",
+              "declaration": "models.CharField(max_length=32)"
+            },
+            {
+              "name": "encrypted_payload",
+              "declaration": "models.TextField()"
+            },
+            {
+              "name": "state",
+              "declaration": "models.CharField(max_length=12, choices=State.choices, default=State.QUEUED)"
+            },
+            {
+              "name": "attempts",
+              "declaration": "models.PositiveSmallIntegerField(default=0)"
+            },
+            {
+              "name": "error_code",
+              "declaration": "models.CharField(max_length=40, blank=True)"
+            },
+            {
+              "name": "created_at",
+              "declaration": "models.DateTimeField(auto_now_add=True)"
+            },
+            {
+              "name": "sent_at",
+              "declaration": "models.DateTimeField(null=True)"
+            },
+            {
+              "name": "next_attempt_at",
+              "declaration": "models.DateTimeField(null=True)"
+            }
+          ]
+        },
+        {
+          "name": "AuditEvent",
+          "kind": "class",
+          "signature": "AuditEvent",
+          "line": 105,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/accounts/models.py#L105",
+          "methods": [],
+          "declared_fields": [
+            {
+              "name": "id",
+              "declaration": "models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)"
+            },
+            {
+              "name": "actor",
+              "declaration": "models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.PROTECT)"
+            },
+            {
+              "name": "identity",
+              "declaration": "models.ForeignKey(AccessProfile, null=True, on_delete=models.PROTECT)"
+            },
+            {
+              "name": "action",
+              "declaration": "models.CharField(max_length=48)"
+            },
+            {
+              "name": "occurred_at",
+              "declaration": "models.DateTimeField(auto_now_add=True)"
+            },
+            {
+              "name": "code",
+              "declaration": "models.CharField(max_length=48, blank=True)"
+            }
+          ]
+        },
+        {
+          "name": "RateBucket",
+          "kind": "class",
+          "signature": "RateBucket",
+          "line": 115,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/accounts/models.py#L115",
+          "methods": [],
+          "declared_fields": [
+            {
+              "name": "key",
+              "declaration": "models.CharField(max_length=64, primary_key=True)"
+            },
+            {
+              "name": "window",
+              "declaration": "models.BigIntegerField()"
+            },
+            {
+              "name": "count",
+              "declaration": "models.PositiveIntegerField(default=0)"
+            }
+          ]
+        },
+        {
+          "name": "SupportTicket",
+          "kind": "class",
+          "signature": "SupportTicket",
+          "line": 121,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/accounts/models.py#L121",
+          "methods": [],
+          "declared_fields": [
+            {
+              "name": "id",
+              "declaration": "models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)"
+            },
+            {
+              "name": "identity",
+              "declaration": "models.ForeignKey(AccessProfile, on_delete=models.PROTECT)"
+            },
+            {
+              "name": "category",
+              "declaration": "models.CharField(max_length=24, choices=CATEGORIES)"
+            },
+            {
+              "name": "message",
+              "declaration": "models.CharField(max_length=2000)"
+            },
+            {
+              "name": "status",
+              "declaration": "models.CharField(max_length=12, choices=[('open', 'Open'), ('answered', 'Answered'), ('closed', 'Closed')], default='open')"
+            },
+            {
+              "name": "reply",
+              "declaration": "models.CharField(max_length=2000, blank=True)"
+            },
+            {
+              "name": "internal_note",
+              "declaration": "models.CharField(max_length=1000, blank=True)"
+            },
+            {
+              "name": "app_version",
+              "declaration": "models.CharField(max_length=80)"
+            },
+            {
+              "name": "created_at",
+              "declaration": "models.DateTimeField(auto_now_add=True)"
+            },
+            {
+              "name": "updated_at",
+              "declaration": "models.DateTimeField(auto_now=True)"
+            },
+            {
+              "name": "submission_key",
+              "declaration": "models.UUIDField(unique=True, default=uuid.uuid4)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/state_model.py",
+      "symbols": [
+        {
+          "name": "initialize_from_assessment",
+          "kind": "function",
+          "signature": "initialize_from_assessment(assessment, user=None)",
+          "line": 14,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/state_model.py#L14"
+        },
+        {
+          "name": "get_current_twin_state",
+          "kind": "function",
+          "signature": "get_current_twin_state(patient)",
+          "line": 89,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/state_model.py#L89"
+        },
+        {
+          "name": "set_current_state",
+          "kind": "function",
+          "signature": "set_current_state(state: PatientTwinState)",
+          "line": 93,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/state_model.py#L93"
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/simulation_bridge.py",
+      "symbols": [
+        {
+          "name": "build_solver_inputs_from_twin_state",
+          "kind": "function",
+          "signature": "build_solver_inputs_from_twin_state(twin_state, therapy_schedule, horizon_days: int, overrides: dict[str, Any] | None=None)",
+          "line": 16,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/simulation_bridge.py#L16"
+        },
+        {
+          "name": "run_patient_simulation",
+          "kind": "function",
+          "signature": "run_patient_simulation(twin_state, therapy_schedule=None, horizon_days: int=90, overrides: dict[str, Any] | None=None)",
+          "line": 76,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/simulation_bridge.py#L76"
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/calibration.py",
+      "symbols": [
+        {
+          "name": "calibrate_patient_parameters",
+          "kind": "function",
+          "signature": "calibrate_patient_parameters(patient, start_state, assessments, therapies, bounds: dict[str, tuple[float, float]] | None=None)",
+          "line": 32,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/calibration.py#L32"
+        },
+        {
+          "name": "objective_function",
+          "kind": "function",
+          "signature": "objective_function(theta, parameter_names, patient, start_state, assessments, therapies, parameter_bounds=None)",
+          "line": 194,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/calibration.py#L194"
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/observation_model.py",
+      "symbols": [
+        {
+          "name": "predict_biomarkers",
+          "kind": "function",
+          "signature": "predict_biomarkers(trajectory, baseline_assessment, target_assessment_date_time_offset, calibration_parameters: dict[str, Any] | None=None)",
+          "line": 41,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/observation_model.py#L41"
+        },
+        {
+          "name": "compute_residuals",
+          "kind": "function",
+          "signature": "compute_residuals(predicted: dict[str, float | None], observed: dict[str, float | None], weights: dict[str, float] | None=None)",
+          "line": 134,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/observation_model.py#L134"
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/run_manifest.py",
+      "symbols": [
+        {
+          "name": "current_git_sha",
+          "kind": "function",
+          "signature": "current_git_sha()",
+          "line": 68,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/run_manifest.py#L68"
+        },
+        {
+          "name": "container_digest",
+          "kind": "function",
+          "signature": "container_digest()",
+          "line": 95,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/run_manifest.py#L95"
+        },
+        {
+          "name": "prepare_run_identity",
+          "kind": "function",
+          "signature": "prepare_run_identity(*, model_id: str, input_payload: Any, configuration_payload: Any, twin_state: Any | None=None, random_seed: int | None=None, epistemic_label: EpistemicLabel | str=EpistemicLabel.SIMULATED, status: str='completed', created_at: datetime | None=None)",
+          "line": 126,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/run_manifest.py#L126"
+        },
+        {
+          "name": "verify_manifest_artifacts",
+          "kind": "function",
+          "signature": "verify_manifest_artifacts(manifest: Any)",
+          "line": 264,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/run_manifest.py#L264"
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/comparability.py",
+      "symbols": [
+        {
+          "name": "compare_manifests",
+          "kind": "function",
+          "signature": "compare_manifests(left: ResearchRunManifest, right: ResearchRunManifest)",
+          "line": 27,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/comparability.py#L27"
+        },
+        {
+          "name": "invalidate_manifest",
+          "kind": "function",
+          "signature": "invalidate_manifest(manifest: ResearchRunManifest, *, change_kind: str, replacement_identity: str, reason: str)",
+          "line": 94,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/comparability.py#L94"
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/validators.py",
+      "symbols": [
+        {
+          "name": "validate_no_direct_identifier_in_artifact_payload",
+          "kind": "function",
+          "signature": "validate_no_direct_identifier_in_artifact_payload(payload: Any)",
+          "line": 37,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/validators.py#L37"
+        },
+        {
+          "name": "validate_patient_access",
+          "kind": "function",
+          "signature": "validate_patient_access(user, patient)",
+          "line": 61,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/validators.py#L61"
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/research_dataset_import.py",
+      "symbols": [
+        {
+          "name": "load_dataset_bundle",
+          "kind": "function",
+          "signature": "load_dataset_bundle(dataset_path: str | Path, manifest_path: str | Path | None=None)",
+          "line": 239,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/research_dataset_import.py#L239"
+        },
+        {
+          "name": "import_dataset",
+          "kind": "function",
+          "signature": "import_dataset(patient, bundle: dict[str, Any], *, dry_run: bool)",
+          "line": 724,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/research_dataset_import.py#L724"
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/counterfactual.py",
+      "symbols": [
+        {
+          "name": "run_counterfactual",
+          "kind": "function",
+          "signature": "run_counterfactual(patient, base_twin_state, intervention_definition, horizon_days, user=None, *, uncertainty_config=None, include_sensitivity: bool=False)",
+          "line": 27,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/counterfactual.py#L27"
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/uncertainty.py",
+      "symbols": [
+        {
+          "name": "UncertaintyConfig",
+          "kind": "class",
+          "signature": "UncertaintyConfig",
+          "line": 29,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/uncertainty.py#L29",
+          "methods": [],
+          "declared_fields": []
+        },
+        {
+          "name": "build_parameter_uncertainty_space",
+          "kind": "function",
+          "signature": "build_parameter_uncertainty_space(twin_state)",
+          "line": 38,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/uncertainty.py#L38"
+        },
+        {
+          "name": "sample_parameter_sets",
+          "kind": "function",
+          "signature": "sample_parameter_sets(twin_state, config: UncertaintyConfig)",
+          "line": 75,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/uncertainty.py#L75"
+        },
+        {
+          "name": "summarize_distribution",
+          "kind": "function",
+          "signature": "summarize_distribution(values)",
+          "line": 121,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/uncertainty.py#L121"
+        },
+        {
+          "name": "compute_interval",
+          "kind": "function",
+          "signature": "compute_interval(values, lower=0.05, upper=0.95)",
+          "line": 143,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/uncertainty.py#L143"
+        },
+        {
+          "name": "classify_uncertainty_width",
+          "kind": "function",
+          "signature": "classify_uncertainty_width(metric_name, interval_width, reference_scale)",
+          "line": 164,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/uncertainty.py#L164"
+        },
+        {
+          "name": "run_counterfactual_uncertainty",
+          "kind": "function",
+          "signature": "run_counterfactual_uncertainty(patient, twin_state, intervention_definition, horizon_days, config: UncertaintyConfig)",
+          "line": 178,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/uncertainty.py#L178"
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/sensitivity.py",
+      "symbols": [
+        {
+          "name": "run_counterfactual_sensitivity",
+          "kind": "function",
+          "signature": "run_counterfactual_sensitivity(patient, twin_state, intervention_definition, horizon_days, *, perturbation_fractions: tuple[float, ...]=(0.1, 0.2))",
+          "line": 17,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/sensitivity.py#L17"
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/robustness.py",
+      "symbols": [
+        {
+          "name": "compute_robust_scenario_ranking",
+          "kind": "function",
+          "signature": "compute_robust_scenario_ranking(runs)",
+          "line": 10,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/robustness.py#L10"
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/backtesting.py",
+      "symbols": [
+        {
+          "name": "run_patient_backtest",
+          "kind": "function",
+          "signature": "run_patient_backtest(patient, twin_state=None, *, minimum_history_points: int=3)",
+          "line": 30,
+          "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/fa9c35473302debf3c9a289d5f34f0bc7f771dbd/twin_engine/backtesting.py#L30"
+        }
+      ]
+    }
+  ]
+}

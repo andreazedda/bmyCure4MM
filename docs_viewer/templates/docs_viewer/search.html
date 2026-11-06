@@ -12,14 +12,17 @@
             </h1>
             
             <form action="{% url 'docs_viewer:search' %}" method="get" class="mb-4">
+                <label class="form-label" for="search-query"><span class="t-en">Search documentation</span><span class="t-it">Cerca nella documentazione</span></label>
                 <div class="input-group input-group-lg">
                     <input 
+                        id="search-query"
                         type="search" 
                         name="q" 
                         class="form-control" 
                         placeholder="Search docs..."
                         value="{{ query }}"
-                        autofocus
+                        maxlength="200"
+                        required
                     >
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-search"></i>
@@ -43,10 +46,10 @@
                 {% for result in results %}
                 <a href="{{ result.url }}" class="list-group-item list-group-item-action">
                     <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">
+                        <h2 class="h5 mb-1">
                             <i class="bi bi-file-earmark-text"></i>
                             {{ result.name }}
-                        </h5>
+                        </h2>
                         <span class="badge bg-primary rounded-pill">{{ result.matches }} match{{ result.matches|pluralize:"es" }}</span>
                     </div>
                     <p class="mb-1 text-muted">
@@ -58,6 +61,11 @@
                 </a>
                 {% endfor %}
             </div>
+            {% if page.has_other_pages %}<nav class="d-flex flex-wrap gap-3 align-items-center mt-4" aria-label="Search result pages / Pagine dei risultati">
+                {% if page.has_previous %}<a class="btn btn-outline-primary" href="?q={{ query|urlencode }}&amp;page={{ page.previous_page_number }}"><span class="t-en">Previous</span><span class="t-it">Precedente</span></a>{% endif %}
+                <span><span class="t-en">Page</span><span class="t-it">Pagina</span> {{ page.number }} / {{ page.paginator.num_pages }}</span>
+                {% if page.has_next %}<a class="btn btn-outline-primary" href="?q={{ query|urlencode }}&amp;page={{ page.next_page_number }}"><span class="t-en">Next</span><span class="t-it">Successiva</span></a>{% endif %}
+            </nav>{% endif %}
             {% else %}
             <div class="alert alert-warning">
                 <h4 class="alert-heading">

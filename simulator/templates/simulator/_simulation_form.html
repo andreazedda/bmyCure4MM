@@ -2,11 +2,11 @@
 <div id="simulation-form-container">
     <div class="d-flex justify-content-end mb-3">
         <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#referenceRangesModal">
-            Reference ranges
+            <span class="t-en">Reference ranges</span><span class="t-it">Intervalli di riferimento</span>
         </button>
     </div>
     <div class="alert alert-secondary mb-3" role="note">
-        Inputs define a scenario to simulate, not an instruction to apply.
+        <span class="t-en">Inputs define a scenario to simulate, not an instruction to apply. Use only synthetic values.</span><span class="t-it">Gli input descrivono uno scenario simulato, non istruzioni da applicare. Usa solo valori sintetici.</span>
     </div>
     <form id="simulation-parameters-form"
           method="post"
@@ -87,12 +87,12 @@
                             <a href="#" class="ms-1 small" data-help="pregnancy" aria-label="Help">?</a>
                         </label>
                     </div>
-                    <div class="form-text">
+                    <div class="form-text" id="{{ form.pregnancy.id_for_label }}_helptext">
                         <span class="t-en">{{ helptext_en|dict_get:'pregnancy' }}</span>
                         <span class="t-it">{{ helptext_it|dict_get:'pregnancy' }}</span>
                     </div>
                     {% if form.pregnancy.errors %}
-                        <div class="invalid-feedback d-block">{{ form.pregnancy.errors|striptags }}</div>
+                        <div class="invalid-feedback d-block" id="{{ form.pregnancy.id_for_label }}_error">{{ form.pregnancy.errors|striptags }}</div>
                     {% endif %}
                 </div>
             </div>
@@ -150,23 +150,25 @@
 
         <fieldset class="mb-4">
             <legend class="h6 mb-3">
-                4. <span class="t-en">Advanced parameters &amp; Twin context</span><span class="t-it">Parametri avanzati &amp; contesto Twin</span>
+                4. <span class="t-en">Advanced model parameters</span><span class="t-it">Parametri avanzati del modello</span>
+                {% if form.clinical_context_allowed %}
                 <a href="{% url 'simulator:interactive_tutorial' %}" class="btn btn-sm btn-outline-info ms-2" target="_blank">
                     <span class="t-en">🎓 How to use Twin?</span>
                     <span class="t-it">🎓 Come usare il Twin?</span>
                 </a>
+                {% endif %}
             </legend>
             <div class="novice-tip alert alert-info mb-3">
                 <div class="mb-2">
-                    <span class="t-en">These parameters configure model behavior. A clinic-linked Patient Twin can auto-derive values from an assessment snapshot.</span>
-                    <span class="t-it">Questi parametri configurano il comportamento del modello. Un Patient Twin collegato alla clinica può derivare automaticamente i valori da uno snapshot di assessment.</span>
+                    <span class="t-en">These parameters configure model behavior. Keep the defaults for your first run, then change one value at a time.</span>
+                    <span class="t-it">Questi parametri configurano il comportamento del modello. Per la prima esecuzione mantieni i valori iniziali, poi modifica un valore alla volta.</span>
                 </div>
-                <div class="small">
+                {% if form.clinical_context_allowed %}<div class="small">
                     <strong class="t-en">Twin workflow:</strong>
                     <strong class="t-it">Workflow Twin:</strong>
                     <span class="t-en">Clinic patient → assessment snapshot with labs → enable Twin below → select assessment → choose Auto or Manual mapping → run the simulator.</span>
                     <span class="t-it">Paziente in clinica → snapshot di assessment con lab → abilita Twin qui sotto → seleziona assessment → scegli mappatura Auto o Manual → esegui il simulatore.</span>
-                </div>
+                </div>{% endif %}
             </div>
             <div class="row g-3">
                 <div class="col-12 col-md-4">
@@ -181,7 +183,7 @@
                     </div>
                     <span id="interaction-strength-badge" class="badge bg-success"></span>
                 </div>
-                <div class="col-12 col-md-6">
+                {% if form.clinical_context_allowed %}<div class="col-12 col-md-6">
                     <div class="form-check form-switch">
                         {{ form.use_twin }}
                         <label class="form-check-label" for="{{ form.use_twin.id_for_label }}">
@@ -190,12 +192,12 @@
                             <a href="#" class="ms-1 small" data-help="use_twin" aria-label="Help">?</a>
                         </label>
                     </div>
-                    <div class="form-text">
+                    <div class="form-text" id="{{ form.use_twin.id_for_label }}_helptext">
                         <span class="t-en">{{ helptext_en|dict_get:'use_twin' }}</span>
                         <span class="t-it">{{ helptext_it|dict_get:'use_twin' }}</span>
                     </div>
                     {% if form.use_twin.errors %}
-                        <div class="invalid-feedback d-block">{{ form.use_twin.errors|striptags }}</div>
+                        <div class="invalid-feedback d-block" id="{{ form.use_twin.id_for_label }}_error">{{ form.use_twin.errors|striptags }}</div>
                     {% endif %}
                 </div>
                 <div class="col-12 col-md-6">
@@ -257,6 +259,7 @@
                 <div class="col-12 col-md-6">
                     {% include "simulator/_form_field.html" with field=form.twin_biology_mode help_en="Auto derives biology from the selected Assessment; Manual keeps the values you enter below." help_it="Auto deriva la biologia dall'Assessment selezionato; Manual mantiene i valori inseriti qui sotto." help_slug="twin" %}
                 </div>
+                {% endif %}
                 <div class="col-12 col-md-6">
                     {% include "simulator/_form_field.html" with field=form.guided_tumor_aggressiveness help_en="Guided choice (optional). Applies a small adjustment to tumor growth rate so you don't have to type numbers." help_it="Scelta guidata (opzionale). Applica una piccola correzione alla crescita tumorale senza dover scrivere numeri." help_slug="twin" %}
                 </div>
@@ -298,12 +301,12 @@
                                 <label class="form-check-label" for="{{ form.custom_drug_enabled.id_for_label }}">
                                     {{ form.custom_drug_enabled.label }}
                                 </label>
-                                <div class="form-text">
+                                <div class="form-text" id="{{ form.custom_drug_enabled.id_for_label }}_helptext">
                                     <span class="t-en">{{ helptext_en|dict_get:'custom_drug_enabled' }}</span>
                                     <span class="t-it">{{ helptext_it|dict_get:'custom_drug_enabled' }}</span>
                                 </div>
                                 {% if form.custom_drug_enabled.errors %}
-                                    <div class="invalid-feedback d-block">{{ form.custom_drug_enabled.errors|striptags }}</div>
+                                    <div class="invalid-feedback d-block" id="{{ form.custom_drug_enabled.id_for_label }}_error">{{ form.custom_drug_enabled.errors|striptags }}</div>
                                 {% endif %}
                             </div>
 

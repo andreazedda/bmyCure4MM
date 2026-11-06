@@ -55,12 +55,14 @@ spec:
                   assert restored.execute('PRAGMA quick_check').fetchone()[0] == 'ok', 'Backup restore check failed'
               call_command('migrate', interactive=False)
               call_command('bootstrap_platform_owner')
+              call_command('ensure_learning_example')
               call_command('collectstatic', interactive=False, verbosity=0)
               assert (pathlib.Path(settings.STATIC_ROOT) / 'docs_viewer/reference.css').is_file()
               assert (pathlib.Path(settings.STATIC_ROOT) / 'docs_images/models/logistic_growth.svg').is_file()
+              from simulator.models import Scenario
               owner = AccessProfile.objects.get(is_owner=True)
               policy = AccessPolicy.objects.get(pk=1)
-              result = {'source': sha, 'backup_restore': 'ok', 'owner_state': owner.access_state, 'owner_mfa_confirmed': owner.totp_confirmed, 'requests_open': policy.requests_open, 'activations_open': policy.activations_open, 'static_assets': 'present'}
+              result = {'source': sha, 'backup_restore': 'ok', 'owner_state': owner.access_state, 'owner_mfa_confirmed': owner.totp_confirmed, 'requests_open': policy.requests_open, 'activations_open': policy.activations_open, 'static_assets': 'present', 'active_scenarios': Scenario.objects.filter(active=True).count()}
               pathlib.Path('/dev/termination-log').write_text(json.dumps(result))
               print(json.dumps(result))
           envFrom:

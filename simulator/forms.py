@@ -1163,9 +1163,19 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
         - user sees assessments for patients they own
         - staff/editor sees all
         """
-        if not self.user or not getattr(self.user, "is_authenticated", False):
+        self.clinical_context_allowed = False
+        if self.user and getattr(self.user, "is_authenticated", False):
+            from accounts.models import AccessProfile
+
+            profile = AccessProfile.objects.filter(user=self.user).only("is_owner").first()
+            self.clinical_context_allowed = profile is None or (
+                profile.is_owner and self.user.is_staff
+            )
+        if not self.clinical_context_allowed:
             self.fields["twin_assessment_id"].choices = [("", "— Select assessment —")]
             self.fields["twin_assessment_id"].disabled = True
+            self.fields["use_twin"].initial = False
+            self.fields["use_twin"].disabled = True
             return
 
         from simulator.permissions import is_editor
@@ -1243,6 +1253,11 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
         cleaned = super().clean()
         cleaned["preset"] = self.preset_key
         cleaned["schedule"] = self.preset_config.get("schedule", {})
+
+        if not self.clinical_context_allowed and (
+            self.data.get("twin_assessment_id") or self.data.get("use_twin")
+        ):
+            raise ValidationError("Patient context is not available for this account.")
 
         use_twin = bool(cleaned.get("use_twin"))
         assessment_id = cleaned.get("twin_assessment_id")
