@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 from django.http import Http404, HttpResponse
 from django.conf import settings
 from django.contrib import messages
-from django.views.decorators.cache import cache_page
+from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_http_methods
 
 from .utils import (
@@ -21,7 +21,7 @@ from .utils import (
 from .models import DocumentView
 
 
-@cache_page(60 * 15)  # Cache for 15 minutes
+@never_cache  # Navigation contains the current account and CSRF-protected logout.
 def docs_index(request):
     """List all available documentation files."""
     docs = get_allowed_doc_paths()

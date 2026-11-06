@@ -7,7 +7,7 @@ from pathlib import Path
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
 
 from clinic.models import Assessment, Patient
@@ -218,3 +218,26 @@ class ResearchRunManifestTests(TestCase):
             response = self.client.get(reverse("twin_engine:counterfactual_report", args=[self.patient.id, run.id]))
             self.assertEqual(response.status_code, 409)
             self.assertContains(response, "ARTIFACT_INTEGRITY_FAILED", status_code=409)
+
+
+class BuildSourceIdentityTests(SimpleTestCase):
+    def test_container_source_sha_survives_without_git_metadata(self):
+        import os
+        from unittest.mock import patch
+        from twin_engine.run_manifest import current_git_sha
+        from twin_engine.provenance import get_code_commit_hash
+
+        expected = "a" * 40
+        with patch.dict(os.environ, {"BMY_SOURCE_SHA": expected}), patch("subprocess.run", side_effect=OSError):
+            self.assertEqual(current_git_sha(), expected)
+            self.assertEqual(get_code_commit_hash(), expected)
+
+    def test_invalid_image_source_is_not_recorded_as_a_commit(self):
+        import os
+        from unittest.mock import patch
+        from twin_engine.run_manifest import current_git_sha, UNAVAILABLE
+        from twin_engine.provenance import get_code_commit_hash
+
+        with patch.dict(os.environ, {"BMY_SOURCE_SHA": "invalid-build-identity"}):
+            self.assertEqual(current_git_sha(), UNAVAILABLE)
+            self.assertEqual(get_code_commit_hash(), "")

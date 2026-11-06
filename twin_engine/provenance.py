@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import subprocess
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -17,8 +16,10 @@ from .models import ResearchRunManifest, SimulationRunMetadata
 from .run_manifest import (
     RUN_MANIFEST_CONTRACT_VERSION,
     SIMULATION_METADATA_CONTRACT_VERSION,
+    UNAVAILABLE,
     PreparedRunIdentity,
     build_manifest_payload,
+    current_git_sha,
     file_artifact,
     hash_only_artifact,
     persist_manifest_artifact,
@@ -43,18 +44,8 @@ def hash_file(path: str | Path) -> str:
 
 
 def get_code_commit_hash() -> str:
-    repo_root = Path(__file__).resolve().parent.parent
-    try:
-        completed = subprocess.run(
-            ["git", "rev-parse", "HEAD"],
-            cwd=repo_root,
-            capture_output=True,
-            check=True,
-            text=True,
-        )
-    except Exception:
-        return ""
-    return completed.stdout.strip()
+    value = current_git_sha()
+    return "" if value == UNAVAILABLE else value
 
 
 def collect_drug_preset_hashes() -> dict[str, str]:
