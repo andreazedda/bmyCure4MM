@@ -360,7 +360,11 @@ def change_access(actor, identity_id, state):
     locked_policy()
     require_manager(actor)
     identity = Identity.objects.select_for_update().get(pk=identity_id)
-    if identity.is_owner or state not in {Identity.AccessState.SUSPENDED, Identity.AccessState.REVOKED}:
+    if (
+        identity.is_owner
+        or state not in {Identity.AccessState.SUSPENDED, Identity.AccessState.REVOKED}
+        or (identity.access_state == Identity.AccessState.REVOKED and state != Identity.AccessState.REVOKED)
+    ):
         raise ValidationError("This access transition is not permitted.")
     if identity.access_state == state:
         return

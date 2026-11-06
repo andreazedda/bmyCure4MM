@@ -91,6 +91,7 @@
         text-decoration: none;
     }
     
+    .headerlink:focus-visible,
     h1:hover .headerlink,
     h2:hover .headerlink,
     h3:hover .headerlink {
@@ -100,11 +101,12 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4">
+<div class="doc-layout">
     <div class="row">
         <!-- Sidebar with TOC -->
         <div class="col-md-3">
-            <div class="doc-sidebar">
+            <details class="doc-sidebar doc-navigation">
+                <summary class="fw-semibold py-2"><span class="t-en">Document navigation</span><span class="t-it">Indice del documento</span></summary>
                 <div class="card mb-3">
                     <div class="card-body">
                         <h6 class="card-title">
@@ -134,30 +136,29 @@
                             <span class="t-en">Table of Contents</span>
                             <span class="t-it">Indice</span>
                         </h6>
-                        <nav class="toc-nav">
+                        <nav class="toc-nav" aria-label="Table of contents / Indice">
                             {{ toc|safe }}
                         </nav>
                     </div>
                 </div>
                 {% endif %}
-            </div>
+            </details>
         </div>
         
         <!-- Main content -->
         <div class="col-md-9">
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span class="fw-semibold">{{ title }}</span>
-                    <div class="btn-group">
-                        <a href="{{ raw_url }}" class="btn btn-sm btn-outline-secondary" download>
+                <div class="card-header doc-card-header d-flex flex-wrap gap-2 justify-content-between align-items-center">
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{{ raw_url }}" class="btn btn-sm btn-outline-secondary" download aria-label="Download source" data-label-en="Download source" data-label-it="Scarica sorgente">
                             <i class="bi bi-download"></i>
-                            <span class="t-en">Download Raw</span>
-                            <span class="t-it">Scarica Sorgente</span>
+                            <span class="t-en">Source</span>
+                            <span class="t-it">Sorgente</span>
                         </a>
                         <a href="{% url 'docs_viewer:index' %}" class="btn btn-sm btn-outline-primary">
                             <i class="bi bi-arrow-left"></i>
-                            <span class="t-en">Back to Index</span>
-                            <span class="t-it">Torna all'Indice</span>
+                            <span class="t-en">All docs</span>
+                            <span class="t-it">Indice</span>
                         </a>
                     </div>
                 </div>
@@ -175,9 +176,16 @@
                     </div>
                     {% endif %}
                     
-                    <div class="doc-content">
+                    <aside class="doc-metadata border rounded p-2 mb-3 small" aria-label="Document status / Stato del documento">
+                        {% if document_metadata.status %}<div><span class="t-en">Authored status:</span><span class="t-it">Stato dichiarato:</span> <strong>{{ document_metadata.status }}</strong></div>{% else %}<div><strong><span class="t-en">Status not recorded</span><span class="t-it">Stato non registrato</span></strong></div>{% endif %}
+                        {% if document_metadata.last_verified_at %}<div><span class="t-en">Last verification recorded:</span><span class="t-it">Ultima verifica registrata:</span> <span class="text-nowrap">{{ document_metadata.last_verified_at }}</span></div>{% endif %}
+                        <details class="mt-1"><summary><span class="t-en">How to read this status</span><span class="t-it">Come leggere questo stato</span></summary>
+                        <p class="mb-0 mt-2"><span class="t-en">Status describes this document, not scientific validation. Check the current <a href="{% url 'docs_viewer:view' path='docs/operations/AUTHENTICATION_AND_ACCESS.md' %}">runtime evidence</a> before operating the platform.</span><span class="t-it">Lo stato descrive il documento, non una validazione scientifica. Prima di operare consulta le <a href="{% url 'docs_viewer:view' path='docs/operations/AUTHENTICATION_AND_ACCESS.md' %}">evidenze runtime aggiornate</a>.</span></p>
+                        </details>
+                    </aside>
+                    <article class="doc-content"{% if document_language %} lang="{{ document_language }}"{% endif %}>
                         {{ content|safe }}
-                    </div>
+                    </article>
                 </div>
                 <div class="card-footer text-muted">
                     <small>

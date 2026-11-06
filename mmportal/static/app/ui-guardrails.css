@@ -308,3 +308,23 @@ footer {
     .card { box-shadow: none; border: 1px solid #ccc; }
     body { background: white !important; }
 }
+/* Shared keyboard, touch and reflow affordances. */
+.skip-link {position:fixed;left:1rem;top:.5rem;transform:translateY(-200%);z-index:2000;background:white;color:#143a70;padding:.75rem 1rem;border:3px solid #143a70;border-radius:.25rem}
+.skip-link:focus {transform:translateY(0)}
+:focus-visible {outline:3px solid #183f75;outline-offset:3px}
+.navbar .nav-link {color:#fff}
+.navbar .nav-link:hover, .navbar .nav-link:focus {color:#fff;background:#0b5ed7;text-decoration:underline}
+.navbar :focus-visible {outline-color:#fff}
+.navbar .nav-link.text-warning {color:#fff !important}
+.btn, .navbar-toggler, .dropdown-item {min-height:44px}
+.navbar .nav-link {padding-top:.65rem;padding-bottom:.65rem}
+#main-content:focus {outline:none}
+[data-testid="intended-use-banner"] .badge {white-space:normal}
+@media(max-width:575px) {
+  #main-content {margin-top:.75rem !important}
+  [data-testid="intended-use-banner"] {font-size:.85rem}
+  .navbar-brand {font-size:1.05rem}
+}
+@media(prefers-reduced-motion:reduce) {
+  *, *::before, *::after {scroll-behavior:auto !important;transition:none !important;animation:none !important}
+}

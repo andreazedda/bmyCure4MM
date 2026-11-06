@@ -1,0 +1,8 @@
+{% load account_ui %}
+{% if form.errors %}<div class="alert alert-danger" role="alert" tabindex="-1" data-error-summary>
+  <h2 class="h5">{% ui 'Please correct the following errors.' %}</h2>
+  <ul class="mb-0">
+    {% for error in form.non_field_errors %}<li>{{ error|account_label }}</li>{% endfor %}
+    {% for field in form %}{% for error in field.errors %}<li>{% if not field.is_hidden %}<a href="#{{ field.id_for_label }}">{{ field.label }}: {{ error|account_label }}</a>{% else %}{{ error|account_label }}{% endif %}</li>{% endfor %}{% endfor %}
+  </ul>
+</div>{% endif %}

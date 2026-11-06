@@ -1,0 +1,6 @@
+{% load account_ui %}{% if page_obj.paginator.num_pages > 1 %}
+<nav class="d-flex flex-wrap align-items-center gap-3 my-3" aria-label="Pagination">
+  {% if page_obj.has_previous %}<a class="btn btn-outline-primary" href="{% if page_param == 'failed_page' %}{% querystring failed_page=page_obj.previous_page_number %}{% else %}{% querystring page=page_obj.previous_page_number %}{% endif %}">{% ui 'Previous' %}</a>{% endif %}
+  <span>{% ui 'Page' %} {{ page_obj.number }} {% ui 'of' %} {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}<a class="btn btn-outline-primary" href="{% if page_param == 'failed_page' %}{% querystring failed_page=page_obj.next_page_number %}{% else %}{% querystring page=page_obj.next_page_number %}{% endif %}">{% ui 'Next' %}</a>{% endif %}
+</nav>{% endif %}

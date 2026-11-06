@@ -38,6 +38,8 @@ nav:
       - Dependencies: operations/DEPENDENCIES.md
       - Dependency Audit Triage: operations/DEPENDENCY_AUDIT_TRIAGE.md
       - Development: development/DEVELOPMENT.md
+      - Source and Data Atlas: development/CODE_ATLAS.md
+      - Developer Audit Evidence: development/AUDIT_VERIFICATION_2026_11_06.md
       - UX Audit: operations/UX_AUDIT_2026_11_06.md
       - Troubleshooting: development/TROUBLESHOOTING.md
   - Governance:

@@ -1,119 +1,81 @@
-# Endpoints (quick reference)
+---
+title: Endpoints and Authorization Map
+language: en
+status: CURRENT_VERIFIED
+owner: Andrea Zedda
+audience: developers and maintainers
+last_verified_at: 2026-11-06
+---
 
-=== "IT"
-    Questa pagina elenca i principali endpoint web “umani” (pagine) e dove cercarli nel codice.
+# Endpoints and authorization map
 
-    ## Terminologia
+Paths below were checked against the actual URLConfs during the 2026-11-06 audit. `<id>` is a route parameter, not a public authorization capability. Existence of a route does not grant access to its data. The [source atlas](../development/CODE_ATLAS.md) follows the implementation and tests behind these entry points.
 
-    - **URLConf**: file `urls.py` che mappa path → view.
-    - **View**: funzione/classe Django che gestisce la request.
-    - **Template**: file HTML in `templates/` o `app/templates/...`.
-    - **HTMX**: request parziali (snippet) per UI reattiva.
+## Access and first use / Accesso e primo utilizzo
 
-    ## Se cerchi…
+| Path | Purpose | Implementation / access boundary |
+| --- | --- | --- |
+| `/` | Public entry | `mmportal.views.home` |
+| `/access/request/` | Email/nickname request, no password | `accounts.views.request_access`; request gate and rate budget |
+| `/access/request/status/` | Pending request status | Session-limited; knowing an email or UUID is insufficient |
+| `/access/verify/` | Email confirmation | GET displays form; purpose token is consumed only by POST |
+| `/access/activate/` | Approved member password setup | POST rechecks identity, approval, expiry and revocation |
+| `/accounts/login/`, `/accounts/logout/` | Ordinary product authentication | Email backend; logout requires POST |
+| `/accounts/security/` | Owner authenticator setup / fresh code | Privileged product session, separate from staff status |
+| `/password/reset/`, `/password/reset/confirm/` | Password recovery | Does not reactivate revoked/suspended/expired access |
+| `/manage/access-requests/`, `/manage/users/` | Review and account lifecycle | Owner/authorized approver plus fresh MFA |
+| `/manage/feedback/` | Private ticket replies | Same privileged product boundary |
+| `/feedback/` | Member's own tickets | Active community identity; author-scoped output |
+| `/sim/getting-started/` | Guided existing learning entry | Product member access |
+| `/learn/`, `/sim/` | Existing scenario catalogue | Same simulator URLConf; permissions still apply |
+| `/admin/` | Separate Django administration | Existing staff requirements; public registration never grants staff |
 
-    | Voglio… | Vai a… |
-    | --- | --- |
-    | routing principale | `mmportal/urls.py` + `*/urls.py` |
-    | mapping DB/Models | `Reference → Database Objects` |
-    | come partire | `Guides → Learning Path` |
+## Existing simulator / Simulatore esistente
 
-    !!! tip "Approccio"
-        Se vuoi trovare velocemente “dove vive” una pagina:
-        1) apri `mmportal/urls.py` e gli `urls.py` delle app  
-        2) cerca la view corrispondente  
-        3) segui il template in `templates/` o `app/templates/...`
+| Path | View / behavior |
+| --- | --- |
+| `/sim/<id>/` | `simulator.views.scenario_detail` |
+| `/sim/scenarios/<id>/simulate/` | `views_manage.simulate_scenario`, validated POST, existing real engine |
+| `/sim/attempts/<id>/export/` | `views_manage.export_attempt`; current author/access check; `?format=csv` for CSV |
+| `/sim/attempts/<id>/plot/embed/` | `views_manage.attempt_plot_embed`; authenticated HTML artifact |
+| `/sim/manage/`, `/sim/scenarios/new/` | Existing editor-only scenario management, not community registration |
+| `/sim/cohort/`, `/sim/experiments/` | Existing advanced research functions; not granted by approved registration |
 
-    ## Core
+`/simulator/` and `/learn/` include the same simulator routes under distinct namespaces. Tests must cover aliases; hiding a link is not authorization. The old reference path `/simulator/scenario/<id>/` was incorrect: the detail route is directly `<id>/` under the chosen prefix.
 
-    | Area | Path | Codice |
-    | --- | --- | --- |
-    | Home | `/` | `mmportal/urls.py` |
-    | Admin | `/admin/` | Django admin |
+## Clinical, research and molecular surfaces
 
-    ## Clinic (pazienti)
+These are documented for source navigation, not offered as public onboarding steps.
 
-    | Pagina | Path (tipico) | URLConf | Views | Templates |
-    | --- | --- | --- | --- | --- |
-    | Lista pazienti | `/patients/` | `clinic/urls.py` | `clinic/views.py` | `clinic/templates/clinic/` |
-    | Nuovo paziente | `/patients/new/` | `clinic/urls.py` | `clinic/views.py` | `clinic/templates/clinic/` |
-    | Dettaglio | `/patients/<id>/` | `clinic/urls.py` | `clinic/views.py` | `clinic/templates/clinic/` |
+| Path | Source | Boundary |
+| --- | --- | --- |
+| `/patients/`, `/patients/new/`, `/patients/<id>/` | `clinic/urls.py`, `clinic/views.py` | Existing clinical permissions; registered community identities denied |
+| `/api/patients/`, `/api/assessments/` | `clinic/api.py` | DRF permissions and scoped querysets; account authentication alone is insufficient |
+| `/research/` and patient research routes | `twin_engine/urls.py`, `twin_engine/views.py` | Separate governed research access; does not follow from access approval |
+| `/chemtools/` | `chemtools/urls.py`, `chemtools/views.py` | Existing molecular utility workflow |
+| `/chemtools/job/<id>/` | `chemtools.views.job_detail` | Job selector/authorization; optional dependencies and broker remain separate |
+| `/chemtools/job/<id>/status.json` | `chemtools.views.job_status` | Polling endpoint, not proof of worker progress |
 
-    ## Simulator (scenari e simulazioni)
+`/chem/` is a backward-compatible alias. Both use singular `job/<id>/`; the old `/chem/jobs/<id>/` reference was incorrect. Keep aliases in denial tests and do not expose media to make a job link work.
 
-    | Pagina | Path (tipico) | URLConf | Views | Templates |
-    | --- | --- | --- | --- | --- |
-    | Lista scenari | `/simulator/` | `simulator/urls.py` | `simulator/views.py` | `simulator/templates/simulator/` |
-    | Dettaglio scenario | `/simulator/scenario/<id>/` | `simulator/urls.py` | `simulator/views.py` | `simulator/templates/simulator/` |
-    | Run simulation | (HTMX/POST) | `simulator/urls.py` | `simulator/views.py` | partials HTMX |
+## Documentation and runtime
 
-    ## ChemTools
+| Path | Source / behavior |
+| --- | --- |
+| `/docs/` | Documentation entry, `docs_viewer.views.docs_index` |
+| `/docs/view/docs/development/DEVELOPMENT.md` | Allowed Markdown path; no trailing slash after the filename |
+| `/docs/search/?q=...` | Allowed-document search; query should contain no secrets or clinical content |
+| `/docs/raw/<path>` | Allowed raw Markdown only |
+| `/healthz/` | Minimal web liveness response; not a DB/worker/email health guarantee |
+| `/static/...` | Existing static service; check MIME type and actual loaded content |
+| `/media/...` | Direct protected media is closed in production; use authorized artifact views |
 
-    | Pagina | Path (tipico) | URLConf | Views | Templates |
-    | --- | --- | --- | --- | --- |
-    | Tools home | `/chem/` | `chemtools/urls.py` | `chemtools/views.py` | `chemtools/templates/chemtools/` |
-    | Job detail | `/chem/jobs/<id>/` | `chemtools/urls.py` | `chemtools/views.py` | `chemtools/templates/chemtools/` |
+## Verify routing without loading a clinical record
 
-    ## Docs Viewer (interno Django)
+Use the disposable settings from the [handbook](../development/DEVELOPMENT.md):
 
-    | Pagina | Path | URLConf | Views |
-    | --- | --- | --- | --- |
-    | Index | `/docs/` | `docs_viewer/urls.py` | `docs_viewer/views.py` |
-    | View | `/docs/view/<path>/` | `docs_viewer/urls.py` | `docs_viewer/views.py` |
-    | Search | `/docs/search/` | `docs_viewer/urls.py` | `docs_viewer/views.py` |
+```bash
+uv run --frozen python manage.py shell -c 'from django.urls import resolve; print(resolve("/sim/1/").view_name); print(resolve("/sim/attempts/1/export/").view_name); print(resolve("/chemtools/job/1/").view_name)'
+```
 
-=== "EN"
-    This page lists the main human-facing endpoints and where they live in code.
-
-    ## Terminology
-
-    - **URLConf**: `urls.py` mapping path → view.
-    - **View**: Django function/class handling the request.
-    - **Template**: HTML file under `templates/` or `app/templates/...`.
-    - **HTMX**: partial requests (snippets) for reactive UI.
-
-    ## Quick find
-
-    | I want… | Go to… |
-    | --- | --- |
-    | main routing | `mmportal/urls.py` + `*/urls.py` |
-    | DB/Model mapping | `Reference → Database Objects` |
-    | where to start | `Guides → Learning Path` |
-
-    ## Core
-
-    | Area | Path | Code |
-    | --- | --- | --- |
-    | Home | `/` | `mmportal/urls.py` |
-    | Admin | `/admin/` | Django admin |
-
-    ## Clinic
-
-    | Page | Typical path | URLConf | Views | Templates |
-    | --- | --- | --- | --- | --- |
-    | Patients list | `/patients/` | `clinic/urls.py` | `clinic/views.py` | `clinic/templates/clinic/` |
-    | New patient | `/patients/new/` | `clinic/urls.py` | `clinic/views.py` | `clinic/templates/clinic/` |
-    | Detail | `/patients/<id>/` | `clinic/urls.py` | `clinic/views.py` | `clinic/templates/clinic/` |
-
-    ## Simulator
-
-    | Page | Typical path | URLConf | Views | Templates |
-    | --- | --- | --- | --- | --- |
-    | Scenarios list | `/simulator/` | `simulator/urls.py` | `simulator/views.py` | `simulator/templates/simulator/` |
-    | Scenario detail | `/simulator/scenario/<id>/` | `simulator/urls.py` | `simulator/views.py` | `simulator/templates/simulator/` |
-    | Run simulation | (HTMX/POST) | `simulator/urls.py` | `simulator/views.py` | HTMX partials |
-
-    ## ChemTools
-
-    | Page | Typical path | URLConf | Views | Templates |
-    | --- | --- | --- | --- | --- |
-    | Tools home | `/chem/` | `chemtools/urls.py` | `chemtools/views.py` | `chemtools/templates/chemtools/` |
-    | Job detail | `/chem/jobs/<id>/` | `chemtools/urls.py` | `chemtools/views.py` | `chemtools/templates/chemtools/` |
-
-    ## Docs Viewer
-
-    | Page | Path | URLConf | Views |
-    | --- | --- | --- | --- |
-    | Index | `/docs/` | `docs_viewer/urls.py` | `docs_viewer/views.py` |
-    | View | `/docs/view/<path>/` | `docs_viewer/urls.py` | `docs_viewer/views.py` |
-    | Search | `/docs/search/` | `docs_viewer/urls.py` | `docs_viewer/views.py` |
+Expected names: `simulator:scenario_detail`, `simulator:attempt_export`, `chemtools:job_detail`. Route resolution alone does not query those IDs or prove access. Run account-denial and artifact-ownership tests for authorization evidence.

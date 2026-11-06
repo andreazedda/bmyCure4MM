@@ -1,1 +1,13 @@
-{% extends 'base.html' %}{% block title %}My tickets{% endblock %}{% block content %}<h1 class="h3"><span class="t-en">Suggestions and support tickets</span><span class="t-it">Suggerimenti e ticket di supporto</span></h1><p>Send suggestions, bugs, usability feedback or questions about the research platform. Only you and the owner can read your ticket. Do not include real patient data, passwords or tokens.</p><div class="row g-4"><section class="col-lg-5"><div class="card"><div class="card-body"><h2 class="h5">New ticket</h2><form method="post">{% csrf_token %}{{ form.as_p }}<button class="btn btn-primary" type="submit">Send ticket</button></form></div></div></section><section class="col-lg-7"><h2 class="h5">My tickets and replies</h2>{% for ticket in tickets %}<article class="card mb-3"><div class="card-body"><h3 class="h6">{{ ticket.get_category_display }} · {{ ticket.get_status_display }}</h3><p class="small text-muted">{{ ticket.created_at }}</p><p>{{ ticket.message|linebreaksbr }}</p>{% if ticket.reply %}<h4 class="h6">Reply from Andrea</h4><p>{{ ticket.reply|linebreaksbr }}</p>{% else %}<p class="text-muted">Waiting for a reply.</p>{% endif %}</div></article>{% empty %}<p>No tickets yet.</p>{% endfor %}</section></div>{% endblock %}
+{% extends 'base.html' %}{% load static account_ui %}{% block title %}My tickets{% endblock %}
+{% block extra_head %}<script defer src="{% static 'accounts/access.js' %}"></script>{% endblock %}
+{% block content %}
+<h1 class="h3">{% ui 'Suggestions and support tickets' %}</h1>
+<p>{% ui 'Send suggestions, bugs, usability feedback or questions about the research platform. Only you and the owner can read your ticket. Do not include real patient data, passwords or tokens.' %}</p>
+<div class="row g-4"><section class="col-lg-5"><div class="card"><div class="card-body">
+<h2 class="h5">{% ui 'New ticket' %}</h2><form method="post">{% csrf_token %}{% include 'accounts/_fields.html' %}<button class="btn btn-primary" type="submit">{% ui 'Send ticket' %}</button></form>
+</div></div></section><section class="col-lg-7"><h2 class="h5">{% ui 'My tickets and replies' %}</h2>
+{% for ticket in tickets %}<article class="card mb-3"><div class="card-body"><h3 class="h6">{{ ticket.get_category_display|account_label }} · {{ ticket.get_status_display|account_label }}</h3><p class="small text-muted">{{ ticket.created_at }}</p><p>{{ ticket.message|linebreaksbr }}</p>
+{% if ticket.reply %}<h4 class="h6">{% ui 'Reply from Andrea' %}</h4><p>{{ ticket.reply|linebreaksbr }}</p>{% else %}<p class="text-muted">{% ui 'Waiting for a reply.' %}</p>{% endif %}
+</div></article>{% empty %}<p>{% ui 'No tickets yet.' %}</p>{% endfor %}
+{% include 'accounts/_pagination.html' with page_obj=tickets %}
+</section></div>{% endblock %}

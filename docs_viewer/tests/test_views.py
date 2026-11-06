@@ -72,6 +72,8 @@ class DocsViewerViewTests(TestCase):
     def test_nonexistent_file_404(self):
         response = self.client.get(reverse("docs_viewer:view", kwargs={"path": "docs/nonexistent.md"}))
         self.assertEqual(response.status_code, 404)
+        self.assertContains(response, "Find documentation", status_code=404)
+        self.assertContains(response, reverse("docs_viewer:index"), status_code=404)
 
     def test_raw_download_works(self):
         response = self.client.get(reverse("docs_viewer:raw", kwargs={"path": "README.md"}))
@@ -118,3 +120,63 @@ class DocsViewerViewTests(TestCase):
         content = response.content.decode()
         if 'result' in content.lower():
             self.assertTrue('/docs/view/' in content or 'list-group-item' in content)
+
+    def test_search_never_exposes_external_symlink_snippets(self):
+        import tempfile
+        from pathlib import Path
+        from django.test import override_settings
+
+        with tempfile.TemporaryDirectory() as root, tempfile.TemporaryDirectory() as external:
+            base = Path(root)
+            (base / 'docs').mkdir()
+            (Path(external) / 'private.md').write_text('UNIQUE_PRIVATE_MARKER', encoding='utf-8')
+            (base / 'docs' / 'linked.md').symlink_to(Path(external) / 'private.md')
+            with override_settings(BASE_DIR=base):
+                response = self.client.get(reverse('docs_viewer:search'), {'q': 'UNIQUE_PRIVATE_MARKER'})
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.context['total_results'], 0)
+                self.assertNotContains(response, 'linked.md')
+                index = self.client.get(reverse('docs_viewer:index'))
+                self.assertEqual(index.context['total_docs'], 0)
+
+    def test_search_is_paginated_and_preserves_the_query(self):
+        import tempfile
+        from pathlib import Path
+        from django.test import override_settings
+
+        with tempfile.TemporaryDirectory() as root:
+            base = Path(root)
+            (base / 'docs').mkdir()
+            for number in range(23):
+                (base / 'docs' / f'{number:02}.md').write_text(f'# Handbook {number}\nUnique search phrase', encoding='utf-8')
+            with override_settings(BASE_DIR=base):
+                first = self.client.get(reverse('docs_viewer:search'), {'q': 'Unique search phrase'})
+                second = self.client.get(reverse('docs_viewer:search'), {'q': 'Unique search phrase', 'page': '2'})
+                self.assertEqual(first.context['total_results'], 23)
+                self.assertEqual(len(first.context['results']), 20)
+                self.assertEqual(len(second.context['results']), 3)
+                self.assertContains(first, 'q=Unique%20search%20phrase')
+                self.assertContains(first, 'for="search-query"')
+                self.assertContains(first, 'Handbook 0')
+                self.assertIn('no-store', first['Cache-Control'])
+
+    def test_document_declared_status_is_visible_and_page_is_not_cached(self):
+        import tempfile
+        from pathlib import Path
+        from django.test import override_settings
+        with tempfile.TemporaryDirectory() as root:
+            base = Path(root)
+            (base / 'docs').mkdir()
+            (base / 'docs' / 'status.md').write_text('---\nstatus: AUDIT_TEST_ONLY\nlast_verified_at: 2026-11-06\n---\n# Test document', encoding='utf-8')
+            with override_settings(BASE_DIR=base):
+                response = self.client.get(reverse('docs_viewer:view', kwargs={'path': 'docs/status.md'}))
+                self.assertContains(response, 'Authored status:')
+                self.assertContains(response, 'AUDIT_TEST_ONLY')
+                self.assertContains(response, 'Last verification recorded:')
+                self.assertContains(response, 'id="main-content"')
+                self.assertContains(response, 'href="#main-content"')
+                self.assertIn('no-store', response['Cache-Control'])
+
+    def test_document_without_metadata_is_not_presented_as_verified(self):
+        response = self.client.get(reverse('docs_viewer:view', kwargs={'path': 'README.md'}))
+        self.assertContains(response, 'Status not recorded')

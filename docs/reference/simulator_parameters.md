@@ -70,8 +70,8 @@
 
     ### `results` (link a file / artifact)
 
-    - `csv`: path su `MEDIA_URL` a CSV dei time-series
-    - `plot`: path su `MEDIA_URL` a HTML Plotly (iframe-friendly)
+    - `csv`: localizzatore del CSV sotto `MEDIA_ROOT`; il download passa dalla route autenticata `attempt_export`, con controllo autore e accesso corrente
+    - `plot`: localizzatore dell’HTML Plotly sotto `MEDIA_ROOT`; la visualizzazione passa dalla route autenticata `attempt_plot_embed`
     - `generated_at`: ISO timestamp
     - (opzionale) `twin_params.json`: payload twin serializzato
 
@@ -159,3 +159,8 @@
     - `results`: artifact links (CSV/Plotly HTML, optional twin JSON)
     - `results_summary`: KPIs and cohort stats
     - `artifacts`: UI/audit-friendly subset
+
+
+## Artifact authorization
+
+Stored `results.csv` / `results.plot` values can look like MEDIA_URL paths. They are storage locators, not public download grants. Use `simulator:attempt_export` and `simulator:attempt_plot_embed`; both recheck the current account and attempt owner before resolving files. Direct media serving remains closed. See the [developer atlas](../development/CODE_ATLAS.md#data-model-and-storage-boundaries).

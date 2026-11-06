@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Document unavailable{% endblock %}
+{% block content %}
+<section class="card"><div class="card-body p-4">
+<h1 class="h3"><span class="t-en">Document unavailable</span><span class="t-it">Documento non disponibile</span></h1>
+<p><span class="t-en">This reference may have moved or may not be published here. Find the current guide in the documentation index.</span><span class="t-it">Il riferimento può essere stato spostato o non essere pubblicato qui. Trova la guida attuale nell’indice della documentazione.</span></p>
+<a class="btn btn-primary" href="{% url 'docs_viewer:index' %}"><span class="t-en">Find documentation</span><span class="t-it">Trova la documentazione</span></a>
+</div></section>
+{% endblock %}

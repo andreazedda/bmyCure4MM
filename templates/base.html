@@ -1,6 +1,6 @@
 {% load static simulator_extras %}
 <!doctype html>
-<html lang="en">
+<html lang="en" data-lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,7 +12,8 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body class="bg-light">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <a class="skip-link" href="#main-content"><span class="t-en">Skip to content</span><span class="t-it">Vai al contenuto</span></a>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary" aria-label="Main navigation / Navigazione principale">
         <div class="container-fluid">
             <a class="navbar-brand fw-semibold d-flex align-items-center gap-2" href="{% if request.user.is_authenticated %}{% url 'simulator:getting_started' %}{% else %}{% url 'docs_viewer:index' %}{% endif %}">
                 <span style="font-size:1.4rem;">🧬</span>
@@ -22,7 +23,7 @@
                     <span class="t-it">Prototipo di Ricerca E1</span>
                 </span>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation" data-label-en="Toggle navigation" data-label-it="Apri navigazione">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="mainNavbar">
@@ -117,13 +118,13 @@
         </div>
     </nav>
 
-    <div class="container my-4 sticky-offset">
+    <main id="main-content" tabindex="-1" class="container my-4 sticky-offset">
         <div class="alert alert-secondary py-2" role="note" data-testid="intended-use-banner">
             <div class="d-flex flex-wrap justify-content-between gap-2 align-items-center">
                 <div class="small">
                     <strong>{{ governance.intended_use_level }}</strong> ·
-                    <span class="t-en">Research prototype only; not clinical decision support. Outputs do not authorize treatment or dose changes.</span>
-                    <span class="t-it">Solo prototipo di ricerca; non è supporto alle decisioni cliniche. Gli output non autorizzano modifiche di trattamento o dose.</span>
+                    <span class="t-en">Research only · no clinical or dosing decisions. Use synthetic data.</span>
+                    <span class="t-it">Solo ricerca · nessuna decisione clinica o di dose. Usa dati sintetici.</span>
                 </div>
                 <div class="small text-nowrap">
                     <span class="badge bg-secondary">{{ governance.epistemic_label }}</span>
@@ -138,7 +139,7 @@
                         {% if message.level_tag == 'error' %}
                             {% with 'danger' as level_class %}
                                 <div class="alert alert-{{ level_class }} alert-dismissible fade show" role="alert">
-                                    {{ message|upper }}
+                                    {{ message }}
                                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                 </div>
                             {% endwith %}
@@ -180,6 +181,7 @@
               document.querySelectorAll('[data-label-en][data-label-it]').forEach(el => el.setAttribute('aria-label', el.getAttribute('data-label-' + lang)));
               Object.entries(langButtons).forEach(([key, btn]) => {
                 if (!btn) return;
+                btn.setAttribute('aria-pressed', String(key === lang));
                 if (key === lang) {
                     btn.classList.add('active');
                 } else {
@@ -199,7 +201,10 @@
             try { if (localStorage.getItem('bmy-language') === 'it') initialLang = 'it'; } catch {}
             setActiveLang(initialLang);
             document.addEventListener('DOMContentLoaded', () => setActiveLang(document.documentElement.lang));
-            document.documentElement.setAttribute('data-novice','');
+            try {
+              if (localStorage.getItem('bmy-novice') === 'off') document.getElementById('novice-mode').checked = false;
+            } catch {}
+            document.documentElement.toggleAttribute('data-novice', document.getElementById('novice-mode').checked);
           })();
         </script>
         <style>
@@ -221,7 +226,7 @@
           document.documentElement.lang = document.documentElement.getAttribute('data-lang') || 'en';
         </script>
         {% block content %}{% endblock %}
-    </div>
+    </main>
 
     <footer class="bg-white border-top py-4 mt-5">
         <div class="container">
@@ -264,15 +269,16 @@
         <div class="offcanvas-body">
             <div id="helpDrawerContent" class="small text-body"></div>
             <div class="d-flex justify-content-between align-items-center mt-3">
-                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="Tour.prev()">‹</button>
-                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="Tour.next()">›</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="Tour.prev()" aria-label="Previous step" data-label-en="Previous step" data-label-it="Passo precedente">‹</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="Tour.next()" aria-label="Next step" data-label-en="Next step" data-label-it="Passo successivo">›</button>
             </div>
         </div>
     </div>
-    <div id="tourOverlay" class="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-none" style="z-index:1080"></div>
-    <div id="cmdkWrapper">
-        <input id="cmdk" data-testid="cmdk-input" class="form-control d-none position-fixed top-10 start-50 translate-middle-x" style="z-index:1090; width:480px;" placeholder="Type to search help…" autocomplete="off" />
-        <div id="cmdkList" class="position-fixed top-25 start-50 translate-middle-x bg-white shadow rounded d-none" style="z-index:1090; width:480px; max-height:60vh; overflow:auto;">
+    <div id="tourOverlay" class="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-none" style="z-index:1040"></div>
+    <div id="cmdkWrapper" role="search" aria-label="Contextual help / Aiuto contestuale">
+        <label class="visually-hidden" for="cmdk"><span class="t-en">Search help</span><span class="t-it">Cerca aiuto</span></label>
+        <input id="cmdk" data-testid="cmdk-input" class="form-control d-none position-fixed top-10 start-50 translate-middle-x" style="z-index:1090; width:min(480px, calc(100vw - 2rem)); top:1rem;" placeholder="Type to search help…" autocomplete="off" />
+        <div id="cmdkList" class="position-fixed top-25 start-50 translate-middle-x bg-white shadow rounded d-none" style="z-index:1090; width:min(480px, calc(100vw - 2rem)); top:4.5rem; max-height:60vh; overflow:auto;">
             <div id="cmdkResults" class="list-group list-group-flush"></div>
         </div>
     </div>
@@ -319,6 +325,8 @@
     const cmdList = document.getElementById('cmdkList');
     const cmdResults = document.getElementById('cmdkResults');
     let cmdOpen = false;
+    let commandTrigger = null;
+    let commandRequest = 0;
     let lastHelpTrigger = null;
     let releaseHelpTrap = null;
     const CMD_TYPE_ICONS = {
@@ -437,6 +445,7 @@
     };
 
     const audit = (event, detail) => {
+        {% if not request.user.is_authenticated or request.access_profile %}return;{% endif %}
         const token = getCsrfToken();
         fetch(API_UX_AUDIT_URL, {
             method: 'POST',
@@ -535,8 +544,10 @@
     document.addEventListener('click', (event) => {
         const trigger = event.target.closest('[data-help]');
         if (trigger) {
+            const fromCommand = cmdOpen;
+            if (fromCommand) toggleCmd(false);
             event.preventDefault();
-            lastHelpTrigger = trigger;
+            lastHelpTrigger = fromCommand ? commandTrigger : trigger;
             openHelp(trigger.getAttribute('data-help'));
         }
         const auditTarget = event.target.closest('[data-audit]');
@@ -629,7 +640,9 @@
     window.scrollToField = scrollToField;
 
     const toggleCmd = (open) => {
+        const wasOpen = cmdOpen;
         cmdOpen = open === undefined ? !cmdOpen : open;
+        if (cmdOpen && !wasOpen) commandTrigger = document.activeElement;
         if (!cmdInput || !cmdList) {
             return;
         }
@@ -639,22 +652,39 @@
             cmdInput.value = '';
             cmdInput.focus();
             renderCmd('');
+        } else if (commandTrigger) {
+            commandTrigger.focus();
         }
     };
 
     const renderCmd = async (query) => {
-        if (!cmdResults) {
-            return;
-        }
+        if (!cmdResults) return;
+        const ticket = ++commandRequest;
         const lang = getCurrentLang() || 'en';
-        const res = await fetch(`${API_HELP_SEARCH_URL}?q=${encodeURIComponent(query)}&lang=${lang}`);
-        const data = await res.json();
-        cmdResults.innerHTML = data.results
-            .map((item) => {
-                const icon = CMD_TYPE_ICONS[item.type] || CMD_TYPE_ICONS.article;
-                return `<a href="#" class="list-group-item list-group-item-action d-flex align-items-center gap-2" data-help="${item.slug}"><span>${icon}</span><span>${item.title}</span></a>`;
-            })
-            .join('');
+        try {
+            const res = await fetch(`${API_HELP_SEARCH_URL}?q=${encodeURIComponent(query)}&lang=${lang}`);
+            if (!res.ok) throw new Error('help-unavailable');
+            const data = await res.json();
+            if (ticket !== commandRequest) return;
+            cmdResults.replaceChildren();
+            for (const item of data.results) {
+                const link = document.createElement('a');
+                link.href = '#';
+                link.className = 'list-group-item list-group-item-action';
+                link.dataset.help = item.slug;
+                link.textContent = item.title;
+                cmdResults.append(link);
+            }
+            if (!data.results.length) {
+                const message = document.createElement('p');
+                message.className = 'p-3 mb-0';
+                message.textContent = lang === 'it' ? 'Nessuna voce trovata. Prova una parola diversa.' : 'No help found. Try another word.';
+                cmdResults.append(message);
+            }
+        } catch {
+            if (ticket !== commandRequest) return;
+            cmdResults.textContent = lang === 'it' ? 'Aiuto temporaneamente non disponibile. Riprova o apri Documentazione.' : 'Help is temporarily unavailable. Retry or open Documentation.';
+        }
     };
 
     document.addEventListener('keydown', (event) => {
@@ -705,6 +735,7 @@
             (focusable || helpDrawerEl).focus();
         });
         helpDrawerEl.addEventListener('hidden.bs.offcanvas', () => {
+            Tour.close();
             if (releaseHelpTrap) {
                 releaseHelpTrap();
             }
@@ -731,6 +762,7 @@
         const noviceToggle = document.getElementById('novice-mode');
         if (noviceToggle) {
             noviceToggle.addEventListener('change', (e) => {
+                try { localStorage.setItem('bmy-novice', e.target.checked ? 'on' : 'off'); } catch {}
                 if (e.target.checked) {
                     document.documentElement.setAttribute('data-novice', '');
                 } else {

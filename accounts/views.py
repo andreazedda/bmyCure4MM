@@ -4,6 +4,7 @@ from functools import wraps
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.paginator import Paginator
 from django.db import DatabaseError, transaction
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -15,15 +16,29 @@ from . import forms, services
 from .backends import VerifiedEmailBackend
 from .models import AccessPolicy, Notification, SupportTicket
 from .models import AccessProfile as Identity
+from .ui import bilingual
 
 
 def limited(request, scope, identity_key="", limit=10):
     try:
         allowed = services.rate_limit(scope, request, identity_key, limit=limit)
     except DatabaseError:
-        return HttpResponse("The service is temporarily unavailable. No action was taken.", status=503)
+        return render(
+            request,
+            "accounts/message.html",
+            {
+                "title": "Please try again later",
+                "text": "The service is temporarily unavailable. No action was taken.",
+            },
+            status=503,
+        )
     if not allowed:
-        response = HttpResponse("Too many attempts. Please try again later.", status=429)
+        response = render(
+            request,
+            "accounts/message.html",
+            {"title": "Please try again later", "text": "Too many attempts. Please try again in an hour."},
+            status=429,
+        )
         response["Retry-After"] = "3600"
         return response
 
@@ -103,6 +118,7 @@ def submitted(request):
             "title": "Check your email",
             "text": "If this request can be processed, a verification email will arrive. Delivery may take a few minutes. Verification does not approve access.",
             "status_link": True,
+            "hide_login": True,
         },
     )
 
@@ -118,6 +134,24 @@ def request_status(request):
         "accounts/message.html",
         {
             "title": "Your access request",
+            "next_step": (
+                "Your email is verified. Andrea will review your request and notify you by email."
+                if identity.request_state == "PENDING_REVIEW"
+                else "Open the verification email to send your request for review."
+                if identity.request_state == "PENDING_EMAIL_VERIFICATION"
+                else "This request was not approved. Reply to the decision email if you need clarification."
+                if identity.request_state == "REJECTED"
+                else "Your request was approved. Use the activation email to set your password; ask Andrea to reissue it if expired."
+                if identity.access_state == "PENDING_ACTIVATION"
+                else "Your access is active. Sign in to continue."
+                if identity.access_state == "ACTIVE"
+                else "Access is unavailable. Reply to an account email for help. Password reset does not renew access."
+            )
+            if identity
+            else "",
+            "hide_login": bool(
+                identity and (identity.request_state != "APPROVED" or identity.access_state != "ACTIVE")
+            ),
             "text": identity.get_request_state_display()
             if identity
             else "Request status is available only in the browser that submitted or verified the request.",
@@ -144,7 +178,9 @@ def capability(request, purpose):
                 if purpose == "verify":
                     request.session["access_request"] = str(identity.pk)
                     return redirect("accounts:status")
-                messages.success(request, "Password saved. You can now sign in with your verified email.")
+                messages.success(
+                    request, bilingual("Password saved. You can now sign in with your verified email.")
+                )
                 return redirect("accounts:login")
     titles = {
         "verify": "Confirm your email",
@@ -164,7 +200,9 @@ def capability(request, purpose):
             "form": form,
             "button": "Confirm email" if purpose == "verify" else "Save password",
             "token_page": True,
-            "notice": "This action requires confirmation. Email previews do not activate access. If the form fails, reopen the email link. Use at least 12 characters for your password.",
+            "notice": "Confirm to send your request for review. Verification does not approve access."
+            if purpose == "verify"
+            else "This action requires confirmation. Email previews do not activate access. If the form fails, reopen the email link. Use at least 12 characters for your password.",
         },
     )
 
@@ -260,15 +298,17 @@ def feedback(request):
             services.submit_feedback(
                 request.access_profile, form.cleaned_data, form.cleaned_data["submission_key"]
             )
+            messages.success(request, bilingual("Your ticket has been saved. Replies will appear below."))
             return redirect("accounts:feedback")
     return render(
         request,
         "accounts/feedback.html",
         {
             "form": form,
-            "tickets": SupportTicket.objects.filter(identity=request.access_profile).order_by("-created_at")[
-                :50
-            ],
+            "tickets": Paginator(
+                SupportTicket.objects.filter(identity=request.access_profile).order_by("-created_at", "-pk"),
+                20,
+            ).get_page(request.GET.get("page")),
         },
     )
 
@@ -276,11 +316,19 @@ def feedback(request):
 @manager_required
 def manage_requests(request):
     form = forms.DecisionForm(request.POST or None)
+    if form.is_bound:
+        try:
+            form.auto_id = f"%s-{uuid.UUID(request.POST.get('identity_id', ''))}"
+        except (ValueError, AttributeError):
+            pass
     if request.method == "POST" and form.is_valid():
         throttle = limited(request, "management", str(request.user.pk), 100)
         if throttle is not None:
             return throttle
         data = form.cleaned_data
+        if data["action"] == "revoke" and not data["confirm_revoke"]:
+            identity = get_object_or_404(Identity, pk=data["identity_id"], is_owner=False, is_approver=False)
+            return render(request, "accounts/revoke_confirm.html", {"identity": identity})
         try:
             if data["action"] in {"approve", "reject"}:
                 services.decide_request(
@@ -302,17 +350,26 @@ def manage_requests(request):
         except (ValidationError, Identity.DoesNotExist) as exc:
             form.add_error(None, exc if isinstance(exc, ValidationError) else "Request unavailable.")
         else:
-            messages.success(request, "Access decision saved.")
+            messages.success(request, bilingual("Access decision saved."))
             return redirect("accounts:manage_requests")
-    rows = Identity.objects.filter(verified_at__isnull=False, is_owner=False).order_by("-created_at")[:100]
+    rows = Paginator(
+        Identity.objects.filter(verified_at__isnull=False, is_owner=False).order_by("-created_at", "-pk"), 20
+    ).get_page(request.GET.get("page"))
     return render(
         request,
         "accounts/manage.html",
         {
             "rows": rows,
+            "submitted_identity_id": request.POST.get("identity_id"),
+            "submitted_days": request.POST.get("days", "14"),
             "form": form,
             "policy": AccessPolicy.objects.get(pk=1),
-            "failed": Notification.objects.filter(state="failed").order_by("-created_at")[:30],
+            "failed": Paginator(
+                Notification.objects.select_related("identity")
+                .filter(state="failed")
+                .order_by("-created_at", "-pk"),
+                10,
+            ).get_page(request.GET.get("failed_page")),
             "switch_form": forms.SwitchForm(
                 initial={k: getattr(AccessPolicy.objects.get(pk=1), k) for k in forms.SwitchForm.base_fields}
             ),
@@ -322,19 +379,10 @@ def manage_requests(request):
 
 @manager_required
 def manage_users(request):
-    rows = Identity.objects.filter(user__isnull=False, is_owner=False).order_by("-created_at")[:100]
-    return render(
-        request,
-        "accounts/users.html",
-        {
-            "rows": [
-                {
-                    "identity": item,
-                }
-                for item in rows
-            ]
-        },
-    )
+    rows = Paginator(
+        Identity.objects.filter(user__isnull=False, is_owner=False).order_by("-created_at", "-pk"), 20
+    ).get_page(request.GET.get("page"))
+    return render(request, "accounts/users.html", {"rows": rows})
 
 
 @require_POST
@@ -351,6 +399,7 @@ def switches(request):
             setattr(policy, key, value)
         policy.save()
         services.audit("pilot_controls_changed", request.access_profile, request.user)
+    messages.success(request, bilingual("Registration controls saved."))
     return redirect("accounts:manage_requests")
 
 
@@ -379,6 +428,7 @@ def retry_notification(request):
 
             transaction.on_commit(request_delivery)
             services.audit("notification_retry", notification.identity, request.user)
+            messages.success(request, bilingual("Notification queued for another delivery attempt."))
     return redirect("accounts:manage_requests")
 
 
@@ -408,11 +458,31 @@ def manage_feedback(request):
                         f"reply:{ticket.pk}:{ticket.updated_at.isoformat()}",
                         "Your feedback has a reply. Sign in and open /feedback/ to read it.",
                     )
+        messages.success(request, bilingual("Reply and ticket status saved."))
         return redirect("accounts:manage_feedback")
+    tickets = Paginator(
+        SupportTicket.objects.select_related("identity").order_by("-created_at", "-pk"), 20
+    ).get_page(request.GET.get("page"))
+    bound_visible = False
+    for ticket in tickets:
+        if form.is_bound and request.POST.get("ticket_id") == str(ticket.pk):
+            ticket.reply_form = form
+            bound_visible = True
+        else:
+            ticket.reply_form = forms.ReplyForm(
+                initial={
+                    "ticket_id": ticket.pk,
+                    "category": ticket.category,
+                    "reply": ticket.reply,
+                    "internal_note": ticket.internal_note,
+                    "status": ticket.status,
+                }
+            )
+        ticket.reply_form.auto_id = f"ticket-{ticket.pk}-%s"
     return render(
         request,
         "accounts/manage_feedback.html",
-        {"tickets": SupportTicket.objects.order_by("-created_at")[:100], "form": form},
+        {"tickets": tickets, "form": form, "bound_ticket_visible": bound_visible},
     )
 
 

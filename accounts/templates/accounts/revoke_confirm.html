@@ -1,0 +1,6 @@
+{% extends 'base.html' %}{% load account_ui %}{% block title %}Confirm revocation{% endblock %}
+{% block content %}<section class="card"><div class="card-body">
+<h1 class="h3">{% ui 'Confirm revocation' %}</h1><p>{{ identity.nickname }} · {{ identity.email }}</p>
+<p>{% ui 'Revoking access is permanent. This person will lose access to saved results and tickets. To pause access temporarily, choose Suspend instead.' %}</p>
+<form method="post">{% csrf_token %}<input type="hidden" name="identity_id" value="{{ identity.pk }}"><input type="hidden" name="action" value="revoke"><input type="hidden" name="confirm_revoke" value="true"><div class="d-flex flex-wrap gap-3"><button class="btn btn-danger" type="submit">{% ui 'Confirm revocation' %}</button><a class="btn btn-outline-secondary" href="{% url 'accounts:manage_requests' %}">{% ui 'Cancel' %}</a></div></form>
+</div></section>{% endblock %}

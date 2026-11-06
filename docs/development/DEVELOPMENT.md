@@ -1,6 +1,7 @@
 ---
 title: Developer Handbook
-status: CURRENT_PARTIAL
+language: en
+status: CURRENT_VERIFIED
 owner: Andrea Zedda
 audience: developers and maintainers
 last_verified_at: 2026-11-06
@@ -13,7 +14,7 @@ This is the entry point for working on the **existing bmyCure4MM application**. 
 !!! tip "Choose your starting point"
     **Using the platform:** follow the [access and first-use guide](../operations/AUTHENTICATION_AND_ACCESS.md#short-user-guide).
 
-    **Changing the code:** start with the disposable environment below, then use the code atlas and two traced workflows.
+    **Changing the code:** start with the disposable environment below, then use the [source/data atlas](CODE_ATLAS.md), two traced workflows and [manual diagnosis exercises](TROUBLESHOOTING.md).
 
     **Understanding the model:** open the [runtime equations and illustrated explanation](../guides/mathematical_models_en.md), [model registry](../models/REGISTRY.md) and [run-manifest contract](../research/RUN_MANIFESTS.md).
 
@@ -24,12 +25,16 @@ Use Python 3.11 or 3.12 and the checked-in `uv.lock`. Work with an empty local d
 ```bash
 uv sync --frozen --extra chemistry
 export DJANGO_SETTINGS_MODULE=mmportal.settings_test
+export DJANGO_DEBUG=1
+export DJANGO_SECURE_SSL_REDIRECT=0
+unset BMY_TEST_DATABASE_NAME
 export BMY_TEST_ROOT="$(mktemp -d /tmp/bmy-development.XXXXXX)"
 uv run python manage.py migrate --noinput
+uv run python manage.py ensure_learning_example
 uv run python manage.py runserver 127.0.0.1:8001
 ```
 
-`mmportal.settings_test` redirects database, test database, media, logs and static output into `BMY_TEST_ROOT`. It uses a local in-memory email backend and reduced password hashing for isolated verification. **Never deploy this settings module.** For the browser onboarding test, use the dedicated SMTP sink command below: no external mailbox or credentials are required.
+`mmportal.settings_test` redirects database, test database, media, logs and static output into `BMY_TEST_ROOT`. It uses a local in-memory email backend and reduced password hashing for isolated verification. **Never deploy this settings module.** An empty isolated database intentionally has no patients or default user. `ensure_learning_example` adds one independently synthetic learning example only when the existing Scenario catalogue is empty; it does not overwrite or reactivate existing scenarios. The local in-memory mail backend does not expose manual activation links. For a complete reproducible onboarding/learning walkthrough, use the dedicated SMTP-sink browser command below: its temporary fixture is created independently and requires no external mailbox or credentials.
 
 The optional `chemistry` extra installs RDKit for molecular workflows. Core checks can run without it. See [dependency profiles](../operations/DEPENDENCIES.md) rather than installing unpinned packages to fix an import.
 
@@ -41,12 +46,14 @@ The web application, Celery and Redis are existing components. In separate termi
 
 ```bash
 redis-server --bind 127.0.0.1
-uv run celery -A mmportal worker --loglevel=info
+uv run celery -A mmportal worker --pool=solo --loglevel=info
 ```
 
 Start only services you own. Stop them through their own terminal or service manager. Synchronous eager tasks are a test convenience and do not demonstrate safe production scheduling. The basic learning simulation still follows its existing execution path; this access release does not introduce a second simulation worker or a new global compute budget.
 
 ## Code atlas
+
+For exact signatures, clickable source anchors, model fields, failure modes and test mapping, open the [source/data/runtime atlas](CODE_ATLAS.md). The table below is the orientation map.
 
 | Area | Entry points | Reads and writes | Boundary |
 | --- | --- | --- | --- |
@@ -119,7 +126,7 @@ flowchart LR
     F --> G[Authorized result and export]
 ```
 
-`SimulationAttempt.run_model` in `simulator/models.py` resolves model inputs, applies PK/PD schedules, calls the runtime in `simulator/models_simulation.py`, then derives trajectory summaries and artifacts. The scenario is a starting point; changing inputs must not mutate the shared example. Follow result/export selectors in `simulator/views.py` and the cross-user checks in `accounts/tests/test_existing_site.py`.
+`SimulationAttempt.run_model` in `simulator/models.py` resolves model inputs, applies PK/PD schedules, calls the runtime in `simulator/models_simulation.py`, then derives trajectory summaries and artifacts. The scenario is a starting point; changing inputs must not mutate the shared example. Follow result/export selectors in `simulator/views_manage.py` and the cross-user checks in `accounts/tests/test_existing_site.py`.
 
 The model documentation explains the existing tumor equation:
 
@@ -141,6 +148,7 @@ uv run ruff check .
 uv run ruff format --check .
 uv run mypy
 uv run python -m scripts.check_repository_hygiene
+uv run python -m scripts.check_developer_atlas
 uv run python -m scripts.check_numerical_baseline
 uv run python -m scripts.audit_dependencies
 DJANGO_SETTINGS_MODULE=mmportal.settings_test uv run python manage.py check
@@ -153,9 +161,10 @@ For real browser forms, CSRF, two independent users, owner TOTP, private ticket 
 
 ```bash
 uv sync --frozen --group screenshots
+uv run --frozen --group screenshots playwright install chromium
 DJANGO_SETTINGS_MODULE=mmportal.settings_test \
 BMY_TEST_ROOT="$(mktemp -d /tmp/bmy-browser.XXXXXX)" \
-uv run --frozen --group screenshots python manage.py test accounts.tests.browser_journey --noinput
+uv run --frozen --group screenshots python manage.py test accounts.tests.browser_journey docs_viewer.tests.browser_audit --noinput
 ```
 
 | Evidence | Proves | Does not prove |
@@ -166,7 +175,7 @@ uv run --frozen --group screenshots python manage.py test accounts.tests.browser
 | Production smoke | Routes, assets, source identity and runtime metadata | Full clinical authorization audit |
 | Owner login and MFA | Owner can enter the product console | First external researcher acceptance |
 
-Do not update golden numerical output to conceal a regression. A reported skip, unavailable backend or inaccessible production page remains a limitation. The complete forensic knowledge atlas tracked by issue #79 still needs independent maintainer validation; this handbook does not mark that wider task complete.
+Do not update golden numerical output to conceal a regression. A reported skip, unavailable backend or inaccessible production page remains a limitation. The [source/data/runtime atlas](CODE_ATLAS.md) and [executed audit record](AUDIT_VERIFICATION_2026_11_06.md) now provide the implementation map and manual commands. Issue #79 still requires independent human maintainer acceptance; an automated command run cannot satisfy that human gate.
 
 ## Actual runtime and release operations
 

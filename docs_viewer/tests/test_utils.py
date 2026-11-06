@@ -211,3 +211,55 @@ class ReferenceRenderingTests(SimpleTestCase):
             Path(base, 'docs/linked.md').symlink_to(private)
             with self.settings(BASE_DIR=base):
                 self.assertFalse(is_safe_path('docs/linked.md'))
+
+    def test_symlink_destination_must_be_whitelisted_markdown(self):
+        with tempfile.TemporaryDirectory() as root:
+            base = Path(root)
+            Path(base, 'docs').mkdir()
+            Path(base, 'private.md').write_text('Synthetic private sentinel')
+            Path(base, 'docs/private.txt').write_text('Synthetic non-document sentinel')
+            Path(base, 'docs/public.md').write_text('# Public documentation')
+            Path(base, 'docs/internal.md').symlink_to(base / 'private.md')
+            Path(base, 'docs/wrong-type.md').symlink_to(base / 'docs/private.txt')
+            Path(base, 'docs/allowed.md').symlink_to(base / 'docs/public.md')
+            Path(base, 'docs/loop.md').symlink_to(base / 'docs/loop.md')
+            with self.settings(BASE_DIR=base):
+                self.assertFalse(is_safe_path('docs/internal.md'))
+                self.assertFalse(is_safe_path('docs/wrong-type.md'))
+                self.assertFalse(is_safe_path('docs/loop.md'))
+                self.assertTrue(is_safe_path('docs/allowed.md'))
+                self.assertEqual(get_allowed_doc_paths(), ['docs/allowed.md', 'docs/public.md'])
+
+
+class DocumentationSourceReferenceTests(SimpleTestCase):
+    def test_public_source_reference_uses_image_revision_and_does_not_expose_code(self):
+        from unittest.mock import patch
+        with patch.dict(os.environ, {'BMY_SOURCE_SHA': 'a' * 40}):
+            html, _ = render_markdown('[Source](../../accounts/services.py#L12)', source_path='docs/development/DEVELOPMENT.md')
+            self.assertIn('https://github.com/andreazedda/bmyCure4MM/blob/' + 'a' * 40 + '/accounts/services.py#L12', html)
+            self.assertNotIn('/docs/view/accounts/services.py', html)
+
+    def test_source_reference_rejects_data_and_external_symlinks(self):
+        from docs_viewer.utils import repository_source_url
+        from django.test import override_settings
+        with tempfile.TemporaryDirectory() as root, tempfile.TemporaryDirectory() as external:
+            base = Path(root)
+            (base / 'accounts').mkdir()
+            (base / 'accounts' / 'private.json').write_text('{}')
+            (Path(external) / 'secret.py').write_text('# private test only')
+            (base / 'accounts' / 'secret.py').symlink_to(Path(external) / 'secret.py')
+            with override_settings(BASE_DIR=base):
+                self.assertEqual(repository_source_url('accounts/private.json'), '')
+                self.assertEqual(repository_source_url('accounts/secret.py'), '')
+
+    def test_actual_operator_runbook_is_readable_via_docs_allowlist(self):
+        self.assertTrue(is_safe_path('deploy/k8s/DEPLOY_K3S.md'))
+        html, _ = render_markdown('[Operations](../../deploy/k8s/DEPLOY_K3S.md)', source_path='docs/development/DEVELOPMENT.md')
+        self.assertIn('/docs/view/deploy/k8s/DEPLOY_K3S.md', html)
+
+    def test_known_and_declared_document_languages_do_not_guess_mixed_docs(self):
+        from docs_viewer.utils import document_language
+        self.assertEqual(document_language('# Modelli', 'docs/guides/mathematical_models.md'), 'it')
+        self.assertEqual(document_language('# Models', 'docs/guides/mathematical_models_en.md'), 'en')
+        self.assertEqual(document_language('---\nlanguage: it\n---\n# Guida', 'docs/development/test.md'), 'it')
+        self.assertEqual(document_language('# English / Italiano', 'docs/reference/database_objects.md'), '')

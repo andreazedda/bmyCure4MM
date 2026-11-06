@@ -1,5 +1,10 @@
 # Database Objects (Model ↔ Table ↔ File)
 
+This legacy quick map covers Clinic/Simulator/ChemTools; the current [source/data atlas](../development/CODE_ATLAS.md#data-model-and-storage-boundaries) adds account lifecycle, private tickets, Twin lineage, immutable manifests and invalidation. Its machine inventory records declared field types and relationships from the audited source. The table names here do not grant permission to query real records.
+
+Run ORM/SQL examples only inside the disposable environment described in the [handbook](../development/DEVELOPMENT.md), using independently synthetic records. Production uses `/data/db.sqlite3` on its existing data PVC; never infer the active database from a filename in the workspace. Do not import a clinical dump to make an example query succeed.
+
+
 === "IT"
     Questa pagina è pensata per “orientarsi” velocemente: dato un nome (es. `PatientTherapy`) vuoi sapere:
 

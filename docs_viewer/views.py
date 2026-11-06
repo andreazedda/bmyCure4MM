@@ -3,8 +3,9 @@ Views for documentation viewer with security controls.
 """
 import os
 from django.shortcuts import render, redirect
-from django.http import Http404, HttpResponse
+from django.http import HttpResponse
 from django.conf import settings
+from django.core.paginator import Paginator
 from django.contrib import messages
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_http_methods
@@ -17,6 +18,8 @@ from .utils import (
     get_breadcrumbs,
     sanitize_path,
     validate_markdown_links,
+    document_metadata,
+    document_language,
 )
 from .models import DocumentView
 
@@ -37,9 +40,14 @@ def docs_index(request):
         if directory not in organized:
             organized[directory] = []
         
+        try:
+            with open(os.path.join(settings.BASE_DIR, doc_path), encoding='utf-8') as source:
+                label = extract_title(source.read())
+        except OSError:
+            continue
         organized[directory].append({
             'path': doc_path,
-            'name': os.path.basename(doc_path),
+            'name': label if label != 'Untitled Document' else os.path.basename(doc_path),
             'url': f'/docs/view/{doc_path}',
         })
     
@@ -51,6 +59,7 @@ def docs_index(request):
     return render(request, 'docs_viewer/index.html', context)
 
 
+@never_cache
 def docs_view(request, path):
     """
     View a documentation file with security checks.
@@ -65,15 +74,15 @@ def docs_view(request, path):
     
     # Security check
     if not is_safe_path(path):
-        raise Http404("Documentation file not found or access denied")
+        return render(request, 'docs_viewer/not_found.html', status=404)
     
     # Read file
     full_path = os.path.join(settings.BASE_DIR, path)
     try:
         with open(full_path, 'r', encoding='utf-8') as f:
             content = f.read()
-    except Exception as e:
-        raise Http404(f"Error reading file: {str(e)}")
+    except OSError:
+        return render(request, 'docs_viewer/not_found.html', status=404)
     
     # Render markdown
     html_content, toc_html = render_markdown(content, source_path=path)
@@ -107,6 +116,8 @@ def docs_view(request, path):
         'path': path,
         'raw_url': f'/docs/raw/{path}',
         'broken_links': broken_links,
+        'document_metadata': document_metadata(content),
+        'document_language': document_language(content, path),
     }
     
     return render(request, 'docs_viewer/view.html', context)
@@ -123,15 +134,15 @@ def docs_raw(request, path):
     
     # Security check
     if not is_safe_path(path):
-        raise Http404("Documentation file not found or access denied")
+        return render(request, 'docs_viewer/not_found.html', status=404)
     
     # Read file
     full_path = os.path.join(settings.BASE_DIR, path)
     try:
         with open(full_path, 'r', encoding='utf-8') as f:
             content = f.read()
-    except Exception as e:
-        raise Http404(f"Error reading file: {str(e)}")
+    except OSError:
+        return render(request, 'docs_viewer/not_found.html', status=404)
     
     # Serve as plain text
     response = HttpResponse(content, content_type='text/plain; charset=utf-8')
@@ -140,10 +151,11 @@ def docs_raw(request, path):
     return response
 
 
+@never_cache
 @require_http_methods(["GET"])
 def docs_search(request):
     """Search documentation content."""
-    query = request.GET.get('q', '').strip()
+    query = request.GET.get('q', '').strip()[:200]
     
     if not query:
         return redirect('docs_viewer:index')
@@ -152,6 +164,8 @@ def docs_search(request):
     docs = get_allowed_doc_paths()
     
     for doc_path in docs:
+        if not is_safe_path(doc_path):
+            continue
         full_path = os.path.join(settings.BASE_DIR, doc_path)
         
         try:
@@ -169,7 +183,7 @@ def docs_search(request):
                 
                 results.append({
                     'path': doc_path,
-                    'name': os.path.basename(doc_path),
+                    'name': extract_title(content) if extract_title(content) != 'Untitled Document' else os.path.basename(doc_path),
                     'url': f'/docs/view/{doc_path}',
                     'matches': len(matching_lines),
                     'preview': matching_lines[0][1][:200] if matching_lines else '',
@@ -180,9 +194,11 @@ def docs_search(request):
     # Sort by number of matches
     results.sort(key=lambda x: x['matches'], reverse=True)
     
+    page = Paginator(results, 20).get_page(request.GET.get('page'))
     context = {
         'query': query,
-        'results': results,
+        'results': page.object_list,
+        'page': page,
         'total_results': len(results),
     }
     
