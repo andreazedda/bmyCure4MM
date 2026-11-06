@@ -82,6 +82,25 @@ jobs:
           test -n "$image_id"
           echo "container_image_id=${image_id}" >> "$GITHUB_STEP_SUMMARY"
 
+  registration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DJANGO_SETTINGS_MODULE: mmportal.settings_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: astral-sh/setup-uv@v7
+        with:
+          version: "0.12.3"
+          enable-cache: true
+      - run: uv sync --frozen --group screenshots
+      - run: uv run --frozen --group screenshots playwright install --with-deps chromium
+      - run: uv run --frozen --group screenshots python manage.py test accounts.tests --noinput
+      - run: uv run --frozen --group screenshots python manage.py test accounts.tests.browser_journey --noinput
+
   required:
     name: required
     if: ${{ always() }}
@@ -89,6 +108,7 @@ jobs:
       - locked-quality
       - core-without-chemistry
       - docker-lock
+      - registration
     runs-on: ubuntu-latest
     steps:
       - name: Enforce the protected aggregate result
@@ -96,6 +116,7 @@ jobs:
           LOCKED_QUALITY_RESULT: ${{ needs.locked-quality.result }}
           CORE_RESULT: ${{ needs.core-without-chemistry.result }}
           DOCKER_RESULT: ${{ needs.docker-lock.result }}
+          REGISTRATION_RESULT: ${{ needs.registration.result }}
         run: |
           set -euo pipefail
           printf 'locked-quality=%s\n' "$LOCKED_QUALITY_RESULT"
@@ -104,4 +125,5 @@ jobs:
           test "$LOCKED_QUALITY_RESULT" = "success"
           test "$CORE_RESULT" = "success"
           test "$DOCKER_RESULT" = "success"
+          test "$REGISTRATION_RESULT" = "success"
           echo "M0_R_REQUIRED_GATE=PASS" >> "$GITHUB_STEP_SUMMARY"

@@ -15,6 +15,7 @@ from simulator.api_help import help_item, help_search
 from simulator.api_ux import audit as ux_audit
 
 urlpatterns = [
+    path("", include("accounts.urls")),
     path("admin/", admin.site.urls),
     path("", portal_views.home, name="home"),
     path("", include(("clinic.urls", "clinic"), namespace="clinic")),

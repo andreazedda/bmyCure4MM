@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+{% if request.access_profile and not request.access_profile.is_owner %}<div class="alert alert-success"><h2 class="h5"><span class="t-en">Welcome, {{ request.access_profile.nickname }}. Start here.</span><span class="t-it">Benvenuto, {{ request.access_profile.nickname }}. Inizia da qui.</span></h2><p><span class="t-en">Follow this existing guide, open the learning scenarios, and use your tickets to send suggestions, report problems or ask questions. Never enter real patient data.</span><span class="t-it">Segui questa guida, apri gli scenari didattici e usa i tuoi ticket per inviare suggerimenti, segnalare problemi o fare domande. Non inserire dati di pazienti reali.</span></p><a class="btn btn-primary" href="{% url 'simulator:scenario_list' %}"><span class="t-en">Explore the learning scenarios</span><span class="t-it">Esplora gli scenari didattici</span></a> <a class="btn btn-outline-primary" href="{% url 'accounts:feedback' %}"><span class="t-en">Send a suggestion / ticket</span><span class="t-it">Invia suggerimento / ticket</span></a></div>{% endif %}
 <div class="row justify-content-center">
     <div class="col-lg-9">
         <div class="card shadow-sm mb-4">

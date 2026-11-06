@@ -7,9 +7,10 @@ requires-python = ">=3.11,<3.13"
 license = { text = "MIT" }
 dependencies = [
   "celery==5.5.3",
+  "cryptography==50.0.2",
   "django==5.2.17",
   "django-filter==25.1",
-  "djangorestframework==3.16.1",
+  "djangorestframework==3.18.2",
   "gunicorn==23.0.0",
   "jsonschema==4.23.0",
   "markdown==3.9",
@@ -18,13 +19,14 @@ dependencies = [
   "optuna==4.5.0",
   "pandas==2.2.3",
   "plotly==6.3.1",
+  "pyotp==2.10.0",
   "pyyaml==6.0.2",
   "redis==6.4.0",
   "requests==2.33.0",
   "scipy==1.13.1",
   # Security floors for transitive runtime dependencies.
   "sqlparse==0.6.0",
-  "urllib3==2.7.0",
+  "urllib3==2.8.0",
 ]
 
 [project.optional-dependencies]
@@ -60,10 +62,11 @@ security = [
 ]
 docs = [
   "mkdocs==1.6.1",
-  "mkdocs-material==9.7.1",
+  "mkdocs-material==9.7.7",
   "pymdown-extensions==11.0.1",
 ]
 screenshots = [
+  "aiosmtpd==1.4.6",
   "playwright==1.55.0",
   "pytest-playwright==0.7.1",
 ]
@@ -80,13 +83,15 @@ environments = [
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "mmportal.settings"
 python_files = ["test_*.py"]
-testpaths = ["mmportal/tests", "simulator/tests", "twin_engine/tests", "clinic/tests", "chemtools/tests", "docs_viewer/tests", "tests"]
+testpaths = ["mmportal/tests", "accounts/tests", "simulator/tests", "twin_engine/tests", "clinic/tests", "chemtools/tests", "docs_viewer/tests", "tests"]
 
 [tool.ruff]
 target-version = "py311"
 line-length = 110
 include = [
   "pyproject.toml",
+  "accounts/**/*.py",
+  "mmportal/settings_test.py",
   "scripts/*.py",
   "mmportal/governance.py",
   "simulator/models_simulation.py",
@@ -111,6 +116,7 @@ select = ["E4", "E7", "E9", "F", "I"]
 [tool.ruff.lint.per-file-ignores]
 "test_*.py" = ["E402"]
 "tests/**/*.py" = ["E402"]
+"mmportal/settings_test.py" = ["E402", "F405"]
 
 [tool.mypy]
 python_version = "3.11"

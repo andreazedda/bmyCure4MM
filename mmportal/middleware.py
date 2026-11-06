@@ -37,16 +37,16 @@ class ActivityLoggingMiddleware:
         error: str | None = None,
     ) -> None:
         user = getattr(request, "user", None)
-        username = user.get_username() if getattr(user, "is_authenticated", False) else "anonymous"
+        username = str(user.pk) if getattr(user, "is_authenticated", False) else "anonymous"
         activity_logger.info(
             "user=%s method=%s path=%s status=%s duration_ms=%.2f ip=%s%s",
             username,
             request.method,
-            request.get_full_path(),
+            getattr(getattr(request, "resolver_match", None), "view_name", "unresolved"),
             status_code,
             duration_ms,
-            request.META.get("REMOTE_ADDR", "unknown"),
-            f" error={error}" if error else "",
+            "redacted",
+            " error=REQUEST_FAILED" if error else "",
         )
 
 
@@ -97,15 +97,15 @@ class EmbedDebugMiddleware:
     ) -> None:
         try:
             user = getattr(request, "user", None)
-            username = user.get_username() if getattr(user, "is_authenticated", False) else "anonymous"
+            username = str(user.pk) if getattr(user, "is_authenticated", False) else "anonymous"
 
             # Request headers that are useful for iframe debugging.
-            origin = request.META.get("HTTP_ORIGIN", "")
-            referer = request.META.get("HTTP_REFERER", "")
+            origin = "redacted"
+            referer = "redacted"
             sec_fetch_dest = request.META.get("HTTP_SEC_FETCH_DEST", "")
             sec_fetch_site = request.META.get("HTTP_SEC_FETCH_SITE", "")
             sec_fetch_mode = request.META.get("HTTP_SEC_FETCH_MODE", "")
-            ua = request.META.get("HTTP_USER_AGENT", "")
+            ua = "redacted"
 
             # Response headers that commonly break embeds.
             status = getattr(response, "status_code", 500)
@@ -117,7 +117,7 @@ class EmbedDebugMiddleware:
                 "user=%s method=%s path=%s status=%s duration_ms=%.2f xfo=%r csp=%r ct=%r origin=%r referer=%r sec_dest=%r sec_site=%r sec_mode=%r ua=%r%s",
                 username,
                 request.method,
-                request.get_full_path(),
+                getattr(getattr(request, "resolver_match", None), "view_name", "unresolved"),
                 status,
                 duration_ms,
                 xfo,
@@ -129,7 +129,7 @@ class EmbedDebugMiddleware:
                 sec_fetch_site,
                 sec_fetch_mode,
                 ua,
-                f" error={error}" if error else "",
+                " error=REQUEST_FAILED" if error else "",
             )
         except Exception:
             # Never break requests due to logging.

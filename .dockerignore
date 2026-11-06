@@ -21,6 +21,10 @@ logs
 *.log
 
 # Local DB/media/static artifacts
+local_private
+artifacts
+outputs
+data
 *.sqlite3
 *.db
 db.sqlite3
