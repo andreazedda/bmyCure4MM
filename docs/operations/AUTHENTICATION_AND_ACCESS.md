@@ -106,6 +106,44 @@ Run disposable backend tests with `BMY_TEST_ROOT=/tmp/bmy-registration-check DJA
 
 ## Verified runtime evidence — 2026-11-06
 
+### Latest verified application release: PR #84
+
+The deployed application source is `abbb98f8bb5c0f121d9469a19bee36a5e3e2a5a8`,
+image index `sha256:47bb2811561bd34a385df91e3bdb942576ddb07940951e36b3ea317929465d66`.
+Protected feature head `2a19c73cf149b7afcee2f853e43e38cee5c3d255` passed required CI;
+456 discovered local Django tests passed on disposable SQLite. The reviewed
+image passed all 29 account tests on disposable SQLite on the actual NFS PVC:
+46.658 seconds test cases, 112.11 seconds runner, peak RSS 268396 KiB, with an
+unchanged 1 CPU / 512 MiB test ceiling. This includes expired-verification retry
+without public status disclosure. Tests use an isolated email sink.
+
+Controlled Job `accounts-release-abbb98f` completed: private online backup restored
+into memory with `quick_check=ok`, bootstrap preserved ACTIVE nonstaff owner/MFA
+and both owner-selected open gates, and static assets were present. No migrations
+were pending. Web and both existing worker pods reported the expected source and
+digest, no `/app/.git`, CPU cgroup `100000 100000` and memory ceiling `1073741824`.
+Both rollouts completed. Notification maintenance was resumed on the same digest;
+a new successful run completed at 19:15:11 UTC. No additional real diagnostic mail
+was sent for this backend-only update.
+
+All 20 public route/asset probes passed after rollout, including protected-route
+denial, correct CSS/JS MIME types, secure cookies, HSTS and HTTP-to-HTTPS 308.
+Production migration drift returned no changes; `check --deploy` retained only
+the documented W019. Intermittent API readiness/timeouts and NFS waits recurred
+during preparation; the controlled Job recovered and passed without raising
+budgets, resetting etcd or changing other projects. This does not establish
+long-term infrastructure or Redis/broker health.
+
+Rollback target is the previous clean product source `55a556b0c5cf4b8dc95ef6be6d0a6bc873cc1a3c`,
+digest `sha256:56a4beb7e54153f7cba30af4de3e5240feb2f23265e9702b33f0f7e19c43f80d`.
+Preserve additive schema, secrets, MFA and PVCs. The earlier release history below
+remains for traceability; the current image is the PR #84 digest above. Visual
+captures from PR #82 still describe the unchanged UI/email templates. Pages
+publication recovered after the two earlier provider failures and passed on
+source `abbb98f`.
+
+### Earlier verified release history
+
 Protected PRs #80 and #81 are merged. Web (one ready replica), existing Celery (two ready replicas) and account notification maintenance use source `2d464f68341378186c156e413cdcafa2dbfd84cd`, index digest `sha256:a37165e803b9d2a8f70d3782b71c5df71293edaefd0bde86ecdf1733f29dcec6`. Runtime source was read back and `/app/.git` is absent. Source lineage now comes from the explicit build SHA. Routine startup migration/static flags are disabled.
 
 The subsequent reviewed UX release (PR #82) was deployed from source `55a556b0c5cf4b8dc95ef6be6d0a6bc873cc1a3c`, digest `sha256:56a4beb7e54153f7cba30af4de3e5240feb2f23265e9702b33f0f7e19c43f80d`. Web and worker runtime source were read back, and both rollouts completed. The controlled release Job restored its private online backup into memory, preserved ACTIVE owner/MFA and both owner-selected open gates, and verified the new documentation assets. Static account/admin/docs CSS/JS and model figures returned 200 with correct MIME types. A new diagnostic notification traversed the real outbox/Gmail transport and was independently found in the owner mailbox at 18:28:15 UTC; no activation token or password was included.
@@ -138,7 +176,7 @@ An online SQLite backup was restored into memory on the target and passed `quick
 | USER_FEEDBACK | PASS | Two independent authors; private replies persist across login |
 | SESSION_REVOCATION_AND_EXPIRY | PASS | Backend/browser access-state and version tests |
 | EMAIL_TRANSPORT | PASS | Actual Gmail TLS authentication and SMTP acceptance |
-| EMAIL_RECEIPT | PASS | Owner activation message only, independently verified |
+| EMAIL_RECEIPT | PASS | Owner activation and diagnostic message, independently verified |
 | DESKTOP_AND_MOBILE_E2E | PASS | Isolated browser journey; not human researcher acceptance |
 | PRODUCTION_DEPLOYMENT | PASS | Digest/source/replica readback for access hardening above |
 | PRODUCTION_SMOKE | PASS | Routes, assets, denial, HTTPS and secure headers; bounded surface |

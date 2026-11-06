@@ -20,6 +20,15 @@ Daily approvals and tickets use the product console, without these commands.
   `55a556b0c5cf4b8dc95ef6be6d0a6bc873cc1a3c`, published digest
   `sha256:56a4beb7e54153f7cba30af4de3e5240feb2f23265e9702b33f0f7e19c43f80d`.
 
+
+- Current verified application: PR #84, tested head
+  `2a19c73cf149b7afcee2f853e43e38cee5c3d255`, merged source
+  `abbb98f8bb5c0f121d9469a19bee36a5e3e2a5a8`, deployed index digest
+  `sha256:47bb2811561bd34a385df91e3bdb942576ddb07940951e36b3ea317929465d66`.
+  Web and two workers are ready on `lenovo2`; cgroup ceilings match the budgets
+  below. Controlled Job `accounts-release-abbb98f` and fresh notification
+  maintenance passed; owner/MFA/gates and persistence were preserved.
+
 On 2026-11-06 the control plane became unstable: `lenovo-master` was NotReady
 and unreachable over SSH, other API endpoints repeatedly failed etcd readiness
 with no leader, and a worker briefly failed GHCR DNS lookup. Image publication
@@ -56,9 +65,9 @@ collectstatic on the existing PVC. It does not send passwords, run simulations
 or introduce a new application. A failed backup check prevents migrations.
 
 ```bash
-export BMY_RELEASE_ID=55a556b
+export BMY_RELEASE_ID=abbb98f
 export BMY_RELEASE_NODE=lenovo2
-export BMY_RELEASE_DIGEST=sha256:56a4beb7e54153f7cba30af4de3e5240feb2f23265e9702b33f0f7e19c43f80d
+export BMY_RELEASE_DIGEST=sha256:47bb2811561bd34a385df91e3bdb942576ddb07940951e36b3ea317929465d66
 python3 - <<'PY' > /tmp/bmy-accounts-release.yaml
 import os
 from pathlib import Path
@@ -85,9 +94,9 @@ the Job passes, or its equivalent scoped commands:
 
 ```bash
 ssh -o BatchMode=yes -o StrictHostKeyChecking=yes lenovo3 \
-  'sudo -n k3s kubectl --request-timeout=20s -n bmycure4mm set image deployment/web web=ghcr.io/andreazedda/bmycure4mm@sha256:56a4beb7e54153f7cba30af4de3e5240feb2f23265e9702b33f0f7e19c43f80d'
+  'sudo -n k3s kubectl --request-timeout=20s -n bmycure4mm set image deployment/web web=ghcr.io/andreazedda/bmycure4mm@sha256:47bb2811561bd34a385df91e3bdb942576ddb07940951e36b3ea317929465d66'
 ssh -o BatchMode=yes -o StrictHostKeyChecking=yes lenovo3 \
-  'sudo -n k3s kubectl --request-timeout=20s -n bmycure4mm set image deployment/celery celery=ghcr.io/andreazedda/bmycure4mm@sha256:56a4beb7e54153f7cba30af4de3e5240feb2f23265e9702b33f0f7e19c43f80d'
+  'sudo -n k3s kubectl --request-timeout=20s -n bmycure4mm set image deployment/celery celery=ghcr.io/andreazedda/bmycure4mm@sha256:47bb2811561bd34a385df91e3bdb942576ddb07940951e36b3ea317929465d66'
 ```
 
 Keep web/Celery startup `DJANGO_MIGRATE=0` and `DJANGO_COLLECTSTATIC=0`, existing
@@ -144,7 +153,8 @@ health/readiness, account JS, admin CSS/JS, docs CSS/figures, owner state and
 email outbox status. Use desktop/mobile browser checks. Never consume the
 owner's activation token or take a screenshot of a real authenticator seed.
 
-For this release the previous clean product image is the `2d464f6` digest above.
+For PR #84 the previous clean product image is source `55a556b`, digest
+`sha256:56a4beb7e54153f7cba30af4de3e5240feb2f23265e9702b33f0f7e19c43f80d`.
 Pause new requests/activations through the owner console if rollback needs an
 outage; repin web, Celery and notification maintenance to that digest and verify
 readiness. Leave additive account tables/index in place. No schema downgrade,
