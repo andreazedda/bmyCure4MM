@@ -97,6 +97,7 @@ INSTALLED_APPS = [
     "twin_engine",
     "docs_viewer",
     "rest_framework",
+    "accounts",
 ]
 
 MIDDLEWARE = [
@@ -105,6 +106,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "accounts.middleware.ProductAccessMiddleware",
     "mmportal.middleware.EmbedDebugMiddleware",
     "mmportal.middleware.ActivityLoggingMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -199,8 +201,27 @@ MEDIA_URL = "/media/"
 _media_root = os.environ.get("DJANGO_MEDIA_ROOT")
 MEDIA_ROOT = Path(_media_root) if _media_root else (BASE_DIR / "media")
 
-LOGIN_URL = "/admin/login/"
-LOGIN_REDIRECT_URL = "/"
+LOGIN_URL = "/accounts/login/"
+LOGIN_REDIRECT_URL = "/sim/getting-started/"
+AUTHENTICATION_BACKENDS = ["django.contrib.auth.backends.ModelBackend", "accounts.backends.VerifiedEmailBackend"]
+PUBLIC_BASE_URL = os.environ.get("PUBLIC_BASE_URL", "")
+PLATFORM_OWNER_EMAIL = os.environ.get("PLATFORM_OWNER_EMAIL", "")
+PLATFORM_OWNER_USERNAME = os.environ.get("PLATFORM_OWNER_USERNAME", "")
+PLATFORM_OWNER_DISPLAY_NAME = os.environ.get("PLATFORM_OWNER_DISPLAY_NAME", "")
+ACCOUNT_TOKEN_ENCRYPTION_KEY = os.environ.get("ACCOUNT_TOKEN_ENCRYPTION_KEY", "")
+ACCOUNT_EMAIL_GLOBAL_HOURLY = int(os.environ.get("ACCOUNT_EMAIL_GLOBAL_HOURLY", "100"))
+ACCOUNT_EMAIL_IDENTITY_HOURLY = int(os.environ.get("ACCOUNT_EMAIL_IDENTITY_HOURLY", "10"))
+ACCOUNT_EMAIL_TASKS_ENABLED = os.environ.get("ACCOUNT_EMAIL_TASKS_ENABLED", "1") == "1"
+CELERY_BROKER_CONNECTION_TIMEOUT = 3
+EMAIL_BACKEND = os.environ.get("EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "")
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "1") == "1"
+EMAIL_USE_SSL = os.environ.get("EMAIL_USE_SSL", "0") == "1"
+EMAIL_TIMEOUT = 10
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -289,6 +310,7 @@ MESSAGE_TAGS = {
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
+        "accounts.permissions.ExistingDataAccess",
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",

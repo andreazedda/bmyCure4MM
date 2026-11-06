@@ -4,6 +4,7 @@
 
 {% block content %}
 <div class="container-fluid py-4">
+    {% if not request.user.is_authenticated %}<div class="alert alert-success"><h2 class="h5"><span class="t-en">New here? Request an account to explore the platform</span><span class="t-it">Sei qui per la prima volta? Richiedi un account per provare la piattaforma</span></h2><p><span class="t-en">Register with your email and nickname. After email verification and Andrea’s approval, set your password, follow the getting-started guide and send suggestions through your own tickets.</span><span class="t-it">Registrati con email e nickname. Dopo la verifica dell’email e l’approvazione di Andrea, imposta la password, segui la guida iniziale e invia suggerimenti tramite i tuoi ticket.</span></p><a class="btn btn-primary" href="{% url 'accounts:request' %}"><span class="t-en">Request access</span><span class="t-it">Richiedi accesso</span></a> <a class="btn btn-outline-primary" href="{% url 'accounts:login' %}"><span class="t-en">Already approved? Log in</span><span class="t-it">Già approvato? Accedi</span></a></div>{% endif %}
     <!-- Main Explanation Banner -->
     <div class="alert alert-primary border-primary mb-4">
         <div class="d-flex align-items-start gap-3">

@@ -28,6 +28,7 @@
             <div class="collapse navbar-collapse" id="mainNavbar">
                 {% simulator_is_editor request.user as user_is_simulator_editor %}
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    {% if not request.access_profile or request.user.is_staff %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'clinic:dashboard' %}">
                             📊 Dashboard
@@ -43,6 +44,7 @@
                             💊 Drug Discovery
                         </a>
                     </li>
+                    {% endif %}
                     <li class="nav-item">
                         <a class="nav-link fw-bold" href="{% url 'learn:scenario_list' %}"
                            data-bs-toggle="tooltip" 
@@ -55,18 +57,19 @@
                             📚 Docs
                         </a>
                     </li>
-                    <li class="nav-item">
+                    {% if not request.access_profile or request.user.is_staff %}<li class="nav-item">
                         <a class="nav-link text-warning fw-bold" href="{% url 'learn:interactive_tutorial' %}"
                            data-bs-toggle="tooltip" 
                            title="Step-by-step interactive tutorial">
                             🎓 <span class="t-en">Tutorial</span><span class="t-it">Tutorial</span>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    {% endif %}
+                    {% if not request.access_profile or request.user.is_staff %}<li class="nav-item">
                         <a class="nav-link" href="{% url 'twin_engine:research_home' %}">
                             🔬 <span class="t-en">Research</span><span class="t-it">Ricerca</span>
                         </a>
-                    </li>
+                    </li>{% endif %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'simulator:algorithm_transparency' %}"
                            data-bs-toggle="tooltip"
@@ -92,20 +95,22 @@
                             </ul>
                         </li>
                     {% endif %}
-                    <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Admin</a></li>
+                    {% if request.user.is_staff %}<li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Admin</a></li>{% endif %}
+                    {% if request.access_profile.is_owner or request.access_profile.is_approver %}<li class="nav-item"><a class="nav-link" href="{% url 'accounts:manage_requests' %}">Access requests</a></li><li class="nav-item"><a class="nav-link" href="{% url 'accounts:manage_feedback' %}">User tickets</a></li>{% elif request.access_profile %}<li class="nav-item"><a class="nav-link" href="{% url 'accounts:feedback' %}"><span class="t-en">Suggestions / tickets</span><span class="t-it">Suggerimenti / ticket</span></a></li>{% endif %}
                 </ul>
                 <ul class="navbar-nav ms-auto">
                     {% if request.user.is_authenticated %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                {{ request.user.username }}
+                                {% if request.access_profile %}{{ request.access_profile.nickname }}{% else %}{{ request.user.username }}{% endif %}
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
-                                <li><a class="dropdown-item" href="{% url 'admin:logout' %}">Log out</a></li>
+                                <li><form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button class="dropdown-item" type="submit">Log out</button></form></li>
                             </ul>
                         </li>
                     {% else %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'admin:login' %}">Log in</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'accounts:request' %}"><span class="t-en">Register</span><span class="t-it">Registrati</span></a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'accounts:login' %}">Log in</a></li>
                     {% endif %}
                 </ul>
             </div>

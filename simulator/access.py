@@ -18,6 +18,11 @@ def accessible_assessments(user, *, base_qs: QuerySet | None = None) -> QuerySet
     - non-staff: assessments for owned patients OR demo patients (MRN startswith DEMO)
     """
     qs = base_qs if base_qs is not None else Assessment.objects.all()
+    if user and getattr(user, "is_authenticated", False):
+        from accounts.models import AccessProfile
+        profile = AccessProfile.objects.filter(user=user).first()
+        if profile and not (profile.is_owner and user.is_staff):
+            return qs.none()
 
     if not user or not getattr(user, "is_authenticated", False):
         return qs.none()

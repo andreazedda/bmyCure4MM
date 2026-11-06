@@ -1,0 +1,51 @@
+# Render RELEASE_DIGEST with the reviewed image digest before applying.
+# Bounded email/expiry maintenance only; no simulation workload or new platform.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: account-notifications
+  namespace: bmycure4mm
+spec:
+  schedule: "* * * * *"
+  suspend: true
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 90
+      backoffLimit: 1
+      ttlSecondsAfterFinished: 3600
+      template:
+        spec:
+          restartPolicy: Never
+          imagePullSecrets:
+            - name: ghcr-creds
+          containers:
+            - name: notifications
+              image: ghcr.io/andreazedda/bmycure4mm@RELEASE_DIGEST
+              command: ["python", "manage.py", "deliver_account_notifications"]
+              envFrom:
+                - configMapRef:
+                    name: bmycure4mm-env
+                - secretRef:
+                    name: bmycure4mm-secrets
+                - secretRef:
+                    name: bmycure4mm-accounts
+              env:
+                - name: ACCOUNT_EMAIL_TASKS_ENABLED
+                  value: "0"
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  cpu: 500m
+                  memory: 512Mi
+              volumeMounts:
+                - name: data
+                  mountPath: /data
+          volumes:
+            - name: data
+              persistentVolumeClaim:
+                claimName: bmycure4mm-data-nfs

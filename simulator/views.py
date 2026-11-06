@@ -1,8 +1,7 @@
 from __future__ import annotations
-
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
+from django.db.models import Q, Prefetch
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
@@ -107,14 +106,21 @@ def visibility_diagnostics(request):
 
 @login_required
 def scenario_detail(request, pk: int):
+    profile = getattr(request, "access_profile", None)
+    visible_attempts = models.SimulationAttempt.objects.select_related("selected_regimen", "user")
+    if profile and not (profile.is_owner and request.user.is_staff):
+        visible_attempts = visible_attempts.filter(user=request.user)
     scenario = get_object_or_404(
-        models.Scenario.objects.prefetch_related("recommended_regimens", "attempts__selected_regimen", "attempts__user"),
+        models.Scenario.objects.prefetch_related("recommended_regimens", Prefetch("attempts", queryset=visible_attempts)),
         pk=pk,
         active=True,
     )
     # Hide legacy/empty entries (e.g. saved without regimen/response/notes and without simulation outputs)
     # to reduce beginner confusion.
-    attempts_all = list(scenario.attempts.all())
+    own_attempts = scenario.attempts.all()
+    if profile and not (profile.is_owner and request.user.is_staff):
+        own_attempts = own_attempts.filter(user=request.user)
+    attempts_all = list(own_attempts)
     attempts = [
         a
         for a in attempts_all
@@ -158,7 +164,7 @@ def scenario_detail(request, pk: int):
         else Regimen.objects.none()
     )
     latest_simulation = (
-        scenario.attempts.exclude(results_summary={}).order_by("-submitted").first()
+        own_attempts.exclude(results_summary={}).order_by("-submitted").first()
     )
     latest_summary = latest_simulation.results_summary if latest_simulation else None
     latest_results = latest_simulation.results if latest_simulation else {}
@@ -256,9 +262,9 @@ def scenario_detail(request, pk: int):
         except Exception:
             twin_error = "Could not resolve selected assessment."
 
-    simulation_runs_qs = scenario.attempts.exclude(results_summary={}).select_related("user").order_by("-submitted")
+    simulation_runs_qs = own_attempts.exclude(results_summary={}).select_related("user").order_by("-submitted")
     decision_logs_qs = (
-        scenario.attempts.filter(
+        own_attempts.filter(
             Q(selected_regimen__isnull=False)
             | ~Q(predicted_response="")
             | ~Q(notes="")
