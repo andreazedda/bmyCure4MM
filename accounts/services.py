@@ -155,11 +155,30 @@ def request_access(data):
     email = normalize_email(data["email"])
     # Public submission cannot claim the configured owner or an existing identity.
     configured_owner = getattr(settings, "PLATFORM_OWNER_EMAIL", "").strip().lower()
-    if (
-        email == configured_owner
-        or Identity.objects.filter(email=email).exists()
-        or get_user_model().objects.filter(email__iexact=email).exists()
-    ):
+    if email == configured_owner or get_user_model().objects.filter(email__iexact=email).exists():
+        return None
+    existing = Identity.objects.filter(email=email).first()
+    if existing:
+        # A forgotten/expired verification must not reserve an email forever.
+        # Preserve valid links and all original request fields. Public retries
+        # never grant a status-session capability merely from knowing an email.
+        if (
+            existing.request_state == Identity.RequestState.UNVERIFIED
+            and existing.access_state == Identity.AccessState.PENDING
+            and existing.verified_at is None
+            and existing.user_id is None
+            and not existing.is_owner
+            and not existing.is_approver
+            and not Capability.objects.filter(
+                identity=existing,
+                purpose="verify",
+                consumed_at=None,
+                revoked_at=None,
+                expires_at__gt=timezone.now(),
+            ).exists()
+        ):
+            issue_capability(existing, "verify")
+            audit("verification_reissued", existing)
         return None
     identity = Identity.objects.create(
         email=email,

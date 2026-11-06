@@ -316,3 +316,45 @@ class AccessLifecycleTests(LifecycleMixin, TestCase):
                 ).status_code,
                 503,
             )
+
+    def test_expired_verification_can_be_reissued_without_public_status_disclosure(self):
+        identity = services.request_access(
+            {
+                "email": "forgotten@example.test",
+                "nickname": "Private original nickname",
+                "reason": "Original purpose",
+                "affiliation": "",
+                "professional_role": "",
+            }
+        )
+        old = Capability.objects.get(identity=identity, purpose="verify")
+        old.expires_at = timezone.now() - timedelta(seconds=1)
+        old.save(update_fields=["expires_at"])
+        outsider = Client()
+        data = {
+            "email": identity.email,
+            "nickname": "Attempted replacement",
+            "reason": "New text",
+            "acknowledgement": "on",
+        }
+        self.assertEqual(outsider.post("/access/request/", data).status_code, 302)
+        identity.refresh_from_db()
+        self.assertEqual(identity.nickname, "Private original nickname")
+        self.assertIsNone(identity.user_id)
+        self.assertEqual(Capability.objects.filter(identity=identity, purpose="verify").count(), 2)
+        self.assertNotIn("access_request", outsider.session)
+        status = outsider.get("/access/request/status/")
+        self.assertNotContains(status, identity.nickname, status_code=status.status_code)
+        # A valid replacement survives duplicate clicks without another message.
+        self.assertEqual(outsider.post("/access/request/", data).status_code, 302)
+        self.assertEqual(Capability.objects.filter(identity=identity, purpose="verify").count(), 2)
+        self.assertEqual(Notification.objects.filter(identity=identity, kind="verify").count(), 2)
+
+        Capability.objects.filter(identity=identity, purpose="verify").update(
+            expires_at=timezone.now() - timedelta(seconds=1)
+        )
+        services.change_access(self.owner.user, identity.pk, "REVOKED")
+        self.assertEqual(outsider.post("/access/request/", data).status_code, 302)
+        self.assertEqual(Capability.objects.filter(identity=identity, purpose="verify").count(), 2)
+        identity.refresh_from_db()
+        self.assertEqual(identity.access_state, "REVOKED")

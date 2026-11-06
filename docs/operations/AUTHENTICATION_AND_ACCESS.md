@@ -46,6 +46,8 @@ Initially only the configured owner is an approver. Public role/owner/staff/quot
 | Access | `PENDING_ACTIVATION` → `ACTIVE` → `SUSPENDED` / `EXPIRED` / `REVOKED` |
 | Notification | `queued` → `sent` / `failed`, independently of access |
 
+An unverified community request whose verification link expired can be submitted again to receive one replacement link. This preserves the original request, does not grant a public status session from an email address, and does not rotate still-valid links or reopen revoked access. Duplicate/concurrent retries serialize through the same policy lock.
+
 Email identity is trimmed/lowercased ASCII; dots and plus suffixes are preserved. An additive unique expression index also protects nonempty legacy `auth_user` email identities. Migration refuses duplicates without merging users or printing addresses. Nickname is a display name only.
 
 Lifecycle mutations serialize through a database singleton write lock, including on the deployed SQLite backend; PostgreSQL `select_for_update` is not assumed to work on SQLite. Approval, activation, ticket submissions and outbox creation are transactional/idempotent. Activation validates identity, purpose, approval, expiry, role and the activation gate. Access state and session version are checked on every authenticated request. Expiry/revocation prevent subsequent access to protected pages and exports.
@@ -63,6 +65,12 @@ The encrypted durable outbox can be dispatched after commit through the **existi
 Requests/reset allow 5 attempts/hour per identity/IP (100 global); login 20 (400 global), token confirmation 20/IP (400 global), feedback 10 (200 global). Counters are shared in the database, HMAC keyed and fail closed on backend errors. The immediate proxy supplies the observed network address; forwarded IP headers are not trusted for arbitrary rate-limit identity. Owner audit logs contain codes/IDs, not form data, tokens, query strings or email bodies.
 
 Sensitive queued payloads expire within 24 hours; unverified/rejected request reason/affiliation/role are cleared after 30 days. Tickets are retained privately for follow-up; no clinical dumps or screenshots are collected. Expiry and cleanup run during outbox tasks; operations must schedule the bounded housekeeping command when mail traffic is idle.
+
+## Current container budgets
+
+A final runtime readback found that the existing web/Celery resource dictionaries were empty. The scoped patches in `deploy/k8s/web-budget.patch.yaml` and `celery-budget.patch.yaml` set each container to a ceiling of **1 CPU / 1 GiB**. Requests are **100m CPU**, **384 MiB web** and **256 MiB per worker**. Replicas remain one web and two existing workers; no new compute deployment or parallel quota service was added. Notification maintenance remains 100m/128 MiB requested and 500m/512 MiB limited.
+
+On the verified eligible node, idle working sets were 251 MiB web and 131 MiB per worker. A disposable actual-NFS test executed the real engine, plot/CSV authorization and suspension path in 6.401 seconds; its runner including a fresh database took 62.04 seconds and peaked at 265408 KiB. The first attempt failed because production HTTPS redirects were inherited by the local HTTP test client; the corrected isolated environment passed with the same CPU/RAM ceiling. Production HTTPS was preserved. These measurements do not prove maximum cluster capacity or global computational admission/cancellation. `QUOTAS_AND_CANCELLATION` remains NOT_TESTED for that broader contract.
 
 ## Bootstrap, recovery and restore
 
