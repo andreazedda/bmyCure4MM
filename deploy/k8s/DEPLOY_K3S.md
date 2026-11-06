@@ -101,7 +101,43 @@ readiness. Its template is suspended intentionally. Confirm a **new successful**
 notification run; an old success timestamp is not current delivery evidence.
 Keep `ACCOUNT_EMAIL_TASKS_ENABLED=0` until the existing broker topology is proven.
 
-## 4. Acceptance and rollback
+## 4. Bound the existing workloads
+
+Do not apply the historical aggregate `bmycure4mm.yaml`: it does not describe the
+current NFS/Caddy topology. The two small strategic patches below touch only
+resource requests/limits of the existing containers; they preserve image,
+replicas, environment, Secret references, routing and PVCs.
+
+```bash
+ssh -o BatchMode=yes -o StrictHostKeyChecking=yes lenovo3 \
+  'sudo -n k3s kubectl --request-timeout=20s -n bmycure4mm patch deployment web --type strategic --patch-file /dev/stdin' < deploy/k8s/web-budget.patch.yaml
+ssh -o BatchMode=yes -o StrictHostKeyChecking=yes lenovo3 \
+  'sudo -n k3s kubectl --request-timeout=20s -n bmycure4mm patch deployment celery --type strategic --patch-file /dev/stdin' < deploy/k8s/celery-budget.patch.yaml
+```
+
+| Existing container | CPU request / limit | Memory request / limit |
+| --- | --- | --- |
+| Web, one replica | 100m / 1 CPU | 384 MiB / 1 GiB |
+| Celery, each of two replicas | 100m / 1 CPU | 256 MiB / 1 GiB |
+| Notification maintenance | 100m / 500m | 128 MiB / 512 MiB |
+
+Before applying, the actual web/worker resource dictionaries were empty. Idle
+measurements on `lenovo2` were 251 MiB web and 131 MiB per worker. The bounded
+real-engine/plot/CSV/ownership/suspension integration path on disposable SQLite
+on the actual NFS volume passed: 6.401 seconds in the test body, 62.04 seconds
+including fresh test-database setup, peak RSS 265408 KiB (about 259 MiB). Its Job
+kept the existing 1 CPU / 512 MiB ceiling. The first attempt inherited production
+HTTPS redirection into a local HTTP test client and failed before calculation;
+only the disposable test environment was corrected, without raising limits or
+weakening production HTTPS.
+
+These are conservative container ceilings for the verified account/learning
+path, not a claim that all advanced workloads or global queue/admission and
+cancellation policies are validated. Recheck rollout, memory and current owner
+state; do not raise ceilings just to pass a test. Existing advanced workload
+capacity and broker health remain separate governance work.
+
+## 5. Acceptance and rollback
 
 Require current web/worker source and digest readback, HTTPS and redirect,
 health/readiness, account JS, admin CSS/JS, docs CSS/figures, owner state and

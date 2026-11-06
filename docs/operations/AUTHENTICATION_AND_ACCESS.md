@@ -64,6 +64,12 @@ Requests/reset allow 5 attempts/hour per identity/IP (100 global); login 20 (400
 
 Sensitive queued payloads expire within 24 hours; unverified/rejected request reason/affiliation/role are cleared after 30 days. Tickets are retained privately for follow-up; no clinical dumps or screenshots are collected. Expiry and cleanup run during outbox tasks; operations must schedule the bounded housekeeping command when mail traffic is idle.
 
+## Current container budgets
+
+A final runtime readback found that the existing web/Celery resource dictionaries were empty. The scoped patches in `deploy/k8s/web-budget.patch.yaml` and `celery-budget.patch.yaml` set each container to a ceiling of **1 CPU / 1 GiB**. Requests are **100m CPU**, **384 MiB web** and **256 MiB per worker**. Replicas remain one web and two existing workers; no new compute deployment or parallel quota service was added. Notification maintenance remains 100m/128 MiB requested and 500m/512 MiB limited.
+
+On the verified eligible node, idle working sets were 251 MiB web and 131 MiB per worker. A disposable actual-NFS test executed the real engine, plot/CSV authorization and suspension path in 6.401 seconds; its runner including a fresh database took 62.04 seconds and peaked at 265408 KiB. The first attempt failed because production HTTPS redirects were inherited by the local HTTP test client; the corrected isolated environment passed with the same CPU/RAM ceiling. Production HTTPS was preserved. These measurements do not prove maximum cluster capacity or global computational admission/cancellation. `QUOTAS_AND_CANCELLATION` remains NOT_TESTED for that broader contract.
+
 ## Bootstrap, recovery and restore
 
 After migrations, run `python manage.py bootstrap_platform_owner` once in a controlled Job with the runtime Secret. Never run it on every web startup. It is idempotent and serialized, rejects identity conflicts, preserves existing credentials/MFA/revocation and other administrators, and links an existing identity only when username/email match an already privileged active administrator. A new owner is nonstaff/inactive with an unusable password until the explicit owner activation link is confirmed.

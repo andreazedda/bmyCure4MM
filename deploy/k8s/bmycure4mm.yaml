@@ -1,3 +1,4 @@
+# HISTORICAL aggregate manifest: not the current cluster topology. Do not apply; follow DEPLOY_K3S.md and the scoped patches instead.
 apiVersion: v1
 kind: Namespace
 metadata:
