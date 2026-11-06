@@ -21,6 +21,7 @@ spec:
             - -c
             - |
               import json, os, pathlib, sqlite3, tempfile
+              from contextlib import closing
               os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mmportal.settings')
               import django
               django.setup()
@@ -40,7 +41,7 @@ spec:
                   with tempfile.NamedTemporaryFile(dir=root, prefix='.backup-', delete=False) as temp:
                       temporary = pathlib.Path(temp.name)
                   try:
-                      with sqlite3.connect('file:' + str(source) + '?mode=ro', uri=True, timeout=15) as live, sqlite3.connect(temporary) as saved:
+                      with closing(sqlite3.connect('file:' + str(source) + '?mode=ro', uri=True, timeout=15)) as live, closing(sqlite3.connect(temporary)) as saved:
                           live.backup(saved)
                           assert saved.execute('PRAGMA quick_check').fetchone()[0] == 'ok'
                       try:
@@ -49,7 +50,7 @@ spec:
                           pass
                   finally:
                       temporary.unlink(missing_ok=True)
-              with sqlite3.connect(backup) as saved, sqlite3.connect(':memory:') as restored:
+              with closing(sqlite3.connect('file:' + str(backup) + '?mode=ro', uri=True)) as saved, closing(sqlite3.connect(':memory:')) as restored:
                   saved.backup(restored)
                   assert restored.execute('PRAGMA quick_check').fetchone()[0] == 'ok', 'Backup restore check failed'
               call_command('migrate', interactive=False)
