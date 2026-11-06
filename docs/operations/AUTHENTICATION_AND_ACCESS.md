@@ -46,6 +46,8 @@ Initially only the configured owner is an approver. Public role/owner/staff/quot
 | Access | `PENDING_ACTIVATION` → `ACTIVE` → `SUSPENDED` / `EXPIRED` / `REVOKED` |
 | Notification | `queued` → `sent` / `failed`, independently of access |
 
+An unverified community request whose verification link expired can be submitted again to receive one replacement link. This preserves the original request, does not grant a public status session from an email address, and does not rotate still-valid links or reopen revoked access. Duplicate/concurrent retries serialize through the same policy lock.
+
 Email identity is trimmed/lowercased ASCII; dots and plus suffixes are preserved. An additive unique expression index also protects nonempty legacy `auth_user` email identities. Migration refuses duplicates without merging users or printing addresses. Nickname is a display name only.
 
 Lifecycle mutations serialize through a database singleton write lock, including on the deployed SQLite backend; PostgreSQL `select_for_update` is not assumed to work on SQLite. Approval, activation, ticket submissions and outbox creation are transactional/idempotent. Activation validates identity, purpose, approval, expiry, role and the activation gate. Access state and session version are checked on every authenticated request. Expiry/revocation prevent subsequent access to protected pages and exports.
