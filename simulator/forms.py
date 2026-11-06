@@ -758,7 +758,6 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
                 "min": "1000000",
                 "max": "1000000000000",
                 "inputmode": "decimal",
-                "readonly": "readonly",
             }
         ),
         label="Initial tumor cells",
@@ -773,7 +772,6 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
                 "min": "100000000",
                 "max": "10000000000000",
                 "inputmode": "decimal",
-                "readonly": "readonly",
             }
         ),
         label="Initial healthy plasma cells",
@@ -788,7 +786,6 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
                 "min": "0",
                 "max": "50",
                 "inputmode": "decimal",
-                "readonly": "readonly",
             }
         ),
         label="Lenalidomide daily dose (mg)",
@@ -803,7 +800,6 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
                 "min": "0",
                 "max": "2",
                 "inputmode": "decimal",
-                "readonly": "readonly",
             }
         ),
         label="Bortezomib weekly dose (mg/m²)",
@@ -818,7 +814,6 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
                 "min": "0",
                 "max": "20",
                 "inputmode": "decimal",
-                "readonly": "readonly",
             }
         ),
         label="Daratumumab dose (mg/kg)",
@@ -835,7 +830,6 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
                 "min": "0",
                 "max": "70",
                 "inputmode": "decimal",
-                "readonly": "readonly",
             }
         ),
         label="Carfilzomib dose (mg/m²)",
@@ -850,7 +844,6 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
                 "min": "7",
                 "max": "365",
                 "inputmode": "decimal",
-                "readonly": "readonly",
             }
         ),
         label="Simulation horizon (days)",
@@ -875,7 +868,6 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
                 "min": "0",
                 "max": "0.1",
                 "inputmode": "decimal",
-                "readonly": "readonly",
             }
         ),
         label="Tumor growth rate (day⁻¹)",
@@ -890,7 +882,6 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
                 "min": "0",
                 "max": "0.05",
                 "inputmode": "decimal",
-                "readonly": "readonly",
             }
         ),
         label="Healthy growth rate (day⁻¹)",
@@ -905,7 +896,6 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
                 "min": "0",
                 "max": "0.2",
                 "inputmode": "decimal",
-                "readonly": "readonly",
             }
         ),
         label="Drug interaction strength",
@@ -1063,7 +1053,6 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
                 "step": "1",
                 "min": "0",
                 "inputmode": "decimal",
-                "readonly": "readonly",
             }
         ),
         label="Tumor carrying capacity (cells)",
@@ -1078,7 +1067,6 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
                 "step": "1",
                 "min": "0",
                 "inputmode": "decimal",
-                "readonly": "readonly",
             }
         ),
         label="Healthy carrying capacity (cells)",
@@ -1094,7 +1082,6 @@ class SimulationParameterForm(BootstrapValidationMixin, forms.Form):
                 "min": "0",
                 "max": "5",
                 "inputmode": "decimal",
-                "readonly": "readonly",
             }
         ),
         label="Immune compromise index",

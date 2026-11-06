@@ -1,5 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
+from django.utils.html import format_html
 
 from .models import SupportTicket
 from .services import normalize_email
@@ -13,7 +14,34 @@ class StrictForm(forms.Form):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("label_suffix", "")
         super().__init__(*args, **kwargs)
+        for name, field in self.fields.items():
+            if field.label is None:
+                field.label = name.replace("_", " ").capitalize()
+        labels_it = {
+            "Email": "Email",
+            "Nickname": "Nickname",
+            "Reason": "Motivo della richiesta",
+            "Professional role": "Ruolo professionale (facoltativo)",
+            "Affiliation": "Affiliazione (facoltativa)",
+            "Password": "Password",
+            "Password confirm": "Conferma password",
+            "Code": "Codice autenticatore",
+            "I have read the privacy notice and research-only limits. I will not enter real patient data.": "Ho letto l’informativa e i limiti di ricerca. Non inserirò dati reali di pazienti.",
+        }
         for field in self.fields.values():
+            if field.label in labels_it and field.label != labels_it[field.label]:
+                field.widget.attrs.update(
+                    {
+                        "aria-label": field.label,
+                        "data-label-en": field.label,
+                        "data-label-it": labels_it[field.label],
+                    }
+                )
+                field.label = format_html(
+                    '<span class="t-en">{}</span><span class="t-it">{}</span>',
+                    field.label,
+                    labels_it[field.label],
+                )
             field.widget.attrs.setdefault(
                 "class",
                 "form-check-input" if isinstance(field.widget, forms.CheckboxInput) else "form-control",

@@ -2,6 +2,8 @@
 Unit tests for documentation viewer utility functions.
 """
 import os
+import tempfile
+from pathlib import Path
 from django.test import SimpleTestCase
 from django.conf import settings
 from docs_viewer.utils import (
@@ -178,3 +180,34 @@ class TestGetAllowedPaths:
         """Results should be sorted."""
         docs = get_allowed_doc_paths()
         assert docs == sorted(docs)
+
+
+class ReferenceRenderingTests(SimpleTestCase):
+    def test_math_figures_links_and_admonitions_use_existing_public_assets(self):
+        source = "docs/guides/mathematical_models_en.md"
+        content = Path(settings.BASE_DIR, source).read_text()
+        html, toc = render_markdown(content, source_path=source)
+        self.assertIn('class="arithmatex"', html)
+        self.assertIn('class="admonition warning"', html)
+        self.assertIn('/static/docs_images/models/logistic_growth.svg', html)
+        self.assertIn('class="mermaid"', html)
+        self.assertNotIn('toctitle', toc)
+        linked, _ = render_markdown('[Model](../models/REGISTRY.md#registry)', source_path=source)
+        self.assertIn('/docs/view/docs/models/REGISTRY.md#registry', linked)
+        self.assertEqual(validate_markdown_links('[Model](../models/REGISTRY.md#registry)', source), [])
+
+    def test_code_is_highlighted_and_front_matter_is_not_visible(self):
+        html, _ = render_markdown('---\nstatus: CURRENT_PARTIAL\n---\n\n# Title\n\n```python\ndef hello():\n    return 1\n```')
+        self.assertNotIn('CURRENT_PARTIAL', html)
+        self.assertIn('class="k"', html)
+
+    def test_file_whitelist_rejects_assets_and_external_symlinks(self):
+        self.assertFalse(is_safe_path('docs/assets/javascripts/mathjax.js'))
+        with tempfile.TemporaryDirectory() as root:
+            base = Path(root, 'repo')
+            Path(base, 'docs').mkdir(parents=True)
+            private = Path(root, 'private.md')
+            private.write_text('Must not be served')
+            Path(base, 'docs/linked.md').symlink_to(private)
+            with self.settings(BASE_DIR=base):
+                self.assertFalse(is_safe_path('docs/linked.md'))

@@ -62,7 +62,7 @@
                                 <p class="text-muted mb-2">{{ scenario.summary }}</p>
                             </div>
                             <div class="d-flex flex-wrap gap-2">
-                                <a class="btn btn-sm btn-primary" href="#simulateScenarioPanel">
+                                <a class="btn btn-sm btn-primary" href="#simulateScenarioPanel" aria-controls="simulateScenarioPanel">
                                     Open simulation form
                                 </a>
                                 <a class="btn btn-sm btn-outline-primary" href="#simulation-results">
@@ -503,6 +503,19 @@
 
 <script>
 (() => {
+    const panel = document.getElementById('simulateScenarioPanel');
+    document.querySelectorAll('a[href="#simulateScenarioPanel"]').forEach(link => {
+        link.setAttribute('aria-expanded', panel.classList.contains('show') ? 'true' : 'false');
+        link.addEventListener('click', event => {
+            if (!window.bootstrap) return;
+            event.preventDefault();
+            bootstrap.Collapse.getOrCreateInstance(panel, {toggle:false}).show();
+            panel.scrollIntoView({behavior:'smooth', block:'start'});
+        });
+    });
+    ['shown.bs.collapse', 'hidden.bs.collapse'].forEach(name => panel.addEventListener(name, () => {
+        document.querySelectorAll('a[href="#simulateScenarioPanel"]').forEach(link => link.setAttribute('aria-expanded', panel.classList.contains('show') ? 'true' : 'false'));
+    }));
     const setStatus = (enHtml, itHtml, klass = 'alert-light') => {
         const el = document.getElementById('simulation-status');
         if (!el) return;

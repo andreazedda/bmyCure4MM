@@ -3,6 +3,7 @@ import uuid
 
 from django.test import Client, TestCase, override_settings
 
+from accounts import services
 from accounts.models import SupportTicket
 
 from .helpers import TEST_SETTINGS, LifecycleMixin
@@ -117,12 +118,30 @@ class ExistingSiteTests(LifecycleMixin, TestCase):
         self.assertIn("tumor_reduction", attempt.results_summary)
         export = reverse("simulator:attempt_export", args=[attempt.pk])
         self.assertEqual(self.client.get(export).status_code, 200)
+        csv_response = self.client.get(export + "?format=csv")
+        self.assertEqual(csv_response.status_code, 200)
+        self.assertEqual(csv_response["Content-Type"], "text/csv")
+        self.assertIn("no-store", csv_response["Cache-Control"])
+        self.assertIn(b"time", b"".join(csv_response.streaming_content))
+        self.assertEqual(
+            self.client.get(reverse("simulator:attempt_plot_embed", args=[attempt.pk])).status_code, 200
+        )
+        self.assertContains(response, reverse("simulator:attempt_plot_embed", args=[attempt.pk]))
         self.client.post("/accounts/logout/")
         self.sign_in(self.bob)
         self.assertEqual(self.client.get(export).status_code, 403)
+        self.assertEqual(self.client.get(export + "?format=csv").status_code, 403)
         self.assertEqual(
             self.client.get(reverse("simulator:attempt_plot_embed", args=[attempt.pk])).status_code, 403
         )
         self.assertNotContains(
             self.client.get(reverse("simulator:scenario_detail", args=[scenario.pk])), "1 simulation run(s)"
+        )
+
+        self.client.post("/accounts/logout/")
+        self.sign_in(self.alice)
+        services.change_access(self.owner.user, self.alice.pk, "SUSPENDED")
+        self.assertEqual(self.client.get(export + "?format=csv").status_code, 302)
+        self.assertEqual(
+            self.client.get(reverse("simulator:attempt_plot_embed", args=[attempt.pk])).status_code, 302
         )

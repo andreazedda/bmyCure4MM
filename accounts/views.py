@@ -84,9 +84,13 @@ def request_access(request):
         "accounts/form.html",
         {
             "title": "Request community access",
+            "title_it": "Richiedi accesso alla piattaforma",
             "form": form,
             "button": "Send verification email",
-            "notice": "We collect only your contact, nickname and research purpose for access review. Requests are retained for 30 days after a decision; audit records contain codes and identifiers. No patient data or attachments. Research only; no clinical decisions.",
+            "button_it": "Invia email di verifica",
+            "privacy_notice": True,
+            "notice": "Confirm your email, wait for Andrea’s approval, then choose your password. Use synthetic data only; never include patient information.",
+            "notice_it": "Conferma l’email, attendi l’approvazione di Andrea, poi scegli la password. Usa solo dati sintetici; non inserire informazioni su pazienti.",
         },
     )
 
@@ -190,7 +194,14 @@ def sign_in(request):
     return render(
         request,
         "accounts/form.html",
-        {"title": "Sign in", "form": form, "button": "Sign in", "login_page": True},
+        {
+            "title": "Sign in",
+            "title_it": "Accedi",
+            "form": form,
+            "button": "Sign in",
+            "button_it": "Accedi",
+            "login_page": True,
+        },
     )
 
 
@@ -228,7 +239,13 @@ def reset_request(request):
     return render(
         request,
         "accounts/form.html",
-        {"title": "Reset your password", "form": form, "button": "Request reset"},
+        {
+            "title": "Reset your password",
+            "title_it": "Reimposta la password",
+            "form": form,
+            "button": "Request reset",
+            "button_it": "Richiedi nuova password",
+        },
     )
 
 

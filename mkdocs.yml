@@ -38,6 +38,7 @@ nav:
       - Dependencies: operations/DEPENDENCIES.md
       - Dependency Audit Triage: operations/DEPENDENCY_AUDIT_TRIAGE.md
       - Development: development/DEVELOPMENT.md
+      - UX Audit: operations/UX_AUDIT_2026_11_06.md
       - Troubleshooting: development/TROUBLESHOOTING.md
   - Governance:
       - Claims Policy: governance/CLAIMS_POLICY.md
@@ -129,4 +130,4 @@ extra_javascript:
   - assets/javascripts/mermaid-init.js
   - assets/javascripts/mermaid-zoom.js
   - assets/javascripts/mathjax.js
-  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+  - https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js

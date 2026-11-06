@@ -548,7 +548,7 @@ class DrugLikenessIndicatorsTests(TestCase):
         
         response = self.client.get(reverse("chemtools:job_detail", args=[job.pk]))
         self.assertContains(response, "bg-warning")  # Orange badge
-        self.assertContains(response, "High")
+        self.assertContains(response, '<span class="text-warning">6.5</span>', html=True)
         
     def test_perfect_similarity_badge(self) -> None:
         """Test perfect similarity (1.0) shows special badge."""

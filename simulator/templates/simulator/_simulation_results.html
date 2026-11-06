@@ -377,12 +377,12 @@
             {% endif %}
             <div class="d-flex flex-wrap gap-2 mt-3">
                 {% if results.plot %}
-                    <a class="btn btn-outline-primary btn-sm" href="{{ results.plot }}" target="_blank" rel="noopener">
+                    <a class="btn btn-outline-primary btn-sm" href="{% url 'simulator:attempt_plot_embed' attempt.pk %}" target="_blank" rel="noopener">
                         <span class="t-en">View plot</span><span class="t-it">Apri grafico</span>
                     </a>
                 {% endif %}
                 {% if results.csv %}
-                    <a class="btn btn-outline-secondary btn-sm" href="{{ results.csv }}" target="_blank" rel="noopener">
+                    <a class="btn btn-outline-secondary btn-sm" href="{% url 'simulator:attempt_export' attempt.pk %}?format=csv" target="_blank" rel="noopener">
                         <span class="t-en">Download CSV</span><span class="t-it">Scarica CSV</span>
                     </a>
                 {% endif %}
