@@ -5,13 +5,32 @@ status: CURRENT_VERIFIED
 owner: Andrea Zedda
 audience: engineers, researchers and reviewers
 last_verified_at: 2026-11-06
-last_verified_git_sha: fa9c35473302debf3c9a289d5f34f0bc7f771dbd
+last_verified_git_sha: 313e2e4d8a839b9c14a8d853d1f008071a6cb013
 source_of_truth: repository tree, Django configuration, model registry and current contracts
 ---
 
 # Current system architecture
 
-> **CURRENT architecture.** This page describes the repository at the verified SHA. It is not the target virtual-laboratory architecture.
+> **CURRENT architecture.** This page describes the existing application structure. The recorded audit SHA is a fixed evidence point, not a moving pointer to the deployed image. It is not the target virtual-laboratory architecture.
+
+Source verification and deployment are separate. PR #86 was tested at
+`49d1a89b12cd0508e8c6aba2340cb193a31eed11` and merged as the SHA above. Required
+and post-merge CI, Pages and image publication passed. Its image index is
+`sha256:0d707ef6c20ee3f6cc4650730610ee045af56955130ab28a5bb98b7bdccfc405`,
+with matching OCI source and image environment. Target-image tests passed on
+disposable SQLite/NFS. The controlled release Job passed backup restore,
+preserved ACTIVE owner/MFA/gates, initialized the empty catalogue with one
+synthetic scenario and verified static assets. Web and both workers report the
+same source/digest with unchanged 1 CPU / 1 GiB ceilings; 20 public route/asset
+probes passed. This was an **intermediate deployment**, because returning
+browsers received stale unversioned CSS (14400-second cache lifetime) despite
+correct collected files. PR #87 adds source-versioned asset URLs. Its acceptance
+requires the corrected image's protected checks, rollout/readback and
+returning-browser asset verification. The [release procedure](../operations/AUTHENTICATION_AND_ACCESS.md)
+and **dated release-evidence comment in [GitHub #79](https://github.com/andreazedda/bmyCure4MM/issues/79)**
+distinguish this historical result from the current deployed source/digest and
+asset hashes, recorded only after observation. This page does not predict a
+future build hash or claim an unobserved PR #87 merge/deployment.
 
 ## System context
 
@@ -68,6 +87,10 @@ Current limitation: object-level authorization is not yet consistently centraliz
 - PK/PD presets and time-resolved dose functions;
 - model-relative KPI summaries;
 - experimental therapy-design code.
+- one controlled, idempotent empty-catalogue initializer using the existing
+  `Scenario` model and shared policy lock; it creates no patient records,
+  per-user sandbox or numerical parameter overrides and preserves existing
+  inactive catalogues.
 
 Current limitation: core biological parameters and several endpoint definitions are heuristic research abstractions.
 
@@ -137,7 +160,7 @@ owner with MFA: request review, account state/expiry, gates and ticket replies
 clinical/research/admin: separate existing permissions, denied to new registrants
 ```
 
-The `accounts` app extends the existing Django User. It does not replace the user model or make approved members staff. Verification, approval, activation and email delivery are separate states. Session version, current access and expiry are checked on protected requests. Object selectors scope saved learning attempts and exports to their author. See the [lifecycle and recovery contract](../operations/AUTHENTICATION_AND_ACCESS.md).
+The `accounts` app extends the existing Django User. It does not replace the user model or make approved members staff. Verification, approval, activation and email delivery are separate states. Session version, current access and expiry are checked on protected requests. Object selectors scope saved learning attempts and exports to their author. Registered members, including a nonstaff owner, cannot discover or submit legacy patient assessments through the simulator form; clinical context retains its separate existing authorization boundary. Revocation is terminal and cannot be bypassed through suspension followed by renewal. Public documentation checks both the requested and symlink-resolved destination against its Markdown allowlist. See the [lifecycle and recovery contract](../operations/AUTHENTICATION_AND_ACCESS.md).
 
 This delivery does not complete broad research RBAC issue #8 or the first external researcher pilot #78. No second demo portal, assigned scenario provisioning, compute worker or parallel quota system was introduced.
 
@@ -148,5 +171,15 @@ This delivery does not complete broad research RBAC issue #8 or the first extern
 - image-build and deployment automation exist;
 - `.github/workflows/dependency-quality.yml` aggregates locked quality, core Python 3.11/3.12, frozen image and real registration-browser jobs into `required`; the protected release checks were verified before the recorded merge;
 - production source/digest, actual SQLite/NFS storage, bounded account security and backup evidence are recorded in the access runbook; PostgreSQL migration, global compute admission/cancellation, comprehensive clinical RBAC and full disaster recovery remain separate M0-S work.
+
+The PR #86 checks passed 473 local Django tests and two combined real-browser
+tests in 38.646s, with no frozen scientific-baseline changes. The target image
+passed 83 focused tests on disposable SQLite on the existing NFS PVC at the
+unchanged 1 CPU / 512 MiB test ceiling. These are technical checks with synthetic
+data and isolated email; they do not establish new email receipt or independent
+maintainer/researcher acceptance. A rollback must keep additive schema and PVCs,
+close requests/activations and suspend external members before reverting these
+security fixes; matching old-image static assets need a separate collectstatic
+Job, because the earlier image lacks the new catalogue command.
 
 The [source/data atlas](../development/CODE_ATLAS.md) maps concrete functions, model fields, scientific kernel and failure domains. The [manual verification record](../development/AUDIT_VERIFICATION_2026_11_06.md) distinguishes current executed checks from historical release evidence and pending human acceptance.

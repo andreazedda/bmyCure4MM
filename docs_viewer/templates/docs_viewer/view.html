@@ -4,7 +4,7 @@
 {% block title %}{{ title }} - Documentation{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'docs_viewer/reference.css' %}">
+<link rel="stylesheet" href="{% static 'docs_viewer/reference.css' %}?v={{ asset_version }}">
 <style>
     .doc-sidebar {
         position: sticky;
@@ -205,5 +205,5 @@
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
 <script src="https://unpkg.com/mermaid@10.9.0/dist/mermaid.min.js"></script>
 <script src="{% static 'docs_js/mermaid-init.js' %}"></script>
-<script src="{% static 'docs_viewer/reference.js' %}"></script>
+<script src="{% static 'docs_viewer/reference.js' %}?v={{ asset_version }}"></script>
 {% endblock %}

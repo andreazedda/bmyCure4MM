@@ -164,7 +164,7 @@
         <span class="t-en">🧪 Available Synthetic Scenarios</span>
         <span class="t-it">🧪 Scenari Sintetici Disponibili</span>
     </h2>
-    <span class="badge bg-primary fs-6">{{ scenarios|length }} <span class="t-en">scenario{{ scenarios|length|pluralize }}</span><span class="t-it">scenari</span></span>
+    <span class="badge bg-primary fs-6">{{ scenarios|length }} <span class="t-en">scenario{{ scenarios|length|pluralize }}</span><span class="t-it">{% if scenarios|length == 1 %}scenario{% else %}scenari{% endif %}</span></span>
 </div>
 
 <div class="alert alert-light border mb-3">
@@ -198,7 +198,9 @@
                             {% endif %}
                         </div>
                         <p class="text-muted small mb-2">
-                            <strong class="t-en">Stage:</strong><strong class="t-it">Stadio:</strong> {{ scenario.get_clinical_stage_display }}
+                            <strong class="t-en">Stage:</strong><strong class="t-it">Stadio:</strong>
+                            <span class="t-en">{{ scenario.get_clinical_stage_display }}</span>
+                            <span class="t-it">{% if scenario.clinical_stage == 'newly_diagnosed' %}Nuova diagnosi{% elif scenario.clinical_stage == 'relapsed_refractory' %}Recidivante/refrattario{% elif scenario.clinical_stage == 'maintenance' %}Mantenimento{% elif scenario.clinical_stage == 'supportive' %}Supporto{% else %}{{ scenario.get_clinical_stage_display }}{% endif %}</span>
                         </p>
                         <p class="mb-3">{{ scenario.summary|truncatewords:40 }}</p>
                         <div class="mt-auto">

@@ -1,5 +1,5 @@
 {% extends 'base.html' %}{% load static account_ui %}{% block title %}User tickets{% endblock %}
-{% block extra_head %}<script defer src="{% static 'accounts/access.js' %}"></script>{% endblock %}
+{% block extra_head %}<script defer src="{% static 'accounts/access.js' %}?v={{ asset_version }}"></script>{% endblock %}
 {% block content %}
 <h1 class="h3">{% ui 'User tickets and suggestions' %}</h1>
 <p>{% ui 'Replies are private to the author. Internal notes are visible only here. Tickets are not automatically published to GitHub or other boards.' %}</p>

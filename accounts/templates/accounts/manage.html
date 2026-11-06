@@ -1,4 +1,4 @@
-{% extends 'base.html' %}{% load static account_ui %}{% block extra_head %}<script defer src="{% static 'accounts/access.js' %}">
+{% extends 'base.html' %}{% load static account_ui %}{% block extra_head %}<script defer src="{% static 'accounts/access.js' %}?v={{ asset_version }}">
 </script>{% endblock %}{% block title %}Access requests{% endblock %}{% block content %}<h1 class="h3">{% ui 'Access requests' %}</h1>
 <p>
 <a href="{% url 'accounts:manage_users' %}">{% ui 'Registered accounts' %}</a> · <a href="{% url 'accounts:manage_feedback' %}">{% ui 'User tickets' %}</a>
