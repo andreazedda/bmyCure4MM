@@ -83,7 +83,7 @@ jobs:
           echo "container_image_id=${image_id}" >> "$GITHUB_STEP_SUMMARY"
 
   registration:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
       DJANGO_SETTINGS_MODULE: mmportal.settings_test
