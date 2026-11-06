@@ -1,0 +1,98 @@
+# Render the release placeholders before applying. Existing app migration/bootstrap/static only.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: accounts-release-RELEASE_ID
+  namespace: bmycure4mm
+spec:
+  activeDeadlineSeconds: 300
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 86400
+  template:
+    spec:
+      restartPolicy: Never
+      nodeSelector:
+        kubernetes.io/hostname: RELEASE_NODE
+      containers:
+        - name: release
+          image: ghcr.io/andreazedda/bmycure4mm@RELEASE_DIGEST
+          command:
+            - python
+            - -c
+            - |
+              import json, os, pathlib, sqlite3, tempfile
+              from contextlib import closing
+              os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mmportal.settings')
+              import django
+              django.setup()
+              from django.conf import settings
+              from django.core.management import call_command
+              from accounts.models import AccessPolicy, AccessProfile
+              assert settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3', 'Review backup procedure for the actual backend'
+              source = pathlib.Path(settings.DATABASES['default']['NAME'])
+              assert source.is_file(), 'Existing target database required; do not create a replacement'
+              root = source.parent / 'release-backups'
+              root.mkdir(mode=0o700, exist_ok=True)
+              os.chmod(root, 0o700)
+              sha = os.environ['BMY_SOURCE_SHA']
+              assert len(sha) == 40 and not pathlib.Path('/app/.git').exists()
+              backup = root / ('pre-' + sha[:12] + '.sqlite3')
+              if not backup.exists():
+                  with tempfile.NamedTemporaryFile(dir=root, prefix='.backup-', delete=False) as temp:
+                      temporary = pathlib.Path(temp.name)
+                  try:
+                      with closing(sqlite3.connect('file:' + str(source) + '?mode=ro', uri=True, timeout=15)) as live, closing(sqlite3.connect(temporary)) as saved:
+                          live.backup(saved)
+                          assert saved.execute('PRAGMA quick_check').fetchone()[0] == 'ok'
+                      try:
+                          os.link(temporary, backup)
+                      except FileExistsError:
+                          pass
+                  finally:
+                      temporary.unlink(missing_ok=True)
+              with closing(sqlite3.connect('file:' + str(backup) + '?mode=ro', uri=True)) as saved, closing(sqlite3.connect(':memory:')) as restored:
+                  saved.backup(restored)
+                  assert restored.execute('PRAGMA quick_check').fetchone()[0] == 'ok', 'Backup restore check failed'
+              call_command('migrate', interactive=False)
+              call_command('bootstrap_platform_owner')
+              call_command('collectstatic', interactive=False, verbosity=0)
+              assert (pathlib.Path(settings.STATIC_ROOT) / 'docs_viewer/reference.css').is_file()
+              assert (pathlib.Path(settings.STATIC_ROOT) / 'docs_images/models/logistic_growth.svg').is_file()
+              owner = AccessProfile.objects.get(is_owner=True)
+              policy = AccessPolicy.objects.get(pk=1)
+              result = {'source': sha, 'backup_restore': 'ok', 'owner_state': owner.access_state, 'owner_mfa_confirmed': owner.totp_confirmed, 'requests_open': policy.requests_open, 'activations_open': policy.activations_open, 'static_assets': 'present'}
+              pathlib.Path('/dev/termination-log').write_text(json.dumps(result))
+              print(json.dumps(result))
+          envFrom:
+            - configMapRef:
+                name: bmycure4mm-env
+            - secretRef:
+                name: bmycure4mm-secrets
+            - secretRef:
+                name: bmycure4mm-accounts
+          env:
+            - name: DJANGO_MIGRATE
+              value: '0'
+            - name: DJANGO_COLLECTSTATIC
+              value: '0'
+            - name: ACCOUNT_EMAIL_TASKS_ENABLED
+              value: '0'
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: '1'
+              memory: 512Mi
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: static
+              mountPath: /app/staticfiles
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: bmycure4mm-data-nfs
+        - name: static
+          persistentVolumeClaim:
+            claimName: bmycure4mm-static-nfs
