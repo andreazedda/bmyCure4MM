@@ -84,6 +84,8 @@ jobs:
 
   registration:
     runs-on: ubuntu-24.04
+    # Official v1.55.0-noble image; browser version matches the locked Python client.
+    container: mcr.microsoft.com/playwright/python@sha256:640d578aae63cfb632461d1b0aecb01414e4e020864ac3dd45a868dc0eff3078
     timeout-minutes: 15
     env:
       DJANGO_SETTINGS_MODULE: mmportal.settings_test
@@ -97,7 +99,6 @@ jobs:
           version: "0.12.3"
           enable-cache: true
       - run: uv sync --frozen --group screenshots
-      - run: uv run --frozen --group screenshots playwright install --with-deps chromium
       - run: uv run --frozen --group screenshots python manage.py test accounts.tests --noinput
       - run: uv run --frozen --group screenshots python manage.py test accounts.tests.browser_journey --noinput
 

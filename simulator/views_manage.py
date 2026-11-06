@@ -399,7 +399,7 @@ def simulate_scenario(request: HttpRequest, pk: int) -> HttpResponse:
 @login_required
 def export_attempt(request: HttpRequest, pk: int) -> HttpResponse:
     attempt = get_object_or_404(models.SimulationAttempt, pk=pk)
-    if getattr(request, "access_profile", None) and not request.access_profile.is_owner and attempt.user_id != request.user.pk:
+    if getattr(request, "access_profile", None) and not (request.access_profile.is_owner and request.user.is_staff) and attempt.user_id != request.user.pk:
         return HttpResponseForbidden("Not allowed")
     if attempt.user_id and attempt.user_id != request.user.id and not is_editor(request.user):
         return HttpResponseForbidden("Not allowed")
@@ -431,7 +431,7 @@ def attempt_plot_embed(request: HttpRequest, pk: int) -> HttpResponse:
     """
 
     attempt = get_object_or_404(models.SimulationAttempt, pk=pk)
-    if getattr(request, "access_profile", None) and not request.access_profile.is_owner and attempt.user_id != request.user.pk:
+    if getattr(request, "access_profile", None) and not (request.access_profile.is_owner and request.user.is_staff) and attempt.user_id != request.user.pk:
         return HttpResponseForbidden("Not allowed")
     if attempt.user_id and attempt.user_id != request.user.id and not is_editor(request.user):
         return HttpResponseForbidden("Not allowed")

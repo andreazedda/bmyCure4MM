@@ -20,7 +20,8 @@ def accessible_assessments(user, *, base_qs: QuerySet | None = None) -> QuerySet
     qs = base_qs if base_qs is not None else Assessment.objects.all()
     if user and getattr(user, "is_authenticated", False):
         from accounts.models import AccessProfile
-        if AccessProfile.objects.filter(user=user, is_owner=False).exists():
+        profile = AccessProfile.objects.filter(user=user).first()
+        if profile and not (profile.is_owner and user.is_staff):
             return qs.none()
 
     if not user or not getattr(user, "is_authenticated", False):

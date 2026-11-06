@@ -69,6 +69,12 @@ class ExistingSiteTests(LifecycleMixin, TestCase):
         self.assertRedirects(self.client.get("/manage/access-requests/"), "/accounts/security/")
         self.assertEqual(self.client.post("/accounts/security/", {"code": "000000"}).status_code, 200)
 
+    def test_owner_governance_does_not_grant_implicit_clinical_access(self):
+        self.sign_in(self.owner)
+        self.assertEqual(self.client.get("/manage/access-requests/").status_code, 200)
+        for path in ("/patients/", "/research/", "/api/patients/"):
+            self.assertIn(self.client.get(path).status_code, (403, 404), path)
+
     def test_registered_user_runs_existing_engine_and_cannot_export_another_users_run(self):
         from django.urls import reverse
 

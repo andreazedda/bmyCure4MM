@@ -39,7 +39,7 @@ class ProductAccessMiddleware(MiddlewareMixin):
             return None
         if not profile:
             return None  # Existing production users and public routes retain their established behavior.
-        if profile.is_owner or profile.is_approver:
+        if profile.is_owner and request.user.is_staff:
             if match.namespace == "admin":
                 from .security import mfa_current
 

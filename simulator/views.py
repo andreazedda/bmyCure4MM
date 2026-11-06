@@ -108,7 +108,7 @@ def visibility_diagnostics(request):
 def scenario_detail(request, pk: int):
     profile = getattr(request, "access_profile", None)
     visible_attempts = models.SimulationAttempt.objects.select_related("selected_regimen", "user")
-    if profile and not profile.is_owner:
+    if profile and not (profile.is_owner and request.user.is_staff):
         visible_attempts = visible_attempts.filter(user=request.user)
     scenario = get_object_or_404(
         models.Scenario.objects.prefetch_related("recommended_regimens", Prefetch("attempts", queryset=visible_attempts)),
@@ -118,7 +118,7 @@ def scenario_detail(request, pk: int):
     # Hide legacy/empty entries (e.g. saved without regimen/response/notes and without simulation outputs)
     # to reduce beginner confusion.
     own_attempts = scenario.attempts.all()
-    if profile and not profile.is_owner:
+    if profile and not (profile.is_owner and request.user.is_staff):
         own_attempts = own_attempts.filter(user=request.user)
     attempts_all = list(own_attempts)
     attempts = [
