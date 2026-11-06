@@ -8,10 +8,27 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import override_settings
 from playwright.sync_api import expect, sync_playwright
 
+from simulator.api_help import GOVERNED_STATIC_HELP
+from simulator.models_help import HelpArticle
+
 
 @override_settings(DEBUG=False, SECURE_SSL_REDIRECT=False)
 class DocumentationAccessibilityJourney(StaticLiveServerTestCase):
     host = '127.0.0.1'
+
+    def setUp(self):
+        super().setUp()
+        # LiveServer tests flush migration-seeded rows between classes. Declare
+        # the actual search index record so this journey is independent of order.
+        english = GOVERNED_STATIC_HELP['quickstart']['en']
+        italian = GOVERNED_STATIC_HELP['quickstart']['it']
+        HelpArticle.objects.update_or_create(
+            slug='quickstart',
+            defaults={
+                'title_en': english[0], 'body_en': english[1],
+                'title_it': italian[0], 'body_it': italian[1],
+            },
+        )
 
     def test_keyboard_reflow_help_recovery_and_contrast(self):
         errors = []

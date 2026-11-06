@@ -117,19 +117,18 @@
                     </div>
                 </div>
 
-                <div class="card shadow-sm mt-3">
-                    <div class="card-header">
-                        <h2 class="h6 mb-0"><span class="t-en">Input classification</span><span class="t-it">Classificazione degli input</span></h2>
-                    </div>
+                <details class="card shadow-sm mt-3" id="input-classification">
+                    <summary class="card-header fw-semibold" id="input-classification-title"><span class="t-en">Input classification and limitations</span><span class="t-it">Classificazione degli input e limiti</span></summary>
                     <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-sm align-middle mb-0">
+                        <p class="small text-muted m-3" id="input-classification-scroll-hint"><span class="t-en">On a small screen, scroll the table horizontally to read every column. With a keyboard, focus the table and use the left and right arrow keys.</span><span class="t-it">Su uno schermo piccolo, scorri la tabella in orizzontale per leggere tutte le colonne. Con la tastiera, porta il focus sulla tabella e usa le frecce sinistra e destra.</span></p>
+                        <div class="table-responsive" tabindex="0" role="region" aria-labelledby="input-classification-title" aria-describedby="input-classification-scroll-hint">
+                            <table class="table table-sm align-middle mb-0" style="min-width: 52rem;">
                                 <thead class="table-light">
                                     <tr>
                                         <th scope="col">Input</th>
-                                        <th scope="col">Classification</th>
-                                        <th scope="col">Purpose</th>
-                                        <th scope="col">Limitation</th>
+                                        <th scope="col"><span class="t-en">Classification</span><span class="t-it">Classificazione</span></th>
+                                        <th scope="col"><span class="t-en">Purpose</span><span class="t-it">Scopo</span></th>
+                                        <th scope="col"><span class="t-en">Limitation</span><span class="t-it">Limite</span></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -145,7 +144,7 @@
                             </table>
                         </div>
                     </div>
-                </div>
+                </details>
 
                 <div class="collapse {% if prefill_twin or not latest_simulation %}show{% endif %} mt-3" id="simulateScenarioPanel">
                     <div class="card shadow-sm">

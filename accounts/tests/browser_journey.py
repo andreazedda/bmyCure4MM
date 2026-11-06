@@ -264,6 +264,27 @@ class RegistrationBrowserJourney(StaticLiveServerTestCase):
                             self.assertEqual(computed.value.status, 200)
                             expect(page.get_by_role("link", name="Export study", exact=True)).to_be_visible()
                             page.reload()
+                        stage = "input classification disclosure and keyboard scrolling"
+                        classification = page.locator("#input-classification")
+                        summary = classification.locator("summary")
+                        self.assertFalse(classification.evaluate("e => e.open"))
+                        summary.focus()
+                        page.keyboard.press("Enter")
+                        self.assertTrue(classification.evaluate("e => e.open"))
+                        expect(classification.locator("tbody tr")).to_have_count(8)
+                        scroller = classification.get_by_role("region")
+                        scroller.focus()
+                        if viewport["width"] == 390:
+                            self.assertTrue(scroller.evaluate("e => e.scrollWidth > e.clientWidth"))
+                            page.keyboard.press("ArrowRight")
+                            page.wait_for_function(
+                                "document.querySelector('#input-classification [role=region]').scrollLeft > 0"
+                            )
+                        check_accessibility(page, viewport["width"])
+                        capture(page, f"07a-input-classification-{index}")
+                        summary.focus()
+                        page.keyboard.press("Enter")
+                        self.assertFalse(classification.evaluate("e => e.open"))
                         capture(page, f"07-results-{index}")
                         runs = db_call(
                             lambda: list(

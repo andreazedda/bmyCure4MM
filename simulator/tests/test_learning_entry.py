@@ -1,5 +1,6 @@
 from io import StringIO
 
+from cryptography.fernet import Fernet
 from django.core.management import call_command
 from django.test import TestCase, override_settings
 
@@ -7,7 +8,11 @@ from accounts.tests.helpers import TEST_SETTINGS, LifecycleMixin
 from simulator.models import Scenario
 
 
-@override_settings(**TEST_SETTINGS)
+@override_settings(
+    **TEST_SETTINGS,
+    ACCOUNT_TOKEN_ENCRYPTION_KEY=Fernet.generate_key().decode(),
+    EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
+)
 class LearningEntryTests(LifecycleMixin, TestCase):
     def setUp(self):
         self.initialize()
