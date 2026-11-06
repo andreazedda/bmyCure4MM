@@ -1,9 +1,10 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}{{ title }} - Documentation{% endblock %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'docs_viewer/reference.css' %}">
 <style>
     .doc-sidebar {
         position: sticky;
@@ -11,9 +12,21 @@
         max-height: calc(100vh - 100px);
         overflow-y: auto;
     }
+    .doc-content .admonition {padding:1rem;border-left:4px solid #0d6efd;background:#edf4ff;margin:1rem 0}
+    .doc-content .admonition.warning {border-color:#a66a00;background:#fff6dc}
+    .doc-content .admonition-title {font-weight:700;margin-bottom:.5rem}
+    .doc-content .arithmatex {overflow-x:auto;max-width:100%;margin:1rem 0}
+    .doc-content .mermaid {overflow:auto;margin:1.5rem 0}
+    .doc-content .mermaid svg {max-width:100%;height:auto}
+    .doc-content .highlight {position:relative}
+    .doc-content .highlight pre {padding-top:3.5rem}
+    .doc-copy {position:absolute;right:.5rem;top:.5rem;min-height:36px;background:white;border:1px solid #bcc9dc;border-radius:4px;color:#174f9a;padding:.25rem .75rem}
+    @media(max-width:767px) {.doc-sidebar {position:static;max-height:none}.doc-sidebar .toc-nav {max-height:180px;overflow:auto}}
     
     .doc-content {
         max-width: 900px;
+        min-width: 0;
+        overflow-wrap: anywhere;
     }
     
     .doc-content img {
@@ -22,7 +35,9 @@
     }
     
     .doc-content table {
-        width: 100%;
+        display: block;
+        overflow-x: auto;
+        max-width: 100%;
         margin: 1rem 0;
         border-collapse: collapse;
     }
@@ -132,7 +147,7 @@
         <div class="col-md-9">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h1 class="h3 mb-0">{{ title }}</h1>
+                    <span class="fw-semibold">{{ title }}</span>
                     <div class="btn-group">
                         <a href="{{ raw_url }}" class="btn btn-sm btn-outline-secondary" download>
                             <i class="bi bi-download"></i>
@@ -178,13 +193,9 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-<script>
-    // Highlight code blocks
-    document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('pre code').forEach((block) => {
-            hljs.highlightElement(block);
-        });
-    });
-</script>
+<script src="{% static 'docs_js/mathjax.js' %}"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+<script src="https://unpkg.com/mermaid@10.9.0/dist/mermaid.min.js"></script>
+<script src="{% static 'docs_js/mermaid-init.js' %}"></script>
+<script src="{% static 'docs_viewer/reference.js' %}"></script>
 {% endblock %}

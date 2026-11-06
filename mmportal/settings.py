@@ -195,7 +195,11 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-STATICFILES_DIRS: list[Path] = [BASE_DIR / "mmportal" / "static"]
+STATICFILES_DIRS: list[Path | tuple[str, Path]] = [BASE_DIR / "mmportal" / "static"]
+STATICFILES_DIRS += [
+    ("docs_images", BASE_DIR / "docs" / "assets" / "images"),
+    ("docs_js", BASE_DIR / "docs" / "assets" / "javascripts"),
+]
 
 MEDIA_URL = "/media/"
 _media_root = os.environ.get("DJANGO_MEDIA_ROOT")

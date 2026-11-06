@@ -220,11 +220,13 @@ class RetryJobViewTests(TestCase):
 class ChemToolsSecurityTests(TestCase):
     """Test security and access control for chemtools."""
     
-    def test_tools_home_requires_login(self) -> None:
-        """Test that tools home requires authentication."""
+    def test_public_tools_home_does_not_list_private_jobs(self) -> None:
+        """The existing public catalog never exposes a user's jobs."""
+        owner = get_user_model().objects.create_user("catalog-owner")
+        models.ChemJob.objects.create(kind=models.ChemJob.SIM, input_a="private-job-marker", user=owner)
         response = self.client.get(reverse("chemtools:tools_home"))
-        self.assertEqual(response.status_code, 302)
-        self.assertIn("/admin/login/", response.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "private-job-marker")
         
     def test_user_can_only_see_own_jobs(self) -> None:
         """Test that users can only see their own jobs."""
@@ -254,7 +256,7 @@ class JobDetailViewTests(TestCase):
         job = models.ChemJob.objects.create(kind=models.ChemJob.PARAM, input_a="CCO", user=self.user)
         response = self.client.get(reverse("chemtools:job_detail", args=[job.pk]))
         self.assertEqual(response.status_code, 302)
-        self.assertIn("/admin/login/", response.url)
+        self.assertIn("/accounts/login/", response.url)
         
     def test_job_detail_user_isolation(self) -> None:
         """Test that users can only view their own jobs."""

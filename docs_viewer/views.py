@@ -76,7 +76,7 @@ def docs_view(request, path):
         raise Http404(f"Error reading file: {str(e)}")
     
     # Render markdown
-    html_content, toc_html = render_markdown(content)
+    html_content, toc_html = render_markdown(content, source_path=path)
     
     # Extract metadata
     title = extract_title(content)

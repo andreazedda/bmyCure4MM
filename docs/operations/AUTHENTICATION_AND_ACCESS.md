@@ -1,6 +1,6 @@
 ---
 title: Authentication and Access
-status: IMPLEMENTED_RELEASE_PENDING
+status: CURRENT_PARTIAL
 owner: Andrea Zedda
 audience: users, maintainers and operators
 last_verified_at: 2026-11-06
@@ -79,9 +79,9 @@ After restoring a backup, **before exposing traffic**, run `python manage.py qua
 1. Verify SSH target, namespace, current web/worker digest, persistence, and restore capability. The historical local kubeconfig is not authoritative. Do not bypass certificate errors or touch other projects' routing/PVCs.
 2. Test migrations against an isolated equivalent database. Create a private online SQLite backup on the existing data volume and validate restore with `PRAGMA quick_check`; keep disaster backup/mirror separate. Save current deployment/config metadata privately.
 3. Publish only reviewed source through protected PR checks. Use a digest for both web and Celery. The old automatic mutable-`latest` restart has been replaced by an explicit digest release workflow, which requires these operator preflight steps.
-4. With gates closed, run migrations and owner bootstrap in a controlled one-shot Job; collect static files to the existing static PVC. Set secure cookies and the verified proxy/HTTPS configuration. Do not reset any existing owner's password.
+4. For initial onboarding keep gates closed. On routine releases preserve the owner’s current gate choices unless a migration needs a documented pause. Run migrations and idempotent owner bootstrap in a controlled one-shot Job; collect static files to the existing static PVC. Set secure cookies and the verified proxy/HTTPS configuration. Do not reset any existing owner's password.
 5. Roll out web and Celery by the same digest, verify readiness, source identity, ordinary routes, local JS and admin CSS, email acceptance/receipt separately, permissions and persistence. Open gates only when the owner can govern access.
-6. Rollback: close request/activation gates; set both deployments back to the recorded previous digest and check rollout/readiness. Leave additive account tables/index intact. Do not downgrade schema or restore an older clinical database merely to undo application code. The prior image will not offer product login; disclose this outage.
+6. Rollback: close request/activation gates; set both deployments back to the recorded previous digest and check rollout/readiness. Leave additive account tables/index intact. Do not downgrade schema or restore an older clinical database merely to undo application code. Choose the previous clean product image when available. The pre-registration image does not offer product login; disclose that outage if used.
 
 ## Requirements and verification evidence
 
@@ -92,10 +92,46 @@ After restoring a backup, **before exposing traffic**, run `python manage.py qua
 | Existing-site guide and private surfaces denied | existing templates, accounts middleware/DRF permission, simulator selectors | `accounts.tests.test_existing_site` |
 | Private suggestions, replies, retry deduplication | SupportTicket and existing-site console | existing-site tests; browser journey |
 | Real HTTP forms, CSRF, SMTP sink, desktop/mobile and authenticator | `accounts/tests/browser_journey.py` | explicit isolated browser test command below |
-| Production transport/receipt, rollout, owner first login | runtime and human actions | pending until separately verified; never inferred from local tests |
+| Production transport/receipt, rollout, owner first login | runtime and human actions | Verified independently on 2026-11-06; see bounded runtime evidence below |
 
 Run disposable backend tests with `BMY_TEST_ROOT=/tmp/bmy-registration-check DJANGO_SETTINGS_MODULE=mmportal.settings_test .venv/bin/python manage.py test accounts.tests --noinput`. The optional browser suite uses `uv sync --frozen --group screenshots`, Chromium, then `BMY_TEST_ROOT=/tmp/bmy-registration-browser DJANGO_SETTINGS_MODULE=mmportal.settings_test .venv/bin/python manage.py test accounts.tests.browser_journey --noinput`. It uses real browser forms and SMTP to a loopback mail sink, not simulated authentication or production mail recipients.
 
-Local release checks on 2026-11-06: 306 Django tests passed on disposable SQLite, including concurrent requests/approval/activation, registered-user execution of the existing real engine, cross-user result/export denial and private tickets. The browser journey passed desktop 1440×1000, mobile 390×844 and owner mobile management using actual CSRF forms, password login, TOTP and an isolated SMTP sink. Numerical baseline had no drift, lint/format/type checks and strict docs build passed. Dependency audit initially failed and was fixed by refreshing vulnerable security/web/tool dependencies; no advisory exceptions were added. A private online production backup was restored into memory and passed quick_check before runtime changes.
+## Verified runtime evidence — 2026-11-06
+
+Protected PRs #80 and #81 are merged. Web (one ready replica), existing Celery (two ready replicas) and account notification maintenance use source `2d464f68341378186c156e413cdcafa2dbfd84cd`, index digest `sha256:a37165e803b9d2a8f70d3782b71c5df71293edaefd0bde86ecdf1733f29dcec6`. Runtime source was read back and `/app/.git` is absent. Source lineage now comes from the explicit build SHA. Routine startup migration/static flags are disabled.
+
+The controlled migration/bootstrap/static Job succeeded with `OWNER_BOOTSTRAP=PRESERVED`. Runtime owner state is ACTIVE with confirmed MFA; the owner completed password setup and login personally and opened both request and activation gates. No external researcher was approved automatically. Existing administrator counts were preserved. Gmail TLS/app-password authentication and restricted Secret persistence passed; the actual owner activation message was accepted by SMTP and independently found in the recipient mailbox. This verifies that message’s receipt, not every later notification or spam-folder placement.
+
+HTTPS login and assets return successful responses, HTTP redirects to HTTPS, CSRF/session secure settings and HSTS are active. Production `check --deploy` retains one existing `security.W019` warning because SAMEORIGIN is used for authenticated embedded plots; this is not silently waived or presented as a zero-warning result. Migration drift check returned no changes. A transient 502 occurred during rollout and subsequent smoke returned 200.
+
+The initial release passed 307 local Django tests and 25 account tests against a disposable SQLite database on the actual NFS target (80.46 seconds total; peak RSS 236024 KiB). Later hardening passed its protected CI and real browser forms/CSRF/password/TOTP with two synthetic users and an isolated SMTP sink. The UX follow-up also runs the wider discovered suite and actual browser calculations/exports. Detailed UX findings and bounded verification are in the [audit](UX_AUDIT_2026_11_06.md).
+
+An online SQLite backup was restored into memory on the target and passed `quick_check`; this is not a complete disaster-recovery drill. Release incident: the previous mutable-latest deployment rescheduled during a pre-existing NotReady-node problem and applied additive migrations through old startup flags before the controlled Job. Gates stayed closed at that time and backups existed. Subsequent deployments use explicit digests and controlled Jobs. No clinical restore, schema downgrade or PVC deletion occurred.
+
+| Delivery control | Status | Scope of evidence |
+| --- | --- | --- |
+| OWNER_BOOTSTRAP | PASS | Idempotent isolated tests; production rerun preserved credentials/MFA |
+| OWNER_FIRST_LOGIN | PASS | Owner report and ACTIVE/confirmed-MFA runtime readback |
+| OWNER_ACCESS_MANAGEMENT | PASS | Synthetic owner browser console; owner’s runtime gate actions |
+| PUBLIC_ACCESS_REQUEST | PASS | Production form/gates; real HTTP submission in isolated browser |
+| EMAIL_VERIFICATION | PASS | Purpose-bound POST verification in sink/browser and negative tests |
+| OWNER_APPROVAL_REQUIRED | PASS | No activation before verified review; isolated negative tests |
+| SINGLE_USE_ACTIVATION | PASS | Real browser password setup; expiry/reuse/purpose tests |
+| NON_STAFF_LOGIN | PASS | Real password browser login and persisted role assertions |
+| SANDBOX_ISOLATION | PASS | Own existing learning attempts; no separate sandbox provisioning |
+| REAL_DEMO_SIMULATION | PASS | Existing real engine on independent synthetic test scenarios |
+| PRIVATE_DATA_DENIAL | PASS | Registered-user clinical/research/API/alias denial; not full #8 closure |
+| ARTIFACT_AUTHORIZATION | PASS | Own plot/export; cross-user and suspension checks; direct media closed |
+| QUOTAS_AND_CANCELLATION | NOT_TESTED | Existing compute behavior retained; no new budget/cancellation claim |
+| USER_FEEDBACK | PASS | Two independent authors; private replies persist across login |
+| SESSION_REVOCATION_AND_EXPIRY | PASS | Backend/browser access-state and version tests |
+| EMAIL_TRANSPORT | PASS | Actual Gmail TLS authentication and SMTP acceptance |
+| EMAIL_RECEIPT | PASS | Owner activation message only, independently verified |
+| DESKTOP_AND_MOBILE_E2E | PASS | Isolated browser journey; not human researcher acceptance |
+| PRODUCTION_DEPLOYMENT | PASS | Digest/source/replica readback for access hardening above |
+| PRODUCTION_SMOKE | PASS | Routes, assets, denial, HTTPS and secure headers; bounded surface |
+| ROLLBACK_READINESS | PASS | Prior digest and tested online backup; additive schema retained |
+| TRACKER_SYNC | PASS | GitHub/Notion/Trello/Asana dated updates; readback recorded in delivery |
+| REAL_RESEARCHER_ACCEPTANCE | PENDING_USER_ACTION | Explicit researcher authorization and human #78 acceptance remain separate |
 
 Release evidence is updated after protected CI and runtime verification. The abandoned parallel draft and its tests are not acceptance evidence for this implementation. No researcher is approved automatically; #78 requires Andrea's explicit authorization and real human acceptance.

@@ -3,8 +3,8 @@ title: Current System Architecture
 status: CURRENT_VERIFIED
 owner: Andrea Zedda
 audience: engineers, researchers and reviewers
-last_verified_at: 2026-08-24
-last_verified_git_sha: bf097810b337dc6b766cda04497005670cd96513
+last_verified_at: 2026-11-06
+last_verified_git_sha: 2d464f68341378186c156e413cdcafa2dbfd84cd
 source_of_truth: repository tree, Django configuration, model registry and current contracts
 ---
 
@@ -23,7 +23,7 @@ flowchart LR
     W --> DOCS["MkDocs and in-app documentation"]
 ```
 
-The primary UI is server-rendered Django with incremental HTMX interactions. Development uses SQLite by default. PostgreSQL and a production-grade runtime are target M0-S concerns unless separately verified in a deployment.
+The primary UI is server-rendered Django with incremental HTMX interactions. The verified 2026-11-06 cluster target also uses SQLite on an existing NFS data PVC. PostgreSQL is a separate target concern, not the deployed backend. Caddy routes the project host to web and the separate static service; media and static files have existing PVCs. Account notifications currently use a bounded minutely maintenance CronJob because broker delivery through the existing independent Redis endpoints is not yet proven. Web and existing Celery use the same digest-pinned image. See the [developer handbook](../development/DEVELOPMENT.md) for the current release boundary.
 
 ## Current application containers
 
@@ -35,9 +35,11 @@ flowchart TB
         TW["twin_engine\nstate, lineage, runs and research diagnostics"]
         CH["chemtools\noptional molecular utilities"]
         DV["docs_viewer\nin-app documentation"]
+        AC["accounts\nregistration, owner console and private tickets"]
         GV["governance\nmachine-readable release claims"]
     end
 
+    AC --> SI
     CL --> TW
     TW --> SI
     SI --> CH
@@ -53,7 +55,7 @@ flowchart TB
 - structured patient, assessment and treatment entities;
 - patient list/detail and clinical-history surfaces;
 - ownership fields and selected API filtering;
-- current product-authentication entry points;
+- legacy clinical authentication entry points;
 - temporary governed smoke-user command.
 
 Current limitation: object-level authorization is not yet consistently centralized across all web views and aggregate queries.
@@ -128,13 +130,15 @@ Private source documents and direct identifiers stay outside Git. The repository
 ## Current authentication boundary
 
 ```text
-public: documentation and selected simulator surfaces
-protected: clinic, research, simulator-management and API surfaces
-configured login target: Django admin login
-normal product login/role contract: incomplete
+public: documentation, access requests, login and synthetic learning catalog
+registered member: own existing learning attempts/exports and private tickets
+owner with MFA: request review, account state/expiry, gates and ticket replies
+clinical/research/admin: separate existing permissions, denied to new registrants
 ```
 
-The target least-privilege role architecture is tracked in M0-S issue `#8`; it is not current behavior.
+The `accounts` app extends the existing Django User. It does not replace the user model or make approved members staff. Verification, approval, activation and email delivery are separate states. Session version, current access and expiry are checked on protected requests. Object selectors scope saved learning attempts and exports to their author. See the [lifecycle and recovery contract](../operations/AUTHENTICATION_AND_ACCESS.md).
+
+This delivery does not complete broad research RBAC issue #8 or the first external researcher pilot #78. No second demo portal, assigned scenario provisioning, compute worker or parallel quota system was introduced.
 
 ## Current deployment and CI boundary
 

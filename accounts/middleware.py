@@ -74,7 +74,7 @@ class ProductAccessMiddleware(MiddlewareMixin):
 
     def process_response(self, request, response):
         match = getattr(request, "resolver_match", None)
-        if match and match.namespace == "accounts":
+        if getattr(request, "access_profile", None) or (match and match.namespace == "accounts"):
             response["Cache-Control"] = "no-store, private"
             response["Referrer-Policy"] = "same-origin"
         return response

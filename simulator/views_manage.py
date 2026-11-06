@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
+from urllib.parse import urlsplit
 from typing import Iterable, Any
 
 from django.contrib import messages
@@ -11,6 +12,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db import transaction
 from django.db.models import Count, Q
 from django.http import (
+    FileResponse,
+    Http404,
     HttpRequest,
     HttpResponse,
     HttpResponseBadRequest,
@@ -396,6 +399,27 @@ def simulate_scenario(request: HttpRequest, pk: int) -> HttpResponse:
     return HttpResponse(html)
 
 
+def _attempt_artifact_path(attempt, kind: str) -> Path:
+    """Resolve only the selected run's artifact inside the private media root."""
+    artifacts = attempt.artifacts or {}
+    value = artifacts.get(kind) if isinstance(artifacts, dict) else None
+    if not isinstance(value, str) or not value:
+        raise Http404("Artifact unavailable")
+    parts = urlsplit(value)
+    if parts.scheme or parts.netloc or parts.query or parts.fragment:
+        raise Http404("Artifact unavailable")
+    media_url = settings.MEDIA_URL or "/media/"
+    if value.startswith(media_url):
+        relative = value[len(media_url):]
+    else:
+        relative = value.lstrip("/").removeprefix("media/")
+    root = Path(settings.MEDIA_ROOT).resolve()
+    path = (root / relative).resolve()
+    if not path.is_relative_to(root) or not path.is_file():
+        raise Http404("Artifact unavailable")
+    return path
+
+
 @login_required
 def export_attempt(request: HttpRequest, pk: int) -> HttpResponse:
     attempt = get_object_or_404(models.SimulationAttempt, pk=pk)
@@ -403,6 +427,11 @@ def export_attempt(request: HttpRequest, pk: int) -> HttpResponse:
         return HttpResponseForbidden("Not allowed")
     if attempt.user_id and attempt.user_id != request.user.id and not is_editor(request.user):
         return HttpResponseForbidden("Not allowed")
+    if request.GET.get("format") == "csv":
+        path = _attempt_artifact_path(attempt, "csv")
+        response = FileResponse(path.open("rb"), as_attachment=True, filename=f"simulation-{attempt.pk}.csv", content_type="text/csv")
+        response["Cache-Control"] = "no-store, private"
+        return response
     payload = {
         "governance": governance_metadata(
             epistemic_label=EpistemicLabel.SIMULATED,
@@ -436,37 +465,7 @@ def attempt_plot_embed(request: HttpRequest, pk: int) -> HttpResponse:
     if attempt.user_id and attempt.user_id != request.user.id and not is_editor(request.user):
         return HttpResponseForbidden("Not allowed")
 
-    artifacts = attempt.artifacts or {}
-    if not isinstance(artifacts, dict):
-        return HttpResponseBadRequest("Invalid artifacts")
-
-    plot_url = artifacts.get("plot")
-    if not plot_url or not isinstance(plot_url, str):
-        return HttpResponseBadRequest("No plot artifact")
-
-    # Convert /media/... URLs into a safe filesystem path under MEDIA_ROOT.
-    rel_path = plot_url
-    media_url = getattr(settings, "MEDIA_URL", "/media/") or "/media/"
-    if rel_path.startswith(media_url):
-        rel_path = rel_path[len(media_url):]
-    else:
-        rel_path = rel_path.lstrip("/")
-        if rel_path.startswith("media/"):
-            rel_path = rel_path[len("media/"):]
-
-    media_root = Path(getattr(settings, "MEDIA_ROOT"))
-    abs_path = (media_root / rel_path)
-    try:
-        abs_resolved = abs_path.resolve()
-        media_resolved = media_root.resolve()
-    except Exception:
-        return HttpResponseForbidden("Invalid plot path")
-
-    if not (abs_resolved == media_resolved or media_resolved in abs_resolved.parents):
-        return HttpResponseForbidden("Invalid plot path")
-
-    if not abs_resolved.exists():
-        return HttpResponseBadRequest("Plot file not found")
+    abs_resolved = _attempt_artifact_path(attempt, "plot")
 
     plot_html = abs_resolved.read_text(encoding="utf-8", errors="replace")
     lower = plot_html.lower()

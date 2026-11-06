@@ -3,11 +3,16 @@ Utility functions for documentation viewer with security controls.
 """
 import os
 import re
+import posixpath
 from pathlib import Path
 from typing import List, Tuple, Optional
 from django.conf import settings
 import markdown
-from markdown.extensions import toc, fenced_code, tables, codehilite
+from markdown.extensions import Extension
+from markdown.treeprocessors import Treeprocessor
+from django.templatetags.static import static
+from urllib.parse import urlsplit, urlunsplit, unquote
+from pymdownx.superfences import fence_div_format
 
 
 # Whitelist of allowed documentation directories
@@ -34,12 +39,12 @@ def is_safe_path(path: str) -> bool:
     normalized = os.path.normpath(path)
     
     # Check for path traversal
-    if '..' in normalized or normalized.startswith('/'):
+    if '..' in normalized or normalized.startswith('/') or Path(normalized).suffix.lower() not in {'.md', '.markdown'}:
         return False
     
     # Check whitelist
     allowed = any(
-        normalized.startswith(allowed_path) or normalized == allowed_path
+        (normalized.startswith(allowed_path) if allowed_path.endswith('/') else normalized == allowed_path)
         for allowed_path in ALLOWED_DOC_PATHS
     )
     if not allowed:
@@ -47,6 +52,8 @@ def is_safe_path(path: str) -> bool:
     
     # Check file exists
     full_path = os.path.join(settings.BASE_DIR, normalized)
+    if not Path(full_path).resolve().is_relative_to(Path(settings.BASE_DIR).resolve()):
+        return False
     if not os.path.exists(full_path):
         return False
     
@@ -81,7 +88,40 @@ def get_allowed_doc_paths() -> List[str]:
     return sorted(docs)
 
 
-def render_markdown(content: str) -> str:
+class DocumentationReferences(Treeprocessor):
+    def __init__(self, md, source_path):
+        super().__init__(md)
+        self.source_path = source_path
+
+    def run(self, root):
+        for element in root.iter():
+            attribute = 'src' if element.tag == 'img' else 'href' if element.tag == 'a' else None
+            if not attribute:
+                continue
+            original = element.get(attribute, '')
+            parts = urlsplit(original)
+            if parts.scheme or parts.netloc or not parts.path or parts.path.startswith('/'):
+                continue
+            resolved = posixpath.normpath(posixpath.join(posixpath.dirname(self.source_path), unquote(parts.path)))
+            if attribute == 'href' and is_safe_path(resolved):
+                element.set(attribute, urlunsplit(('', '', '/docs/view/' + resolved, parts.query, parts.fragment)))
+            elif attribute == 'src' and resolved.startswith('docs/assets/images/'):
+                image_root = Path(settings.BASE_DIR, 'docs/assets/images').resolve()
+                image = Path(settings.BASE_DIR, resolved).resolve()
+                if image.is_file() and image.is_relative_to(image_root):
+                    element.set(attribute, static('docs_images/' + resolved.removeprefix('docs/assets/images/')))
+
+
+class DocumentationExtension(Extension):
+    def __init__(self, source_path):
+        self.source_path = source_path
+        super().__init__()
+
+    def extendMarkdown(self, md):
+        md.treeprocessors.register(DocumentationReferences(md, self.source_path), 'documentation_references', 5)
+
+
+def render_markdown(content: str, source_path: str = '') -> tuple[str, str]:
     """
     Render markdown to HTML with syntax highlighting and TOC.
     
@@ -94,21 +134,31 @@ def render_markdown(content: str) -> str:
     md = markdown.Markdown(
         extensions=[
             'toc',
-            'fenced_code',
+            'meta',
+            'admonition',
+            'attr_list',
+            'def_list',
+            'pymdownx.superfences',
+            'pymdownx.arithmatex',
             'tables',
             'codehilite',
             'nl2br',
             'sane_lists',
+            DocumentationExtension(source_path),
         ],
         extension_configs={
             'codehilite': {
                 'css_class': 'highlight',
                 'linenums': False,
             },
+            'pymdownx.arithmatex': {'generic': True},
+            'pymdownx.superfences': {
+                'custom_fences': [{'name': 'mermaid', 'class': 'mermaid', 'format': fence_div_format}],
+            },
             'toc': {
                 'permalink': True,
                 'permalink_class': 'headerlink',
-                'title': 'Table of Contents',
+                'title': '',
             }
         }
     )
@@ -168,12 +218,13 @@ def validate_markdown_links(content: str, base_path: str) -> List[str]:
         link_url = match.group(2)
         
         # Skip external links
-        if link_url.startswith(('http://', 'https://', 'mailto:', '#')):
+        parts = urlsplit(link_url)
+        if parts.scheme or parts.netloc or not parts.path:
             continue
         
         # Resolve relative link
         link_path = os.path.normpath(
-            os.path.join(os.path.dirname(base_path), link_url)
+            os.path.join(os.path.dirname(base_path), unquote(parts.path))
         )
         full_path = os.path.join(base_dir, link_path)
         

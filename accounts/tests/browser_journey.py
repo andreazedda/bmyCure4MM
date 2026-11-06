@@ -4,6 +4,7 @@ import io
 import re
 import secrets
 import socket
+import traceback
 from concurrent.futures import ThreadPoolExecutor
 from email import message_from_bytes
 
@@ -19,6 +20,7 @@ from playwright.sync_api import expect, sync_playwright
 from accounts import services
 from accounts.models import AccessProfile, Notification
 from accounts.notifications import dispatch_notification
+from simulator.models import Scenario, SimulationAttempt
 
 from .helpers import TEST_SETTINGS, open_policy
 
@@ -55,6 +57,7 @@ class RegistrationBrowserJourney(StaticLiveServerTestCase):
         smtp.start()
         password = secrets.token_urlsafe(24)
         errors, bad_assets = [], []
+        stage = "account setup"
 
         def db_call(fn):
             def operation():
@@ -108,6 +111,14 @@ class RegistrationBrowserJourney(StaticLiveServerTestCase):
             ):
                 open_policy()
                 services.bootstrap_owner()
+                scenario_id = db_call(
+                    lambda: Scenario.objects.create(
+                        title="Synthetic browser learning example",
+                        clinical_stage="newly_diagnosed",
+                        summary="Independent synthetic software verification",
+                        risk_stratification="Standard",
+                    ).pk
+                )
                 with sync_playwright() as playwright:
                     browser = playwright.chromium.launch()
                     owner_context = browser.new_context(viewport={"width": 1280, "height": 900})
@@ -139,6 +150,7 @@ class RegistrationBrowserJourney(StaticLiveServerTestCase):
                         owner_page.get_by_role("heading", name="Access requests", exact=True)
                     ).to_be_visible()
 
+                    first_run = None
                     for index, viewport in enumerate(
                         ({"width": 1440, "height": 1000}, {"width": 390, "height": 844})
                     ):
@@ -184,6 +196,58 @@ class RegistrationBrowserJourney(StaticLiveServerTestCase):
                         expect(
                             page.get_by_text("Explore the learning scenarios", exact=False)
                         ).to_be_visible()
+                        stage = "real simulation and authorized artifacts"
+                        page.goto(self.live_server_url + "/learn/")
+                        page.get_by_role(
+                            "link", name="Synthetic browser learning example", exact=True
+                        ).click()
+                        for dose in (20, 25):
+                            if not page.locator("#simulateScenarioPanel").is_visible():
+                                page.get_by_role("link", name="Open simulation form", exact=True).click()
+                            page.locator('[name="lenalidomide_dose"]').fill(str(dose))
+                            page.locator('[name="time_horizon"]').fill("30")
+                            with page.expect_response(
+                                lambda r: "/simulate/" in r.url and r.request.method == "POST"
+                            ) as computed:
+                                page.get_by_role("button", name="Run simulation", exact=True).click()
+                            self.assertEqual(computed.value.status, 200)
+                            expect(page.get_by_role("link", name="Export study", exact=True)).to_be_visible()
+                            page.reload()
+                        runs = db_call(
+                            lambda: list(
+                                SimulationAttempt.objects.filter(user__email=email, scenario_id=scenario_id)
+                                .order_by("pk")
+                                .values("pk", "parameters", "results_summary")
+                            )
+                        )
+                        self.assertEqual(len(runs), 2)
+                        self.assertEqual([r["parameters"]["lenalidomide_dose"] for r in runs], [20, 25])
+                        self.assertNotEqual(runs[0]["results_summary"], runs[1]["results_summary"])
+                        self.assertEqual(
+                            db_call(lambda: Scenario.objects.get(pk=scenario_id).title),
+                            "Synthetic browser learning example",
+                        )
+                        stage = "authorized plot and CSV export"
+                        plot_url = page.get_by_role("link", name="View plot", exact=True).get_attribute(
+                            "href"
+                        )
+                        plot_page = context.new_page()
+                        self.assertEqual(plot_page.goto(self.live_server_url + plot_url).status, 200)
+                        expect(plot_page.locator(".plotly-graph-div")).to_be_visible()
+                        plot_page.close()
+                        export_url = page.get_by_role("link", name="Export study", exact=True).get_attribute(
+                            "href"
+                        )
+                        self.assertEqual(page.request.get(self.live_server_url + export_url).status, 200)
+                        with page.expect_download() as download:
+                            page.get_by_role("link", name="Download CSV", exact=True).click()
+                        self.assertTrue(download.value.suggested_filename.endswith(".csv"))
+                        if index:
+                            self.assertIsNotNone(first_run)
+                            forbidden = self.live_server_url + f"/sim/attempts/{first_run}/export/"
+                            self.assertEqual(page.request.get(forbidden).status, 403)
+                        else:
+                            first_run = runs[0]["pk"]
                         page.goto(self.live_server_url + "/feedback/")
                         page.get_by_label("Category", exact=True).select_option("usability")
                         message = f"Synthetic suggestion {index}: make the first steps clearer."
@@ -221,9 +285,45 @@ class RegistrationBrowserJourney(StaticLiveServerTestCase):
                         owner_page.get_by_role("heading", name="User tickets and suggestions")
                     ).to_be_visible()
                     self.assertLessEqual(owner_page.evaluate("document.documentElement.scrollWidth"), 390)
+                    stage = "documentation and localized forms"
+                    for width in (1280, 390):
+                        docs_context = browser.new_context(viewport={"width": width, "height": 844})
+                        docs_page = docs_context.new_page()
+                        docs_page.goto(self.live_server_url + "/docs/")
+                        docs_page.get_by_role("link", name="Open the handbook", exact=True).click()
+                        expect(docs_page.locator(".mermaid svg").first).to_be_visible(timeout=20000)
+                        expect(docs_page.locator("mjx-container").first).to_be_visible(timeout=20000)
+                        expect(docs_page.get_by_role("button", name="Copy code").first).to_be_visible()
+                        self.assertTrue(
+                            docs_page.evaluate(
+                                "[...document.querySelectorAll('.doc-content img')].every(i=>i.complete && i.naturalWidth>0)"
+                            )
+                        )
+                        self.assertLessEqual(
+                            docs_page.evaluate("document.documentElement.scrollWidth"), width
+                        )
+                        docs_page.goto(self.live_server_url + "/accounts/login/")
+                        docs_page.get_by_role("button", name="IT", exact=True).click()
+                        expect(docs_page.get_by_role("heading", name="Accedi", exact=True)).to_be_visible()
+                        expect(docs_page.get_by_label("Email", exact=True)).to_be_visible()
+                        docs_page.get_by_role("link", name="Richiedi accesso", exact=True).click()
+                        expect(docs_page.get_by_label("Motivo della richiesta", exact=True)).to_be_visible()
+                        self.assertEqual(docs_page.locator("html").get_attribute("lang"), "it")
+                        self.assertLessEqual(
+                            docs_page.evaluate("document.documentElement.scrollWidth"), width
+                        )
+                        docs_context.close()
                     self.assertFalse(errors, "Browser JavaScript errors")
                     self.assertFalse(bad_assets, "Missing local CSS or JavaScript")
                     self.assertTrue(db_call(lambda: Notification.objects.filter(state="sent").exists()))
                     browser.close()
+        except Exception as exc:
+            frame = next(
+                f for f in reversed(traceback.extract_tb(exc.__traceback__)) if f.filename == __file__
+            )
+            # Playwright diagnostics can include capability URLs or entered credentials.
+            raise AssertionError(
+                f"Isolated browser journey failed during {stage}: {type(exc).__name__} at line {frame.lineno}"
+            ) from None
         finally:
             smtp.stop()
