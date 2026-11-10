@@ -1,0 +1,345 @@
+{
+  "version": "2.1",
+  "type": "MICROTASK_EXECUTION_MANIFEST",
+  "group": "M0_R",
+  "generated_at": "2026-11-10",
+  "verified_source_sha": "4a62cf7f1b6f05724faec203f2f3b8847f88868b",
+  "notes": "Source symbol-line references are anchored only at the inspected SHA. Verify before editing. All tasks are planned, not executed. Do not use this document as permission to handle protected data.",
+  "shared_preflight": [
+    "Review issue and current HEAD; confirm task remains open/unblocked.",
+    "Re-resolve exact file/function and line numbers on current source SHA.",
+    "Create synthetic failing fixture or verified absence of behavior.",
+    "Implement minimal change, run tests, preserve negative evidence and update issue checkbox only after CI and applicable gate."
+  ],
+  "shared_completion": [
+    "Reviewed PR and actual SHA",
+    "Focused and negative tests",
+    "Privacy/security regression gate",
+    "Cited scientific evidence only when claim concerns a biological outcome",
+    "Cross-tool readback"
+  ],
+  "goals": [
+    {
+      "issue": 13,
+      "title": "[M0-R][CI] Consolidate existing workflows into mandatory scientific quality gates and protected PR governance",
+      "source_candidates": [
+        {
+          "path": "scripts/check_repository_hygiene.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/scripts/check_repository_hygiene.py"
+        },
+        {
+          "path": "scripts/check_numerical_baseline.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/scripts/check_numerical_baseline.py"
+        }
+      ],
+      "candidate_scientific_sources": [],
+      "tasks": [
+        {
+          "id": "M13.T01",
+          "objective": "Compare branch protection required contexts against current green CI and deployed SHA.",
+          "test_candidates": [
+            "twin_engine.tests.test_services",
+            "simulator.tests.test_numerical_sanity"
+          ],
+          "negative_case": "Invalid/missing input and environment failure must be tested and produce deterministic error/blocked evidence.",
+          "human_gate": "REQUIRES_REVIEW_BEFORE_EXTERNAL_ACTION",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M13.T02",
+          "objective": "Unify `uv lock --check`, migrations, format, mypy, tests, PHI/secret scan and numeric golden in a mandatory aggregator.",
+          "test_candidates": [
+            "twin_engine.tests.test_services",
+            "simulator.tests.test_numerical_sanity"
+          ],
+          "negative_case": "Invalid/missing input and environment failure must be tested and produce deterministic error/blocked evidence.",
+          "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M13.T03",
+          "objective": "Make staged diff and base/head PR safety scanning distinct, with false-positive review but no privacy bypass.",
+          "test_candidates": [
+            "twin_engine.tests.test_services",
+            "simulator.tests.test_numerical_sanity"
+          ],
+          "negative_case": "Invalid/missing input and environment failure must be tested and produce deterministic error/blocked evidence.",
+          "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M13.T04",
+          "objective": "Run negative fixtures that intentionally violate each check and prove the gate fails.",
+          "test_candidates": [
+            "twin_engine.tests.test_services",
+            "simulator.tests.test_numerical_sanity"
+          ],
+          "negative_case": "Invalid/missing input and environment failure must be tested and produce deterministic error/blocked evidence.",
+          "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M13.T05",
+          "objective": "Add or update explicit synthetic tests and negative/failure cases in the module's established test suite; do not use real patient data.",
+          "test_candidates": [
+            "accounts.tests.test_lifecycle",
+            "accounts.tests.test_existing_site",
+            "clinic.tests.test_security_and_ux"
+          ],
+          "negative_case": "Unauthorized, revoked and unrelated-scope synthetic users must not access target objects, exports or metadata.",
+          "human_gate": "REQUIRES_REVIEW_BEFORE_EXTERNAL_ACTION",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M13.T06",
+          "objective": "Execute relevant quality/safety/numerical checks and record compare-to-previous SHA; never mark passed without logs.",
+          "test_candidates": [
+            "twin_engine.tests.test_services",
+            "simulator.tests.test_numerical_sanity"
+          ],
+          "negative_case": "Invalid/missing input and environment failure must be tested and produce deterministic error/blocked evidence.",
+          "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M13.T07",
+          "objective": "Update canonical docs and backlink to this goal + release gate without making unvalidated claims.",
+          "test_candidates": [
+            "twin_engine.tests.test_services",
+            "simulator.tests.test_numerical_sanity"
+          ],
+          "negative_case": "Invalid/missing input and environment failure must be tested and produce deterministic error/blocked evidence.",
+          "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS",
+          "status": "PLANNED"
+        }
+      ]
+    },
+    {
+      "issue": 23,
+      "title": "[M0-R][QA] Enforce the minimum scientific invariants and define the extended test architecture",
+      "source_candidates": [
+        {
+          "path": "scripts/check_numerical_baseline.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/scripts/check_numerical_baseline.py"
+        },
+        {
+          "path": "twin_engine/tests/test_run_manifests.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/tests/test_run_manifests.py"
+        },
+        {
+          "path": "simulator/tests/test_numerical_sanity.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/tests/test_numerical_sanity.py"
+        },
+        {
+          "path": "accounts/tests/test_existing_site.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/accounts/tests/test_existing_site.py"
+        }
+      ],
+      "candidate_scientific_sources": [],
+      "tasks": [
+        {
+          "id": "M23.T01",
+          "objective": "Write testable model invariants: units, nonnegativity when applicable, seeds, schedule timing, hash identity. Evidence: current SHA/source span, failing synthetic test or verified gap, minimal PR and passing focused regression.",
+          "test_candidates": [
+            "twin_engine.tests.test_exposure_bridge",
+            "simulator.tests.test_pkpd_yaml"
+          ],
+          "negative_case": "Missing source, unit, unidentifiable parameter or no held-out gain must result in explicit unsupported/blocked status.",
+          "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M23.T02",
+          "objective": "Add property-based fixtures for stage transitions, negative/zero doses and artifact tampering. Evidence: current SHA/source span, failing synthetic test or verified gap, minimal PR and passing focused regression.",
+          "test_candidates": [
+            "twin_engine.tests.test_exposure_bridge",
+            "simulator.tests.test_pkpd_yaml"
+          ],
+          "negative_case": "Missing source, unit, unidentifiable parameter or no held-out gain must result in explicit unsupported/blocked status.",
+          "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M23.T03",
+          "objective": "Exercise synthetic migration forward/back and IDOR/PHI scanning negative cases. Evidence: current SHA/source span, failing synthetic test or verified gap, minimal PR and passing focused regression.",
+          "test_candidates": [
+            "accounts.tests.test_lifecycle",
+            "accounts.tests.test_existing_site",
+            "clinic.tests.test_security_and_ux"
+          ],
+          "negative_case": "Unauthorized, revoked and unrelated-scope synthetic users must not access target objects, exports or metadata.",
+          "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M23.T04",
+          "objective": "Make changed golden outputs explicitly versioned with model meaning and reviewer acceptance. Evidence: current SHA/source span, failing synthetic test or verified gap, minimal PR and passing focused regression.",
+          "test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_case": "Missing source, unit, unidentifiable parameter or no held-out gain must result in explicit unsupported/blocked status.",
+          "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M23.T05",
+          "objective": "Add negative/privacy/edge-case tests in existing suite; record command and expected failures.",
+          "test_candidates": [
+            "accounts.tests.test_lifecycle",
+            "accounts.tests.test_existing_site",
+            "clinic.tests.test_security_and_ux"
+          ],
+          "negative_case": "Unauthorized, revoked and unrelated-scope synthetic users must not access target objects, exports or metadata.",
+          "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M23.T06",
+          "objective": "Run applicable full CI/numerical/PHI gates and inspect diff against prior model version.",
+          "test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_case": "Missing source, unit, unidentifiable parameter or no held-out gain must result in explicit unsupported/blocked status.",
+          "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M23.T07",
+          "objective": "Reconcile related GitHub issue/Notion goal/Asana/Trello mirror with redacted evidence.",
+          "test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_case": "Missing source, unit, unidentifiable parameter or no held-out gain must result in explicit unsupported/blocked status.",
+          "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS",
+          "status": "PLANNED"
+        }
+      ]
+    },
+    {
+      "issue": 26,
+      "title": "[M0-R TRACKER] Canonical Scientific Baseline",
+      "source_candidates": [
+        {
+          "path": "docs/product/CURRENT_STATE.md",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/docs/product/CURRENT_STATE.md"
+        },
+        {
+          "path": "docs/development/CODE_ATLAS.md",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/docs/development/CODE_ATLAS.md"
+        }
+      ],
+      "candidate_scientific_sources": [],
+      "tasks": [
+        {
+          "id": "M26.T01",
+          "objective": "Read all M0-R child-issue statuses from GitHub; reconcile any stale Notion-based status. Evidence: exact symbol/line anchor + failing case or negative proof + focused test + SHA/PR.",
+          "test_candidates": [
+            "accounts.tests.test_lifecycle",
+            "accounts.tests.test_existing_site",
+            "clinic.tests.test_security_and_ux"
+          ],
+          "negative_case": "Unauthorized, revoked and unrelated-scope synthetic users must not access target objects, exports or metadata.",
+          "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M26.T02",
+          "objective": "Verify schema, model registry, uv lock, source audit and numerical baseline at one SHA. Evidence: exact symbol/line anchor + failing case or negative proof + focused test + SHA/PR.",
+          "test_candidates": [
+            "accounts.tests.test_lifecycle",
+            "accounts.tests.test_existing_site",
+            "clinic.tests.test_security_and_ux"
+          ],
+          "negative_case": "Unauthorized, revoked and unrelated-scope synthetic users must not access target objects, exports or metadata.",
+          "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M26.T03",
+          "objective": "Demand independent CI readback, PHI scan and proof of fixed negative tests for each child. Evidence: exact symbol/line anchor + failing case or negative proof + focused test + SHA/PR.",
+          "test_candidates": [
+            "accounts.tests.test_lifecycle",
+            "accounts.tests.test_existing_site",
+            "clinic.tests.test_security_and_ux"
+          ],
+          "negative_case": "Unauthorized, revoked and unrelated-scope synthetic users must not access target objects, exports or metadata.",
+          "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M26.T04",
+          "objective": "Publish precise blockers and close tracker only after all mandatory child gates are evidenced. Evidence: exact symbol/line anchor + failing case or negative proof + focused test + SHA/PR.",
+          "test_candidates": [
+            "accounts.tests.test_lifecycle",
+            "accounts.tests.test_existing_site",
+            "clinic.tests.test_security_and_ux"
+          ],
+          "negative_case": "Unauthorized, revoked and unrelated-scope synthetic users must not access target objects, exports or metadata.",
+          "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M26.T05",
+          "objective": "Add synthetic regression and negative authorization/privacy/failure fixtures.",
+          "test_candidates": [
+            "accounts.tests.test_lifecycle",
+            "accounts.tests.test_existing_site",
+            "clinic.tests.test_security_and_ux"
+          ],
+          "negative_case": "Unauthorized, revoked and unrelated-scope synthetic users must not access target objects, exports or metadata.",
+          "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M26.T06",
+          "objective": "Run relevant full suite, privacy gate, source-doc check and numerical golden.",
+          "test_candidates": [
+            "twin_engine.tests.test_services",
+            "simulator.tests.test_numerical_sanity"
+          ],
+          "negative_case": "Invalid/missing input and environment failure must be tested and produce deterministic error/blocked evidence.",
+          "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M26.T07",
+          "objective": "Update linked milestone + Asana/Notion/Trello with public-safe, source-bound evidence.",
+          "test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_case": "Missing source, unit, unidentifiable parameter or no held-out gain must result in explicit unsupported/blocked status.",
+          "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS",
+          "status": "PLANNED"
+        }
+      ]
+    }
+  ]
+}

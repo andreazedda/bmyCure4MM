@@ -1,0 +1,1158 @@
+{
+  "version": "2.1",
+  "group": "M4",
+  "source_sha": "4a62cf7f1b6f05724faec203f2f3b8847f88868b",
+  "issue_count": 7,
+  "task_count": 49,
+  "preflight": "Read issue and current source; locate symbol/line by source SHA. Freeze scientific question, comparator and assumptions before implementation; preserve null/negative results and never promote research predictions to clinical advice.",
+  "goals": [
+    {
+      "issue": 46,
+      "title": "[M4][ARCHITECTURE] Define the multiscale Multiple Myeloma state-vector contract v0.4",
+      "source_candidates": [
+        {
+          "path": "simulator/design/types.py",
+          "symbol_hint": "TumorState",
+          "verified_file_at_sha": true,
+          "line": 50,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/design/types.py"
+        },
+        {
+          "path": "twin_engine/model_registry.json",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/model_registry.json"
+        },
+        {
+          "path": "twin_engine/observation_model.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/observation_model.py"
+        }
+      ],
+      "evidence_sources_to_verify": [
+        "https://www.nature.com/articles/s41588-024-01853-0",
+        "https://www.nature.com/articles/s41591-023-02491-5"
+      ],
+      "tasks": [
+        {
+          "id": "M46.T01",
+          "objective": "Define a versioned multiscale state vector separating tumor bulk, subclones, putative reservoir, healthy lineages, marrow niche, immunity and organs.",
+          "existing_test_candidates": [
+            "simulator.tests.test_api_design_report",
+            "simulator.tests.test_numerical_sanity"
+          ],
+          "negative_control": "Non-identifiable alternative mechanism or missing observation must remain hypothetical and may show NO_GAIN_OVER_BASELINE.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M46.T02",
+          "objective": "Annotate every state with observable proxy, biological evidence, unit, timescale and missingness.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M46.T03",
+          "objective": "Keep incompatible and non-identifiable state components optional; no automatic mapping risk score→growth rate.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M46.T04",
+          "objective": "Provide dimensional-analysis tests, synthetic initial-value validation and compare to minimal logistic baseline.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Patient leakage, licensing restriction, missing source/assay, and no gain over baseline must fail closed.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M46.T05",
+          "objective": "Add dimension, positivity, conservation, seeded reproducibility and no-data negative tests.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Patient leakage, licensing restriction, missing source/assay, and no gain over baseline must fail closed.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M46.T06",
+          "objective": "Version model/parameter meaning and run numerical baseline plus source/PHI gate.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M46.T07",
+          "objective": "Record valid-domain, uncertainty, counterevidence and blocked/nonidentifiable outcomes in model card; sync trackers.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        }
+      ]
+    },
+    {
+      "issue": 47,
+      "title": "[M4][CLONAL] Implement the clonal evolution and treatment-selection model v0.1",
+      "source_candidates": [
+        {
+          "path": "simulator/design/evolution.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/design/evolution.py"
+        },
+        {
+          "path": "simulator/design/simulator.py",
+          "symbol_hint": "step",
+          "verified_file_at_sha": true,
+          "line": 59,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/design/simulator.py"
+        },
+        {
+          "path": "simulator/design/types.py",
+          "symbol_hint": "Clone",
+          "verified_file_at_sha": true,
+          "line": 35,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/design/types.py"
+        },
+        {
+          "path": "twin_engine/robustness.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/robustness.py"
+        }
+      ],
+      "evidence_sources_to_verify": [
+        "https://www.nature.com/articles/s41588-024-01853-0",
+        "https://www.nature.com/articles/s41591-023-02491-5"
+      ],
+      "tasks": [
+        {
+          "id": "M47.T01",
+          "objective": "Implement explicit clone fraction accounting and mutation/selection transition model separate from growth.",
+          "existing_test_candidates": [
+            "simulator.tests.test_api_design_report",
+            "simulator.tests.test_numerical_sanity"
+          ],
+          "negative_control": "Non-identifiable alternative mechanism or missing observation must remain hypothetical and may show NO_GAIN_OVER_BASELINE.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M47.T02",
+          "objective": "Test sensitivity to initial subclone mix and non-negativity; conserve clone fractions when appropriate.",
+          "existing_test_candidates": [
+            "simulator.tests.test_api_design_report",
+            "simulator.tests.test_numerical_sanity"
+          ],
+          "negative_control": "Non-identifiable alternative mechanism or missing observation must remain hypothetical and may show NO_GAIN_OVER_BASELINE.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M47.T03",
+          "objective": "Estimate or bound rates only from linked sources/data; use HYPOTHETICAL otherwise.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Patient leakage, licensing restriction, missing source/assay, and no gain over baseline must fail closed.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M47.T04",
+          "objective": "Compare multiclone simulation against the single-tumor baseline and falsify if no gain.",
+          "existing_test_candidates": [
+            "simulator.tests.test_api_design_report",
+            "simulator.tests.test_numerical_sanity"
+          ],
+          "negative_control": "Non-identifiable alternative mechanism or missing observation must remain hypothetical and may show NO_GAIN_OVER_BASELINE.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M47.T05",
+          "objective": "Add dimension, positivity, conservation, seeded reproducibility and no-data negative tests.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Patient leakage, licensing restriction, missing source/assay, and no gain over baseline must fail closed.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M47.T06",
+          "objective": "Version model/parameter meaning and run numerical baseline plus source/PHI gate.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M47.T07",
+          "objective": "Record valid-domain, uncertainty, counterevidence and blocked/nonidentifiable outcomes in model card; sync trackers.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        }
+      ]
+    },
+    {
+      "issue": 48,
+      "title": "[M4][RESIDUAL-DISEASE] Implement competing reservoir and cell-of-origin hypotheses",
+      "source_candidates": [
+        {
+          "path": "simulator/design/types.py",
+          "symbol_hint": "TumorState",
+          "verified_file_at_sha": true,
+          "line": 50,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/design/types.py"
+        },
+        {
+          "path": "simulator/design/simulator.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/design/simulator.py"
+        },
+        {
+          "path": "twin_engine/uncertainty.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/uncertainty.py"
+        },
+        {
+          "path": "twin_engine/model_registry.json",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/model_registry.json"
+        }
+      ],
+      "evidence_sources_to_verify": [
+        "https://www.nature.com/articles/s41588-024-01853-0",
+        "https://www.nature.com/articles/s41591-023-02491-5"
+      ],
+      "tasks": [
+        {
+          "id": "M48.T01",
+          "objective": "Represent H0 residual mature plasma cells, H1 dormant plasma cells, H2 less differentiated, H3 B-like, H4 spatial protection as separate competing hypotheses.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M48.T02",
+          "objective": "No assertion that a specific clonogenic B-like reservoir is established; mark each evidence level.",
+          "existing_test_candidates": [
+            "simulator.tests.test_api_design_report",
+            "simulator.tests.test_numerical_sanity"
+          ],
+          "negative_control": "Non-identifiable alternative mechanism or missing observation must remain hypothetical and may show NO_GAIN_OVER_BASELINE.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M48.T03",
+          "objective": "Implement parameterized transitions and state/observation mapping without hardcoded universal reservoir truth.",
+          "existing_test_candidates": [
+            "simulator.tests.test_api_design_report",
+            "simulator.tests.test_numerical_sanity"
+          ],
+          "negative_control": "Non-identifiable alternative mechanism or missing observation must remain hypothetical and may show NO_GAIN_OVER_BASELINE.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M48.T04",
+          "objective": "Evaluate identifiability and predictive gains under each hypothesis; admit `HYPOTHESIS_UNTESTABLE`.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M48.T05",
+          "objective": "Add dimension, positivity, conservation, seeded reproducibility and no-data negative tests.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Patient leakage, licensing restriction, missing source/assay, and no gain over baseline must fail closed.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M48.T06",
+          "objective": "Version model/parameter meaning and run numerical baseline plus source/PHI gate.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M48.T07",
+          "objective": "Record valid-domain, uncertainty, counterevidence and blocked/nonidentifiable outcomes in model card; sync trackers.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        }
+      ]
+    },
+    {
+      "issue": 49,
+      "title": "[M4][NICHE] Implement the bone-marrow microenvironment model v0.1",
+      "source_candidates": [
+        {
+          "path": "simulator/design/types.py",
+          "symbol_hint": "TumorState",
+          "verified_file_at_sha": true,
+          "line": 50,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/design/types.py"
+        },
+        {
+          "path": "simulator/design/simulator.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/design/simulator.py"
+        },
+        {
+          "path": "twin_engine/observation_model.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/observation_model.py"
+        },
+        {
+          "path": "twin_engine/model_registry.json",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/model_registry.json"
+        }
+      ],
+      "evidence_sources_to_verify": [
+        "https://www.nature.com/articles/s41588-024-01853-0",
+        "https://www.nature.com/articles/s41591-023-02491-5"
+      ],
+      "tasks": [
+        {
+          "id": "M49.T01",
+          "objective": "Define versioned niche state with separate stromal/cytokine/adhesion inputs, based only on documented relationships.",
+          "existing_test_candidates": [
+            "simulator.tests.test_api_design_report",
+            "simulator.tests.test_numerical_sanity"
+          ],
+          "negative_control": "Non-identifiable alternative mechanism or missing observation must remain hypothetical and may show NO_GAIN_OVER_BASELINE.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M49.T02",
+          "objective": "Build explicit coupling terms to clonal dynamics, not invisible global growth multipliers.",
+          "existing_test_candidates": [
+            "simulator.tests.test_api_design_report",
+            "simulator.tests.test_numerical_sanity"
+          ],
+          "negative_control": "Non-identifiable alternative mechanism or missing observation must remain hypothetical and may show NO_GAIN_OVER_BASELINE.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M49.T03",
+          "objective": "Use evidence-backed dose/kinetic ranges only; otherwise sensitivity bounds and HYPOTHETICAL label.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M49.T04",
+          "objective": "Test limiting case with niche coupling off versus on and reject unidentifiable components.",
+          "existing_test_candidates": [
+            "simulator.tests.test_api_design_report",
+            "simulator.tests.test_numerical_sanity"
+          ],
+          "negative_control": "Non-identifiable alternative mechanism or missing observation must remain hypothetical and may show NO_GAIN_OVER_BASELINE.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M49.T05",
+          "objective": "Add dimension, positivity, conservation, seeded reproducibility and no-data negative tests.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Patient leakage, licensing restriction, missing source/assay, and no gain over baseline must fail closed.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M49.T06",
+          "objective": "Version model/parameter meaning and run numerical baseline plus source/PHI gate.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M49.T07",
+          "objective": "Record valid-domain, uncertainty, counterevidence and blocked/nonidentifiable outcomes in model card; sync trackers.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        }
+      ]
+    },
+    {
+      "issue": 50,
+      "title": "[M4][IMMUNE] Implement normal plasma-cell lineage, immunoparesis, and immune-recovery dynamics",
+      "source_candidates": [
+        {
+          "path": "simulator/design/types.py",
+          "symbol_hint": "NormalCompartment",
+          "verified_file_at_sha": true,
+          "line": 63,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/design/types.py"
+        },
+        {
+          "path": "simulator/design/toxicity.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/design/toxicity.py"
+        },
+        {
+          "path": "twin_engine/toxicity_dynamics.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/toxicity_dynamics.py"
+        },
+        {
+          "path": "twin_engine/observation_model.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/observation_model.py"
+        }
+      ],
+      "evidence_sources_to_verify": [
+        "https://www.nature.com/articles/s41588-024-01853-0",
+        "https://www.nature.com/articles/s41591-023-02491-5"
+      ],
+      "tasks": [
+        {
+          "id": "M50.T01",
+          "objective": "Separate normal plasma-cell and marrow progenitor states from malignant cells and CAR-T/toxic effects.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M50.T02",
+          "objective": "Define observable immune markers, assay evidence and compartment-specific units.",
+          "existing_test_candidates": [
+            "simulator.tests.test_api_design_report",
+            "simulator.tests.test_numerical_sanity"
+          ],
+          "negative_control": "Non-identifiable alternative mechanism or missing observation must remain hypothetical and may show NO_GAIN_OVER_BASELINE.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M50.T03",
+          "objective": "Model infection/immunoparesis only as heuristic proxy unless measured outcomes and external validation exist.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_backtesting",
+            "twin_engine.tests.test_regressions"
+          ],
+          "negative_control": "Patient leakage, licensing restriction, missing source/assay, and no gain over baseline must fail closed.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M50.T04",
+          "objective": "Use synthetic perturbation tests and baseline comparison; ensure normal compartment never silently equals tumor.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M50.T05",
+          "objective": "Add dimension, positivity, conservation, seeded reproducibility and no-data negative tests.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Patient leakage, licensing restriction, missing source/assay, and no gain over baseline must fail closed.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M50.T06",
+          "objective": "Version model/parameter meaning and run numerical baseline plus source/PHI gate.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M50.T07",
+          "objective": "Record valid-domain, uncertainty, counterevidence and blocked/nonidentifiable outcomes in model card; sync trackers.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        }
+      ]
+    },
+    {
+      "issue": 51,
+      "title": "[M4][ORGANS] Implement bone disease, marrow reserve, and organ-state dynamics",
+      "source_candidates": [
+        {
+          "path": "clinic/models_symptoms.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/clinic/models_symptoms.py"
+        },
+        {
+          "path": "twin_engine/models.py",
+          "symbol_hint": "AdverseEvent",
+          "verified_file_at_sha": true,
+          "line": 326,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/models.py"
+        },
+        {
+          "path": "twin_engine/observation_model.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/observation_model.py"
+        },
+        {
+          "path": "simulator/design/toxicity.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/design/toxicity.py"
+        }
+      ],
+      "evidence_sources_to_verify": [
+        "https://www.nature.com/articles/s41588-024-01853-0",
+        "https://www.nature.com/articles/s41591-023-02491-5"
+      ],
+      "tasks": [
+        {
+          "id": "M51.T01",
+          "objective": "Separate bone structural imaging/history from disease activity/FDG metabolic signal.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M51.T02",
+          "objective": "Record creatinine/eGFR, marrow reserve, hepatic and functional measures with provenance and units.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M51.T03",
+          "objective": "Model organ repair as separate hypothesis, not output of generic tumor-healthy scalar.",
+          "existing_test_candidates": [
+            "simulator.tests.test_api_design_report",
+            "simulator.tests.test_numerical_sanity"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M51.T04",
+          "objective": "Run observed-versus-simulated separability and no-measurement failure tests.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M51.T05",
+          "objective": "Add dimension, positivity, conservation, seeded reproducibility and no-data negative tests.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Patient leakage, licensing restriction, missing source/assay, and no gain over baseline must fail closed.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M51.T06",
+          "objective": "Version model/parameter meaning and run numerical baseline plus source/PHI gate.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M51.T07",
+          "objective": "Record valid-domain, uncertainty, counterevidence and blocked/nonidentifiable outcomes in model card; sync trackers.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        }
+      ]
+    },
+    {
+      "issue": 60,
+      "title": "[M4 TRACKER] Multiscale Multiple Myeloma Model v0.4",
+      "source_candidates": [
+        {
+          "path": "docs/architecture/TARGET_VIRTUAL_LAB.md",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/docs/architecture/TARGET_VIRTUAL_LAB.md"
+        },
+        {
+          "path": "simulator/design/types.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/design/types.py"
+        },
+        {
+          "path": "twin_engine/model_registry.json",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/model_registry.json"
+        }
+      ],
+      "evidence_sources_to_verify": [
+        "https://www.nature.com/articles/s41588-024-01853-0",
+        "https://www.nature.com/articles/s41591-023-02491-5"
+      ],
+      "tasks": [
+        {
+          "id": "M60.T01",
+          "objective": "Inventory #46–#51 completed state, code evidence and model-reference coverage.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M60.T02",
+          "objective": "Confirm every new state has measurement/parameter linkage or is labelled hypothetical.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M60.T03",
+          "objective": "Verify multiscale gains over minimal comparator under frozen synthetic or authorized cohorts.",
+          "existing_test_candidates": [
+            "simulator.tests.test_api_design_report",
+            "simulator.tests.test_numerical_sanity"
+          ],
+          "negative_control": "Patient leakage, licensing restriction, missing source/assay, and no gain over baseline must fail closed.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M60.T04",
+          "objective": "Do not mark M4 validated when only toy model runs without external evidence.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_backtesting",
+            "twin_engine.tests.test_regressions"
+          ],
+          "negative_control": "Patient leakage, licensing restriction, missing source/assay, and no gain over baseline must fail closed.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M60.T05",
+          "objective": "Add dimension, positivity, conservation, seeded reproducibility and no-data negative tests.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Patient leakage, licensing restriction, missing source/assay, and no gain over baseline must fail closed.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M60.T06",
+          "objective": "Version model/parameter meaning and run numerical baseline plus source/PHI gate.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M60.T07",
+          "objective": "Record valid-domain, uncertainty, counterevidence and blocked/nonidentifiable outcomes in model card; sync trackers.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        }
+      ]
+    }
+  ]
+}

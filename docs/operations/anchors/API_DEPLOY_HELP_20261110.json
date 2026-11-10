@@ -1,0 +1,373 @@
+{
+  "kind": "CODE_ANCHOR_MAP",
+  "source_sha": "4a62cf7f1b6f05724faec203f2f3b8847f88868b",
+  "verified_on": "2026-11-10",
+  "scope": "api_deployment_help",
+  "files": [
+    {
+      "path": "simulator/views_cohort.py",
+      "lines": 209,
+      "blob_sha": "b3732a309a817d645b216eb75d2c2b350c829151",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/views_cohort.py",
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "CohortView",
+          "line": 23
+        },
+        {
+          "kind": "def",
+          "name": "get_context_data",
+          "line": 32
+        },
+        {
+          "kind": "def",
+          "name": "cohort_run",
+          "line": 39
+        },
+        {
+          "kind": "def",
+          "name": "cohort_export",
+          "line": 126
+        }
+      ]
+    },
+    {
+      "path": "simulator/optim.py",
+      "lines": 109,
+      "blob_sha": "6f763c54f48bca4c0c99298582921c7e8f28f456",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/optim.py",
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "TrialResult",
+          "line": 13
+        },
+        {
+          "kind": "def",
+          "name": "_suggest",
+          "line": 19
+        },
+        {
+          "kind": "def",
+          "name": "_apply_schedule",
+          "line": 31
+        },
+        {
+          "kind": "def",
+          "name": "run_study",
+          "line": 49
+        },
+        {
+          "kind": "def",
+          "name": "objective",
+          "line": 65
+        },
+        {
+          "kind": "def",
+          "name": "dominated",
+          "line": 88
+        }
+      ]
+    },
+    {
+      "path": "simulator/api_design.py",
+      "lines": 55,
+      "blob_sha": "a317963459249f7c1119649fd78d969b8f1c33df",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/api_design.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "_parse_int",
+          "line": 12
+        },
+        {
+          "kind": "def",
+          "name": "_parse_float",
+          "line": 20
+        },
+        {
+          "kind": "def",
+          "name": "design_report",
+          "line": 29
+        }
+      ]
+    },
+    {
+      "path": "simulator/api.py",
+      "lines": 34,
+      "blob_sha": "671a56fd0715d4f4025c2f6b739f590c2a1c0cb2",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/api.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "glossary",
+          "line": 13
+        },
+        {
+          "kind": "def",
+          "name": "drugs",
+          "line": 25
+        }
+      ]
+    },
+    {
+      "path": "simulator/twin.py",
+      "lines": 137,
+      "blob_sha": "2517946e099c8a40121021b87143001ae6a6ef8e",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/twin.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "build_patient_twin",
+          "line": 13
+        },
+        {
+          "kind": "def",
+          "name": "_load_twin_config",
+          "line": 52
+        },
+        {
+          "kind": "def",
+          "name": "_score_riss",
+          "line": 62
+        },
+        {
+          "kind": "def",
+          "name": "_score_ldh",
+          "line": 68
+        },
+        {
+          "kind": "def",
+          "name": "_score_beta2m",
+          "line": 83
+        },
+        {
+          "kind": "def",
+          "name": "_score_flc_ratio",
+          "line": 97
+        },
+        {
+          "kind": "def",
+          "name": "_lerp",
+          "line": 119
+        },
+        {
+          "kind": "def",
+          "name": "_maybe_float",
+          "line": 130
+        }
+      ]
+    },
+    {
+      "path": "docs_viewer/utils.py",
+      "lines": 314,
+      "blob_sha": "0a17f3c47d56a6d1525e1310c94daaf9901475a9",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/docs_viewer/utils.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "is_safe_path",
+          "line": 30
+        },
+        {
+          "kind": "def",
+          "name": "get_allowed_doc_paths",
+          "line": 77
+        },
+        {
+          "kind": "def",
+          "name": "document_metadata",
+          "line": 103
+        },
+        {
+          "kind": "def",
+          "name": "document_language",
+          "line": 119
+        },
+        {
+          "kind": "def",
+          "name": "repository_source_url",
+          "line": 135
+        },
+        {
+          "kind": "class",
+          "name": "DocumentationReferences",
+          "line": 151
+        },
+        {
+          "kind": "def",
+          "name": "__init__",
+          "line": 152
+        },
+        {
+          "kind": "def",
+          "name": "run",
+          "line": 156
+        },
+        {
+          "kind": "class",
+          "name": "DocumentationExtension",
+          "line": 177
+        },
+        {
+          "kind": "def",
+          "name": "__init__",
+          "line": 178
+        },
+        {
+          "kind": "def",
+          "name": "extendMarkdown",
+          "line": 182
+        },
+        {
+          "kind": "def",
+          "name": "render_markdown",
+          "line": 186
+        },
+        {
+          "kind": "def",
+          "name": "extract_title",
+          "line": 234
+        },
+        {
+          "kind": "def",
+          "name": "get_breadcrumbs",
+          "line": 245
+        },
+        {
+          "kind": "def",
+          "name": "validate_markdown_links",
+          "line": 265
+        },
+        {
+          "kind": "def",
+          "name": "sanitize_path",
+          "line": 299
+        }
+      ]
+    },
+    {
+      "path": "docs_viewer/views.py",
+      "lines": 206,
+      "blob_sha": "080d974bf27593ad9b774c40374e96988b157431",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/docs_viewer/views.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "docs_index",
+          "line": 28
+        },
+        {
+          "kind": "def",
+          "name": "docs_view",
+          "line": 63
+        },
+        {
+          "kind": "def",
+          "name": "docs_raw",
+          "line": 126
+        },
+        {
+          "kind": "def",
+          "name": "docs_search",
+          "line": 156
+        }
+      ]
+    },
+    {
+      "path": "mmportal/settings.py",
+      "lines": 350,
+      "blob_sha": "7f43dce65d310a9e087f8a1c67ad0f03ccb0ddcd",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/mmportal/settings.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "_parse_csv_env",
+          "line": 50
+        },
+        {
+          "kind": "def",
+          "name": "_build_allowed_hosts",
+          "line": 63
+        },
+        {
+          "kind": "def",
+          "name": "_build_csrf_trusted_origins",
+          "line": 73
+        }
+      ]
+    },
+    {
+      "path": "mmportal/urls.py",
+      "lines": 44,
+      "blob_sha": "f785fca5583c8d8fb127c798d0ff15cf66838f5d",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/mmportal/urls.py",
+      "symbols": []
+    },
+    {
+      "path": "scripts/check_numerical_baseline.py",
+      "lines": 116,
+      "blob_sha": "a713cb716ccc3bf63ec182ebf01768af54b01ea7",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/scripts/check_numerical_baseline.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "characterize",
+          "line": 24
+        },
+        {
+          "kind": "def",
+          "name": "_compare",
+          "line": 82
+        },
+        {
+          "kind": "def",
+          "name": "main",
+          "line": 99
+        }
+      ]
+    },
+    {
+      "path": "scripts/check_repository_hygiene.py",
+      "lines": 84,
+      "blob_sha": "651027709513fd0d2430159a90237d309cf61371",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/scripts/check_repository_hygiene.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "_tracked_files",
+          "line": 19
+        },
+        {
+          "kind": "def",
+          "name": "_notebook_errors",
+          "line": 29
+        },
+        {
+          "kind": "def",
+          "name": "main",
+          "line": 49
+        }
+      ]
+    },
+    {
+      "path": "accounts/management/commands/bootstrap_platform_owner.py",
+      "lines": 16,
+      "blob_sha": "5c02207b38d4b6e84c5bec8194fd5ad46a9a4aa3",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/accounts/management/commands/bootstrap_platform_owner.py",
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "Command",
+          "line": 7
+        },
+        {
+          "kind": "def",
+          "name": "handle",
+          "line": 10
+        }
+      ]
+    }
+  ]
+}

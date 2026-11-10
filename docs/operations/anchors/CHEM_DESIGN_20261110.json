@@ -1,0 +1,775 @@
+{
+  "kind": "CODE_ANCHOR_MAP",
+  "source_sha": "4a62cf7f1b6f05724faec203f2f3b8847f88868b",
+  "verified_on": "2026-11-10",
+  "scope": "chemistry_design",
+  "files": [
+    {
+      "path": "chemtools/views.py",
+      "lines": 359,
+      "blob_sha": "829f5358f0d7c83fb4361b96c78bad6f000cd41c",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/chemtools/views.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "_enqueue",
+          "line": 21
+        },
+        {
+          "kind": "def",
+          "name": "tools_home",
+          "line": 37
+        },
+        {
+          "kind": "def",
+          "name": "drug_params",
+          "line": 65
+        },
+        {
+          "kind": "def",
+          "name": "binding_viz",
+          "line": 89
+        },
+        {
+          "kind": "def",
+          "name": "similarity",
+          "line": 153
+        },
+        {
+          "kind": "def",
+          "name": "retry_job",
+          "line": 174
+        },
+        {
+          "kind": "def",
+          "name": "job_status",
+          "line": 204
+        },
+        {
+          "kind": "def",
+          "name": "job_detail",
+          "line": 226
+        },
+        {
+          "kind": "def",
+          "name": "job_enriched_data",
+          "line": 307
+        }
+      ]
+    },
+    {
+      "path": "chemtools/tasks.py",
+      "lines": 225,
+      "blob_sha": "cb5f7ec3976a1e6bdf95625baf63b3a81f484591",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/chemtools/tasks.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "_job_media_dir",
+          "line": 19
+        },
+        {
+          "kind": "def",
+          "name": "_ensure_placeholder_thumbnail",
+          "line": 25
+        },
+        {
+          "kind": "def",
+          "name": "_next_versioned_path",
+          "line": 35
+        },
+        {
+          "kind": "def",
+          "name": "_store_file",
+          "line": 47
+        },
+        {
+          "kind": "def",
+          "name": "_merge_logs",
+          "line": 55
+        },
+        {
+          "kind": "def",
+          "name": "_error_entry",
+          "line": 62
+        },
+        {
+          "kind": "def",
+          "name": "_append_log",
+          "line": 71
+        },
+        {
+          "kind": "def",
+          "name": "_run_setup",
+          "line": 75
+        },
+        {
+          "kind": "def",
+          "name": "run_drug_params_job",
+          "line": 83
+        },
+        {
+          "kind": "def",
+          "name": "run_binding_viz_job",
+          "line": 122
+        },
+        {
+          "kind": "def",
+          "name": "run_similarity_job",
+          "line": 170
+        }
+      ]
+    },
+    {
+      "path": "chemtools/models.py",
+      "lines": 74,
+      "blob_sha": "79c0b310575d0fa83ec491063ad7de1357867d41",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/chemtools/models.py",
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "ChemJob",
+          "line": 10
+        },
+        {
+          "kind": "class",
+          "name": "Meta",
+          "line": 45
+        },
+        {
+          "kind": "def",
+          "name": "__str__",
+          "line": 48
+        },
+        {
+          "kind": "def",
+          "name": "media_directory",
+          "line": 52
+        },
+        {
+          "kind": "def",
+          "name": "thumbnail_url",
+          "line": 55
+        },
+        {
+          "kind": "def",
+          "name": "status_label",
+          "line": 61
+        },
+        {
+          "kind": "def",
+          "name": "update_progress",
+          "line": 69
+        }
+      ]
+    },
+    {
+      "path": "chemtools/utils.py",
+      "lines": 333,
+      "blob_sha": "496a2682e98428d0e5485830e20d611aaa041ea9",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/chemtools/utils.py",
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "ToolRunError",
+          "line": 16
+        },
+        {
+          "kind": "def",
+          "name": "__init__",
+          "line": 19
+        },
+        {
+          "kind": "def",
+          "name": "_media_root",
+          "line": 31
+        },
+        {
+          "kind": "def",
+          "name": "_chem_media_root",
+          "line": 37
+        },
+        {
+          "kind": "def",
+          "name": "_pdb_cache_dir",
+          "line": 43
+        },
+        {
+          "kind": "def",
+          "name": "_chem_cache_dir",
+          "line": 49
+        },
+        {
+          "kind": "def",
+          "name": "_binding_cache_dir",
+          "line": 55
+        },
+        {
+          "kind": "def",
+          "name": "_drug_cache_dir",
+          "line": 61
+        },
+        {
+          "kind": "def",
+          "name": "_sim_cache_dir",
+          "line": 67
+        },
+        {
+          "kind": "def",
+          "name": "temporary_yaml_override",
+          "line": 74
+        },
+        {
+          "kind": "def",
+          "name": "_compose_logs",
+          "line": 85
+        },
+        {
+          "kind": "def",
+          "name": "_run_command",
+          "line": 95
+        },
+        {
+          "kind": "def",
+          "name": "_snapshot",
+          "line": 122
+        },
+        {
+          "kind": "def",
+          "name": "_new_files",
+          "line": 130
+        },
+        {
+          "kind": "def",
+          "name": "_resolve_outdir",
+          "line": 140
+        },
+        {
+          "kind": "def",
+          "name": "run_settings_generator",
+          "line": 151
+        },
+        {
+          "kind": "def",
+          "name": "run_paths_generator",
+          "line": 159
+        },
+        {
+          "kind": "def",
+          "name": "run_drug_parameter_evaluator",
+          "line": 167
+        },
+        {
+          "kind": "def",
+          "name": "mutate_config",
+          "line": 181
+        },
+        {
+          "kind": "def",
+          "name": "_prepare_pdb_cache",
+          "line": 214
+        },
+        {
+          "kind": "def",
+          "name": "_store_pdb_cache",
+          "line": 221
+        },
+        {
+          "kind": "def",
+          "name": "run_binding_visualizer",
+          "line": 228
+        },
+        {
+          "kind": "def",
+          "name": "mutate_config",
+          "line": 245
+        },
+        {
+          "kind": "def",
+          "name": "run_similarity_search",
+          "line": 288
+        },
+        {
+          "kind": "def",
+          "name": "mutate_config",
+          "line": 303
+        }
+      ]
+    },
+    {
+      "path": "chemtools/viewsets.py",
+      "lines": 15,
+      "blob_sha": "c0b623e90f8b69513dddd1f737591eea0bc6c8f4",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/chemtools/viewsets.py",
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "ChemJobViewSet",
+          "line": 8
+        }
+      ]
+    },
+    {
+      "path": "chemtools/forms.py",
+      "lines": 275,
+      "blob_sha": "08aeb23f474b322f7335c1f647f213d496146a86",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/chemtools/forms.py",
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "DrugParamForm",
+          "line": 13
+        },
+        {
+          "kind": "def",
+          "name": "clean",
+          "line": 50
+        },
+        {
+          "kind": "class",
+          "name": "BindingVizForm",
+          "line": 69
+        },
+        {
+          "kind": "def",
+          "name": "clean_pdb_id",
+          "line": 212
+        },
+        {
+          "kind": "def",
+          "name": "clean_ligand",
+          "line": 216
+        },
+        {
+          "kind": "class",
+          "name": "SimilarityForm",
+          "line": 224
+        },
+        {
+          "kind": "def",
+          "name": "clean_smiles",
+          "line": 264
+        }
+      ]
+    },
+    {
+      "path": "chemtools/validators.py",
+      "lines": 159,
+      "blob_sha": "3cc1edf92870a7c2514b192eb5fe69b137f4e6ff",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/chemtools/validators.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "validate_smiles_basic",
+          "line": 11
+        },
+        {
+          "kind": "def",
+          "name": "validate_smiles_rdkit",
+          "line": 48
+        },
+        {
+          "kind": "def",
+          "name": "validate_pdb_content",
+          "line": 82
+        },
+        {
+          "kind": "def",
+          "name": "validate_threshold",
+          "line": 119
+        },
+        {
+          "kind": "def",
+          "name": "sanitize_input",
+          "line": 130
+        }
+      ]
+    },
+    {
+      "path": "chemtools/pdb_api_client.py",
+      "lines": 960,
+      "blob_sha": "ed05a3b1b044a95d34853889a3fe2f6ecf57cfb0",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/chemtools/pdb_api_client.py",
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "PDBAPIClient",
+          "line": 14
+        },
+        {
+          "kind": "def",
+          "name": "__init__",
+          "line": 30
+        },
+        {
+          "kind": "def",
+          "name": "get_pdb_summary",
+          "line": 38
+        },
+        {
+          "kind": "def",
+          "name": "get_pdb_molecules",
+          "line": 77
+        },
+        {
+          "kind": "def",
+          "name": "get_pdb_citations",
+          "line": 88
+        },
+        {
+          "kind": "def",
+          "name": "get_uniprot_info",
+          "line": 113
+        },
+        {
+          "kind": "def",
+          "name": "search_chembl_by_name",
+          "line": 145
+        },
+        {
+          "kind": "def",
+          "name": "get_reactome_pathways",
+          "line": 168
+        },
+        {
+          "kind": "def",
+          "name": "get_pubchem_compound",
+          "line": 186
+        },
+        {
+          "kind": "def",
+          "name": "get_pdbe_validation",
+          "line": 214
+        },
+        {
+          "kind": "def",
+          "name": "get_pdbe_ligand_interactions",
+          "line": 235
+        },
+        {
+          "kind": "def",
+          "name": "get_similar_structures",
+          "line": 260
+        },
+        {
+          "kind": "def",
+          "name": "search_pubmed",
+          "line": 283
+        },
+        {
+          "kind": "def",
+          "name": "search_clinical_trials",
+          "line": 332
+        },
+        {
+          "kind": "def",
+          "name": "get_protein_interactions",
+          "line": 365
+        },
+        {
+          "kind": "def",
+          "name": "get_chembl_drug_details",
+          "line": 392
+        },
+        {
+          "kind": "def",
+          "name": "_get_chembl_target_details",
+          "line": 446
+        },
+        {
+          "kind": "def",
+          "name": "estimate_mm_efficacy",
+          "line": 473
+        },
+        {
+          "kind": "def",
+          "name": "estimate_survival_impact",
+          "line": 501
+        },
+        {
+          "kind": "def",
+          "name": "estimate_toxicity_profile",
+          "line": 524
+        },
+        {
+          "kind": "def",
+          "name": "build_standard_links",
+          "line": 548
+        },
+        {
+          "kind": "def",
+          "name": "enrich_pdb_metadata",
+          "line": 591
+        },
+        {
+          "kind": "def",
+          "name": "enrich_pdb_metadata_for_view",
+          "line": 774
+        }
+      ]
+    },
+    {
+      "path": "modules/binding_visualizer/binding_visualizer.py",
+      "lines": 1246,
+      "blob_sha": "fb5dd732cee52fcf98e2b2060923a0e11e78b651",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/modules/binding_visualizer/binding_visualizer.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "ensure_local_3dmoljs",
+          "line": 1
+        },
+        {
+          "kind": "def",
+          "name": "fetch_pdb_data",
+          "line": 82
+        },
+        {
+          "kind": "def",
+          "name": "file_hash",
+          "line": 119
+        },
+        {
+          "kind": "def",
+          "name": "parse_pdb_header",
+          "line": 133
+        },
+        {
+          "kind": "def",
+          "name": "visualize_structure",
+          "line": 259
+        },
+        {
+          "kind": "def",
+          "name": "get_binding_site_residues",
+          "line": 364
+        },
+        {
+          "kind": "def",
+          "name": "fetch_rcsb_validation",
+          "line": 382
+        },
+        {
+          "kind": "def",
+          "name": "fetch_rcsb_citation",
+          "line": 394
+        },
+        {
+          "kind": "def",
+          "name": "safe_viewer_call",
+          "line": 535
+        },
+        {
+          "kind": "def",
+          "name": "inject_js_head",
+          "line": 607
+        },
+        {
+          "kind": "def",
+          "name": "main",
+          "line": 877
+        },
+        {
+          "kind": "def",
+          "name": "generate_structure_image",
+          "line": 950
+        },
+        {
+          "kind": "def",
+          "name": "create_latex_template",
+          "line": 997
+        },
+        {
+          "kind": "def",
+          "name": "generate_pdf_report",
+          "line": 1118
+        },
+        {
+          "kind": "def",
+          "name": "compile_latex_to_pdf",
+          "line": 1174
+        }
+      ]
+    },
+    {
+      "path": "simulator/design/reporting.py",
+      "lines": 261,
+      "blob_sha": "dc8021a27c4942ebfb2669106127a2412448b512",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/design/reporting.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "_json_default",
+          "line": 16
+        },
+        {
+          "kind": "def",
+          "name": "_pareto_front",
+          "line": 22
+        },
+        {
+          "kind": "def",
+          "name": "build_demo_scenario",
+          "line": 34
+        },
+        {
+          "kind": "def",
+          "name": "run_design_report",
+          "line": 145
+        },
+        {
+          "kind": "def",
+          "name": "write_report_json",
+          "line": 256
+        }
+      ]
+    },
+    {
+      "path": "simulator/design/simulator.py",
+      "lines": 136,
+      "blob_sha": "a4bac304212c285cda1e3975b7f60f71ce1651e4",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/design/simulator.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "_clamp01",
+          "line": 12
+        },
+        {
+          "kind": "def",
+          "name": "_kill_strength",
+          "line": 16
+        },
+        {
+          "kind": "def",
+          "name": "step",
+          "line": 59
+        }
+      ]
+    },
+    {
+      "path": "simulator/design/targeting.py",
+      "lines": 84,
+      "blob_sha": "ea8738eed45a978f3eedd9586370f5bf89092ddf",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/design/targeting.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "binding_probability",
+          "line": 9
+        },
+        {
+          "kind": "def",
+          "name": "activation_probability",
+          "line": 28
+        },
+        {
+          "kind": "def",
+          "name": "estimate_tp_fp",
+          "line": 51
+        },
+        {
+          "kind": "def",
+          "name": "rate",
+          "line": 67
+        }
+      ]
+    },
+    {
+      "path": "simulator/design/logic.py",
+      "lines": 69,
+      "blob_sha": "eeef03bf0a317f571261b60e380eabeeeeacaada",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/design/logic.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "activation_score",
+          "line": 9
+        },
+        {
+          "kind": "def",
+          "name": "sigmoid",
+          "line": 22
+        },
+        {
+          "kind": "def",
+          "name": "antigen_term",
+          "line": 30
+        }
+      ]
+    },
+    {
+      "path": "simulator/design/types.py",
+      "lines": 160,
+      "blob_sha": "8f8a676b57066341593a78dd24cc2c221b7ee636",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/design/types.py",
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "AntigenProfile",
+          "line": 19
+        },
+        {
+          "kind": "def",
+          "name": "get",
+          "line": 27
+        },
+        {
+          "kind": "class",
+          "name": "Clone",
+          "line": 35
+        },
+        {
+          "kind": "def",
+          "name": "sensitivity",
+          "line": 45
+        },
+        {
+          "kind": "class",
+          "name": "TumorState",
+          "line": 50
+        },
+        {
+          "kind": "class",
+          "name": "NormalCompartment",
+          "line": 63
+        },
+        {
+          "kind": "class",
+          "name": "LogicGate",
+          "line": 72
+        },
+        {
+          "kind": "class",
+          "name": "SmallMoleculeModel",
+          "line": 89
+        },
+        {
+          "kind": "class",
+          "name": "ADCModel",
+          "line": 99
+        },
+        {
+          "kind": "class",
+          "name": "CARTModel",
+          "line": 113
+        },
+        {
+          "kind": "class",
+          "name": "Therapy",
+          "line": 125
+        },
+        {
+          "kind": "class",
+          "name": "StepOutcome",
+          "line": 136
+        },
+        {
+          "kind": "class",
+          "name": "DesignReport",
+          "line": 150
+        }
+      ]
+    }
+  ]
+}
