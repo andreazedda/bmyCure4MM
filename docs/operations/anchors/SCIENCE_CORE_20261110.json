@@ -1,0 +1,631 @@
+{
+  "kind": "CODE_ANCHOR_MAP",
+  "source_sha": "4a62cf7f1b6f05724faec203f2f3b8847f88868b",
+  "verified_on": "2026-11-10",
+  "scope": "science_core",
+  "files": [
+    {
+      "path": "simulator/models_simulation.py",
+      "lines": 154,
+      "blob_sha": "33553c0daff1a544445523367d4d36be45d1cdec",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/models_simulation.py",
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "MathematicalModel",
+          "line": 12
+        },
+        {
+          "kind": "def",
+          "name": "simulate",
+          "line": 31
+        }
+      ]
+    },
+    {
+      "path": "simulator/models.py",
+      "lines": 943,
+      "blob_sha": "f776d17f6ac1e967a66127c373ce812409558051",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/models.py",
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "Scenario",
+          "line": 48
+        },
+        {
+          "kind": "class",
+          "name": "Meta",
+          "line": 276
+        },
+        {
+          "kind": "def",
+          "name": "__str__",
+          "line": 279
+        },
+        {
+          "kind": "def",
+          "name": "lab_items",
+          "line": 282
+        },
+        {
+          "kind": "class",
+          "name": "SimulationAttempt",
+          "line": 287
+        },
+        {
+          "kind": "class",
+          "name": "Meta",
+          "line": 326
+        },
+        {
+          "kind": "def",
+          "name": "__str__",
+          "line": 329
+        },
+        {
+          "kind": "def",
+          "name": "run_model",
+          "line": 333
+        },
+        {
+          "kind": "def",
+          "name": "_resolve_solver_inputs",
+          "line": 743
+        },
+        {
+          "kind": "def",
+          "name": "_float_or_strict",
+          "line": 844
+        },
+        {
+          "kind": "def",
+          "name": "_merge_twin_parameters",
+          "line": 855
+        },
+        {
+          "kind": "def",
+          "name": "_apply_guided_twin_choices",
+          "line": 884
+        },
+        {
+          "kind": "def",
+          "name": "_float_or",
+          "line": 934
+        }
+      ]
+    },
+    {
+      "path": "simulator/pharmaco/registry.py",
+      "lines": 188,
+      "blob_sha": "6fdecab6de93e0d1e9c85469499b864be32d47e8",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/pharmaco/registry.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "resolve",
+          "line": 16
+        },
+        {
+          "kind": "def",
+          "name": "get_drug_profile",
+          "line": 48
+        },
+        {
+          "kind": "def",
+          "name": "list_profiles",
+          "line": 54
+        },
+        {
+          "kind": "def",
+          "name": "_load_registry",
+          "line": 60
+        },
+        {
+          "kind": "def",
+          "name": "_validate_profile",
+          "line": 81
+        },
+        {
+          "kind": "def",
+          "name": "_normalize_schedule",
+          "line": 112
+        },
+        {
+          "kind": "def",
+          "name": "_build_schedule",
+          "line": 134
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/observation_model.py",
+      "lines": 256,
+      "blob_sha": "d967ac1e954867cb1befdd4c08663d198336b50d",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/observation_model.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "default_observation_parameters",
+          "line": 19
+        },
+        {
+          "kind": "def",
+          "name": "predict_biomarkers",
+          "line": 41
+        },
+        {
+          "kind": "def",
+          "name": "build_predicted_biomarker_projection",
+          "line": 80
+        },
+        {
+          "kind": "def",
+          "name": "observed_from_assessment",
+          "line": 126
+        },
+        {
+          "kind": "def",
+          "name": "compute_residuals",
+          "line": 134
+        },
+        {
+          "kind": "def",
+          "name": "compute_rmse",
+          "line": 163
+        },
+        {
+          "kind": "def",
+          "name": "compute_mae",
+          "line": 179
+        },
+        {
+          "kind": "def",
+          "name": "_trajectory_state_at",
+          "line": 194
+        },
+        {
+          "kind": "def",
+          "name": "_maybe_float",
+          "line": 231
+        },
+        {
+          "kind": "def",
+          "name": "_decorate_prediction_payload",
+          "line": 240
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/calibration.py",
+      "lines": 583,
+      "blob_sha": "dfde40cfa778febfe9941ab78d852faa8a0d5ea6",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/calibration.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "calibrate_patient_parameters",
+          "line": 32
+        },
+        {
+          "kind": "def",
+          "name": "objective_function",
+          "line": 194
+        },
+        {
+          "kind": "def",
+          "name": "_build_residual_diagnostics",
+          "line": 213
+        },
+        {
+          "kind": "def",
+          "name": "_get_parameter_value",
+          "line": 273
+        },
+        {
+          "kind": "def",
+          "name": "_set_parameter_value",
+          "line": 286
+        },
+        {
+          "kind": "def",
+          "name": "_run_optimizer_sequence",
+          "line": 295
+        },
+        {
+          "kind": "def",
+          "name": "_build_attempt_payload",
+          "line": 400
+        },
+        {
+          "kind": "def",
+          "name": "_residual_vector_objective",
+          "line": 430
+        },
+        {
+          "kind": "def",
+          "name": "_parameters_from_theta",
+          "line": 442
+        },
+        {
+          "kind": "def",
+          "name": "_clip_to_bounds",
+          "line": 450
+        },
+        {
+          "kind": "def",
+          "name": "_bounds_penalty",
+          "line": 455
+        },
+        {
+          "kind": "def",
+          "name": "_is_usable_calibration",
+          "line": 466
+        },
+        {
+          "kind": "def",
+          "name": "_attempt_improves_over_baseline",
+          "line": 481
+        },
+        {
+          "kind": "def",
+          "name": "_build_parameter_uncertainty_payload",
+          "line": 486
+        },
+        {
+          "kind": "def",
+          "name": "_upsert_residual_records",
+          "line": 523
+        },
+        {
+          "kind": "def",
+          "name": "_get_parameter_value_from_parameters",
+          "line": 573
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/backtesting.py",
+      "lines": 251,
+      "blob_sha": "b4eb3cc75cd85ae4046808f6a5c19c8a07e0dc3b",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/backtesting.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "run_patient_backtest",
+          "line": 30
+        },
+        {
+          "kind": "def",
+          "name": "_fit_parameters_in_memory",
+          "line": 134
+        },
+        {
+          "kind": "def",
+          "name": "_predict_heldout_assessment",
+          "line": 211
+        },
+        {
+          "kind": "def",
+          "name": "_ephemeral_state_from_assessment",
+          "line": 237
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/exposure_bridge.py",
+      "lines": 443,
+      "blob_sha": "cd6747691ff4f719580e82bada02860ffee0699f",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/exposure_bridge.py",
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "ExposureScheduleError",
+          "line": 11
+        },
+        {
+          "kind": "class",
+          "name": "ExposureProfile",
+          "line": 16
+        },
+        {
+          "kind": "def",
+          "name": "to_dict",
+          "line": 34
+        },
+        {
+          "kind": "def",
+          "name": "build_exposure_profile",
+          "line": 55
+        },
+        {
+          "kind": "def",
+          "name": "build_legacy_scalar_exposure_profile",
+          "line": 107
+        },
+        {
+          "kind": "def",
+          "name": "build_exposure_profiles_from_schedule",
+          "line": 127
+        },
+        {
+          "kind": "def",
+          "name": "compare_exposure_profiles",
+          "line": 189
+        },
+        {
+          "kind": "def",
+          "name": "build_exposure_dose_function",
+          "line": 227
+        },
+        {
+          "kind": "def",
+          "name": "_dose_at_time",
+          "line": 231
+        },
+        {
+          "kind": "def",
+          "name": "exposure_profiles_to_payload",
+          "line": 240
+        },
+        {
+          "kind": "def",
+          "name": "exposure_profile_from_payload",
+          "line": 244
+        },
+        {
+          "kind": "def",
+          "name": "_schedule_item",
+          "line": 267
+        },
+        {
+          "kind": "def",
+          "name": "_dose_entries_for_item",
+          "line": 279
+        },
+        {
+          "kind": "def",
+          "name": "_schedule_spec_for_item",
+          "line": 291
+        },
+        {
+          "kind": "def",
+          "name": "_derive_schedule_from_cycle_fields",
+          "line": 310
+        },
+        {
+          "kind": "def",
+          "name": "_administration_days",
+          "line": 324
+        },
+        {
+          "kind": "def",
+          "name": "_normalize_days_on",
+          "line": 341
+        },
+        {
+          "kind": "def",
+          "name": "_apply_interruption_days",
+          "line": 351
+        },
+        {
+          "kind": "def",
+          "name": "_finalize_profile",
+          "line": 376
+        },
+        {
+          "kind": "def",
+          "name": "_extract_numeric_dose",
+          "line": 423
+        },
+        {
+          "kind": "def",
+          "name": "_parse_date",
+          "line": 434
+        },
+        {
+          "kind": "def",
+          "name": "_profile_payload",
+          "line": 442
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/therapy_schedule.py",
+      "lines": 244,
+      "blob_sha": "a1623385ff33cacd9d5f89d6749c54d8bd18182b",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/therapy_schedule.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "build_therapy_schedule",
+          "line": 31
+        },
+        {
+          "kind": "def",
+          "name": "convert_patient_therapies_to_drug_doses",
+          "line": 104
+        },
+        {
+          "kind": "def",
+          "name": "parse_regimen_components",
+          "line": 181
+        },
+        {
+          "kind": "def",
+          "name": "validate_schedule",
+          "line": 199
+        },
+        {
+          "kind": "def",
+          "name": "_extract_numeric_dose",
+          "line": 215
+        },
+        {
+          "kind": "def",
+          "name": "_parse_date",
+          "line": 226
+        },
+        {
+          "kind": "def",
+          "name": "_count_administrations",
+          "line": 234
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/counterfactual.py",
+      "lines": 635,
+      "blob_sha": "d6c780fbef86a882cdd8b41a28470400e17ade44",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/counterfactual.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "run_counterfactual",
+          "line": 27
+        },
+        {
+          "kind": "def",
+          "name": "compare_counterfactual_to_baseline",
+          "line": 296
+        },
+        {
+          "kind": "def",
+          "name": "_get_active_therapy",
+          "line": 379
+        },
+        {
+          "kind": "def",
+          "name": "_normalize_intervention_definition",
+          "line": 387
+        },
+        {
+          "kind": "def",
+          "name": "_build_schedule_payload",
+          "line": 422
+        },
+        {
+          "kind": "def",
+          "name": "_phase_to_schedule_item",
+          "line": 463
+        },
+        {
+          "kind": "def",
+          "name": "_schedule_spec_to_cycle",
+          "line": 507
+        },
+        {
+          "kind": "def",
+          "name": "_sanitize_payload_for_artifact",
+          "line": 529
+        },
+        {
+          "kind": "def",
+          "name": "_determine_toxicity_constraint_penalty",
+          "line": 544
+        },
+        {
+          "kind": "def",
+          "name": "_build_schedule_comparison",
+          "line": 562
+        },
+        {
+          "kind": "def",
+          "name": "_determine_toxicity_prototype_penalty",
+          "line": 626
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/simulation_bridge.py",
+      "lines": 271,
+      "blob_sha": "77b650570aed8a2d53817691594d848d666e1741",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/simulation_bridge.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "build_solver_inputs_from_twin_state",
+          "line": 16
+        },
+        {
+          "kind": "def",
+          "name": "run_patient_simulation",
+          "line": 76
+        },
+        {
+          "kind": "def",
+          "name": "summarize_trajectory",
+          "line": 156
+        },
+        {
+          "kind": "def",
+          "name": "_integrate_trapezoid",
+          "line": 231
+        },
+        {
+          "kind": "def",
+          "name": "_summarize_exposure_profiles",
+          "line": 238
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/toxicity_dynamics.py",
+      "lines": 273,
+      "blob_sha": "9cf2b057bb7a1616d17df99771e6a724040308d5",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/toxicity_dynamics.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "compute_toxicity_dynamics",
+          "line": 29
+        },
+        {
+          "kind": "def",
+          "name": "estimate_toxicity_coefficients",
+          "line": 154
+        },
+        {
+          "kind": "def",
+          "name": "_coefficient_from_values",
+          "line": 181
+        },
+        {
+          "kind": "def",
+          "name": "_lab_values",
+          "line": 190
+        },
+        {
+          "kind": "def",
+          "name": "_normalize",
+          "line": 197
+        },
+        {
+          "kind": "def",
+          "name": "_peak_normalized",
+          "line": 207
+        },
+        {
+          "kind": "def",
+          "name": "_has_low_neutrophil",
+          "line": 212
+        },
+        {
+          "kind": "def",
+          "name": "_resolve_exposure_profile",
+          "line": 216
+        },
+        {
+          "kind": "def",
+          "name": "_clip01",
+          "line": 267
+        },
+        {
+          "kind": "def",
+          "name": "_clip",
+          "line": 271
+        }
+      ]
+    }
+  ]
+}
