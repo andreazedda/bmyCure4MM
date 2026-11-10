@@ -1,0 +1,1115 @@
+{
+  "kind": "CODE_ANCHOR_MAP",
+  "source_sha": "4a62cf7f1b6f05724faec203f2f3b8847f88868b",
+  "verified_on": "2026-11-10",
+  "scope": "access_clinic_ui",
+  "files": [
+    {
+      "path": "accounts/models.py",
+      "lines": 140,
+      "blob_sha": "e8c8f909fe6b8652961c57c112087e3f7988e215",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/accounts/models.py",
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "AccessPolicy",
+          "line": 10
+        },
+        {
+          "kind": "class",
+          "name": "Meta",
+          "line": 16
+        },
+        {
+          "kind": "class",
+          "name": "AccessProfile",
+          "line": 20
+        },
+        {
+          "kind": "class",
+          "name": "RequestState",
+          "line": 21
+        },
+        {
+          "kind": "class",
+          "name": "AccessState",
+          "line": 27
+        },
+        {
+          "kind": "class",
+          "name": "Meta",
+          "line": 58
+        },
+        {
+          "kind": "class",
+          "name": "Capability",
+          "line": 70
+        },
+        {
+          "kind": "class",
+          "name": "Purpose",
+          "line": 71
+        },
+        {
+          "kind": "class",
+          "name": "Notification",
+          "line": 86
+        },
+        {
+          "kind": "class",
+          "name": "State",
+          "line": 87
+        },
+        {
+          "kind": "class",
+          "name": "AuditEvent",
+          "line": 105
+        },
+        {
+          "kind": "class",
+          "name": "RateBucket",
+          "line": 115
+        },
+        {
+          "kind": "class",
+          "name": "SupportTicket",
+          "line": 121
+        }
+      ]
+    },
+    {
+      "path": "accounts/views.py",
+      "lines": 518,
+      "blob_sha": "a6b23bcf28229c6e4aa26c082cc22fc8a07c106c",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/accounts/views.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "limited",
+          "line": 22
+        },
+        {
+          "kind": "def",
+          "name": "member_required",
+          "line": 46
+        },
+        {
+          "kind": "def",
+          "name": "wrapped",
+          "line": 48
+        },
+        {
+          "kind": "def",
+          "name": "manager_required",
+          "line": 57
+        },
+        {
+          "kind": "def",
+          "name": "wrapped",
+          "line": 59
+        },
+        {
+          "kind": "def",
+          "name": "request_access",
+          "line": 73
+        },
+        {
+          "kind": "def",
+          "name": "submitted",
+          "line": 113
+        },
+        {
+          "kind": "def",
+          "name": "request_status",
+          "line": 126
+        },
+        {
+          "kind": "def",
+          "name": "capability",
+          "line": 163
+        },
+        {
+          "kind": "def",
+          "name": "sign_in",
+          "line": 211
+        },
+        {
+          "kind": "def",
+          "name": "sign_out",
+          "line": 247
+        },
+        {
+          "kind": "def",
+          "name": "reset_request",
+          "line": 253
+        },
+        {
+          "kind": "def",
+          "name": "feedback",
+          "line": 291
+        },
+        {
+          "kind": "def",
+          "name": "manage_requests",
+          "line": 317
+        },
+        {
+          "kind": "def",
+          "name": "manage_users",
+          "line": 381
+        },
+        {
+          "kind": "def",
+          "name": "switches",
+          "line": 390
+        },
+        {
+          "kind": "def",
+          "name": "retry_notification",
+          "line": 408
+        },
+        {
+          "kind": "def",
+          "name": "manage_feedback",
+          "line": 436
+        },
+        {
+          "kind": "def",
+          "name": "owner_security",
+          "line": 490
+        }
+      ]
+    },
+    {
+      "path": "accounts/services.py",
+      "lines": 482,
+      "blob_sha": "7ed106733fcb678cc68555e800df2979e9d5307c",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/accounts/services.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "normalize_email",
+          "line": 32
+        },
+        {
+          "kind": "def",
+          "name": "locked_policy",
+          "line": 44
+        },
+        {
+          "kind": "def",
+          "name": "audit",
+          "line": 50
+        },
+        {
+          "kind": "def",
+          "name": "usable",
+          "line": 54
+        },
+        {
+          "kind": "def",
+          "name": "require_manager",
+          "line": 72
+        },
+        {
+          "kind": "def",
+          "name": "require_community",
+          "line": 79
+        },
+        {
+          "kind": "def",
+          "name": "public_base",
+          "line": 86
+        },
+        {
+          "kind": "def",
+          "name": "cipher",
+          "line": 98
+        },
+        {
+          "kind": "def",
+          "name": "notify",
+          "line": 102
+        },
+        {
+          "kind": "def",
+          "name": "issue_capability",
+          "line": 116
+        },
+        {
+          "kind": "def",
+          "name": "request_access",
+          "line": 151
+        },
+        {
+          "kind": "def",
+          "name": "bootstrap_owner",
+          "line": 197
+        },
+        {
+          "kind": "def",
+          "name": "confirm_capability",
+          "line": 257
+        },
+        {
+          "kind": "def",
+          "name": "decide_request",
+          "line": 310
+        },
+        {
+          "kind": "def",
+          "name": "resend_activation",
+          "line": 348
+        },
+        {
+          "kind": "def",
+          "name": "change_access",
+          "line": 359
+        },
+        {
+          "kind": "def",
+          "name": "renew_access",
+          "line": 388
+        },
+        {
+          "kind": "def",
+          "name": "rate_limit",
+          "line": 425
+        },
+        {
+          "kind": "def",
+          "name": "submit_feedback",
+          "line": 448
+        }
+      ]
+    },
+    {
+      "path": "accounts/middleware.py",
+      "lines": 81,
+      "blob_sha": "51c916eca6b388392aea4bcd05685b04379a4720",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/accounts/middleware.py",
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "ProductAccessMiddleware",
+          "line": 10
+        },
+        {
+          "kind": "def",
+          "name": "process_view",
+          "line": 11
+        },
+        {
+          "kind": "def",
+          "name": "process_response",
+          "line": 75
+        }
+      ]
+    },
+    {
+      "path": "accounts/permissions.py",
+      "lines": 14,
+      "blob_sha": "4fc8205ad1c203a0ebb64d244a39b40f68c1167c",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/accounts/permissions.py",
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "ExistingDataAccess",
+          "line": 6
+        },
+        {
+          "kind": "def",
+          "name": "has_permission",
+          "line": 9
+        }
+      ]
+    },
+    {
+      "path": "accounts/backends.py",
+      "lines": 32,
+      "blob_sha": "ab22e2ee781851c1f603c79d608e1dd0c9d09b3f",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/accounts/backends.py",
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "VerifiedEmailBackend",
+          "line": 8
+        },
+        {
+          "kind": "def",
+          "name": "authenticate",
+          "line": 9
+        },
+        {
+          "kind": "def",
+          "name": "get_user",
+          "line": 26
+        }
+      ]
+    },
+    {
+      "path": "accounts/notifications.py",
+      "lines": 147,
+      "blob_sha": "16ca1e88637f6074277b896b2d766b506547d320",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/accounts/notifications.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "dispatch_notification",
+          "line": 26
+        },
+        {
+          "kind": "def",
+          "name": "housekeeping",
+          "line": 110
+        }
+      ]
+    },
+    {
+      "path": "clinic/models.py",
+      "lines": 182,
+      "blob_sha": "86bd0bcc05526935abc47e0af23906ab4833ec25",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/clinic/models.py",
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "Patient",
+          "line": 8
+        },
+        {
+          "kind": "class",
+          "name": "Meta",
+          "line": 33
+        },
+        {
+          "kind": "def",
+          "name": "__str__",
+          "line": 36
+        },
+        {
+          "kind": "def",
+          "name": "age",
+          "line": 40
+        },
+        {
+          "kind": "class",
+          "name": "CytogeneticAbnormality",
+          "line": 47
+        },
+        {
+          "kind": "class",
+          "name": "Meta",
+          "line": 53
+        },
+        {
+          "kind": "def",
+          "name": "__str__",
+          "line": 56
+        },
+        {
+          "kind": "class",
+          "name": "PatientCytogenetics",
+          "line": 60
+        },
+        {
+          "kind": "class",
+          "name": "Meta",
+          "line": 72
+        },
+        {
+          "kind": "def",
+          "name": "__str__",
+          "line": 76
+        },
+        {
+          "kind": "class",
+          "name": "Assessment",
+          "line": 80
+        },
+        {
+          "kind": "class",
+          "name": "Meta",
+          "line": 114
+        },
+        {
+          "kind": "def",
+          "name": "__str__",
+          "line": 119
+        },
+        {
+          "kind": "class",
+          "name": "Regimen",
+          "line": 123
+        },
+        {
+          "kind": "class",
+          "name": "Meta",
+          "line": 132
+        },
+        {
+          "kind": "def",
+          "name": "__str__",
+          "line": 135
+        },
+        {
+          "kind": "class",
+          "name": "PatientTherapy",
+          "line": 139
+        },
+        {
+          "kind": "class",
+          "name": "Meta",
+          "line": 173
+        },
+        {
+          "kind": "def",
+          "name": "__str__",
+          "line": 176
+        }
+      ]
+    },
+    {
+      "path": "clinic/models_symptoms.py",
+      "lines": 373,
+      "blob_sha": "9b2658f739808d04a95acf53ad36052fa8807e2f",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/clinic/models_symptoms.py",
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "SymptomAssessment",
+          "line": 18
+        },
+        {
+          "kind": "class",
+          "name": "Meta",
+          "line": 252
+        },
+        {
+          "kind": "def",
+          "name": "__str__",
+          "line": 257
+        },
+        {
+          "kind": "def",
+          "name": "crab_count",
+          "line": 263
+        },
+        {
+          "kind": "def",
+          "name": "crab_string",
+          "line": 273
+        },
+        {
+          "kind": "def",
+          "name": "max_neuropathy_grade",
+          "line": 287
+        },
+        {
+          "kind": "def",
+          "name": "pain_severity",
+          "line": 296
+        },
+        {
+          "kind": "def",
+          "name": "fatigue_severity",
+          "line": 309
+        },
+        {
+          "kind": "def",
+          "name": "calculate_facit_from_items",
+          "line": 322
+        },
+        {
+          "kind": "def",
+          "name": "get_symptom_summary",
+          "line": 339
+        }
+      ]
+    },
+    {
+      "path": "clinic/views.py",
+      "lines": 1279,
+      "blob_sha": "5e2bbd4e7c20ff7141cc04638a0eb6576e2a74d2",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/clinic/views.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "can_edit_patient",
+          "line": 35
+        },
+        {
+          "kind": "def",
+          "name": "dashboard",
+          "line": 48
+        },
+        {
+          "kind": "class",
+          "name": "PatientFilter",
+          "line": 117
+        },
+        {
+          "kind": "class",
+          "name": "Meta",
+          "line": 128
+        },
+        {
+          "kind": "def",
+          "name": "filter_high_risk",
+          "line": 132
+        },
+        {
+          "kind": "def",
+          "name": "patient_list",
+          "line": 142
+        },
+        {
+          "kind": "def",
+          "name": "patient_detail",
+          "line": 164
+        },
+        {
+          "kind": "def",
+          "name": "maybe_float",
+          "line": 231
+        },
+        {
+          "kind": "def",
+          "name": "_format_date_range",
+          "line": 572
+        },
+        {
+          "kind": "def",
+          "name": "_build_patient_detail_chart_points",
+          "line": 581
+        },
+        {
+          "kind": "def",
+          "name": "regimen_list",
+          "line": 618
+        },
+        {
+          "kind": "def",
+          "name": "regimen_new",
+          "line": 627
+        },
+        {
+          "kind": "def",
+          "name": "patient_new",
+          "line": 640
+        },
+        {
+          "kind": "def",
+          "name": "patient_edit",
+          "line": 659
+        },
+        {
+          "kind": "def",
+          "name": "assessment_new",
+          "line": 680
+        },
+        {
+          "kind": "def",
+          "name": "symptom_assessment_new",
+          "line": 705
+        },
+        {
+          "kind": "def",
+          "name": "symptom_assessment_list",
+          "line": 729
+        },
+        {
+          "kind": "def",
+          "name": "prognosis_timeline",
+          "line": 746
+        },
+        {
+          "kind": "def",
+          "name": "prognosis_api",
+          "line": 850
+        },
+        {
+          "kind": "def",
+          "name": "regimen_suggestions",
+          "line": 877
+        },
+        {
+          "kind": "def",
+          "name": "_build_regimen_data_source_rows",
+          "line": 1020
+        },
+        {
+          "kind": "def",
+          "name": "_build_regimen_sections",
+          "line": 1133
+        },
+        {
+          "kind": "def",
+          "name": "_build_regimen_cards",
+          "line": 1169
+        },
+        {
+          "kind": "def",
+          "name": "_build_regimen_constraint_cards",
+          "line": 1204
+        },
+        {
+          "kind": "def",
+          "name": "_build_regimen_uncertainty_caveat",
+          "line": 1224
+        },
+        {
+          "kind": "def",
+          "name": "regimen_suggestions_api",
+          "line": 1233
+        }
+      ]
+    },
+    {
+      "path": "clinic/api.py",
+      "lines": 55,
+      "blob_sha": "ce90aa1d4a512bea350e5189938f490c459748bb",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/clinic/api.py",
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "PatientSerializer",
+          "line": 9
+        },
+        {
+          "kind": "class",
+          "name": "Meta",
+          "line": 10
+        },
+        {
+          "kind": "class",
+          "name": "AssessmentSerializer",
+          "line": 15
+        },
+        {
+          "kind": "class",
+          "name": "Meta",
+          "line": 16
+        },
+        {
+          "kind": "class",
+          "name": "PatientViewSet",
+          "line": 21
+        },
+        {
+          "kind": "def",
+          "name": "get_queryset",
+          "line": 25
+        },
+        {
+          "kind": "class",
+          "name": "AssessmentViewSet",
+          "line": 35
+        },
+        {
+          "kind": "def",
+          "name": "get_queryset",
+          "line": 39
+        }
+      ]
+    },
+    {
+      "path": "simulator/views.py",
+      "lines": 809,
+      "blob_sha": "12c3da1690a67abd087da1fe474c514ffb9650dd",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/views.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "scenario_list",
+          "line": 19
+        },
+        {
+          "kind": "def",
+          "name": "getting_started",
+          "line": 54
+        },
+        {
+          "kind": "def",
+          "name": "interactive_tutorial",
+          "line": 60
+        },
+        {
+          "kind": "def",
+          "name": "visibility_diagnostics",
+          "line": 77
+        },
+        {
+          "kind": "def",
+          "name": "scenario_detail",
+          "line": 108
+        },
+        {
+          "kind": "def",
+          "name": "_profile_with_ranges",
+          "line": 188
+        },
+        {
+          "kind": "def",
+          "name": "_build_scenario_page_purpose_rows",
+          "line": 343
+        },
+        {
+          "kind": "def",
+          "name": "_build_scenario_input_classification_rows",
+          "line": 385
+        },
+        {
+          "kind": "def",
+          "name": "_build_scenario_next_actions",
+          "line": 449
+        },
+        {
+          "kind": "def",
+          "name": "algorithm_transparency",
+          "line": 509
+        },
+        {
+          "kind": "def",
+          "name": "_build_algorithm_rule_family_rows",
+          "line": 547
+        },
+        {
+          "kind": "def",
+          "name": "_build_algorithm_threshold_sections",
+          "line": 587
+        },
+        {
+          "kind": "def",
+          "name": "_build_algorithm_decision_rule_rows",
+          "line": 642
+        },
+        {
+          "kind": "def",
+          "name": "_build_algorithm_risk_context_rows",
+          "line": 662
+        },
+        {
+          "kind": "def",
+          "name": "_build_algorithm_cytogenetic_flag_rows",
+          "line": 681
+        },
+        {
+          "kind": "def",
+          "name": "_build_algorithm_next_actions",
+          "line": 712
+        },
+        {
+          "kind": "def",
+          "name": "_build_algorithm_patient_context",
+          "line": 761
+        },
+        {
+          "kind": "def",
+          "name": "_build_algorithm_inputs_used",
+          "line": 779
+        },
+        {
+          "kind": "def",
+          "name": "_build_algorithm_rule_purpose",
+          "line": 787
+        },
+        {
+          "kind": "def",
+          "name": "_soften_algorithm_action",
+          "line": 799
+        }
+      ]
+    },
+    {
+      "path": "simulator/views_manage.py",
+      "lines": 590,
+      "blob_sha": "d5433021a047c36d35579060f6dbf2075c5db952",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/views_manage.py",
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "EditorRequiredMixin",
+          "line": 47
+        },
+        {
+          "kind": "def",
+          "name": "test_func",
+          "line": 52
+        },
+        {
+          "kind": "class",
+          "name": "RegimenListView",
+          "line": 56
+        },
+        {
+          "kind": "def",
+          "name": "get_queryset",
+          "line": 59
+        },
+        {
+          "kind": "def",
+          "name": "get_context_data",
+          "line": 74
+        },
+        {
+          "kind": "class",
+          "name": "RegimenCreateView",
+          "line": 91
+        },
+        {
+          "kind": "def",
+          "name": "get",
+          "line": 95
+        },
+        {
+          "kind": "def",
+          "name": "post",
+          "line": 99
+        },
+        {
+          "kind": "class",
+          "name": "RegimenUpdateView",
+          "line": 108
+        },
+        {
+          "kind": "def",
+          "name": "dispatch",
+          "line": 112
+        },
+        {
+          "kind": "def",
+          "name": "get",
+          "line": 116
+        },
+        {
+          "kind": "def",
+          "name": "post",
+          "line": 124
+        },
+        {
+          "kind": "class",
+          "name": "RegimenDeleteView",
+          "line": 137
+        },
+        {
+          "kind": "def",
+          "name": "dispatch",
+          "line": 141
+        },
+        {
+          "kind": "def",
+          "name": "get",
+          "line": 145
+        },
+        {
+          "kind": "def",
+          "name": "post",
+          "line": 148
+        },
+        {
+          "kind": "class",
+          "name": "ScenarioManageListView",
+          "line": 159
+        },
+        {
+          "kind": "def",
+          "name": "get_context_data",
+          "line": 162
+        },
+        {
+          "kind": "class",
+          "name": "ScenarioCreateView",
+          "line": 179
+        },
+        {
+          "kind": "def",
+          "name": "get",
+          "line": 183
+        },
+        {
+          "kind": "def",
+          "name": "post",
+          "line": 187
+        },
+        {
+          "kind": "class",
+          "name": "ScenarioUpdateView",
+          "line": 196
+        },
+        {
+          "kind": "def",
+          "name": "dispatch",
+          "line": 200
+        },
+        {
+          "kind": "def",
+          "name": "get",
+          "line": 204
+        },
+        {
+          "kind": "def",
+          "name": "post",
+          "line": 212
+        },
+        {
+          "kind": "def",
+          "name": "duplicate_scenario",
+          "line": 226
+        },
+        {
+          "kind": "def",
+          "name": "add_regimen_to_scenario",
+          "line": 249
+        },
+        {
+          "kind": "def",
+          "name": "remove_regimen_from_scenario",
+          "line": 266
+        },
+        {
+          "kind": "def",
+          "name": "_render_guideline_update",
+          "line": 281
+        },
+        {
+          "kind": "def",
+          "name": "_distinct_values",
+          "line": 296
+        },
+        {
+          "kind": "def",
+          "name": "_preset_descriptions",
+          "line": 305
+        },
+        {
+          "kind": "def",
+          "name": "simulate_scenario",
+          "line": 316
+        },
+        {
+          "kind": "def",
+          "name": "_profile_with_ranges",
+          "line": 322
+        },
+        {
+          "kind": "def",
+          "name": "_attempt_artifact_path",
+          "line": 402
+        },
+        {
+          "kind": "def",
+          "name": "export_attempt",
+          "line": 424
+        },
+        {
+          "kind": "def",
+          "name": "attempt_plot_embed",
+          "line": 454
+        },
+        {
+          "kind": "class",
+          "name": "ExperimentsView",
+          "line": 526
+        },
+        {
+          "kind": "def",
+          "name": "get_context_data",
+          "line": 538
+        },
+        {
+          "kind": "def",
+          "name": "run_experiment",
+          "line": 545
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/views.py",
+      "lines": 469,
+      "blob_sha": "5b8e1c4b790a185044a1183c9da10c57e0456645",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/views.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "research_home_view",
+          "line": 47
+        },
+        {
+          "kind": "def",
+          "name": "patient_twin_detail",
+          "line": 63
+        },
+        {
+          "kind": "def",
+          "name": "simple_research_view",
+          "line": 68
+        },
+        {
+          "kind": "def",
+          "name": "research_cockpit_view",
+          "line": 79
+        },
+        {
+          "kind": "def",
+          "name": "research_glossary_view",
+          "line": 86
+        },
+        {
+          "kind": "def",
+          "name": "initialize_twin_from_assessment_view",
+          "line": 91
+        },
+        {
+          "kind": "def",
+          "name": "calibrate_twin_from_history_view",
+          "line": 120
+        },
+        {
+          "kind": "def",
+          "name": "run_patient_simulation_view",
+          "line": 158
+        },
+        {
+          "kind": "def",
+          "name": "run_counterfactual_view",
+          "line": 235
+        },
+        {
+          "kind": "def",
+          "name": "counterfactual_report_view",
+          "line": 266
+        },
+        {
+          "kind": "def",
+          "name": "causal_assumption_set_view",
+          "line": 297
+        },
+        {
+          "kind": "def",
+          "name": "developer_console_view",
+          "line": 349
+        },
+        {
+          "kind": "def",
+          "name": "_get_research_patient",
+          "line": 395
+        },
+        {
+          "kind": "def",
+          "name": "_get_base_state",
+          "line": 402
+        },
+        {
+          "kind": "def",
+          "name": "_build_research_context",
+          "line": 415
+        },
+        {
+          "kind": "def",
+          "name": "_load_json_artifact",
+          "line": 460
+        }
+      ]
+    }
+  ]
+}
