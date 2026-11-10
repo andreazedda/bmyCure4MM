@@ -1,0 +1,884 @@
+{
+  "kind": "CODE_ANCHOR_MAP",
+  "source_sha": "4a62cf7f1b6f05724faec203f2f3b8847f88868b",
+  "verified_on": "2026-11-10",
+  "scope": "science_state",
+  "files": [
+    {
+      "path": "twin_engine/uncertainty.py",
+      "lines": 490,
+      "blob_sha": "92cbf2a213c0513acbed2ae93450f82a8827fb34",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/uncertainty.py",
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "UncertaintyConfig",
+          "line": 29
+        },
+        {
+          "kind": "def",
+          "name": "build_parameter_uncertainty_space",
+          "line": 38
+        },
+        {
+          "kind": "def",
+          "name": "sample_parameter_sets",
+          "line": 75
+        },
+        {
+          "kind": "def",
+          "name": "summarize_distribution",
+          "line": 121
+        },
+        {
+          "kind": "def",
+          "name": "compute_interval",
+          "line": 143
+        },
+        {
+          "kind": "def",
+          "name": "classify_uncertainty_width",
+          "line": 164
+        },
+        {
+          "kind": "def",
+          "name": "run_counterfactual_uncertainty",
+          "line": 178
+        },
+        {
+          "kind": "def",
+          "name": "_run_uncertainty_sample",
+          "line": 305
+        },
+        {
+          "kind": "def",
+          "name": "_research_utility",
+          "line": 361
+        },
+        {
+          "kind": "def",
+          "name": "_research_utility_v2",
+          "line": 368
+        },
+        {
+          "kind": "def",
+          "name": "_flatten_numeric_parameters",
+          "line": 375
+        },
+        {
+          "kind": "def",
+          "name": "_restore_flat_parameters",
+          "line": 389
+        },
+        {
+          "kind": "def",
+          "name": "_parameter_standard_error",
+          "line": 400
+        },
+        {
+          "kind": "def",
+          "name": "_parameter_bounds",
+          "line": 411
+        },
+        {
+          "kind": "def",
+          "name": "_noise_scale_for_parameter",
+          "line": 421
+        },
+        {
+          "kind": "def",
+          "name": "_clip_sample",
+          "line": 431
+        },
+        {
+          "kind": "def",
+          "name": "_merge_parameters",
+          "line": 442
+        },
+        {
+          "kind": "def",
+          "name": "_clean_numeric_values",
+          "line": 452
+        },
+        {
+          "kind": "def",
+          "name": "_reference_scale",
+          "line": 464
+        },
+        {
+          "kind": "def",
+          "name": "_reference_floor",
+          "line": 473
+        },
+        {
+          "kind": "def",
+          "name": "_safe_float",
+          "line": 484
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/robustness.py",
+      "lines": 162,
+      "blob_sha": "598f0149a513b49edbed13d5795b09cc0fac480b",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/robustness.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "compute_robust_scenario_ranking",
+          "line": 10
+        },
+        {
+          "kind": "def",
+          "name": "_extract_scenario_payload",
+          "line": 103
+        },
+        {
+          "kind": "def",
+          "name": "_latest_uncertainty",
+          "line": 130
+        },
+        {
+          "kind": "def",
+          "name": "_interval_overlap",
+          "line": 140
+        },
+        {
+          "kind": "def",
+          "name": "_classify_robustness",
+          "line": 154
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/sensitivity.py",
+      "lines": 227,
+      "blob_sha": "0e7d6559751873f8075757d60b4783f931cb9550",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/sensitivity.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "run_counterfactual_sensitivity",
+          "line": 17
+        },
+        {
+          "kind": "def",
+          "name": "_run_driver_perturbation",
+          "line": 118
+        },
+        {
+          "kind": "def",
+          "name": "_model_parameter_drivers",
+          "line": 154
+        },
+        {
+          "kind": "def",
+          "name": "_schedule_knob_drivers",
+          "line": 169
+        },
+        {
+          "kind": "def",
+          "name": "_perturbed_value",
+          "line": 197
+        },
+        {
+          "kind": "def",
+          "name": "_driver_direction",
+          "line": 204
+        },
+        {
+          "kind": "def",
+          "name": "_classify_sensitivity",
+          "line": 210
+        },
+        {
+          "kind": "def",
+          "name": "_set_path_value",
+          "line": 220
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/run_manifest.py",
+      "lines": 297,
+      "blob_sha": "e3430be1f913770929c778b6c8e86c525aac61c6",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/run_manifest.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "canonical_json",
+          "line": 41
+        },
+        {
+          "kind": "def",
+          "name": "canonical_sha256",
+          "line": 45
+        },
+        {
+          "kind": "def",
+          "name": "file_sha256",
+          "line": 49
+        },
+        {
+          "kind": "def",
+          "name": "repository_root",
+          "line": 57
+        },
+        {
+          "kind": "def",
+          "name": "dependency_lock_sha256",
+          "line": 61
+        },
+        {
+          "kind": "def",
+          "name": "current_git_sha",
+          "line": 68
+        },
+        {
+          "kind": "def",
+          "name": "database_schema_version",
+          "line": 86
+        },
+        {
+          "kind": "def",
+          "name": "container_digest",
+          "line": 95
+        },
+        {
+          "kind": "def",
+          "name": "_dataset_identity",
+          "line": 104
+        },
+        {
+          "kind": "class",
+          "name": "PreparedRunIdentity",
+          "line": 120
+        },
+        {
+          "kind": "def",
+          "name": "prepare_run_identity",
+          "line": 126
+        },
+        {
+          "kind": "def",
+          "name": "hash_only_artifact",
+          "line": 180
+        },
+        {
+          "kind": "def",
+          "name": "file_artifact",
+          "line": 192
+        },
+        {
+          "kind": "def",
+          "name": "_manifest_unsigned_payload",
+          "line": 211
+        },
+        {
+          "kind": "def",
+          "name": "build_manifest_payload",
+          "line": 222
+        },
+        {
+          "kind": "def",
+          "name": "manifest_storage_path",
+          "line": 234
+        },
+        {
+          "kind": "def",
+          "name": "persist_manifest_artifact",
+          "line": 240
+        },
+        {
+          "kind": "def",
+          "name": "validate_manifest_instance",
+          "line": 250
+        },
+        {
+          "kind": "def",
+          "name": "verify_manifest_artifacts",
+          "line": 264
+        },
+        {
+          "kind": "def",
+          "name": "_resolve_media_uri",
+          "line": 287
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/state_model.py",
+      "lines": 148,
+      "blob_sha": "9ec9a5b8cfd28c7929de8bc87dea506201ecff20",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/state_model.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "initialize_from_assessment",
+          "line": 14
+        },
+        {
+          "kind": "def",
+          "name": "preview_state_from_assessment",
+          "line": 64
+        },
+        {
+          "kind": "def",
+          "name": "get_current_twin_state",
+          "line": 89
+        },
+        {
+          "kind": "def",
+          "name": "set_current_state",
+          "line": 93
+        },
+        {
+          "kind": "def",
+          "name": "serialize_state",
+          "line": 102
+        },
+        {
+          "kind": "def",
+          "name": "_infer_state_vector_from_assessment",
+          "line": 123
+        },
+        {
+          "kind": "def",
+          "name": "_float_or_default",
+          "line": 141
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/models.py",
+      "lines": 733,
+      "blob_sha": "f307d826a71f1a0da60912ae4445c59273d00082",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/models.py",
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "PatientTwinState",
+          "line": 22
+        },
+        {
+          "kind": "class",
+          "name": "Meta",
+          "line": 91
+        },
+        {
+          "kind": "def",
+          "name": "__str__",
+          "line": 101
+        },
+        {
+          "kind": "def",
+          "name": "validate_scientific_contracts",
+          "line": 104
+        },
+        {
+          "kind": "def",
+          "name": "save",
+          "line": 116
+        },
+        {
+          "kind": "class",
+          "name": "ObservationResidual",
+          "line": 121
+        },
+        {
+          "kind": "class",
+          "name": "Meta",
+          "line": 165
+        },
+        {
+          "kind": "def",
+          "name": "__str__",
+          "line": 168
+        },
+        {
+          "kind": "def",
+          "name": "save",
+          "line": 171
+        },
+        {
+          "kind": "class",
+          "name": "LongitudinalLabResult",
+          "line": 176
+        },
+        {
+          "kind": "class",
+          "name": "Meta",
+          "line": 252
+        },
+        {
+          "kind": "def",
+          "name": "__str__",
+          "line": 265
+        },
+        {
+          "kind": "class",
+          "name": "TherapyInterruption",
+          "line": 269
+        },
+        {
+          "kind": "class",
+          "name": "Meta",
+          "line": 309
+        },
+        {
+          "kind": "def",
+          "name": "__str__",
+          "line": 322
+        },
+        {
+          "kind": "class",
+          "name": "AdverseEvent",
+          "line": 326
+        },
+        {
+          "kind": "class",
+          "name": "Meta",
+          "line": 364
+        },
+        {
+          "kind": "def",
+          "name": "__str__",
+          "line": 377
+        },
+        {
+          "kind": "class",
+          "name": "CounterfactualRun",
+          "line": 381
+        },
+        {
+          "kind": "class",
+          "name": "Meta",
+          "line": 447
+        },
+        {
+          "kind": "def",
+          "name": "__str__",
+          "line": 450
+        },
+        {
+          "kind": "def",
+          "name": "_assert_not_completed_mutation",
+          "line": 453
+        },
+        {
+          "kind": "def",
+          "name": "save",
+          "line": 484
+        },
+        {
+          "kind": "def",
+          "name": "delete",
+          "line": 489
+        },
+        {
+          "kind": "class",
+          "name": "CausalAssumptionSet",
+          "line": 495
+        },
+        {
+          "kind": "class",
+          "name": "Meta",
+          "line": 537
+        },
+        {
+          "kind": "def",
+          "name": "__str__",
+          "line": 540
+        },
+        {
+          "kind": "class",
+          "name": "ResearchRunManifest",
+          "line": 544
+        },
+        {
+          "kind": "class",
+          "name": "Meta",
+          "line": 581
+        },
+        {
+          "kind": "def",
+          "name": "__str__",
+          "line": 584
+        },
+        {
+          "kind": "def",
+          "name": "version_vector",
+          "line": 587
+        },
+        {
+          "kind": "def",
+          "name": "save",
+          "line": 615
+        },
+        {
+          "kind": "def",
+          "name": "delete",
+          "line": 623
+        },
+        {
+          "kind": "class",
+          "name": "ResearchRunInvalidation",
+          "line": 627
+        },
+        {
+          "kind": "class",
+          "name": "Meta",
+          "line": 657
+        },
+        {
+          "kind": "def",
+          "name": "save",
+          "line": 666
+        },
+        {
+          "kind": "def",
+          "name": "delete",
+          "line": 671
+        },
+        {
+          "kind": "class",
+          "name": "SimulationRunMetadata",
+          "line": 675
+        },
+        {
+          "kind": "class",
+          "name": "Meta",
+          "line": 716
+        },
+        {
+          "kind": "def",
+          "name": "__str__",
+          "line": 719
+        },
+        {
+          "kind": "def",
+          "name": "save",
+          "line": 722
+        },
+        {
+          "kind": "def",
+          "name": "delete",
+          "line": 729
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/input_contract.py",
+      "lines": 414,
+      "blob_sha": "23083dd74be2f821f79245255a2458b0cd3e5ae6",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/input_contract.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "_normalize",
+          "line": 39
+        },
+        {
+          "kind": "def",
+          "name": "_canonical_sort_key",
+          "line": 62
+        },
+        {
+          "kind": "def",
+          "name": "serialize_assessment_input",
+          "line": 71
+        },
+        {
+          "kind": "def",
+          "name": "serialize_start_state_input",
+          "line": 86
+        },
+        {
+          "kind": "def",
+          "name": "serialize_therapy_input",
+          "line": 103
+        },
+        {
+          "kind": "def",
+          "name": "serialize_interruption_input",
+          "line": 123
+        },
+        {
+          "kind": "def",
+          "name": "build_computational_input_manifest",
+          "line": 133
+        },
+        {
+          "kind": "def",
+          "name": "computational_input_sha256",
+          "line": 171
+        },
+        {
+          "kind": "def",
+          "name": "_dataset_provenance_payload",
+          "line": 177
+        },
+        {
+          "kind": "def",
+          "name": "collect_structured_dataset_binding",
+          "line": 194
+        },
+        {
+          "kind": "def",
+          "name": "_interruptions_for_horizon",
+          "line": 285
+        },
+        {
+          "kind": "def",
+          "name": "build_twin_lineage",
+          "line": 302
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/research_dataset_import.py",
+      "lines": 801,
+      "blob_sha": "4045267944acbf1c6c146fcc3965db298125fc6f",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/research_dataset_import.py",
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "DatasetImportError",
+          "line": 47
+        },
+        {
+          "kind": "def",
+          "name": "canonical_dataset_bytes",
+          "line": 51
+        },
+        {
+          "kind": "def",
+          "name": "canonical_dataset_sha256",
+          "line": 60
+        },
+        {
+          "kind": "def",
+          "name": "file_sha256",
+          "line": 64
+        },
+        {
+          "kind": "def",
+          "name": "_read_json",
+          "line": 74
+        },
+        {
+          "kind": "def",
+          "name": "_walk_identifier_keys",
+          "line": 88
+        },
+        {
+          "kind": "def",
+          "name": "_validate_schema",
+          "line": 103
+        },
+        {
+          "kind": "def",
+          "name": "_semantic_key",
+          "line": 130
+        },
+        {
+          "kind": "def",
+          "name": "_validate_record_semantics",
+          "line": 162
+        },
+        {
+          "kind": "def",
+          "name": "load_dataset_bundle",
+          "line": 239
+        },
+        {
+          "kind": "def",
+          "name": "_choice_values",
+          "line": 303
+        },
+        {
+          "kind": "def",
+          "name": "_require_choice",
+          "line": 309
+        },
+        {
+          "kind": "def",
+          "name": "_numbers_equal",
+          "line": 321
+        },
+        {
+          "kind": "def",
+          "name": "_dataset_provenance",
+          "line": 331
+        },
+        {
+          "kind": "def",
+          "name": "_strip_interruption_metadata",
+          "line": 346
+        },
+        {
+          "kind": "def",
+          "name": "_resolve_patient_therapy",
+          "line": 359
+        },
+        {
+          "kind": "def",
+          "name": "_plan_lab",
+          "line": 389
+        },
+        {
+          "kind": "def",
+          "name": "_plan_adverse_event",
+          "line": 503
+        },
+        {
+          "kind": "def",
+          "name": "_plan_interruption",
+          "line": 589
+        },
+        {
+          "kind": "def",
+          "name": "_plan_record",
+          "line": 705
+        },
+        {
+          "kind": "def",
+          "name": "import_dataset",
+          "line": 724
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/toxicity_model.py",
+      "lines": 119,
+      "blob_sha": "eead49be22898fbcaa8d0225cde90008e9c4115e",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/toxicity_model.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "extract_toxicity_history",
+          "line": 8
+        },
+        {
+          "kind": "def",
+          "name": "summarize_liver_toxicity",
+          "line": 28
+        },
+        {
+          "kind": "def",
+          "name": "summarize_neutropenia_history",
+          "line": 58
+        },
+        {
+          "kind": "def",
+          "name": "summarize_infection_history",
+          "line": 76
+        },
+        {
+          "kind": "def",
+          "name": "compute_toxicity_constraints",
+          "line": 95
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/model_registry.py",
+      "lines": 141,
+      "blob_sha": "660c7599dd93a5c6499d5d5f65ffbf42bb0e852b",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/model_registry.py",
+      "symbols": [
+        {
+          "kind": "class",
+          "name": "ParameterDefinition",
+          "line": 31
+        },
+        {
+          "kind": "class",
+          "name": "ModelRegistration",
+          "line": 38
+        },
+        {
+          "kind": "def",
+          "name": "major_version",
+          "line": 51
+        },
+        {
+          "kind": "def",
+          "name": "units",
+          "line": 58
+        },
+        {
+          "kind": "def",
+          "name": "registry_path",
+          "line": 62
+        },
+        {
+          "kind": "def",
+          "name": "registry_sha256",
+          "line": 66
+        },
+        {
+          "kind": "def",
+          "name": "load_model_registry",
+          "line": 71
+        },
+        {
+          "kind": "def",
+          "name": "get_model_registration",
+          "line": 126
+        },
+        {
+          "kind": "def",
+          "name": "validate_registry_entry_points",
+          "line": 133
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/causal.py",
+      "lines": 104,
+      "blob_sha": "47dbd137a40f2c93c2baf6c3db394cc99f45cfb7",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/causal.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "build_causal_assumption_set",
+          "line": 10
+        },
+        {
+          "kind": "def",
+          "name": "validate_causal_graph_definition",
+          "line": 41
+        },
+        {
+          "kind": "def",
+          "name": "classify_estimand",
+          "line": 54
+        },
+        {
+          "kind": "def",
+          "name": "distinguish_mechanistic_counterfactual_vs_causal_estimand",
+          "line": 78
+        }
+      ]
+    },
+    {
+      "path": "twin_engine/report_builder.py",
+      "lines": 66,
+      "blob_sha": "89a7c22a4c706354d2e28e516e7272edb864cf20",
+      "source_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/report_builder.py",
+      "symbols": [
+        {
+          "kind": "def",
+          "name": "build_counterfactual_report_payload",
+          "line": 13
+        },
+        {
+          "kind": "def",
+          "name": "write_json_artifact",
+          "line": 52
+        }
+      ]
+    }
+  ]
+}
