@@ -1,5 +1,5 @@
 # bmyCure4MM canonical microtask index
-schema_version: '1.0'
+schema_version: '1.1'
 purpose: planning_only
 intended_use: E1_research_prototype
 clinical_decision_support: false
@@ -14,7 +14,7 @@ goals:
   M0_R:
     - issue: 13
       url: https://github.com/andreazedda/bmyCure4MM/issues/13
-      microtasks_planned: 0
+      microtasks_planned: 7
       status: NOT_EXECUTED
       selection: first_unblocked_unchecked
       gate: RELEVANT_QA_SECURITY
@@ -39,13 +39,13 @@ goals:
       gate: RELEVANT_QA_SECURITY
     - issue: 9
       url: https://github.com/andreazedda/bmyCure4MM/issues/9
-      microtasks_planned: 0
+      microtasks_planned: 7
       status: NOT_EXECUTED
       selection: first_unblocked_unchecked
       gate: RELEVANT_QA_SECURITY
     - issue: 10
       url: https://github.com/andreazedda/bmyCure4MM/issues/10
-      microtasks_planned: 0
+      microtasks_planned: 7
       status: NOT_EXECUTED
       selection: first_unblocked_unchecked
       gate: RELEVANT_QA_SECURITY
@@ -347,63 +347,63 @@ goals:
   G00:
     - issue: 88
       url: https://github.com/andreazedda/bmyCure4MM/issues/88
-      microtasks_planned: 8
+      microtasks_planned: 10
       status: NOT_EXECUTED
       selection: first_unblocked_unchecked
       gate: RELEVANT_QA_SECURITY
   G01:
     - issue: 89
       url: https://github.com/andreazedda/bmyCure4MM/issues/89
-      microtasks_planned: 8
+      microtasks_planned: 11
       status: NOT_EXECUTED
       selection: first_unblocked_unchecked
       gate: RELEVANT_QA_SECURITY
   G02:
     - issue: 90
       url: https://github.com/andreazedda/bmyCure4MM/issues/90
-      microtasks_planned: 8
+      microtasks_planned: 11
       status: NOT_EXECUTED
       selection: first_unblocked_unchecked
       gate: RELEVANT_QA_SECURITY
   G03:
     - issue: 91
       url: https://github.com/andreazedda/bmyCure4MM/issues/91
-      microtasks_planned: 8
+      microtasks_planned: 11
       status: NOT_EXECUTED
       selection: first_unblocked_unchecked
       gate: RELEVANT_QA_SECURITY
   G04:
     - issue: 92
       url: https://github.com/andreazedda/bmyCure4MM/issues/92
-      microtasks_planned: 8
+      microtasks_planned: 11
       status: NOT_EXECUTED
       selection: first_unblocked_unchecked
       gate: RELEVANT_QA_SECURITY
   G05:
     - issue: 93
       url: https://github.com/andreazedda/bmyCure4MM/issues/93
-      microtasks_planned: 8
+      microtasks_planned: 11
       status: NOT_EXECUTED
       selection: first_unblocked_unchecked
       gate: RELEVANT_QA_SECURITY
   G06:
     - issue: 94
       url: https://github.com/andreazedda/bmyCure4MM/issues/94
-      microtasks_planned: 8
+      microtasks_planned: 11
       status: NOT_EXECUTED
       selection: first_unblocked_unchecked
       gate: AUTHORIZED_PRIVATE_CASE_ONLY
   G07:
     - issue: 95
       url: https://github.com/andreazedda/bmyCure4MM/issues/95
-      microtasks_planned: 8
+      microtasks_planned: 11
       status: NOT_EXECUTED
       selection: first_unblocked_unchecked
       gate: HUMAN_PRODUCTION_RELEASE
   G08:
     - issue: 96
       url: https://github.com/andreazedda/bmyCure4MM/issues/96
-      microtasks_planned: 8
+      microtasks_planned: 11
       status: NOT_EXECUTED
       selection: first_unblocked_unchecked
       gate: HUMAN_SPECIALIST_ACCEPTANCE
