@@ -1,0 +1,1151 @@
+{
+  "version": "2.1",
+  "group": "M2",
+  "source_sha": "4a62cf7f1b6f05724faec203f2f3b8847f88868b",
+  "issue_count": 7,
+  "task_count": 49,
+  "preflight": "Read first unchecked task from live issue; verify current SHA and symbol/line; write failing synthetic test, minimal patch, negative tests, scientific/source review, evidence; never pretend clinical validity.",
+  "goals": [
+    {
+      "issue": 22,
+      "title": "[M2][VALIDATION] Create model cards, dataset cards, validation protocols, backtesting, and uncertainty gates",
+      "source_candidates": [
+        {
+          "path": "twin_engine/model_registry.json",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/model_registry.json"
+        },
+        {
+          "path": "twin_engine/model_references.json",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/model_references.json"
+        },
+        {
+          "path": "twin_engine/run_manifest.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/run_manifest.py"
+        },
+        {
+          "path": "twin_engine/backtesting.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/backtesting.py"
+        }
+      ],
+      "evidence_sources_to_verify": [
+        "https://pubmed.ncbi.nlm.nih.gov/35605179/",
+        "https://pubmed.ncbi.nlm.nih.gov/27511158/"
+      ],
+      "tasks": [
+        {
+          "id": "M22.T01",
+          "objective": "Bind every registered runtime model to explicit population/input/outcome/units/model version and limitations.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_control": "Missing unit/source, unidentifiable parameter and out-of-domain observations must not produce a validated result.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M22.T02",
+          "objective": "Write model cards with training-vs-validation split, assumptions, leakage and calibration diagnostics.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_backtesting",
+            "twin_engine.tests.test_regressions"
+          ],
+          "negative_control": "Missing unit/source, unidentifiable parameter and out-of-domain observations must not produce a validated result.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M22.T03",
+          "objective": "Implement validation protocol gate using held-out and baseline comparisons; uncertainty not necessarily calibrated.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_backtesting",
+            "twin_engine.tests.test_regressions"
+          ],
+          "negative_control": "Missing unit/source, unidentifiable parameter and out-of-domain observations must not produce a validated result.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M22.T04",
+          "objective": "Reject false `validated` badges and publish failure states.",
+          "existing_test_candidates": [
+            "simulator.tests.test_numerical_sanity",
+            "accounts.tests.test_existing_site"
+          ],
+          "negative_control": "Missing input, conflicting source or regression must produce explicit blocked state with no silent fallback.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M22.T05",
+          "objective": "Add unit/edge/missingness/error-path regression tests and negative privacy cases.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_control": "Cross-tenant/unauthorized identity cannot list, infer existence, export or retrieve another object's data.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M22.T06",
+          "objective": "Execute golden numeric, full related Django tests, model-card and evidence validation with redacted logs.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_control": "Missing unit/source, unidentifiable parameter and out-of-domain observations must not produce a validated result.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M22.T07",
+          "objective": "Crosslink output/artifact to existing milestone and update Asana/Notion/Trello mirror.",
+          "existing_test_candidates": [
+            "simulator.tests.test_numerical_sanity",
+            "accounts.tests.test_existing_site"
+          ],
+          "negative_control": "Missing input, conflicting source or regression must produce explicit blocked state with no silent fallback.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        }
+      ]
+    },
+    {
+      "issue": 29,
+      "title": "[M2 TRACKER] Measurement & Evidence Layer v0.2",
+      "source_candidates": [
+        {
+          "path": "docs/models/REGISTRY.md",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/docs/models/REGISTRY.md"
+        },
+        {
+          "path": "twin_engine/observation_model.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/observation_model.py"
+        },
+        {
+          "path": "twin_engine/models.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/models.py"
+        },
+        {
+          "path": "clinic/models.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/clinic/models.py"
+        }
+      ],
+      "evidence_sources_to_verify": [
+        "https://pubmed.ncbi.nlm.nih.gov/35605179/",
+        "https://pubmed.ncbi.nlm.nih.gov/27511158/"
+      ],
+      "tasks": [
+        {
+          "id": "M29.T01",
+          "objective": "Audit all M2 measurement, evidence, risk, MRD and functional-outcome child issues.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_control": "Missing unit/source, unidentifiable parameter and out-of-domain observations must not produce a validated result.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M29.T02",
+          "objective": "Prove that each displayed clinical metric has precise unit, timestamp, assay and source version.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_control": "Missing input, conflicting source or regression must produce explicit blocked state with no silent fallback.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M29.T03",
+          "objective": "Require evidence completeness for any clinical threshold or staging claim.",
+          "existing_test_candidates": [
+            "simulator.tests.test_numerical_sanity",
+            "accounts.tests.test_existing_site"
+          ],
+          "negative_control": "Missing input, conflicting source or regression must produce explicit blocked state with no silent fallback.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M29.T04",
+          "objective": "Block readiness if intended use and model-cards are inconsistent.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_control": "Missing unit/source, unidentifiable parameter and out-of-domain observations must not produce a validated result.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M29.T05",
+          "objective": "Add unit/edge/missingness/error-path regression tests and negative privacy cases.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_control": "Cross-tenant/unauthorized identity cannot list, infer existence, export or retrieve another object's data.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M29.T06",
+          "objective": "Execute golden numeric, full related Django tests, model-card and evidence validation with redacted logs.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_control": "Missing unit/source, unidentifiable parameter and out-of-domain observations must not produce a validated result.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M29.T07",
+          "objective": "Crosslink output/artifact to existing milestone and update Asana/Notion/Trello mirror.",
+          "existing_test_candidates": [
+            "simulator.tests.test_numerical_sanity",
+            "accounts.tests.test_existing_site"
+          ],
+          "negative_control": "Missing input, conflicting source or regression must produce explicit blocked state with no silent fallback.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        }
+      ]
+    },
+    {
+      "issue": 37,
+      "title": "[M2][EVIDENCE] Build the curated scientific evidence registry v0.1",
+      "source_candidates": [
+        {
+          "path": "twin_engine/model_references.json",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/model_references.json"
+        },
+        {
+          "path": "docs/models/REGISTRY.md",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/docs/models/REGISTRY.md"
+        },
+        {
+          "path": "docs_viewer/utils.py",
+          "symbol_hint": "render_markdown",
+          "verified_file_at_sha": true,
+          "line": 186,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/docs_viewer/utils.py"
+        },
+        {
+          "path": "chemtools/pdb_api_client.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/chemtools/pdb_api_client.py"
+        }
+      ],
+      "evidence_sources_to_verify": [
+        "https://pubmed.ncbi.nlm.nih.gov/35605179/",
+        "https://pubmed.ncbi.nlm.nih.gov/27511158/"
+      ],
+      "tasks": [
+        {
+          "id": "M37.T01",
+          "objective": "Design `EvidenceRecord` with DOI/PMID/URL, publication date, evidence type, context, validity window and contradiction links; check existing implementation first.",
+          "existing_test_candidates": [
+            "simulator.tests.test_numerical_sanity",
+            "accounts.tests.test_existing_site"
+          ],
+          "negative_control": "Missing input, conflicting source or regression must produce explicit blocked state with no silent fallback.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M37.T02",
+          "objective": "Connect each source to visible claim/parameter and display source version beside chart/model outputs.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_control": "Missing unit/source, unidentifiable parameter and out-of-domain observations must not produce a validated result.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M37.T03",
+          "objective": "Distinguish study evidence, guideline consensus and heuristic model assumptions; never auto-certify a claim.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_control": "Missing unit/source, unidentifiable parameter and out-of-domain observations must not produce a validated result.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M37.T04",
+          "objective": "Validate source links by identifier, provenance changes, contradictions and explicit incomplete coverage.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_backtesting",
+            "twin_engine.tests.test_regressions"
+          ],
+          "negative_control": "Missing input, conflicting source or regression must produce explicit blocked state with no silent fallback.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M37.T05",
+          "objective": "Add unit/edge/missingness/error-path regression tests and negative privacy cases.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_control": "Cross-tenant/unauthorized identity cannot list, infer existence, export or retrieve another object's data.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M37.T06",
+          "objective": "Execute golden numeric, full related Django tests, model-card and evidence validation with redacted logs.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_control": "Missing unit/source, unidentifiable parameter and out-of-domain observations must not produce a validated result.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M37.T07",
+          "objective": "Crosslink output/artifact to existing milestone and update Asana/Notion/Trello mirror.",
+          "existing_test_candidates": [
+            "simulator.tests.test_numerical_sanity",
+            "accounts.tests.test_existing_site"
+          ],
+          "negative_control": "Missing input, conflicting source or regression must produce explicit blocked state with no silent fallback.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        }
+      ]
+    },
+    {
+      "issue": 38,
+      "title": "[M2][MEASUREMENT] Expand the biomarker and clinical measurement contract v0.2",
+      "source_candidates": [
+        {
+          "path": "clinic/models.py",
+          "symbol_hint": "Assessment",
+          "verified_file_at_sha": true,
+          "line": 80,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/clinic/models.py"
+        },
+        {
+          "path": "twin_engine/models.py",
+          "symbol_hint": "LongitudinalLabResult",
+          "verified_file_at_sha": true,
+          "line": 176,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/models.py"
+        },
+        {
+          "path": "twin_engine/observation_model.py",
+          "symbol_hint": "predict_biomarkers",
+          "verified_file_at_sha": true,
+          "line": 41,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/observation_model.py"
+        }
+      ],
+      "evidence_sources_to_verify": [
+        "https://pubmed.ncbi.nlm.nih.gov/35605179/",
+        "https://pubmed.ncbi.nlm.nih.gov/27511158/"
+      ],
+      "tasks": [
+        {
+          "id": "M38.T01",
+          "objective": "Specify analyte vocabularies, UCUM-like units or documented unit transform and sample timestamps.",
+          "existing_test_candidates": [
+            "simulator.tests.test_numerical_sanity",
+            "accounts.tests.test_existing_site"
+          ],
+          "negative_control": "Missing input, conflicting source or regression must produce explicit blocked state with no silent fallback.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M38.T02",
+          "objective": "Separate FLC kappa/lambda absolute values, ratio, renal state and non-secretory burden with missingness labels.",
+          "existing_test_candidates": [
+            "simulator.tests.test_numerical_sanity",
+            "accounts.tests.test_existing_site"
+          ],
+          "negative_control": "Missing input, conflicting source or regression must produce explicit blocked state with no silent fallback.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M38.T03",
+          "objective": "Write assay-aware normalization and ambiguous unit reject path; do not silently impute a clinical value.",
+          "existing_test_candidates": [
+            "simulator.tests.test_numerical_sanity",
+            "accounts.tests.test_existing_site"
+          ],
+          "negative_control": "Missing input, conflicting source or regression must produce explicit blocked state with no silent fallback.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M38.T04",
+          "objective": "Test round-trip unit transformations and clinically invalid/null/negative edge inputs.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_control": "Missing input, conflicting source or regression must produce explicit blocked state with no silent fallback.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M38.T05",
+          "objective": "Add unit/edge/missingness/error-path regression tests and negative privacy cases.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_control": "Cross-tenant/unauthorized identity cannot list, infer existence, export or retrieve another object's data.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M38.T06",
+          "objective": "Execute golden numeric, full related Django tests, model-card and evidence validation with redacted logs.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_control": "Missing unit/source, unidentifiable parameter and out-of-domain observations must not produce a validated result.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M38.T07",
+          "objective": "Crosslink output/artifact to existing milestone and update Asana/Notion/Trello mirror.",
+          "existing_test_candidates": [
+            "simulator.tests.test_numerical_sanity",
+            "accounts.tests.test_existing_site"
+          ],
+          "negative_control": "Missing input, conflicting source or regression must produce explicit blocked state with no silent fallback.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        }
+      ]
+    },
+    {
+      "issue": 39,
+      "title": "[M2][RISK] Implement modern genomic risk and disease-state representation",
+      "source_candidates": [
+        {
+          "path": "clinic/models.py",
+          "symbol_hint": "PatientCytogenetics",
+          "verified_file_at_sha": true,
+          "line": 60,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/clinic/models.py"
+        },
+        {
+          "path": "twin_engine/state_model.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/state_model.py"
+        },
+        {
+          "path": "twin_engine/model_registry.json",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/model_registry.json"
+        }
+      ],
+      "evidence_sources_to_verify": [
+        "https://pubmed.ncbi.nlm.nih.gov/35605179/",
+        "https://pubmed.ncbi.nlm.nih.gov/27511158/"
+      ],
+      "tasks": [
+        {
+          "id": "M39.T01",
+          "objective": "Add data-source fields for cytogenetic alteration assay, specimen and observation date before risk calculation.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_control": "Missing unit/source, unidentifiable parameter and out-of-domain observations must not produce a validated result.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M39.T02",
+          "objective": "Implement R2-ISS (if validated inputs available) as an evidence-linked derived index, not numerical tumor growth rate.",
+          "existing_test_candidates": [
+            "simulator.tests.test_numerical_sanity",
+            "accounts.tests.test_existing_site"
+          ],
+          "negative_control": "Missing unit/source, unidentifiable parameter and out-of-domain observations must not produce a validated result.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M39.T03",
+          "objective": "Reject risk stage if component assays are absent; report incomplete rather than guess.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_control": "Missing unit/source, unidentifiable parameter and out-of-domain observations must not produce a validated result.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M39.T04",
+          "objective": "Compare formal calculations with published examples and explicit version/test fixtures.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_control": "Missing input, conflicting source or regression must produce explicit blocked state with no silent fallback.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M39.T05",
+          "objective": "Add unit/edge/missingness/error-path regression tests and negative privacy cases.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_control": "Cross-tenant/unauthorized identity cannot list, infer existence, export or retrieve another object's data.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M39.T06",
+          "objective": "Execute golden numeric, full related Django tests, model-card and evidence validation with redacted logs.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_control": "Missing unit/source, unidentifiable parameter and out-of-domain observations must not produce a validated result.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M39.T07",
+          "objective": "Crosslink output/artifact to existing milestone and update Asana/Notion/Trello mirror.",
+          "existing_test_candidates": [
+            "simulator.tests.test_numerical_sanity",
+            "accounts.tests.test_existing_site"
+          ],
+          "negative_control": "Missing input, conflicting source or regression must produce explicit blocked state with no silent fallback.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        }
+      ]
+    },
+    {
+      "issue": 40,
+      "title": "[M2][MRD] Implement assay-aware MRD and imaging observability",
+      "source_candidates": [
+        {
+          "path": "clinic/models.py",
+          "symbol_hint": "Assessment",
+          "verified_file_at_sha": true,
+          "line": 80,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/clinic/models.py"
+        },
+        {
+          "path": "twin_engine/models.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/models.py"
+        },
+        {
+          "path": "twin_engine/observation_model.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/observation_model.py"
+        }
+      ],
+      "evidence_sources_to_verify": [
+        "https://pubmed.ncbi.nlm.nih.gov/35605179/",
+        "https://pubmed.ncbi.nlm.nih.gov/27511158/"
+      ],
+      "tasks": [
+        {
+          "id": "M40.T01",
+          "objective": "Represent MRD result with method, detection threshold, sample/site, date, value and assay uncertainty.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_control": "Missing unit/source, unidentifiable parameter and out-of-domain observations must not produce a validated result.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M40.T02",
+          "objective": "Keep MRD negative distinct from zero residual disease; avoid using skeletal old lesions as direct active tumor count.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_control": "Missing unit/source, unidentifiable parameter and out-of-domain observations must not produce a validated result.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M40.T03",
+          "objective": "Align response-state nomenclature with IMWG 2016 and version cite each derived response.",
+          "existing_test_candidates": [
+            "simulator.tests.test_numerical_sanity",
+            "accounts.tests.test_existing_site"
+          ],
+          "negative_control": "Missing input, conflicting source or regression must produce explicit blocked state with no silent fallback.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M40.T04",
+          "objective": "Test missing/invalid assay limits and imaging/MRD discordant scenarios.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_control": "Missing unit/source, unidentifiable parameter and out-of-domain observations must not produce a validated result.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M40.T05",
+          "objective": "Add unit/edge/missingness/error-path regression tests and negative privacy cases.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_control": "Cross-tenant/unauthorized identity cannot list, infer existence, export or retrieve another object's data.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M40.T06",
+          "objective": "Execute golden numeric, full related Django tests, model-card and evidence validation with redacted logs.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_control": "Missing unit/source, unidentifiable parameter and out-of-domain observations must not produce a validated result.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M40.T07",
+          "objective": "Crosslink output/artifact to existing milestone and update Asana/Notion/Trello mirror.",
+          "existing_test_candidates": [
+            "simulator.tests.test_numerical_sanity",
+            "accounts.tests.test_existing_site"
+          ],
+          "negative_control": "Missing input, conflicting source or regression must produce explicit blocked state with no silent fallback.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        }
+      ]
+    },
+    {
+      "issue": 41,
+      "title": "[M2][OUTCOMES] Define functional, organ, infection, and patient-win measurements",
+      "source_candidates": [
+        {
+          "path": "clinic/models_symptoms.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/clinic/models_symptoms.py"
+        },
+        {
+          "path": "clinic/models.py",
+          "symbol_hint": "Patient",
+          "verified_file_at_sha": true,
+          "line": 8,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/clinic/models.py"
+        },
+        {
+          "path": "twin_engine/models.py",
+          "symbol_hint": "AdverseEvent",
+          "verified_file_at_sha": true,
+          "line": 326,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/models.py"
+        },
+        {
+          "path": "twin_engine/observation_model.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/observation_model.py"
+        }
+      ],
+      "evidence_sources_to_verify": [
+        "https://pubmed.ncbi.nlm.nih.gov/35605179/",
+        "https://pubmed.ncbi.nlm.nih.gov/27511158/"
+      ],
+      "tasks": [
+        {
+          "id": "M41.T01",
+          "objective": "Create observational functional outcome schema with instrument, score scale, date and provenance.",
+          "existing_test_candidates": [
+            "chemtools.tests.test_tasks",
+            "chemtools.tests.test_views"
+          ],
+          "negative_control": "Missing unit/source, unidentifiable parameter and out-of-domain observations must not produce a validated result.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M41.T02",
+          "objective": "Separate organ effects, pain/neuropathy, patient-reported outcome and tumor response.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_control": "Missing input, conflicting source or regression must produce explicit blocked state with no silent fallback.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M41.T03",
+          "objective": "Do not infer direct causal improvement in function from tumor-cell simulation.",
+          "existing_test_candidates": [
+            "simulator.tests.test_numerical_sanity",
+            "accounts.tests.test_existing_site"
+          ],
+          "negative_control": "Missing input, conflicting source or regression must produce explicit blocked state with no silent fallback.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M41.T04",
+          "objective": "Test missing instruments, repeated measures and negative change reporting without inventing values.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_control": "Missing input, conflicting source or regression must produce explicit blocked state with no silent fallback.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M41.T05",
+          "objective": "Add unit/edge/missingness/error-path regression tests and negative privacy cases.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_control": "Cross-tenant/unauthorized identity cannot list, infer existence, export or retrieve another object's data.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M41.T06",
+          "objective": "Execute golden numeric, full related Django tests, model-card and evidence validation with redacted logs.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_services",
+            "twin_engine.tests.test_input_contract"
+          ],
+          "negative_control": "Missing unit/source, unidentifiable parameter and out-of-domain observations must not produce a validated result.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M41.T07",
+          "objective": "Crosslink output/artifact to existing milestone and update Asana/Notion/Trello mirror.",
+          "existing_test_candidates": [
+            "simulator.tests.test_numerical_sanity",
+            "accounts.tests.test_existing_site"
+          ],
+          "negative_control": "Missing input, conflicting source or regression must produce explicit blocked state with no silent fallback.",
+          "evidence": [
+            "redacted test result",
+            "source file and SHA",
+            "scientific qualification if model related",
+            "reviewed PR",
+            "unresolved limitations"
+          ],
+          "human_gate": "NOT_FOR_LOCAL_SYNTHETIC_ANALYSIS",
+          "status": "PLANNED"
+        }
+      ]
+    }
+  ]
+}
