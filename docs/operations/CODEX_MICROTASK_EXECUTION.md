@@ -107,3 +107,35 @@ def installed_distribution_version(distribution_name: str) -> str | None:
 ## Public privacy rule
 
 No real clinician/patient names, email addresses, medical history, identifiers, private screenshots, raw labs, protected cohort rows, tokens, credentials or source excerpts in this repository, issues, PRs, CI or public docs. Private SaaS trackers also store only operational metadata. Preserve no-PHI payload boundaries across all releases.
+
+
+## v2 goal-scoped retrieval and continuation contract
+
+Before the next task, load only:
+1. Canonical issue (for example `#89`) and its unchecked microtask IDs.
+2. `docs/operations/CODEX_MICROTASKS_V2_README.md` and its single matching JSON manifest under `docs/operations/microtasks_v2/`.
+3. Relevant file(s) in `docs/operations/anchors/` plus actual source/test code; do not paste all 476 tasks into one prompt.
+4. `docs/operations/E1_RELEASE_IMPLEMENTATION_V2.md` for demo software, or `docs/research/M0_M6_SCIENCE_ACCEPTANCE_V2.md` for scientific goals.
+
+Snapshot: 63 goals / 476 planned microtasks. Verified anchor maps derive from source SHA `4a62cf7f1b6f05724faec203f2f3b8847f88868b`. Refresh exact line numbers and current branch SHA before editing.
+
+### Task lifecycle
+
+```text
+SELECTED → SOURCE_VERIFIED → RED_TEST_OR_DOCUMENTED_GAP → MINIMAL_PATCH
+→ POSITIVE_AND_NEGATIVE_TESTS → PRIVACY_MODEL_CI_GATES
+→ REVIEWED_PR_OR_BLOCKED_REASON → SANITIZED_EVIDENCE_READBACK
+→ MARK_CHECKBOX_COMPLETE → NEXT_OPEN_TASK
+```
+
+A blocked microtask must retain reason/evidence; progress to an independent item only if no dependency or approval is bypassed. Never fabricate test or patient-level model outcomes. Production deployment, credential/permission elevation, sending a real invitation and clinical data import always require explicit authorized human gates.
+
+### Short follow-up command
+
+```text
+Continua goal G01: controlla issue e manifesto v2, esegui il primo task sbloccato,
+registra test, PR e SHA, sincronizza i tracker e prosegui nella sessione fino al gate
+o al primo blocco umano. Non importare dati clinici e non deployare senza autorizzazione.
+```
+
+The invocation advances only during active execution, not autonomously between conversations.
