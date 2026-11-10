@@ -1,0 +1,805 @@
+{
+  "version": "2.1",
+  "group": "M3",
+  "source_sha": "4a62cf7f1b6f05724faec203f2f3b8847f88868b",
+  "issue_count": 5,
+  "task_count": 35,
+  "preflight": "Read issue and current source; locate symbol/line by source SHA. Freeze scientific question, comparator and assumptions before implementation; preserve null/negative results and never promote research predictions to clinical advice.",
+  "goals": [
+    {
+      "issue": 42,
+      "title": "[M3][DATA] Establish the external dataset registry, access, licensing, and cohort governance",
+      "source_candidates": [
+        {
+          "path": "twin_engine/research_dataset_import.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/research_dataset_import.py"
+        },
+        {
+          "path": "twin_engine/schemas/research_dataset_v0_1.schema.json",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/schemas/research_dataset_v0_1.schema.json"
+        }
+      ],
+      "evidence_sources_to_verify": [
+        "https://www.nature.com/articles/s41588-024-01853-0",
+        "https://www.bmj.com/content/388/bmj-2024-082505"
+      ],
+      "tasks": [
+        {
+          "id": "M42.T01",
+          "objective": "Record each external MM cohort source, permitted access tier, consent/license and data-use scope.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_backtesting",
+            "twin_engine.tests.test_regressions"
+          ],
+          "negative_control": "Patient leakage, licensing restriction, missing source/assay, and no gain over baseline must fail closed.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M42.T02",
+          "objective": "Implement only authorized download/adapter contract, with private credentials outside repo and immutable raw checksums.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M42.T03",
+          "objective": "Specify schema, missingness, study split and embargo per cohort; no identifier leakage.",
+          "existing_test_candidates": [
+            "chemtools.tests.test_tasks",
+            "simulator.tests.test_api_design_report"
+          ],
+          "negative_control": "Patient leakage, licensing restriction, missing source/assay, and no gain over baseline must fail closed.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M42.T04",
+          "objective": "Make data-use noncompliance a hard BLOCKED gate, not skip-and-proceed.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Patient leakage, licensing restriction, missing source/assay, and no gain over baseline must fail closed.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M42.T05",
+          "objective": "Add missingness, cross-patient leakage, wrong-units and license denial negative tests.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_backtesting",
+            "twin_engine.tests.test_regressions"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M42.T06",
+          "objective": "Re-run frozen external splits and validated simpler baseline with report and uncertainty.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_backtesting",
+            "twin_engine.tests.test_regressions"
+          ],
+          "negative_control": "Patient leakage, licensing restriction, missing source/assay, and no gain over baseline must fail closed.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M42.T07",
+          "objective": "Update public-safe result, model/dataset card, linked issue milestone and operational mirrors.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Patient leakage, licensing restriction, missing source/assay, and no gain over baseline must fail closed.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        }
+      ]
+    },
+    {
+      "issue": 43,
+      "title": "[M3][COMMMPASS] Implement the CoMMpass schema adapter and frozen benchmark cohort",
+      "source_candidates": [
+        {
+          "path": "twin_engine/research_dataset_import.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/research_dataset_import.py"
+        },
+        {
+          "path": "twin_engine/observation_model.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/observation_model.py"
+        }
+      ],
+      "evidence_sources_to_verify": [
+        "https://www.nature.com/articles/s41588-024-01853-0",
+        "https://www.bmj.com/content/388/bmj-2024-082505"
+      ],
+      "tasks": [
+        {
+          "id": "M43.T01",
+          "objective": "Define CoMMpass field mapping across ID, longitudinal visit, genomics, therapy, response and endpoint using authorized dictionary.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "A dominated/safety-violating hypothetical strategy must not be recommended as clinically superior.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M43.T02",
+          "objective": "Freeze patient-level partition and temporal split before any feature transform; no train-test patient leakage.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_backtesting",
+            "twin_engine.tests.test_regressions"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M43.T03",
+          "objective": "Implement adapter for sanctioned sample/cohort with robust units, missingness and a dry-run mode.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_backtesting",
+            "twin_engine.tests.test_regressions"
+          ],
+          "negative_control": "Patient leakage, licensing restriction, missing source/assay, and no gain over baseline must fail closed.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M43.T04",
+          "objective": "Write agreement test with declared cohort/codebook and separate synthetic fixture for public CI.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_backtesting",
+            "twin_engine.tests.test_regressions"
+          ],
+          "negative_control": "Patient leakage, licensing restriction, missing source/assay, and no gain over baseline must fail closed.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M43.T05",
+          "objective": "Add missingness, cross-patient leakage, wrong-units and license denial negative tests.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_backtesting",
+            "twin_engine.tests.test_regressions"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M43.T06",
+          "objective": "Re-run frozen external splits and validated simpler baseline with report and uncertainty.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_backtesting",
+            "twin_engine.tests.test_regressions"
+          ],
+          "negative_control": "Patient leakage, licensing restriction, missing source/assay, and no gain over baseline must fail closed.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M43.T07",
+          "objective": "Update public-safe result, model/dataset card, linked issue milestone and operational mirrors.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Patient leakage, licensing restriction, missing source/assay, and no gain over baseline must fail closed.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        }
+      ]
+    },
+    {
+      "issue": 44,
+      "title": "[M3][BENCHMARK] Define leakage-resistant external benchmark tasks and baseline comparators",
+      "source_candidates": [
+        {
+          "path": "twin_engine/backtesting.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/backtesting.py"
+        },
+        {
+          "path": "twin_engine/calibration.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/calibration.py"
+        },
+        {
+          "path": "twin_engine/uncertainty.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/uncertainty.py"
+        },
+        {
+          "path": "twin_engine/robustness.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/robustness.py"
+        }
+      ],
+      "evidence_sources_to_verify": [
+        "https://www.nature.com/articles/s41588-024-01853-0",
+        "https://www.bmj.com/content/388/bmj-2024-082505"
+      ],
+      "tasks": [
+        {
+          "id": "M44.T01",
+          "objective": "Specify target outcome/horizon/estimand and baseline comparators before model fitting.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M44.T02",
+          "objective": "Implement patient-group and temporal leakage controls; hold-out cohort must be immutable.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_backtesting",
+            "twin_engine.tests.test_regressions"
+          ],
+          "negative_control": "Patient leakage, licensing restriction, missing source/assay, and no gain over baseline must fail closed.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M44.T03",
+          "objective": "Quantify discrimination/calibration and CI on compatible tasks only; record threshold rationale.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_backtesting",
+            "twin_engine.tests.test_regressions"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M44.T04",
+          "objective": "Write baseline/no-gain and shifted-distribution tests before invoking complex architecture.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M44.T05",
+          "objective": "Add missingness, cross-patient leakage, wrong-units and license denial negative tests.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_backtesting",
+            "twin_engine.tests.test_regressions"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M44.T06",
+          "objective": "Re-run frozen external splits and validated simpler baseline with report and uncertainty.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_backtesting",
+            "twin_engine.tests.test_regressions"
+          ],
+          "negative_control": "Patient leakage, licensing restriction, missing source/assay, and no gain over baseline must fail closed.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M44.T07",
+          "objective": "Update public-safe result, model/dataset card, linked issue milestone and operational mirrors.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Patient leakage, licensing restriction, missing source/assay, and no gain over baseline must fail closed.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        }
+      ]
+    },
+    {
+      "issue": 45,
+      "title": "[M3][VALIDATION] Execute and publish the external benchmark evidence bundle",
+      "source_candidates": [
+        {
+          "path": "twin_engine/backtesting.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/backtesting.py"
+        },
+        {
+          "path": "twin_engine/run_manifest.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/run_manifest.py"
+        },
+        {
+          "path": "twin_engine/report_builder.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/report_builder.py"
+        },
+        {
+          "path": "docs/models/REGISTRY.md",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/docs/models/REGISTRY.md"
+        }
+      ],
+      "evidence_sources_to_verify": [
+        "https://www.nature.com/articles/s41588-024-01853-0",
+        "https://www.bmj.com/content/388/bmj-2024-082505"
+      ],
+      "tasks": [
+        {
+          "id": "M45.T01",
+          "objective": "Execute frozen external test tasks and baseline comparators with fixed versions and patient-disjoint splits.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_backtesting",
+            "twin_engine.tests.test_regressions"
+          ],
+          "negative_control": "Patient leakage, licensing restriction, missing source/assay, and no gain over baseline must fail closed.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M45.T02",
+          "objective": "Persist performance, coverage, uncertainty, subgroup sensitivity and negative outcomes in immutable reports.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M45.T03",
+          "objective": "Ensure E3 claims only for domains actually externally tested; otherwise remain E1/E2.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_backtesting",
+            "twin_engine.tests.test_regressions"
+          ],
+          "negative_control": "Patient leakage, licensing restriction, missing source/assay, and no gain over baseline must fail closed.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M45.T04",
+          "objective": "Publish reproducible sanitized evidence bundle with dataset access/license and model card.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Patient leakage, licensing restriction, missing source/assay, and no gain over baseline must fail closed.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M45.T05",
+          "objective": "Add missingness, cross-patient leakage, wrong-units and license denial negative tests.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_backtesting",
+            "twin_engine.tests.test_regressions"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M45.T06",
+          "objective": "Re-run frozen external splits and validated simpler baseline with report and uncertainty.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_backtesting",
+            "twin_engine.tests.test_regressions"
+          ],
+          "negative_control": "Patient leakage, licensing restriction, missing source/assay, and no gain over baseline must fail closed.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M45.T07",
+          "objective": "Update public-safe result, model/dataset card, linked issue milestone and operational mirrors.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Patient leakage, licensing restriction, missing source/assay, and no gain over baseline must fail closed.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        }
+      ]
+    },
+    {
+      "issue": 59,
+      "title": "[M3 TRACKER] External Validation & Benchmark v0.3",
+      "source_candidates": [
+        {
+          "path": "docs/product/ROADMAP.md",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/docs/product/ROADMAP.md"
+        },
+        {
+          "path": "twin_engine/backtesting.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/backtesting.py"
+        },
+        {
+          "path": "docs/models/REGISTRY.md",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "line": null,
+          "github_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/docs/models/REGISTRY.md"
+        }
+      ],
+      "evidence_sources_to_verify": [
+        "https://www.nature.com/articles/s41588-024-01853-0",
+        "https://www.bmj.com/content/388/bmj-2024-082505"
+      ],
+      "tasks": [
+        {
+          "id": "M59.T01",
+          "objective": "Read #42–#45 completion evidence and compare to frozen M3 acceptance.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M59.T02",
+          "objective": "Require explicit baseline comparisons, held-out evaluation and access/licensing compliance.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M59.T03",
+          "objective": "Record negative `EXTERNAL_VALIDATION_FAILED` as legitimate milestone result, not fabricated PASS.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_backtesting",
+            "twin_engine.tests.test_regressions"
+          ],
+          "negative_control": "Patient leakage, licensing restriction, missing source/assay, and no gain over baseline must fail closed.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M59.T04",
+          "objective": "Promote scope only if method-specific robustness is actually demonstrated.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M59.T05",
+          "objective": "Add missingness, cross-patient leakage, wrong-units and license denial negative tests.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_backtesting",
+            "twin_engine.tests.test_regressions"
+          ],
+          "negative_control": "Scientific output without independent evidence, versioned model and a valid comparator must be marked unverified or blocked.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M59.T06",
+          "objective": "Re-run frozen external splits and validated simpler baseline with report and uncertainty.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_backtesting",
+            "twin_engine.tests.test_regressions"
+          ],
+          "negative_control": "Patient leakage, licensing restriction, missing source/assay, and no gain over baseline must fail closed.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        },
+        {
+          "id": "M59.T07",
+          "objective": "Update public-safe result, model/dataset card, linked issue milestone and operational mirrors.",
+          "existing_test_candidates": [
+            "twin_engine.tests.test_run_manifests",
+            "scripts.check_numerical_baseline"
+          ],
+          "negative_control": "Patient leakage, licensing restriction, missing source/assay, and no gain over baseline must fail closed.",
+          "required_evidence": [
+            "versioned scientific assumption and comparator",
+            "synthetic/authorized-data test result",
+            "PR SHA and source anchoring",
+            "private data safety scan",
+            "explicit model readiness state"
+          ],
+          "human_gate": "NOT_FOR_SYNTHETIC_LOCAL_RESEARCH",
+          "status": "PLANNED"
+        }
+      ]
+    }
+  ]
+}
