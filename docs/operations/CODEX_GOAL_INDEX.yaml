@@ -1,0 +1,419 @@
+# bmyCure4MM canonical microtask index
+schema_version: '1.0'
+purpose: planning_only
+intended_use: E1_research_prototype
+clinical_decision_support: false
+patient_specific_prediction_validated: false
+causal_effect_identified: false
+source_sha_at_planning: '4a62cf7f1b6f05724faec203f2f3b8847f88868b'
+source_of_truth: github_issue_checkboxes
+privacy_policy: public_synthetic_only
+continuation_document: docs/operations/CODEX_MICROTASK_EXECUTION.md
+runtime_workflow: synchronous_one_microtask_at_a_time
+goals:
+  M0_R:
+    - issue: 13
+      url: https://github.com/andreazedda/bmyCure4MM/issues/13
+      microtasks_planned: 0
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RELEVANT_QA_SECURITY
+    - issue: 23
+      url: https://github.com/andreazedda/bmyCure4MM/issues/23
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RELEVANT_QA_SECURITY
+    - issue: 26
+      url: https://github.com/andreazedda/bmyCure4MM/issues/26
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RELEVANT_QA_SECURITY
+  M0_S:
+    - issue: 8
+      url: https://github.com/andreazedda/bmyCure4MM/issues/8
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RELEVANT_QA_SECURITY
+    - issue: 9
+      url: https://github.com/andreazedda/bmyCure4MM/issues/9
+      microtasks_planned: 0
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RELEVANT_QA_SECURITY
+    - issue: 10
+      url: https://github.com/andreazedda/bmyCure4MM/issues/10
+      microtasks_planned: 0
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RELEVANT_QA_SECURITY
+    - issue: 16
+      url: https://github.com/andreazedda/bmyCure4MM/issues/16
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RELEVANT_QA_SECURITY
+    - issue: 17
+      url: https://github.com/andreazedda/bmyCure4MM/issues/17
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RELEVANT_QA_SECURITY
+    - issue: 20
+      url: https://github.com/andreazedda/bmyCure4MM/issues/20
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RELEVANT_QA_SECURITY
+    - issue: 21
+      url: https://github.com/andreazedda/bmyCure4MM/issues/21
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RELEVANT_QA_SECURITY
+    - issue: 24
+      url: https://github.com/andreazedda/bmyCure4MM/issues/24
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RELEVANT_QA_SECURITY
+    - issue: 27
+      url: https://github.com/andreazedda/bmyCure4MM/issues/27
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RELEVANT_QA_SECURITY
+    - issue: 75
+      url: https://github.com/andreazedda/bmyCure4MM/issues/75
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RELEVANT_QA_SECURITY
+    - issue: 76
+      url: https://github.com/andreazedda/bmyCure4MM/issues/76
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RELEVANT_QA_SECURITY
+    - issue: 78
+      url: https://github.com/andreazedda/bmyCure4MM/issues/78
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RELEVANT_QA_SECURITY
+    - issue: 79
+      url: https://github.com/andreazedda/bmyCure4MM/issues/79
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RELEVANT_QA_SECURITY
+  M1:
+    - issue: 18
+      url: https://github.com/andreazedda/bmyCure4MM/issues/18
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+    - issue: 28
+      url: https://github.com/andreazedda/bmyCure4MM/issues/28
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+    - issue: 32
+      url: https://github.com/andreazedda/bmyCure4MM/issues/32
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+    - issue: 33
+      url: https://github.com/andreazedda/bmyCure4MM/issues/33
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+    - issue: 34
+      url: https://github.com/andreazedda/bmyCure4MM/issues/34
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+    - issue: 35
+      url: https://github.com/andreazedda/bmyCure4MM/issues/35
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+    - issue: 36
+      url: https://github.com/andreazedda/bmyCure4MM/issues/36
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+  M2:
+    - issue: 22
+      url: https://github.com/andreazedda/bmyCure4MM/issues/22
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+    - issue: 29
+      url: https://github.com/andreazedda/bmyCure4MM/issues/29
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+    - issue: 37
+      url: https://github.com/andreazedda/bmyCure4MM/issues/37
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+    - issue: 38
+      url: https://github.com/andreazedda/bmyCure4MM/issues/38
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+    - issue: 39
+      url: https://github.com/andreazedda/bmyCure4MM/issues/39
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+    - issue: 40
+      url: https://github.com/andreazedda/bmyCure4MM/issues/40
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+    - issue: 41
+      url: https://github.com/andreazedda/bmyCure4MM/issues/41
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+  M3:
+    - issue: 42
+      url: https://github.com/andreazedda/bmyCure4MM/issues/42
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+    - issue: 43
+      url: https://github.com/andreazedda/bmyCure4MM/issues/43
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+    - issue: 44
+      url: https://github.com/andreazedda/bmyCure4MM/issues/44
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+    - issue: 45
+      url: https://github.com/andreazedda/bmyCure4MM/issues/45
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+    - issue: 59
+      url: https://github.com/andreazedda/bmyCure4MM/issues/59
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+  M4:
+    - issue: 46
+      url: https://github.com/andreazedda/bmyCure4MM/issues/46
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+    - issue: 47
+      url: https://github.com/andreazedda/bmyCure4MM/issues/47
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+    - issue: 48
+      url: https://github.com/andreazedda/bmyCure4MM/issues/48
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+    - issue: 49
+      url: https://github.com/andreazedda/bmyCure4MM/issues/49
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+    - issue: 50
+      url: https://github.com/andreazedda/bmyCure4MM/issues/50
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+    - issue: 51
+      url: https://github.com/andreazedda/bmyCure4MM/issues/51
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+    - issue: 60
+      url: https://github.com/andreazedda/bmyCure4MM/issues/60
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+  M5:
+    - issue: 52
+      url: https://github.com/andreazedda/bmyCure4MM/issues/52
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+    - issue: 53
+      url: https://github.com/andreazedda/bmyCure4MM/issues/53
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+    - issue: 54
+      url: https://github.com/andreazedda/bmyCure4MM/issues/54
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+    - issue: 55
+      url: https://github.com/andreazedda/bmyCure4MM/issues/55
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+    - issue: 56
+      url: https://github.com/andreazedda/bmyCure4MM/issues/56
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+    - issue: 57
+      url: https://github.com/andreazedda/bmyCure4MM/issues/57
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+    - issue: 58
+      url: https://github.com/andreazedda/bmyCure4MM/issues/58
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+    - issue: 61
+      url: https://github.com/andreazedda/bmyCure4MM/issues/61
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+    - issue: 77
+      url: https://github.com/andreazedda/bmyCure4MM/issues/77
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+  M6:
+    - issue: 25
+      url: https://github.com/andreazedda/bmyCure4MM/issues/25
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+    - issue: 30
+      url: https://github.com/andreazedda/bmyCure4MM/issues/30
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RESEARCH_EVIDENCE_AND_VALIDATION
+  MASTER:
+    - issue: 31
+      url: https://github.com/andreazedda/bmyCure4MM/issues/31
+      microtasks_planned: 7
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RELEVANT_QA_SECURITY
+  G00:
+    - issue: 88
+      url: https://github.com/andreazedda/bmyCure4MM/issues/88
+      microtasks_planned: 8
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RELEVANT_QA_SECURITY
+  G01:
+    - issue: 89
+      url: https://github.com/andreazedda/bmyCure4MM/issues/89
+      microtasks_planned: 8
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RELEVANT_QA_SECURITY
+  G02:
+    - issue: 90
+      url: https://github.com/andreazedda/bmyCure4MM/issues/90
+      microtasks_planned: 8
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RELEVANT_QA_SECURITY
+  G03:
+    - issue: 91
+      url: https://github.com/andreazedda/bmyCure4MM/issues/91
+      microtasks_planned: 8
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RELEVANT_QA_SECURITY
+  G04:
+    - issue: 92
+      url: https://github.com/andreazedda/bmyCure4MM/issues/92
+      microtasks_planned: 8
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RELEVANT_QA_SECURITY
+  G05:
+    - issue: 93
+      url: https://github.com/andreazedda/bmyCure4MM/issues/93
+      microtasks_planned: 8
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: RELEVANT_QA_SECURITY
+  G06:
+    - issue: 94
+      url: https://github.com/andreazedda/bmyCure4MM/issues/94
+      microtasks_planned: 8
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: AUTHORIZED_PRIVATE_CASE_ONLY
+  G07:
+    - issue: 95
+      url: https://github.com/andreazedda/bmyCure4MM/issues/95
+      microtasks_planned: 8
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: HUMAN_PRODUCTION_RELEASE
+  G08:
+    - issue: 96
+      url: https://github.com/andreazedda/bmyCure4MM/issues/96
+      microtasks_planned: 8
+      status: NOT_EXECUTED
+      selection: first_unblocked_unchecked
+      gate: HUMAN_SPECIALIST_ACCEPTANCE
+microtask_closure_requires:
+  - actual_code_sha
+  - verified_source_line_anchor
+  - focused_regression_tests
+  - scientific_reference_if_applicable
+  - privacy_and_security_checks
+  - reviewed_pr_or_explicit_no_code_evidence
+  - cross_tool_status_update
+no_unattended_deployment: true
+no_unattended_clinical_case_import: true
