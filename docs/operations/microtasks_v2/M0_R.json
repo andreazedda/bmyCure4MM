@@ -1,0 +1,894 @@
+{
+  "version": "2.0",
+  "type": "MICROTASK_EXECUTION_MANIFEST",
+  "group": "M0_R",
+  "generated_at": "2026-11-10",
+  "verified_source_sha": "4a62cf7f1b6f05724faec203f2f3b8847f88868b",
+  "notes": "Derived from existing public GitHub issue checkboxes; source candidates are not task-line proofs unless verified_symbol_line is populated. All medical/private data forbidden in public artifacts. Existing issue is source of truth.",
+  "count": 21,
+  "tasks": [
+    {
+      "task_id": "M13.T01",
+      "goal_issue": 13,
+      "goal_title": "[M0-R][CI] Consolidate existing workflows into mandatory scientific quality gates and protected PR governance",
+      "objective": "Compare branch protection required contexts against current green CI and deployed SHA.",
+      "source_candidates": [
+        {
+          "path": "scripts/check_repository_hygiene.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/scripts/check_repository_hygiene.py"
+        },
+        {
+          "path": "scripts/check_numerical_baseline.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/scripts/check_numerical_baseline.py"
+        }
+      ],
+      "preflight": [
+        "Fetch current branch HEAD and check this issue task remains unchecked.",
+        "Reconfirm code symbol and line range; invalidate anchor on SHA drift.",
+        "Write a minimal reproducible synthetic failing case before code change where applicable."
+      ],
+      "test_candidates": [
+        "twin_engine.tests.test_services",
+        "simulator.tests.test_numerical_sanity"
+      ],
+      "negative_case": "Invalid/missing input and environment failure must be tested and produce deterministic error/blocked evidence.",
+      "acceptance_rule": "Demonstrate the explicit objective with a focused positive and negative test, record actual command/output, reviewed PR SHA and privacy/source evidence. Close only after relevant runtime/scientific gate.",
+      "candidate_scientific_sources": [],
+      "claim_status": "NOT_VALIDATED_BY_PLANNING",
+      "status": "PLANNED",
+      "human_gate": "REQUIRES_REVIEW_BEFORE_EXTERNAL_ACTION"
+    },
+    {
+      "task_id": "M13.T02",
+      "goal_issue": 13,
+      "goal_title": "[M0-R][CI] Consolidate existing workflows into mandatory scientific quality gates and protected PR governance",
+      "objective": "Unify `uv lock --check`, migrations, format, mypy, tests, PHI/secret scan and numeric golden in a mandatory aggregator.",
+      "source_candidates": [
+        {
+          "path": "scripts/check_repository_hygiene.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/scripts/check_repository_hygiene.py"
+        },
+        {
+          "path": "scripts/check_numerical_baseline.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/scripts/check_numerical_baseline.py"
+        }
+      ],
+      "preflight": [
+        "Fetch current branch HEAD and check this issue task remains unchecked.",
+        "Reconfirm code symbol and line range; invalidate anchor on SHA drift.",
+        "Write a minimal reproducible synthetic failing case before code change where applicable."
+      ],
+      "test_candidates": [
+        "twin_engine.tests.test_services",
+        "simulator.tests.test_numerical_sanity"
+      ],
+      "negative_case": "Invalid/missing input and environment failure must be tested and produce deterministic error/blocked evidence.",
+      "acceptance_rule": "Demonstrate the explicit objective with a focused positive and negative test, record actual command/output, reviewed PR SHA and privacy/source evidence. Close only after relevant runtime/scientific gate.",
+      "candidate_scientific_sources": [],
+      "claim_status": "NOT_VALIDATED_BY_PLANNING",
+      "status": "PLANNED",
+      "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS"
+    },
+    {
+      "task_id": "M13.T03",
+      "goal_issue": 13,
+      "goal_title": "[M0-R][CI] Consolidate existing workflows into mandatory scientific quality gates and protected PR governance",
+      "objective": "Make staged diff and base/head PR safety scanning distinct, with false-positive review but no privacy bypass.",
+      "source_candidates": [
+        {
+          "path": "scripts/check_repository_hygiene.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/scripts/check_repository_hygiene.py"
+        },
+        {
+          "path": "scripts/check_numerical_baseline.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/scripts/check_numerical_baseline.py"
+        }
+      ],
+      "preflight": [
+        "Fetch current branch HEAD and check this issue task remains unchecked.",
+        "Reconfirm code symbol and line range; invalidate anchor on SHA drift.",
+        "Write a minimal reproducible synthetic failing case before code change where applicable."
+      ],
+      "test_candidates": [
+        "twin_engine.tests.test_services",
+        "simulator.tests.test_numerical_sanity"
+      ],
+      "negative_case": "Invalid/missing input and environment failure must be tested and produce deterministic error/blocked evidence.",
+      "acceptance_rule": "Demonstrate the explicit objective with a focused positive and negative test, record actual command/output, reviewed PR SHA and privacy/source evidence. Close only after relevant runtime/scientific gate.",
+      "candidate_scientific_sources": [],
+      "claim_status": "NOT_VALIDATED_BY_PLANNING",
+      "status": "PLANNED",
+      "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS"
+    },
+    {
+      "task_id": "M13.T04",
+      "goal_issue": 13,
+      "goal_title": "[M0-R][CI] Consolidate existing workflows into mandatory scientific quality gates and protected PR governance",
+      "objective": "Run negative fixtures that intentionally violate each check and prove the gate fails.",
+      "source_candidates": [
+        {
+          "path": "scripts/check_repository_hygiene.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/scripts/check_repository_hygiene.py"
+        },
+        {
+          "path": "scripts/check_numerical_baseline.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/scripts/check_numerical_baseline.py"
+        }
+      ],
+      "preflight": [
+        "Fetch current branch HEAD and check this issue task remains unchecked.",
+        "Reconfirm code symbol and line range; invalidate anchor on SHA drift.",
+        "Write a minimal reproducible synthetic failing case before code change where applicable."
+      ],
+      "test_candidates": [
+        "twin_engine.tests.test_services",
+        "simulator.tests.test_numerical_sanity"
+      ],
+      "negative_case": "Invalid/missing input and environment failure must be tested and produce deterministic error/blocked evidence.",
+      "acceptance_rule": "Demonstrate the explicit objective with a focused positive and negative test, record actual command/output, reviewed PR SHA and privacy/source evidence. Close only after relevant runtime/scientific gate.",
+      "candidate_scientific_sources": [],
+      "claim_status": "NOT_VALIDATED_BY_PLANNING",
+      "status": "PLANNED",
+      "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS"
+    },
+    {
+      "task_id": "M13.T05",
+      "goal_issue": 13,
+      "goal_title": "[M0-R][CI] Consolidate existing workflows into mandatory scientific quality gates and protected PR governance",
+      "objective": "Add or update explicit synthetic tests and negative/failure cases in the module's established test suite; do not use real patient data.",
+      "source_candidates": [
+        {
+          "path": "scripts/check_repository_hygiene.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/scripts/check_repository_hygiene.py"
+        },
+        {
+          "path": "scripts/check_numerical_baseline.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/scripts/check_numerical_baseline.py"
+        }
+      ],
+      "preflight": [
+        "Fetch current branch HEAD and check this issue task remains unchecked.",
+        "Reconfirm code symbol and line range; invalidate anchor on SHA drift.",
+        "Write a minimal reproducible synthetic failing case before code change where applicable."
+      ],
+      "test_candidates": [
+        "accounts.tests.test_lifecycle",
+        "accounts.tests.test_existing_site",
+        "clinic.tests.test_security_and_ux"
+      ],
+      "negative_case": "Unauthorized, revoked and unrelated-scope synthetic users must not access target objects, exports or metadata.",
+      "acceptance_rule": "Demonstrate the explicit objective with a focused positive and negative test, record actual command/output, reviewed PR SHA and privacy/source evidence. Close only after relevant runtime/scientific gate.",
+      "candidate_scientific_sources": [],
+      "claim_status": "NOT_VALIDATED_BY_PLANNING",
+      "status": "PLANNED",
+      "human_gate": "REQUIRES_REVIEW_BEFORE_EXTERNAL_ACTION"
+    },
+    {
+      "task_id": "M13.T06",
+      "goal_issue": 13,
+      "goal_title": "[M0-R][CI] Consolidate existing workflows into mandatory scientific quality gates and protected PR governance",
+      "objective": "Execute relevant quality/safety/numerical checks and record compare-to-previous SHA; never mark passed without logs.",
+      "source_candidates": [
+        {
+          "path": "scripts/check_repository_hygiene.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/scripts/check_repository_hygiene.py"
+        },
+        {
+          "path": "scripts/check_numerical_baseline.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/scripts/check_numerical_baseline.py"
+        }
+      ],
+      "preflight": [
+        "Fetch current branch HEAD and check this issue task remains unchecked.",
+        "Reconfirm code symbol and line range; invalidate anchor on SHA drift.",
+        "Write a minimal reproducible synthetic failing case before code change where applicable."
+      ],
+      "test_candidates": [
+        "twin_engine.tests.test_services",
+        "simulator.tests.test_numerical_sanity"
+      ],
+      "negative_case": "Invalid/missing input and environment failure must be tested and produce deterministic error/blocked evidence.",
+      "acceptance_rule": "Demonstrate the explicit objective with a focused positive and negative test, record actual command/output, reviewed PR SHA and privacy/source evidence. Close only after relevant runtime/scientific gate.",
+      "candidate_scientific_sources": [],
+      "claim_status": "NOT_VALIDATED_BY_PLANNING",
+      "status": "PLANNED",
+      "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS"
+    },
+    {
+      "task_id": "M13.T07",
+      "goal_issue": 13,
+      "goal_title": "[M0-R][CI] Consolidate existing workflows into mandatory scientific quality gates and protected PR governance",
+      "objective": "Update canonical docs and backlink to this goal + release gate without making unvalidated claims.",
+      "source_candidates": [
+        {
+          "path": "scripts/check_repository_hygiene.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/scripts/check_repository_hygiene.py"
+        },
+        {
+          "path": "scripts/check_numerical_baseline.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/scripts/check_numerical_baseline.py"
+        }
+      ],
+      "preflight": [
+        "Fetch current branch HEAD and check this issue task remains unchecked.",
+        "Reconfirm code symbol and line range; invalidate anchor on SHA drift.",
+        "Write a minimal reproducible synthetic failing case before code change where applicable."
+      ],
+      "test_candidates": [
+        "twin_engine.tests.test_services",
+        "simulator.tests.test_numerical_sanity"
+      ],
+      "negative_case": "Invalid/missing input and environment failure must be tested and produce deterministic error/blocked evidence.",
+      "acceptance_rule": "Demonstrate the explicit objective with a focused positive and negative test, record actual command/output, reviewed PR SHA and privacy/source evidence. Close only after relevant runtime/scientific gate.",
+      "candidate_scientific_sources": [],
+      "claim_status": "NOT_VALIDATED_BY_PLANNING",
+      "status": "PLANNED",
+      "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS"
+    },
+    {
+      "task_id": "M23.T01",
+      "goal_issue": 23,
+      "goal_title": "[M0-R][QA] Enforce the minimum scientific invariants and define the extended test architecture",
+      "objective": "Write testable model invariants: units, nonnegativity when applicable, seeds, schedule timing, hash identity. Evidence: current SHA/source span, failing synthetic test or verified gap, minimal PR and passing focused regression.",
+      "source_candidates": [
+        {
+          "path": "scripts/check_numerical_baseline.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/scripts/check_numerical_baseline.py"
+        },
+        {
+          "path": "twin_engine/tests/test_run_manifests.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/tests/test_run_manifests.py"
+        },
+        {
+          "path": "simulator/tests/test_numerical_sanity.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/tests/test_numerical_sanity.py"
+        },
+        {
+          "path": "accounts/tests/test_existing_site.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/accounts/tests/test_existing_site.py"
+        }
+      ],
+      "preflight": [
+        "Fetch current branch HEAD and check this issue task remains unchecked.",
+        "Reconfirm code symbol and line range; invalidate anchor on SHA drift.",
+        "Write a minimal reproducible synthetic failing case before code change where applicable."
+      ],
+      "test_candidates": [
+        "twin_engine.tests.test_exposure_bridge",
+        "simulator.tests.test_pkpd_yaml"
+      ],
+      "negative_case": "Missing source, unit, unidentifiable parameter or no held-out gain must result in explicit unsupported/blocked status.",
+      "acceptance_rule": "Demonstrate the explicit objective with a focused positive and negative test, record actual command/output, reviewed PR SHA and privacy/source evidence. Close only after relevant runtime/scientific gate.",
+      "candidate_scientific_sources": [],
+      "claim_status": "NOT_VALIDATED_BY_PLANNING",
+      "status": "PLANNED",
+      "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS"
+    },
+    {
+      "task_id": "M23.T02",
+      "goal_issue": 23,
+      "goal_title": "[M0-R][QA] Enforce the minimum scientific invariants and define the extended test architecture",
+      "objective": "Add property-based fixtures for stage transitions, negative/zero doses and artifact tampering. Evidence: current SHA/source span, failing synthetic test or verified gap, minimal PR and passing focused regression.",
+      "source_candidates": [
+        {
+          "path": "scripts/check_numerical_baseline.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/scripts/check_numerical_baseline.py"
+        },
+        {
+          "path": "twin_engine/tests/test_run_manifests.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/tests/test_run_manifests.py"
+        },
+        {
+          "path": "simulator/tests/test_numerical_sanity.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/tests/test_numerical_sanity.py"
+        },
+        {
+          "path": "accounts/tests/test_existing_site.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/accounts/tests/test_existing_site.py"
+        }
+      ],
+      "preflight": [
+        "Fetch current branch HEAD and check this issue task remains unchecked.",
+        "Reconfirm code symbol and line range; invalidate anchor on SHA drift.",
+        "Write a minimal reproducible synthetic failing case before code change where applicable."
+      ],
+      "test_candidates": [
+        "twin_engine.tests.test_exposure_bridge",
+        "simulator.tests.test_pkpd_yaml"
+      ],
+      "negative_case": "Missing source, unit, unidentifiable parameter or no held-out gain must result in explicit unsupported/blocked status.",
+      "acceptance_rule": "Demonstrate the explicit objective with a focused positive and negative test, record actual command/output, reviewed PR SHA and privacy/source evidence. Close only after relevant runtime/scientific gate.",
+      "candidate_scientific_sources": [],
+      "claim_status": "NOT_VALIDATED_BY_PLANNING",
+      "status": "PLANNED",
+      "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS"
+    },
+    {
+      "task_id": "M23.T03",
+      "goal_issue": 23,
+      "goal_title": "[M0-R][QA] Enforce the minimum scientific invariants and define the extended test architecture",
+      "objective": "Exercise synthetic migration forward/back and IDOR/PHI scanning negative cases. Evidence: current SHA/source span, failing synthetic test or verified gap, minimal PR and passing focused regression.",
+      "source_candidates": [
+        {
+          "path": "scripts/check_numerical_baseline.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/scripts/check_numerical_baseline.py"
+        },
+        {
+          "path": "twin_engine/tests/test_run_manifests.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/tests/test_run_manifests.py"
+        },
+        {
+          "path": "simulator/tests/test_numerical_sanity.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/tests/test_numerical_sanity.py"
+        },
+        {
+          "path": "accounts/tests/test_existing_site.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/accounts/tests/test_existing_site.py"
+        }
+      ],
+      "preflight": [
+        "Fetch current branch HEAD and check this issue task remains unchecked.",
+        "Reconfirm code symbol and line range; invalidate anchor on SHA drift.",
+        "Write a minimal reproducible synthetic failing case before code change where applicable."
+      ],
+      "test_candidates": [
+        "accounts.tests.test_lifecycle",
+        "accounts.tests.test_existing_site",
+        "clinic.tests.test_security_and_ux"
+      ],
+      "negative_case": "Unauthorized, revoked and unrelated-scope synthetic users must not access target objects, exports or metadata.",
+      "acceptance_rule": "Demonstrate the explicit objective with a focused positive and negative test, record actual command/output, reviewed PR SHA and privacy/source evidence. Close only after relevant runtime/scientific gate.",
+      "candidate_scientific_sources": [],
+      "claim_status": "NOT_VALIDATED_BY_PLANNING",
+      "status": "PLANNED",
+      "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS"
+    },
+    {
+      "task_id": "M23.T04",
+      "goal_issue": 23,
+      "goal_title": "[M0-R][QA] Enforce the minimum scientific invariants and define the extended test architecture",
+      "objective": "Make changed golden outputs explicitly versioned with model meaning and reviewer acceptance. Evidence: current SHA/source span, failing synthetic test or verified gap, minimal PR and passing focused regression.",
+      "source_candidates": [
+        {
+          "path": "scripts/check_numerical_baseline.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/scripts/check_numerical_baseline.py"
+        },
+        {
+          "path": "twin_engine/tests/test_run_manifests.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/tests/test_run_manifests.py"
+        },
+        {
+          "path": "simulator/tests/test_numerical_sanity.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/tests/test_numerical_sanity.py"
+        },
+        {
+          "path": "accounts/tests/test_existing_site.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/accounts/tests/test_existing_site.py"
+        }
+      ],
+      "preflight": [
+        "Fetch current branch HEAD and check this issue task remains unchecked.",
+        "Reconfirm code symbol and line range; invalidate anchor on SHA drift.",
+        "Write a minimal reproducible synthetic failing case before code change where applicable."
+      ],
+      "test_candidates": [
+        "twin_engine.tests.test_services",
+        "twin_engine.tests.test_input_contract"
+      ],
+      "negative_case": "Missing source, unit, unidentifiable parameter or no held-out gain must result in explicit unsupported/blocked status.",
+      "acceptance_rule": "Demonstrate the explicit objective with a focused positive and negative test, record actual command/output, reviewed PR SHA and privacy/source evidence. Close only after relevant runtime/scientific gate.",
+      "candidate_scientific_sources": [],
+      "claim_status": "NOT_VALIDATED_BY_PLANNING",
+      "status": "PLANNED",
+      "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS"
+    },
+    {
+      "task_id": "M23.T05",
+      "goal_issue": 23,
+      "goal_title": "[M0-R][QA] Enforce the minimum scientific invariants and define the extended test architecture",
+      "objective": "Add negative/privacy/edge-case tests in existing suite; record command and expected failures.",
+      "source_candidates": [
+        {
+          "path": "scripts/check_numerical_baseline.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/scripts/check_numerical_baseline.py"
+        },
+        {
+          "path": "twin_engine/tests/test_run_manifests.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/tests/test_run_manifests.py"
+        },
+        {
+          "path": "simulator/tests/test_numerical_sanity.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/tests/test_numerical_sanity.py"
+        },
+        {
+          "path": "accounts/tests/test_existing_site.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/accounts/tests/test_existing_site.py"
+        }
+      ],
+      "preflight": [
+        "Fetch current branch HEAD and check this issue task remains unchecked.",
+        "Reconfirm code symbol and line range; invalidate anchor on SHA drift.",
+        "Write a minimal reproducible synthetic failing case before code change where applicable."
+      ],
+      "test_candidates": [
+        "accounts.tests.test_lifecycle",
+        "accounts.tests.test_existing_site",
+        "clinic.tests.test_security_and_ux"
+      ],
+      "negative_case": "Unauthorized, revoked and unrelated-scope synthetic users must not access target objects, exports or metadata.",
+      "acceptance_rule": "Demonstrate the explicit objective with a focused positive and negative test, record actual command/output, reviewed PR SHA and privacy/source evidence. Close only after relevant runtime/scientific gate.",
+      "candidate_scientific_sources": [],
+      "claim_status": "NOT_VALIDATED_BY_PLANNING",
+      "status": "PLANNED",
+      "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS"
+    },
+    {
+      "task_id": "M23.T06",
+      "goal_issue": 23,
+      "goal_title": "[M0-R][QA] Enforce the minimum scientific invariants and define the extended test architecture",
+      "objective": "Run applicable full CI/numerical/PHI gates and inspect diff against prior model version.",
+      "source_candidates": [
+        {
+          "path": "scripts/check_numerical_baseline.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/scripts/check_numerical_baseline.py"
+        },
+        {
+          "path": "twin_engine/tests/test_run_manifests.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/tests/test_run_manifests.py"
+        },
+        {
+          "path": "simulator/tests/test_numerical_sanity.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/tests/test_numerical_sanity.py"
+        },
+        {
+          "path": "accounts/tests/test_existing_site.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/accounts/tests/test_existing_site.py"
+        }
+      ],
+      "preflight": [
+        "Fetch current branch HEAD and check this issue task remains unchecked.",
+        "Reconfirm code symbol and line range; invalidate anchor on SHA drift.",
+        "Write a minimal reproducible synthetic failing case before code change where applicable."
+      ],
+      "test_candidates": [
+        "twin_engine.tests.test_services",
+        "twin_engine.tests.test_input_contract"
+      ],
+      "negative_case": "Missing source, unit, unidentifiable parameter or no held-out gain must result in explicit unsupported/blocked status.",
+      "acceptance_rule": "Demonstrate the explicit objective with a focused positive and negative test, record actual command/output, reviewed PR SHA and privacy/source evidence. Close only after relevant runtime/scientific gate.",
+      "candidate_scientific_sources": [],
+      "claim_status": "NOT_VALIDATED_BY_PLANNING",
+      "status": "PLANNED",
+      "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS"
+    },
+    {
+      "task_id": "M23.T07",
+      "goal_issue": 23,
+      "goal_title": "[M0-R][QA] Enforce the minimum scientific invariants and define the extended test architecture",
+      "objective": "Reconcile related GitHub issue/Notion goal/Asana/Trello mirror with redacted evidence.",
+      "source_candidates": [
+        {
+          "path": "scripts/check_numerical_baseline.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": true,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/scripts/check_numerical_baseline.py"
+        },
+        {
+          "path": "twin_engine/tests/test_run_manifests.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/twin_engine/tests/test_run_manifests.py"
+        },
+        {
+          "path": "simulator/tests/test_numerical_sanity.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/simulator/tests/test_numerical_sanity.py"
+        },
+        {
+          "path": "accounts/tests/test_existing_site.py",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/accounts/tests/test_existing_site.py"
+        }
+      ],
+      "preflight": [
+        "Fetch current branch HEAD and check this issue task remains unchecked.",
+        "Reconfirm code symbol and line range; invalidate anchor on SHA drift.",
+        "Write a minimal reproducible synthetic failing case before code change where applicable."
+      ],
+      "test_candidates": [
+        "twin_engine.tests.test_services",
+        "twin_engine.tests.test_input_contract"
+      ],
+      "negative_case": "Missing source, unit, unidentifiable parameter or no held-out gain must result in explicit unsupported/blocked status.",
+      "acceptance_rule": "Demonstrate the explicit objective with a focused positive and negative test, record actual command/output, reviewed PR SHA and privacy/source evidence. Close only after relevant runtime/scientific gate.",
+      "candidate_scientific_sources": [],
+      "claim_status": "NOT_VALIDATED_BY_PLANNING",
+      "status": "PLANNED",
+      "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS"
+    },
+    {
+      "task_id": "M26.T01",
+      "goal_issue": 26,
+      "goal_title": "[M0-R TRACKER] Canonical Scientific Baseline",
+      "objective": "Read all M0-R child-issue statuses from GitHub; reconcile any stale Notion-based status. Evidence: exact symbol/line anchor + failing case or negative proof + focused test + SHA/PR.",
+      "source_candidates": [
+        {
+          "path": "docs/product/CURRENT_STATE.md",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/docs/product/CURRENT_STATE.md"
+        },
+        {
+          "path": "docs/development/CODE_ATLAS.md",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/docs/development/CODE_ATLAS.md"
+        }
+      ],
+      "preflight": [
+        "Fetch current branch HEAD and check this issue task remains unchecked.",
+        "Reconfirm code symbol and line range; invalidate anchor on SHA drift.",
+        "Write a minimal reproducible synthetic failing case before code change where applicable."
+      ],
+      "test_candidates": [
+        "accounts.tests.test_lifecycle",
+        "accounts.tests.test_existing_site",
+        "clinic.tests.test_security_and_ux"
+      ],
+      "negative_case": "Unauthorized, revoked and unrelated-scope synthetic users must not access target objects, exports or metadata.",
+      "acceptance_rule": "Demonstrate the explicit objective with a focused positive and negative test, record actual command/output, reviewed PR SHA and privacy/source evidence. Close only after relevant runtime/scientific gate.",
+      "candidate_scientific_sources": [],
+      "claim_status": "NOT_VALIDATED_BY_PLANNING",
+      "status": "PLANNED",
+      "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS"
+    },
+    {
+      "task_id": "M26.T02",
+      "goal_issue": 26,
+      "goal_title": "[M0-R TRACKER] Canonical Scientific Baseline",
+      "objective": "Verify schema, model registry, uv lock, source audit and numerical baseline at one SHA. Evidence: exact symbol/line anchor + failing case or negative proof + focused test + SHA/PR.",
+      "source_candidates": [
+        {
+          "path": "docs/product/CURRENT_STATE.md",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/docs/product/CURRENT_STATE.md"
+        },
+        {
+          "path": "docs/development/CODE_ATLAS.md",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/docs/development/CODE_ATLAS.md"
+        }
+      ],
+      "preflight": [
+        "Fetch current branch HEAD and check this issue task remains unchecked.",
+        "Reconfirm code symbol and line range; invalidate anchor on SHA drift.",
+        "Write a minimal reproducible synthetic failing case before code change where applicable."
+      ],
+      "test_candidates": [
+        "accounts.tests.test_lifecycle",
+        "accounts.tests.test_existing_site",
+        "clinic.tests.test_security_and_ux"
+      ],
+      "negative_case": "Unauthorized, revoked and unrelated-scope synthetic users must not access target objects, exports or metadata.",
+      "acceptance_rule": "Demonstrate the explicit objective with a focused positive and negative test, record actual command/output, reviewed PR SHA and privacy/source evidence. Close only after relevant runtime/scientific gate.",
+      "candidate_scientific_sources": [],
+      "claim_status": "NOT_VALIDATED_BY_PLANNING",
+      "status": "PLANNED",
+      "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS"
+    },
+    {
+      "task_id": "M26.T03",
+      "goal_issue": 26,
+      "goal_title": "[M0-R TRACKER] Canonical Scientific Baseline",
+      "objective": "Demand independent CI readback, PHI scan and proof of fixed negative tests for each child. Evidence: exact symbol/line anchor + failing case or negative proof + focused test + SHA/PR.",
+      "source_candidates": [
+        {
+          "path": "docs/product/CURRENT_STATE.md",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/docs/product/CURRENT_STATE.md"
+        },
+        {
+          "path": "docs/development/CODE_ATLAS.md",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/docs/development/CODE_ATLAS.md"
+        }
+      ],
+      "preflight": [
+        "Fetch current branch HEAD and check this issue task remains unchecked.",
+        "Reconfirm code symbol and line range; invalidate anchor on SHA drift.",
+        "Write a minimal reproducible synthetic failing case before code change where applicable."
+      ],
+      "test_candidates": [
+        "accounts.tests.test_lifecycle",
+        "accounts.tests.test_existing_site",
+        "clinic.tests.test_security_and_ux"
+      ],
+      "negative_case": "Unauthorized, revoked and unrelated-scope synthetic users must not access target objects, exports or metadata.",
+      "acceptance_rule": "Demonstrate the explicit objective with a focused positive and negative test, record actual command/output, reviewed PR SHA and privacy/source evidence. Close only after relevant runtime/scientific gate.",
+      "candidate_scientific_sources": [],
+      "claim_status": "NOT_VALIDATED_BY_PLANNING",
+      "status": "PLANNED",
+      "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS"
+    },
+    {
+      "task_id": "M26.T04",
+      "goal_issue": 26,
+      "goal_title": "[M0-R TRACKER] Canonical Scientific Baseline",
+      "objective": "Publish precise blockers and close tracker only after all mandatory child gates are evidenced. Evidence: exact symbol/line anchor + failing case or negative proof + focused test + SHA/PR.",
+      "source_candidates": [
+        {
+          "path": "docs/product/CURRENT_STATE.md",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/docs/product/CURRENT_STATE.md"
+        },
+        {
+          "path": "docs/development/CODE_ATLAS.md",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/docs/development/CODE_ATLAS.md"
+        }
+      ],
+      "preflight": [
+        "Fetch current branch HEAD and check this issue task remains unchecked.",
+        "Reconfirm code symbol and line range; invalidate anchor on SHA drift.",
+        "Write a minimal reproducible synthetic failing case before code change where applicable."
+      ],
+      "test_candidates": [
+        "accounts.tests.test_lifecycle",
+        "accounts.tests.test_existing_site",
+        "clinic.tests.test_security_and_ux"
+      ],
+      "negative_case": "Unauthorized, revoked and unrelated-scope synthetic users must not access target objects, exports or metadata.",
+      "acceptance_rule": "Demonstrate the explicit objective with a focused positive and negative test, record actual command/output, reviewed PR SHA and privacy/source evidence. Close only after relevant runtime/scientific gate.",
+      "candidate_scientific_sources": [],
+      "claim_status": "NOT_VALIDATED_BY_PLANNING",
+      "status": "PLANNED",
+      "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS"
+    },
+    {
+      "task_id": "M26.T05",
+      "goal_issue": 26,
+      "goal_title": "[M0-R TRACKER] Canonical Scientific Baseline",
+      "objective": "Add synthetic regression and negative authorization/privacy/failure fixtures.",
+      "source_candidates": [
+        {
+          "path": "docs/product/CURRENT_STATE.md",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/docs/product/CURRENT_STATE.md"
+        },
+        {
+          "path": "docs/development/CODE_ATLAS.md",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/docs/development/CODE_ATLAS.md"
+        }
+      ],
+      "preflight": [
+        "Fetch current branch HEAD and check this issue task remains unchecked.",
+        "Reconfirm code symbol and line range; invalidate anchor on SHA drift.",
+        "Write a minimal reproducible synthetic failing case before code change where applicable."
+      ],
+      "test_candidates": [
+        "accounts.tests.test_lifecycle",
+        "accounts.tests.test_existing_site",
+        "clinic.tests.test_security_and_ux"
+      ],
+      "negative_case": "Unauthorized, revoked and unrelated-scope synthetic users must not access target objects, exports or metadata.",
+      "acceptance_rule": "Demonstrate the explicit objective with a focused positive and negative test, record actual command/output, reviewed PR SHA and privacy/source evidence. Close only after relevant runtime/scientific gate.",
+      "candidate_scientific_sources": [],
+      "claim_status": "NOT_VALIDATED_BY_PLANNING",
+      "status": "PLANNED",
+      "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS"
+    },
+    {
+      "task_id": "M26.T06",
+      "goal_issue": 26,
+      "goal_title": "[M0-R TRACKER] Canonical Scientific Baseline",
+      "objective": "Run relevant full suite, privacy gate, source-doc check and numerical golden.",
+      "source_candidates": [
+        {
+          "path": "docs/product/CURRENT_STATE.md",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/docs/product/CURRENT_STATE.md"
+        },
+        {
+          "path": "docs/development/CODE_ATLAS.md",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/docs/development/CODE_ATLAS.md"
+        }
+      ],
+      "preflight": [
+        "Fetch current branch HEAD and check this issue task remains unchecked.",
+        "Reconfirm code symbol and line range; invalidate anchor on SHA drift.",
+        "Write a minimal reproducible synthetic failing case before code change where applicable."
+      ],
+      "test_candidates": [
+        "twin_engine.tests.test_services",
+        "simulator.tests.test_numerical_sanity"
+      ],
+      "negative_case": "Invalid/missing input and environment failure must be tested and produce deterministic error/blocked evidence.",
+      "acceptance_rule": "Demonstrate the explicit objective with a focused positive and negative test, record actual command/output, reviewed PR SHA and privacy/source evidence. Close only after relevant runtime/scientific gate.",
+      "candidate_scientific_sources": [],
+      "claim_status": "NOT_VALIDATED_BY_PLANNING",
+      "status": "PLANNED",
+      "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS"
+    },
+    {
+      "task_id": "M26.T07",
+      "goal_issue": 26,
+      "goal_title": "[M0-R TRACKER] Canonical Scientific Baseline",
+      "objective": "Update linked milestone + Asana/Notion/Trello with public-safe, source-bound evidence.",
+      "source_candidates": [
+        {
+          "path": "docs/product/CURRENT_STATE.md",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/docs/product/CURRENT_STATE.md"
+        },
+        {
+          "path": "docs/development/CODE_ATLAS.md",
+          "symbol_hint": null,
+          "verified_file_at_sha": false,
+          "verified_symbol_line": null,
+          "code_url": "https://github.com/andreazedda/bmyCure4MM/blob/4a62cf7f1b6f05724faec203f2f3b8847f88868b/docs/development/CODE_ATLAS.md"
+        }
+      ],
+      "preflight": [
+        "Fetch current branch HEAD and check this issue task remains unchecked.",
+        "Reconfirm code symbol and line range; invalidate anchor on SHA drift.",
+        "Write a minimal reproducible synthetic failing case before code change where applicable."
+      ],
+      "test_candidates": [
+        "twin_engine.tests.test_services",
+        "twin_engine.tests.test_input_contract"
+      ],
+      "negative_case": "Missing source, unit, unidentifiable parameter or no held-out gain must result in explicit unsupported/blocked status.",
+      "acceptance_rule": "Demonstrate the explicit objective with a focused positive and negative test, record actual command/output, reviewed PR SHA and privacy/source evidence. Close only after relevant runtime/scientific gate.",
+      "candidate_scientific_sources": [],
+      "claim_status": "NOT_VALIDATED_BY_PLANNING",
+      "status": "PLANNED",
+      "human_gate": "NO_HUMAN_GATE_FOR_SYNTHETIC_LOCAL_ANALYSIS"
+    }
+  ]
+}
